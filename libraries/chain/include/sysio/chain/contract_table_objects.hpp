@@ -284,35 +284,6 @@ namespace config {
 
 } // namespace config
 
-namespace detail {
-   template<>
-   struct snapshot_row_traits<key_value_object> {
-      using value_type = key_value_object;
-      using snapshot_type = snapshot_key_value_object;
-
-      static snapshot_key_value_object to_snapshot_row(const key_value_object& value, const chainbase::database&) {
-         snapshot_key_value_object ret;
-
-         ret.primary_key = value.primary_key;
-         ret.payer = value.payer;
-         if(value.value.size()) {
-            ret.value.resize(value.value.size());
-            memcpy(ret.value.data(), value.value.data(), value.value.size());
-         }
-         return ret;
-      };
-
-      static void from_snapshot_row(snapshot_key_value_object&& row, key_value_object& value, chainbase::database&) {
-         value.primary_key = row.primary_key;
-         value.payer = row.payer;
-         if(row.value.size())
-            value.value.resize_and_fill(row.value.size(), [&](char* data, std::size_t size) {
-               memcpy(data, row.value.data(), size);
-            });
-      }
-   };
-}
-
 } }  // namespace sysio::chain
 
 CHAINBASE_SET_INDEX_TYPE(sysio::chain::table_id_object, sysio::chain::table_id_multi_index)
