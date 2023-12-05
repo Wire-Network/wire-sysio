@@ -61,7 +61,7 @@ namespace sysio::chain {
       fc_dlog(_logger, "START_BLOCK ${block_num}", ("block_num", block_num));
    }
 
-   void deep_mind_handler::on_accepted_block(const std::shared_ptr<block_state>& bsp)
+   void deep_mind_handler::on_accepted_block(const std::shared_ptr<block_state_legacy>& bsp)
    {
       auto packed_blk = fc::raw::pack(*bsp);
 

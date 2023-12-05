@@ -20,7 +20,7 @@ namespace sysio { namespace chain {
    const uint32_t fork_database::min_supported_version = 1;
    const uint32_t fork_database::max_supported_version = 1;
 
-   // work around block_state::is_valid being private
+   // work around block_state_legacy::is_valid being private
    inline bool block_state_is_valid( const block_state_legacy& bs ) {
       return bs.is_valid();
    }
@@ -65,11 +65,11 @@ namespace sysio { namespace chain {
       :datadir(data_dir)
       {}
 
-      std::shared_mutex     mtx;
-      fork_multi_index_type index;
-      block_state_legacy_ptr       root; // Only uses the block_header_state portion
-      block_state_legacy_ptr       head;
-      std::filesystem::path datadir;
+      std::shared_mutex      mtx;
+      fork_multi_index_type  index;
+      block_state_legacy_ptr root; // Only uses the block_header_state portion
+      block_state_legacy_ptr head;
+      std::filesystem::path  datadir;
 
       void open_impl( const std::function<void( block_timestamp_type,
                                                 const flat_set<digest_type>&,

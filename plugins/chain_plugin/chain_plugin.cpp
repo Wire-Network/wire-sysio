@@ -1035,11 +1035,11 @@ void chain_plugin_impl::plugin_initialize(const variables_map& options) {
       });
 
       accepted_block_header_connection = chain->accepted_block_header.connect(
-            [this]( const block_state_ptr& blk ) {
+            [this]( const block_state_legacy_ptr& blk ) {
                accepted_block_header_channel.publish( priority::medium, blk );
             } );
 
-      accepted_block_connection = chain->accepted_block.connect( [this]( const block_state_ptr& blk ) {
+      accepted_block_connection = chain->accepted_block.connect( [this]( const block_state_legacy_ptr& blk ) {
          if (_account_query_db) {
             _account_query_db->commit_block(blk);
          }
@@ -1055,7 +1055,7 @@ void chain_plugin_impl::plugin_initialize(const variables_map& options) {
          accepted_block_channel.publish( priority::high, blk );
       } );
 
-      irreversible_block_connection = chain->irreversible_block.connect( [this]( const block_state_ptr& blk ) {
+      irreversible_block_connection = chain->irreversible_block.connect( [this]( const block_state_legacy_ptr& blk ) {
          if (_trx_retry_db) {
             _trx_retry_db->on_irreversible_block(blk);
          }
@@ -1221,7 +1221,7 @@ chain_apis::read_only chain_plugin::get_read_only_api(const fc::microseconds& ht
 }
 
 
-bool chain_plugin::accept_block(const signed_block_ptr& block, const block_id_type& id, const block_state_ptr& bsp ) {
+bool chain_plugin::accept_block(const signed_block_ptr& block, const block_id_type& id, const block_state_legacy_ptr& bsp ) {
    return my->incoming_block_sync_method(block, id, bsp);
 }
 
@@ -2003,7 +2003,7 @@ fc::variant read_only::get_block_header_state(const get_block_header_state_param
 
 void read_write::push_block(read_write::push_block_params&& params, next_function<read_write::push_block_results> next) {
    try {
-      app().get_method<incoming::methods::block_sync>()(std::make_shared<signed_block>( std::move(params) ), std::optional<block_id_type>{}, block_state_ptr{});
+      app().get_method<incoming::methods::block_sync>()(std::make_shared<signed_block>( std::move(params) ), std::optional<block_id_type>{}, block_state_legacy_ptr{});
    } catch ( boost::interprocess::bad_alloc& ) {
       handle_db_exhaustion();
    } catch ( const std::bad_alloc& ) {

@@ -36,7 +36,7 @@ namespace sysio { namespace chain {
    }
 
    pending_block_header_state  block_header_state_legacy::next( block_timestamp_type when,
-                                                         uint16_t num_prev_blocks_to_confirm )const
+                                                                uint16_t num_prev_blocks_to_confirm )const
    {
       pending_block_header_state result;
 

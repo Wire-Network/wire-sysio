@@ -66,12 +66,12 @@ struct pending_block_header_state : public detail::block_header_state_legacy_com
                                     const std::function<void( block_timestamp_type,
                                                               const flat_set<digest_type>&,
                                                               const vector<digest_type>& )>& validator,
-                                    const signer_callback_type& signer )&&;
+                                           const signer_callback_type& signer )&&;
 
 protected:
    block_header_state_legacy  _finish_next( const signed_block_header& h,
-                                     const protocol_feature_set& pfs,
-                                     const std::function<void( block_timestamp_type,
+                                            const protocol_feature_set& pfs,
+                                            const std::function<void( block_timestamp_type,
                                                                const flat_set<digest_type>&,
                                                                const vector<digest_type>& )>& validator )&&;
 };
@@ -105,7 +105,7 @@ struct block_header_state_legacy : public detail::block_header_state_legacy_comm
                               const std::function<void( block_timestamp_type,
                                                         const flat_set<digest_type>&,
                                                         const vector<digest_type>& )>& validator,
-                              bool skip_validate_signee = false )const;
+                                    bool skip_validate_signee = false )const;
 
    bool                 has_pending_producers()const { return pending_schedule.schedule.producers.size(); }
    uint32_t             calc_dpos_last_irreversible( account_name producer_of_next_block )const;
