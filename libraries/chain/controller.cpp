@@ -902,7 +902,7 @@ struct controller_impl {
          section.add_row(chain_snapshot_header(), db);
       });
 
-      snapshot->write_section<block_state_legacy>([this]( auto &section ){
+      snapshot->write_section("eosio::chain::block_state", [this]( auto &section ){
          section.template add_row<block_header_state_legacy>(*head, db);
       });
 
@@ -943,9 +943,9 @@ struct controller_impl {
       });
 
       { /// load and upgrade the block header state
-         block_header_state head_header_state;
+         block_header_state_legcy head_header_state;
 
-         snapshot->read_section<block_state>([this,&head_header_state]( auto &section ){
+         snapshot->read_section<block_state_legacy>([this,&head_header_state]( auto &section ){
             section.read_row(head_header_state, db);
          });
 
