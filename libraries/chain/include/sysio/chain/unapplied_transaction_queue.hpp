@@ -2,7 +2,7 @@
 
 #include <sysio/chain/transaction_metadata.hpp>
 #include <sysio/chain/trace.hpp>
-#include <sysio/chain/block_state.hpp>
+#include <sysio/chain/block_state_legacy.hpp>
 #include <sysio/chain/exceptions.hpp>
 
 #include <boost/multi_index_container.hpp>

@@ -1,5 +1,5 @@
 #include <sysio/chain/deep_mind.hpp>
-#include <sysio/chain/block_state.hpp>
+#include <sysio/chain/block_state_legacy.hpp>
 #include <sysio/chain/contract_table_objects.hpp>
 #include <sysio/chain/resource_limits_private.hpp>
 #include <sysio/chain/permission_object.hpp>

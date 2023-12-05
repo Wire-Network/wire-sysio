@@ -1,6 +1,6 @@
 #pragma once
 #include <sysio/chain/types.hpp>
-#include <sysio/chain/block_state.hpp>
+#include <sysio/chain/block_state_legacy.hpp>
 #include <sysio/chain/trace.hpp>
 
 namespace sysio::chain_apis {

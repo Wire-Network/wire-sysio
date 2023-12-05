@@ -7,7 +7,7 @@
 #include <sysio/chain/abi_def.hpp>
 #include <sysio/chain/asset.hpp>
 #include <sysio/chain/block.hpp>
-#include <sysio/chain/block_state.hpp>
+#include <sysio/chain/block_state_legacy.hpp>
 #include <sysio/chain/name.hpp>
 #include <sysio/chain/types.hpp>
 

@@ -1,4 +1,4 @@
-#include <sysio/chain/block_header_state.hpp>
+#include <sysio/chain/block_header_state_legacy.hpp>
 #include <sysio/chain/block_log.hpp>
 #include <sysio/chain/block_log_config.hpp>
 #include <sysio/chain/exceptions.hpp>
@@ -40,40 +40,40 @@ namespace sysio { namespace chain {
    template<>
    inline std::string filename_prefix<signed_block>() { return std::string("blocks"); }
    template<>
-   inline std::string filename_prefix<block_header_state>() { return std::string("block_state"); }
+   inline std::string filename_prefix<block_header_state_legacy>() { return std::string("block_state"); }
 
    template<typename StoredType>
    inline std::string log_filename();
    template<>
    inline std::string log_filename<signed_block>() { return std::string("blocks.log"); }
    template<>
-   inline std::string log_filename<block_header_state>() { return std::string("block_state.log"); }
+   inline std::string log_filename<block_header_state_legacy>() { return std::string("block_state.log"); }
 
    template<typename StoredType>
    inline std::string index_filename();
    template<>
    inline std::string index_filename<signed_block>() { return std::string("blocks.index"); }
    template<>
-   inline std::string index_filename<block_header_state>() { return std::string("block_state.index"); }
+   inline std::string index_filename<block_header_state_legacy>() { return std::string("block_state.index"); }
 
    template<typename StoredType>
    inline bool needed_for_replay();
    template<>
    inline bool needed_for_replay<signed_block>() { return true; }
    template<>
-   inline bool needed_for_replay<block_header_state>() { return false; }
+   inline bool needed_for_replay<block_header_state_legacy>() { return false; }
 
    namespace detail {
       constexpr uint32_t pruned_version_flag = 1 << 31;
   
       inline block_id_type retrieve_id(const signed_block& b) { return b.calculate_id(); }
-      inline block_id_type retrieve_id(const block_header_state& b) { return b.id; }
+      inline block_id_type retrieve_id(const block_header_state_legacy& b) { return b.id; }
 
       inline uint32_t retrieve_block_num(const signed_block& b) { return b.block_num(); }
-      inline uint32_t retrieve_block_num(const block_header_state& b) { return b.block_num; }
+      inline uint32_t retrieve_block_num(const block_header_state_legacy& b) { return b.block_num; }
 
       inline signed_block_header retrieve_header(const signed_block& b) { return b; }
-      inline signed_block_header retrieve_header(const block_header_state& b) { return b.header; }
+      inline signed_block_header retrieve_header(const block_header_state_legacy& b) { return b.header; }
       
       static const uint64_t npos = std::numeric_limits<uint64_t>::max();
 //      static const uint64_t npos = REMOVE::get_npos();
@@ -252,8 +252,8 @@ namespace sysio { namespace chain {
 
 
       template<typename Stream>
-      signed_block_header retrieve_block_header(Stream& ds, uint32_t expect_block_num, block_header_state* n) {
-         block_header_state bhs;
+      signed_block_header retrieve_block_header(Stream& ds, uint32_t expect_block_num, block_header_state_legacy* n) {
+         block_header_state_legacy bhs;
          fc::raw::unpack(ds, bhs);
 
          SYS_ASSERT(bhs.block_num == expect_block_num, block_log_exception,

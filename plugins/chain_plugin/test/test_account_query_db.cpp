@@ -2,7 +2,7 @@
 #include <sysio/chain/permission_object.hpp>
 #include <sysio/testing/tester.hpp>
 #include <sysio/chain/types.hpp>
-#include <sysio/chain/block_state.hpp>
+#include <sysio/chain/block_state_legacy.hpp>
 #include <sysio/chain_plugin/account_query_db.hpp>
 #include <sysio/chain/thread_utils.hpp>
 

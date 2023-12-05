@@ -2,7 +2,7 @@
 
 #include <sysio/chain/types.hpp>
 #include <sysio/chain/exceptions.hpp>
-#include <sysio/chain/block_state.hpp>
+#include <sysio/chain/block_state_legacy.hpp>
 #include <sysio/chain/transaction.hpp>
 #include <sysio/chain/resource_limits.hpp>
 #include <sysio/chain/resource_limits_private.hpp>

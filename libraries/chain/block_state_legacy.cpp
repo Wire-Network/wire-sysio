@@ -1,4 +1,4 @@
-#include <sysio/chain/block_state.hpp>
+#include <sysio/chain/block_state_legacy.hpp>
 #include <sysio/chain/exceptions.hpp>
 
 namespace sysio { namespace chain {

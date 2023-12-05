@@ -319,13 +319,13 @@ void trx_retry_db::on_block_start( uint32_t block_num ) {
    } FC_LOG_AND_DROP(("trx retry block_start ERROR"));
 }
 
-void trx_retry_db::on_accepted_block(const chain::block_state_ptr& block ) {
+void trx_retry_db::on_accepted_block(const chain::block_state_legacy_ptr& block ) {
    try {
       _impl->on_accepted_block(block);
    } FC_LOG_AND_DROP(("trx retry accepted_block ERROR"));
 }
 
-void trx_retry_db::on_irreversible_block(const chain::block_state_ptr& block ) {
+void trx_retry_db::on_irreversible_block(const chain::block_state_legacy_ptr& block ) {
    try {
       _impl->on_irreversible_block(block);
    } FC_LOG_AND_DROP(("trx retry irreversible_block ERROR"));

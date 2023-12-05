@@ -5,7 +5,7 @@
 #include <sysio/chain/trace.hpp>
 #include <sysio/chain/transaction.hpp>
 #include <sysio/chain/block.hpp>
-#include <sysio/chain/block_state.hpp>
+#include <sysio/chain/block_state_legacy.hpp>
 
 #include <sysio/trace_api/test_common.hpp>
 #include <sysio/trace_api/chain_extraction.hpp>

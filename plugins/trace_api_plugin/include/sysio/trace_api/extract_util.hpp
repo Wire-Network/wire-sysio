@@ -1,7 +1,7 @@
 #pragma once
 
 #include <sysio/trace_api/trace.hpp>
-#include <sysio/chain/block_state.hpp>
+#include <sysio/chain/block_state_legacy.hpp>
 
 namespace sysio { namespace trace_api {
 

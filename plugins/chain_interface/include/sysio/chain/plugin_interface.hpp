@@ -4,7 +4,7 @@
 #include <appbase/method.hpp>
 
 #include <sysio/chain/block.hpp>
-#include <sysio/chain/block_state.hpp>
+#include <sysio/chain/block_state_legacy.hpp>
 #include <sysio/chain/transaction_metadata.hpp>
 #include <sysio/chain/trace.hpp>
 

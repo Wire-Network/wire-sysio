@@ -2,7 +2,7 @@
 
 #include <sysio/chain/pending_snapshot.hpp>
 
-#include <sysio/chain/block_state.hpp>
+#include <sysio/chain/block_state_legacy.hpp>
 #include <sysio/chain/config.hpp>
 #include <sysio/chain/exceptions.hpp>
 #include <sysio/chain/resource_limits.hpp>

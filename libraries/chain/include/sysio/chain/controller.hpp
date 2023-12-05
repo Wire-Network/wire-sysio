@@ -1,5 +1,5 @@
 #pragma once
-#include <sysio/chain/block_state.hpp>
+#include <sysio/chain/block_state_legacy.hpp>
 #include <sysio/chain/block_log.hpp>
 #include <sysio/chain/trace.hpp>
 #include <sysio/chain/genesis_state.hpp>
@@ -162,14 +162,14 @@ namespace sysio { namespace chain {
             fc::microseconds   total_time{};
          };
 
-         block_state_ptr finalize_block( block_report& br, const signer_callback_type& signer_callback );
+         block_state_legacy_ptr finalize_block( block_report& br, const signer_callback_type& signer_callback );
          void sign_block( const signer_callback_type& signer_callback );
          void commit_block();
 
          // thread-safe
-         std::future<block_state_ptr> create_block_state_future( const block_id_type& id, const signed_block_ptr& b );
+         std::future<block_state_legacy_ptr> create_block_state_future( const block_id_type& id, const signed_block_ptr& b );
          // thread-safe
-         block_state_ptr create_block_state( const block_id_type& id, const signed_block_ptr& b ) const;
+         block_state_legacy_ptr create_block_state( const block_id_type& id, const signed_block_ptr& b ) const;
 
          /**
           * @param br returns statistics for block
@@ -178,7 +178,7 @@ namespace sysio { namespace chain {
           * @param trx_lookup user provided lookup function for externally cached transaction_metadata
           */
          void push_block( block_report& br,
-                          const block_state_ptr& bsp,
+                          const block_state_legacy_ptr& bsp,
                           const forked_branch_callback& cb,
                           const trx_meta_cache_lookup& trx_lookup );
 
@@ -220,7 +220,7 @@ namespace sysio { namespace chain {
          block_id_type        head_block_id()const;
          account_name         head_block_producer()const;
          const block_header&  head_block_header()const;
-         block_state_ptr      head_block_state()const;
+         block_state_legacy_ptr      head_block_state()const;
 
          uint32_t             fork_db_head_block_num()const;
          block_id_type        fork_db_head_block_id()const;
@@ -251,11 +251,11 @@ namespace sysio { namespace chain {
          // thread-safe
          std::optional<signed_block_header> fetch_block_header_by_id( const block_id_type& id )const;
          // return block_state from forkdb, thread-safe
-         block_state_ptr fetch_block_state_by_number( uint32_t block_num )const;
+         block_state_legacy_ptr fetch_block_state_by_number( uint32_t block_num )const;
          // return block_state from forkdb, thread-safe
-         block_state_ptr fetch_block_state_by_id( block_id_type id )const;
+         block_state_legacy_ptr fetch_block_state_by_id( block_id_type id )const;
          // return the irreversible block header_state from block state log, thread-safe
-         block_header_state_ptr fetch_irr_block_header_state_by_number( uint32_t block_num )const;
+         block_header_state_legacy_ptr fetch_irr_block_header_state_by_number( uint32_t block_num )const;
          // thread-safe
          block_id_type get_block_id_for_num( uint32_t block_num )const;
 
@@ -332,9 +332,9 @@ namespace sysio { namespace chain {
 
          signal<void(uint32_t)>                        block_start; // block_num
          signal<void(const signed_block_ptr&)>         pre_accepted_block;
-         signal<void(const block_state_ptr&)>          accepted_block_header;
-         signal<void(const block_state_ptr&)>          accepted_block;
-         signal<void(const block_state_ptr&)>          irreversible_block;
+         signal<void(const block_state_legacy_ptr&)>          accepted_block_header;
+         signal<void(const block_state_legacy_ptr&)>          accepted_block;
+         signal<void(const block_state_legacy_ptr&)>          irreversible_block;
          signal<void(const transaction_metadata_ptr&)> accepted_transaction;
          signal<void(std::tuple<const transaction_trace_ptr&, const packed_transaction_ptr&>)> applied_transaction;
          signal<void(const int&)>                      bad_alloc;
