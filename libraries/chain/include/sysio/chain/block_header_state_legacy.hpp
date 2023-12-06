@@ -62,18 +62,18 @@ struct pending_block_header_state : public detail::block_header_state_legacy_com
                                     bool skip_validate_signee = false) &&;
 
    block_header_state_legacy  finish_next( signed_block_header& h,
-                                    const protocol_feature_set& pfs,
-                                    const std::function<void( block_timestamp_type,
-                                                              const flat_set<digest_type>&,
-                                                              const vector<digest_type>& )>& validator,
+                                           const protocol_feature_set& pfs,
+                                           const std::function<void( block_timestamp_type,
+                                                                     const flat_set<digest_type>&,
+                                                                     const vector<digest_type>& )>& validator,
                                            const signer_callback_type& signer )&&;
 
 protected:
    block_header_state_legacy  _finish_next( const signed_block_header& h,
                                             const protocol_feature_set& pfs,
                                             const std::function<void( block_timestamp_type,
-                                                               const flat_set<digest_type>&,
-                                                               const vector<digest_type>& )>& validator )&&;
+                                                                      const flat_set<digest_type>&,
+                                                                      const vector<digest_type>& )>& validator )&&;
 };
 
 /**
@@ -100,12 +100,12 @@ struct block_header_state_legacy : public detail::block_header_state_legacy_comm
    pending_block_header_state  next( block_timestamp_type when, uint16_t num_prev_blocks_to_confirm )const;
 
    block_header_state_legacy   next( const signed_block_header& h,
-                              vector<signature_type>&& additional_signatures,
-                              const protocol_feature_set& pfs,
-                              const std::function<void( block_timestamp_type,
-                                                        const flat_set<digest_type>&,
-                                                        const vector<digest_type>& )>& validator,
-                                    bool skip_validate_signee = false )const;
+                                     vector<signature_type>&& additional_signatures,
+                                     const protocol_feature_set& pfs,
+                                     const std::function<void( block_timestamp_type,
+                                                               const flat_set<digest_type>&,
+                                                               const vector<digest_type>& )>& validator,
+                                     bool skip_validate_signee = false )const;
 
    bool                 has_pending_producers()const { return pending_schedule.schedule.producers.size(); }
    uint32_t             calc_dpos_last_irreversible( account_name producer_of_next_block )const;
