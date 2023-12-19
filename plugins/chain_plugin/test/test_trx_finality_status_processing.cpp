@@ -252,7 +252,7 @@ BOOST_AUTO_TEST_CASE(trx_finality_status_logic) { try {
    const auto block_20_time = set_now("2022-04-04", "04:44:44.500");
    add(trx_pairs_20, bs_20);
    add(trx_pairs_20, bs_20);
-   status.signal_accepted_block(bs_20);
+   status.signal_accepted_block(bs_20->block, bs_20->id);
 
 
    cs = status.get_chain_state();
@@ -319,7 +319,7 @@ BOOST_AUTO_TEST_CASE(trx_finality_status_logic) { try {
    fc::logger::get(DEFAULT_LOGGER).set_log_level(fc::log_level::debug);
 
    add(trx_pairs_21, bs_21);
-   status.signal_accepted_block(bs_21);
+   status.signal_accepted_block(bs_21->block, bs_21->id);
 
    cs = status.get_chain_state();
    BOOST_CHECK(cs.head_id == bs_21->id);
@@ -388,7 +388,7 @@ BOOST_AUTO_TEST_CASE(trx_finality_status_logic) { try {
    status.signal_block_start(bn);
 
    add(trx_pairs_22, bs_22);
-   status.signal_accepted_block(bs_22);
+   status.signal_accepted_block(bs_22->block, bs_22->id);
 
    cs = status.get_chain_state();
    BOOST_CHECK(cs.head_id == bs_22->id);
@@ -466,7 +466,7 @@ BOOST_AUTO_TEST_CASE(trx_finality_status_logic) { try {
    status.signal_block_start(bn);
 
    add(trx_pairs_22_alt, bs_22_alt);
-   status.signal_accepted_block(bs_22_alt);
+   status.signal_accepted_block(bs_22_alt->block, bs_22_alt->id);
 
    cs = status.get_chain_state();
    BOOST_CHECK(cs.head_id == bs_22_alt->id);
@@ -551,7 +551,7 @@ BOOST_AUTO_TEST_CASE(trx_finality_status_logic) { try {
    status.signal_block_start(bn);
 
    add(trx_pairs_19, bs_19);
-   status.signal_accepted_block(bs_19);
+   status.signal_accepted_block(bs_19->block, bs_19->id);
 
    cs = status.get_chain_state();
    BOOST_CHECK(cs.head_id == bs_19->id);
@@ -659,7 +659,7 @@ BOOST_AUTO_TEST_CASE(trx_finality_status_logic) { try {
       status.signal_applied_transaction(trace, txn);
    }
 
-   status.signal_accepted_block(bs_19_alt);
+   status.signal_accepted_block(bs_19_alt->block, bs_19_alt->id);
 
    cs = status.get_chain_state();
    BOOST_CHECK(cs.head_id == bs_19_alt->id);
@@ -748,7 +748,7 @@ BOOST_AUTO_TEST_CASE(trx_finality_status_logic) { try {
    BOOST_REQUIRE(!ts);
 
    // irreversible
-   status.signal_irreversible_block(bs_19_alt);
+   status.signal_irreversible_block(bs_19_alt->block, bs_19_alt->id);
 
    cs = status.get_chain_state();
    BOOST_CHECK(cs.head_id == bs_19_alt->id);
@@ -896,7 +896,7 @@ namespace {
             status.signal_applied_transaction(trace, txn);
          }
 
-         status.signal_accepted_block(bs);
+         status.signal_accepted_block(bs->block, bs->id);
       }
 
       void send_spec_block() {

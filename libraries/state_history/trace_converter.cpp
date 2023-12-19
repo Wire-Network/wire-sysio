@@ -13,11 +13,11 @@ void trace_converter::add_transaction(const transaction_trace_ptr& trace, const 
    }
 }
 
-void trace_converter::pack(boost::iostreams::filtering_ostreambuf& obuf, bool trace_debug_mode, const block_state_legacy_ptr& block_state) {
+void trace_converter::pack(boost::iostreams::filtering_ostreambuf& obuf, bool trace_debug_mode, const chain::signed_block_ptr& block) {
    std::vector<augmented_transaction_trace> traces;
    if (onblock_trace)
       traces.push_back(*onblock_trace);
-   for (auto& r : block_state->block->transactions) {
+   for (auto& r : block->transactions) {
       const transaction_id_type& id = std::get<chain::packed_transaction>(r.trx).id();
       auto it = cached_traces.find(id);
       SYS_ASSERT(it != cached_traces.end() && it->second.trace->receipt, chain::plugin_exception,
