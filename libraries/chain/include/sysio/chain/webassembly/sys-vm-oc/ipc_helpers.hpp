@@ -1,14 +1,13 @@
 #pragma once
 
 #include <sysio/chain/webassembly/sys-vm-oc/ipc_protocol.hpp>
+#include <sysio/chain/webassembly/sys-vm-oc/memfd_helpers.hpp>
 
 #include <boost/asio/local/datagram_protocol.hpp>
 
 #include <vector>
 
-#include <linux/memfd.h>
-
-namespace sysio { namespace chain { namespace sysvmoc {
+namespace sysio { namespace chain { namespace eosvmoc {
 
 class wrapped_fd {
    public:
@@ -53,7 +52,7 @@ bool write_message_with_fds(int fd_to_send_to, const sysvmoc_message& message, c
 
 template<typename T>
 wrapped_fd memfd_for_bytearray(const T& bytes) {
-   int fd = memfd_create("sysvmoc_code", MFD_CLOEXEC);
+   int fd = exec_sealed_memfd_create("sysvmoc_code");
    FC_ASSERT(fd >= 0, "Failed to create memfd");
    FC_ASSERT(ftruncate(fd, bytes.size()) == 0, "failed to grow memfd");
    if(bytes.size()) {
