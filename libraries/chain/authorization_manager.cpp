@@ -435,7 +435,12 @@ namespace sysio { namespace chain {
    {
       const auto& checktime = ( static_cast<bool>(_checktime) ? _checktime : _noop_checktime );
 
-      auto checker = make_auth_checker( [&](const permission_level& p){ return get_permission(p).auth; },
+      auto checker = make_auth_checker( [&](const permission_level& p) -> const shared_authority* {
+                                          if(const permission_object* po = find_permission(p))
+                                             return &po->auth;
+                                          else
+                                             return nullptr;
+                                        },
                                         _control.get_global_properties().configuration.max_authority_depth,
                                         provided_keys,
                                         provided_permissions,
@@ -543,7 +548,12 @@ namespace sysio { namespace chain {
    {
       const auto& checktime = ( static_cast<bool>(_checktime) ? _checktime : _noop_checktime );
 
-      auto checker = make_auth_checker( [&](const permission_level& p){ return get_permission(p).auth; },
+      auto checker = make_auth_checker( [&](const permission_level& p) -> const shared_authority* {
+                                          if(const permission_object* po = find_permission(p))
+                                             return &po->auth;
+                                          else
+                                             return nullptr;
+                                        },
                                         _control.get_global_properties().configuration.max_authority_depth,
                                         provided_keys,
                                         provided_permissions,
@@ -569,7 +579,12 @@ namespace sysio { namespace chain {
                                                                        const flat_set<public_key_type>& candidate_keys
                                                                      )const
    {
-      auto checker = make_auth_checker( [&](const permission_level& p){ return get_permission(p).auth; },
+      auto checker = make_auth_checker( [&](const permission_level& p) -> const shared_authority* {
+                                          if(const permission_object* po = find_permission(p))
+                                             return &po->auth;
+                                          else
+                                             return nullptr;
+                                        },
                                         _control.get_global_properties().configuration.max_authority_depth,
                                         candidate_keys,
                                         {},
