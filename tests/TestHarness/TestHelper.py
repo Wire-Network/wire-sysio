@@ -190,3 +190,5 @@ class TestHelper(object):
         cluster.testFailed = not testSuccessful
         if walletMgr:
             walletMgr.testFailed = not testSuccessful
+
+        cluster.shutdown()
