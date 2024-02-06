@@ -278,6 +278,12 @@ struct controller_impl {
 
    void set_s_headers( uint32_t block_num );
 
+   signal<void(uint32_t)>                    block_start;
+   signal<void(const block_signal_params&)>  accepted_block_header;
+   signal<void(const block_signal_params&)>  accepted_block;
+   signal<void(const block_signal_params&)>  irreversible_block;
+   signal<void(std::tuple<const transaction_trace_ptr&, const packed_transaction_ptr&>)> applied_transaction;
+
    void pop_block() {
       auto prev = fork_db.get_block( head->header.previous );
 
@@ -353,7 +359,7 @@ struct controller_impl {
 
       set_activation_handler<builtin_protocol_feature_t::reserved_first_protocol_feature>();
 
-      self.irreversible_block.connect([this](const block_signal_params& t) {
+      irreversible_block.connect([this](const block_signal_params& t) {
          const auto& [ block, id] = t;
          wasmif.current_lib(block->block_num());
       });
@@ -413,7 +419,7 @@ struct controller_impl {
       if (auto dm_logger = get_deep_mind_logger(false)) {
          if (trx && is_onblock(*t))
             dm_logger->on_onblock(*trx);
-         dm_logger->on_applied_transaction(self.head_block_num() + 1, t);
+         dm_logger->on_applied_transaction(head_block_num() + 1, t);
       }
    }
 
@@ -466,7 +472,7 @@ struct controller_impl {
                apply_block( br, *bitr, controller::block_status::complete, trx_meta_cache_lookup{} );
             }
 
-            emit( self.irreversible_block, std::tie((*bitr)->block, (*bitr)->id) );
+            emit( irreversible_block, std::tie((*bitr)->block, (*bitr)->id) );
 
             // blog.append could fail due to failures like running out of space.
             // Do it before commit so that in case it throws, DB can be rolled back.
@@ -840,11 +846,6 @@ struct controller_impl {
    void clear_all_undo() {
       // Rewind the database to the last irreversible block
       db.undo_all();
-      /*
-      FC_ASSERT(db.revision() == self.head_block_num(),
-                  "Chainbase revision does not match head block num",
-                  ("rev", db.revision())("head_block", self.head_block_num()));
-                  */
    }
 
    void add_contract_tables_to_snapshot( const snapshot_writer_ptr& snapshot ) const {
@@ -1214,7 +1215,7 @@ struct controller_impl {
       transaction_trace_ptr trace;
       try {
          auto start = fc::time_point::now();
-         const bool check_auth = !self.skip_auth_check() && !trx->implicit() && !trx->is_read_only();
+         const bool check_auth = !skip_auth_check() && !trx->implicit() && !trx->is_read_only();
          const fc::microseconds sig_cpu_usage = trx->signature_cpu_usage();
 
          if( !explicit_billed_cpu_time ) {
@@ -1230,7 +1231,7 @@ struct controller_impl {
          const signed_transaction& trn = trx->packed_trx()->get_signed_transaction();
          transaction_checktime_timer trx_timer(timer);
          transaction_context trx_context(self, *trx->packed_trx(), trx->id(), std::move(trx_timer), start, trx->get_trx_type());
-         if ((bool)subjective_cpu_leeway && self.is_speculative_block()) {
+         if ((bool)subjective_cpu_leeway && is_speculative_block()) {
             trx_context.leeway = *subjective_cpu_leeway;
          }
          trx_context.block_deadline = block_deadline;
@@ -1295,7 +1296,7 @@ struct controller_impl {
                    }
 
                    dmlog_applied_transaction(trace, &trn);
-                   emit(self.applied_transaction, std::tie(trace, trx->packed_trx()));
+                   emit(applied_transaction, std::tie(trace, trx->packed_trx()));
                 }
             }
 
@@ -1339,7 +1340,7 @@ struct controller_impl {
 
          if (!trx->is_transient()) {
             dmlog_applied_transaction(trace);
-            emit(self.applied_transaction, std::tie(trace, trx->packed_trx()));
+            emit(applied_transaction, std::tie(trace, trx->packed_trx()));
 
             pending->_block_report.total_net_usage += trace->net_usage;
             if( trace->receipt ) pending->_block_report.total_cpu_usage_us += trace->receipt->cpu_usage_us;
@@ -1360,7 +1361,7 @@ struct controller_impl {
    {
       SYS_ASSERT( !pending, block_validate_exception, "pending block already exists" );
 
-      emit( self.block_start, head->block_num + 1 );
+      emit( block_start, head->block_num + 1 );
 
       // at block level, no transaction specific logging is possible
       if (auto dm_logger = get_deep_mind_logger(false)) {
@@ -1455,7 +1456,7 @@ struct controller_impl {
             });
          }
 
-         const auto& gpo = self.get_global_properties();
+         const auto& gpo = db.get<global_property_object>();
 
          if( gpo.proposed_schedule_block_num && // if there is a proposed schedule that was proposed in a block ...
              ( *gpo.proposed_schedule_block_num <= pbhs.dpos_irreversible_blocknum ) && // ... that has now become irreversible ...
@@ -1614,7 +1615,7 @@ struct controller_impl {
          if( s == controller::block_status::incomplete ) {
             fork_db.add( bsp );
             fork_db.mark_valid( bsp );
-            emit( self.accepted_block_header, std::tie(bsp->block, bsp->id) );
+            emit( accepted_block_header, std::tie(bsp->block, bsp->id) );
             SYS_ASSERT( bsp == fork_db.head(), fork_database_exception, "committed block did not become the new head in fork database");
          } else if (s != controller::block_status::irreversible) {
             fork_db.mark_valid( bsp );
@@ -1626,7 +1627,7 @@ struct controller_impl {
             dm_logger->on_accepted_block(bsp);
          }
 
-         emit( self.accepted_block, std::tie(bsp->block, bsp->id) );
+         emit( accepted_block, std::tie(bsp->block, bsp->id) );
 
          if( s == controller::block_status::incomplete ) {
             log_irreversible();
@@ -1952,7 +1953,7 @@ struct controller_impl {
          SYS_ASSERT( bsp, block_validate_exception, "null block" );
          const auto& b = bsp->block;
 
-         if( conf.terminate_at_block > 0 && conf.terminate_at_block <= self.head_block_num()) {
+         if( conf.terminate_at_block > 0 && conf.terminate_at_block <= head_block_num()) {
             ilog("Reached configured maximum block ${num}; terminating", ("num", conf.terminate_at_block) );
             shutdown();
             return;
@@ -1960,11 +1961,11 @@ struct controller_impl {
 
          fork_db.add( bsp );
 
-         if (self.is_trusted_producer(b->producer)) {
+         if (is_trusted_producer(b->producer)) {
             trusted_producer_light_validation = true;
          };
 
-         emit( self.accepted_block_header, std::tie(bsp->block, bsp->id) );
+         emit( accepted_block_header, std::tie(bsp->block, bsp->id) );
 
          if( read_mode != db_read_mode::IRREVERSIBLE ) {
             maybe_switch_forks( br, fork_db.pending_head(), s, forked_branch_cb, trx_lookup );
@@ -1976,7 +1977,7 @@ struct controller_impl {
    }
 
    void replay_push_block( const signed_block_ptr& b, controller::block_status s ) {
-      self.validate_db_available_size();
+      validate_db_available_size();
 
       SYS_ASSERT(!pending, block_validate_exception, "it is not valid to push a block when there is a pending block");
 
@@ -1985,7 +1986,7 @@ struct controller_impl {
          SYS_ASSERT( (s == controller::block_status::irreversible || s == controller::block_status::validated),
                      block_validate_exception, "invalid block status for replay" );
 
-         if( conf.terminate_at_block > 0 && conf.terminate_at_block <= self.head_block_num() ) {
+         if( conf.terminate_at_block > 0 && conf.terminate_at_block <= head_block_num() ) {
             ilog("Reached configured maximum block ${num}; terminating", ("num", conf.terminate_at_block) );
             shutdown();
             return;
@@ -2008,7 +2009,7 @@ struct controller_impl {
             fork_db.add( bsp, true );
          }
 
-         emit( self.accepted_block_header, std::tie(bsp->block, bsp->id) );
+         emit( accepted_block_header, std::tie(bsp->block, bsp->id) );
 
          controller::block_report br;
          if( s == controller::block_status::irreversible ) {
@@ -2016,9 +2017,9 @@ struct controller_impl {
 
             // On replay, log_irreversible is not called and so no irreversible_block signal is emitted.
             // So emit it explicitly here.
-            emit( self.irreversible_block, std::tie(bsp->block, bsp->id) );
+            emit( irreversible_block, std::tie(bsp->block, bsp->id) );
 
-            if (!self.skip_db_sessions(s)) {
+            if (!skip_db_sessions(s)) {
                db.commit(bsp->block_num);
             }
 
@@ -2058,7 +2059,7 @@ struct controller_impl {
             for( auto itr = branches.second.begin(); itr != branches.second.end(); ++itr ) {
                pop_block();
             }
-            SYS_ASSERT( self.head_block_id() == branches.second.back()->header.previous, fork_database_exception,
+            SYS_ASSERT( head_block_id() == branches.second.back()->header.previous, fork_database_exception,
                      "loss of sync between fork_db and chainbase during fork switch" ); // _should_ never fail
 
             if( forked_branch_cb ) forked_branch_cb( branches.second );
@@ -2194,7 +2195,7 @@ struct controller_impl {
       //Look for expired transactions in the deduplication list, and remove them.
       auto& transaction_idx = db.get_mutable_index<transaction_multi_index>();
       const auto& dedupe_index = transaction_idx.indices().get<by_expiration>();
-      auto now = self.is_building_block() ? self.pending_block_time() : self.head_block_time();
+      auto now = is_building_block() ? pending_block_time() : head_block_time();
       const auto total = dedupe_index.size();
       uint32_t num_removed = 0;
       while( (!dedupe_index.empty()) && ( now > dedupe_index.begin()->expiration.to_time_point() ) ) {
@@ -2337,22 +2338,6 @@ struct controller_impl {
       }
    }
 
-   /*
-   bool should_check_tapos()const { return true; }
-
-   void validate_tapos( const transaction& trx )const {
-      if( !should_check_tapos() ) return;
-
-      const auto& tapos_block_summary = db.get<block_summary_object>((uint16_t)trx.ref_block_num);
-
-      //Verify TaPoS block summary has correct ID prefix, and that this block's time is not past the expiration
-      SYS_ASSERT(trx.verify_reference_block(tapos_block_summary.block_id), invalid_ref_block_exception,
-                 "Transaction's reference block did not match. Is this transaction from a different fork?",
-                 ("tapos_summary", tapos_block_summary));
-   }
-   */
-
-
    /**
     *  At the start of each block we notify the system contract with a transaction that passes in
     *  the block header of the prior block (which is currently our head block)
@@ -2363,7 +2348,7 @@ struct controller_impl {
       on_block_act.account = config::system_account_name;
       on_block_act.name = "onblock"_n;
       on_block_act.authorization = vector<permission_level>{{config::system_account_name, config::active_name}};
-      on_block_act.data = fc::raw::pack(self.head_block_header());
+      on_block_act.data = fc::raw::pack(head_block_header());
 
       signed_transaction trx;
       trx.actions.emplace_back(std::move(on_block_act));
@@ -2418,6 +2403,153 @@ struct controller_impl {
    }
 
    block_state_legacy_ptr fork_db_head() const;
+
+   uint32_t head_block_num()const {
+      return head->block_num;
+   }
+
+   const block_id_type& head_block_id()const {
+      return head->id;
+   }
+
+   time_point head_block_time()const {
+      return head->header.timestamp;
+   }
+
+   const block_header& head_block_header()const {
+      return head->header;
+   }
+
+   bool light_validation_allowed() const {
+      if (!pending || in_trx_requiring_checks) {
+         return false;
+      }
+
+      const auto pb_status = pending->_block_status;
+
+      // in a pending irreversible or previously validated block and we have forcing all checks
+      const bool consider_skipping_on_replay =
+            (pb_status == controller::block_status::irreversible || pb_status == controller::block_status::validated) && !conf.force_all_checks;
+
+      // OR in a signed block and in light validation mode
+      const bool consider_skipping_on_validate = pb_status == controller::block_status::complete &&
+                                                 (conf.block_validation_mode == validation_mode::LIGHT || trusted_producer_light_validation);
+
+      return consider_skipping_on_replay || consider_skipping_on_validate;
+   }
+
+
+   bool skip_auth_check() const {
+      return light_validation_allowed();
+   }
+
+   bool skip_trx_checks() const {
+      return light_validation_allowed();
+   }
+
+   bool skip_db_sessions( controller::block_status bs ) const {
+      bool consider_skipping = bs == controller::block_status::irreversible;
+      return consider_skipping
+         && !conf.disable_replay_opts
+         && !in_trx_requiring_checks;
+   }
+
+   bool skip_db_sessions() const {
+      if (pending) {
+         return skip_db_sessions(pending->_block_status);
+      } else {
+         return false;
+      }
+   }
+
+   bool is_trusted_producer( const account_name& producer) const {
+      return conf.block_validation_mode == validation_mode::LIGHT || conf.trusted_producers.count(producer);
+   }
+
+   bool is_builtin_activated( builtin_protocol_feature_t f )const {
+      uint32_t current_block_num = head_block_num();
+
+      if( pending ) {
+         ++current_block_num;
+      }
+
+      return protocol_features.is_builtin_activated( f, current_block_num );
+   }
+
+   block_timestamp_type pending_block_timestamp()const {
+      SYS_ASSERT( pending, block_validate_exception, "no pending block" );
+
+      if( std::holds_alternative<completed_block>(pending->_block_stage) )
+         return std::get<completed_block>(pending->_block_stage)._block_state->header.timestamp;
+
+      return pending->get_pending_block_header_state_legacy().timestamp;
+   }
+
+   time_point pending_block_time()const {
+      return pending_block_timestamp();
+   }
+
+   bool is_building_block()const {
+      return pending.has_value() && !std::holds_alternative<completed_block>(pending->_block_stage);
+   }
+
+   bool is_speculative_block()const {
+      if( !pending ) return false;
+
+      return (pending->_block_status == controller::block_status::incomplete || pending->_block_status == controller::block_status::ephemeral );
+   }
+
+   std::optional<block_id_type> pending_producer_block_id()const {
+      SYS_ASSERT( pending, block_validate_exception, "no pending block" );
+      return pending->_producer_block_id;
+   }
+
+   void validate_db_available_size() const {
+      const auto free = db.get_free_memory();
+      const auto guard = conf.state_guard_size;
+      SYS_ASSERT(free >= guard, database_guard_exception, "database free: ${f}, guard size: ${g}", ("f", free)("g",guard));
+   }
+
+   const producer_authority_schedule& active_producers()const {
+      if( !(pending) )
+         return head->active_schedule;
+
+      if( std::holds_alternative<completed_block>(pending->_block_stage) )
+         return std::get<completed_block>(pending->_block_stage)._block_state->active_schedule;
+
+      return pending->get_pending_block_header_state_legacy().active_schedule;
+   }
+
+   const producer_authority_schedule& pending_producers()const {
+      if( !(pending) )
+         return  head->pending_schedule.schedule;
+
+      if( std::holds_alternative<completed_block>(pending->_block_stage) )
+         return std::get<completed_block>(pending->_block_stage)._block_state->pending_schedule.schedule;
+
+      if( std::holds_alternative<assembled_block>(pending->_block_stage) ) {
+         const auto& new_prods_cache = std::get<assembled_block>(pending->_block_stage)._new_producer_authority_cache;
+         if( new_prods_cache ) {
+            return *new_prods_cache;
+         }
+      }
+
+      const auto& bb = std::get<building_block>(pending->_block_stage);
+
+      if( bb._new_pending_producer_schedule )
+         return *bb._new_pending_producer_schedule;
+
+      return bb._pending_block_header_state_legacy.prev_pending_schedule.schedule;
+   }
+
+   std::optional<producer_authority_schedule> proposed_producers()const {
+      const auto& gpo = db.get<global_property_object>();
+      if( !gpo.proposed_schedule_block_num )
+         return std::optional<producer_authority_schedule>();
+
+      return producer_authority_schedule::from_shared(gpo.proposed_schedule);
+   }
+
 }; /// controller_impl
 
 thread_local platform_timer controller_impl::timer;
@@ -2469,9 +2601,9 @@ controller::controller( const config& cfg, protocol_feature_set&& pfs, const cha
 
 controller::~controller() {
    my->abort_block();
-   // controller_impl (my) holds a reference to controller (controller_impl.self)
-   // The self is mainly used to access signals defined on controller. Currently
-   // nothing posted to the thread_pool accesses the `self` reference, but to make
+   // controller_impl (my) holds a reference to controller (controller_impl.self).
+   // The self is passed to transaction_context which passes it on to apply_context.
+   // Currently nothing posted to the thread_pool accesses the `self` reference, but to make
    // sure it is safe in case something is added to the thread pool that does access self,
    // stop the thread pool before the unique_ptr (my) destructor runs.
    my->thread_pool.stop();
@@ -2777,19 +2909,19 @@ void controller::set_disable_replay_opts( bool v ) {
 }
 
 uint32_t controller::head_block_num()const {
-   return my->head->block_num;
+   return my->head_block_num();
 }
 time_point controller::head_block_time()const {
-   return my->head->header.timestamp;
+   return my->head_block_time();
 }
 block_id_type controller::head_block_id()const {
-   return my->head->id;
+   return my->head_block_id();
 }
 account_name  controller::head_block_producer()const {
    return my->head->header.producer;
 }
 const block_header& controller::head_block_header()const {
-   return my->head->header;
+   return my->head_block_header();
 }
 block_state_legacy_ptr controller::head_block_state()const {
    return my->head;
@@ -2815,16 +2947,11 @@ block_id_type controller::fork_db_head_block_id()const {
 }
 
 block_timestamp_type controller::pending_block_timestamp()const {
-   SYS_ASSERT( my->pending, block_validate_exception, "no pending block" );
-
-   if( std::holds_alternative<completed_block>(my->pending->_block_stage) )
-      return std::get<completed_block>(my->pending->_block_stage)._block_state->header.timestamp;
-
-   return my->pending->get_pending_block_header_state_legacy().timestamp;
+   return my->pending_block_timestamp();
 }
 
 time_point controller::pending_block_time()const {
-   return pending_block_timestamp();
+   return my->pending_block_time();
 }
 
 uint32_t controller::pending_block_num()const {
@@ -3020,89 +3147,39 @@ int64_t controller::set_proposed_producers( vector<producer_authority> producers
 }
 
 const producer_authority_schedule&    controller::active_producers()const {
-   if( !(my->pending) )
-      return  my->head->active_schedule;
-
-   if( std::holds_alternative<completed_block>(my->pending->_block_stage) )
-      return std::get<completed_block>(my->pending->_block_stage)._block_state->active_schedule;
-
-   return my->pending->get_pending_block_header_state_legacy().active_schedule;
+   return my->active_producers();
 }
 
 const producer_authority_schedule& controller::pending_producers()const {
-   if( !(my->pending) )
-      return  my->head->pending_schedule.schedule;
-
-   if( std::holds_alternative<completed_block>(my->pending->_block_stage) )
-      return std::get<completed_block>(my->pending->_block_stage)._block_state->pending_schedule.schedule;
-
-   if( std::holds_alternative<assembled_block>(my->pending->_block_stage) ) {
-      const auto& new_prods_cache = std::get<assembled_block>(my->pending->_block_stage)._new_producer_authority_cache;
-      if( new_prods_cache ) {
-         return *new_prods_cache;
-      }
-   }
-
-   const auto& bb = std::get<building_block>(my->pending->_block_stage);
-
-   if( bb._new_pending_producer_schedule )
-      return *bb._new_pending_producer_schedule;
-
-   return bb._pending_block_header_state_legacy.prev_pending_schedule.schedule;
+   return my->pending_producers();
 }
 
 std::optional<producer_authority_schedule> controller::proposed_producers()const {
-   const auto& gpo = get_global_properties();
-   if( !gpo.proposed_schedule_block_num )
-      return std::optional<producer_authority_schedule>();
-
-   return producer_authority_schedule::from_shared(gpo.proposed_schedule);
+   return my->proposed_producers();
 }
 
 bool controller::light_validation_allowed() const {
-   if (!my->pending || my->in_trx_requiring_checks) {
-      return false;
-   }
-
-   const auto pb_status = my->pending->_block_status;
-
-   // in a pending irreversible or previously validated block and we have forcing all checks
-   const bool consider_skipping_on_replay =
-         (pb_status == block_status::irreversible || pb_status == block_status::validated) && !my->conf.force_all_checks;
-
-   // OR in a signed block and in light validation mode
-   const bool consider_skipping_on_validate = (pb_status == block_status::complete &&
-         (my->conf.block_validation_mode == validation_mode::LIGHT || my->trusted_producer_light_validation));
-
-   return consider_skipping_on_replay || consider_skipping_on_validate;
+   return my->light_validation_allowed();
 }
 
-
 bool controller::skip_auth_check() const {
-   return light_validation_allowed();
+   return my->skip_auth_check();
 }
 
 bool controller::skip_trx_checks() const {
-   return light_validation_allowed();
+   return my->skip_trx_checks();
 }
 
 bool controller::skip_db_sessions( block_status bs ) const {
-   bool consider_skipping = bs == block_status::irreversible;
-   return consider_skipping
-      && !my->conf.disable_replay_opts
-      && !my->in_trx_requiring_checks;
+   return my->skip_db_sessions( bs );
 }
 
 bool controller::skip_db_sessions() const {
-   if (my->pending) {
-      return skip_db_sessions(my->pending->_block_status);
-   } else {
-      return false;
-   }
+   return my->skip_db_sessions();
 }
 
 bool controller::is_trusted_producer( const account_name& producer) const {
-   return get_validation_mode() == chain::validation_mode::LIGHT || my->conf.trusted_producers.count(producer);
+   return my->is_trusted_producer( producer );
 }
 
 bool controller::contracts_console()const {
@@ -3173,9 +3250,7 @@ bool controller::is_building_block()const {
 }
 
 bool controller::is_speculative_block()const {
-   if( !my->pending ) return false;
-
-   return (my->pending->_block_status == block_status::incomplete || my->pending->_block_status == block_status::ephemeral );
+   return my->is_speculative_block();
 }
 
 uint32_t controller::configured_subjective_signature_length_limit()const {
@@ -3229,13 +3304,7 @@ bool controller::is_protocol_feature_activated( const digest_type& feature_diges
 }
 
 bool controller::is_builtin_activated( builtin_protocol_feature_t f )const {
-   uint32_t current_block_num = head_block_num();
-
-   if( my->pending ) {
-      ++current_block_num;
-   }
-
-   return my->protocol_features.is_builtin_activated( f, current_block_num );
+   return my->is_builtin_activated( f );
 }
 
 bool controller::is_known_unexpired_transaction( const transaction_id_type& id) const {
@@ -3312,6 +3381,12 @@ std::optional<uint64_t> controller::convert_exception_to_error_code( const fc::e
 
    return e_ptr->error_code;
 }
+
+signal<void(uint32_t)>&                    controller::block_start() { return my->block_start; }
+signal<void(const block_signal_params&)>&  controller::accepted_block_header() { return my->accepted_block_header; }
+signal<void(const block_signal_params&)>&  controller::accepted_block() { return my->accepted_block; }
+signal<void(const block_signal_params&)>&  controller::irreversible_block() { return my->irreversible_block; }
+signal<void(std::tuple<const transaction_trace_ptr&, const packed_transaction_ptr&>)>& controller::applied_transaction() { return my->applied_transaction; }
 
 chain_id_type controller::extract_chain_id(snapshot_reader& snapshot) {
    chain_snapshot_header header;
@@ -3430,16 +3505,16 @@ void controller::initialize_root_extensions(contract_action_matches&& matches) {
       auto root_txn_ident = std::make_shared<root_txn_identification>(
          std::move(matches)
       );
-      applied_transaction.connect(
+      applied_transaction().connect(
          [root_txn_ident]( std::tuple<const transaction_trace_ptr&, const packed_transaction_ptr&> t ) {
                root_txn_ident->signal_applied_transaction(std::get<0>(t), std::get<1>(t));
          } );
-      accepted_block.connect(
+      accepted_block().connect(
          [root_txn_ident]( const block_signal_params& t ) {
                const auto& [ block, id ] = t;
                root_txn_ident->signal_accepted_block(block, id);
          } ) ;
-      block_start.connect(
+      block_start().connect(
          [root_txn_ident]( uint32_t block_num ) {
                root_txn_ident->signal_block_start(block_num);
          } ) ;

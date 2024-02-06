@@ -531,7 +531,7 @@ BOOST_AUTO_TEST_CASE(test_deltas_contract) {
       fc::temp_directory state_history_dir;
       sysio::state_history::trace_converter log;
 
-      c.control->applied_transaction.connect(
+      c.control->applied_transaction().connect(
             [&](std::tuple<const transaction_trace_ptr&, const packed_transaction_ptr&> t) {
                log.add_transaction(std::get<0>(t), std::get<1>(t));
             });
@@ -569,12 +569,12 @@ struct state_history_tester : state_history_tester_logs, tester {
 
    state_history_tester(const std::filesystem::path& dir, const sysio::state_history_log_config& config)
    : state_history_tester_logs(dir, config), tester ([this](sysio::chain::controller& control) {
-      control.applied_transaction.connect(
+      control.applied_transaction().connect(
        [&](std::tuple<const transaction_trace_ptr&, const packed_transaction_ptr&> t) {
           trace_converter.add_transaction(std::get<0>(t), std::get<1>(t));
        });
 
-      control.accepted_block.connect([&](block_signal_params t) {
+      control.accepted_block().connect([&](block_signal_params t) {
          const auto& [ block, id ] = t;
          sysio::state_history_log_header header{.magic        = sysio::ship_magic(sysio::ship_current_version, 0),
                                       .block_id     = id,
@@ -588,7 +588,7 @@ struct state_history_tester : state_history_tester_logs, tester {
             sysio::state_history::pack_deltas(buf, control.db(), true);
          });
       });
-      control.block_start.connect([this](uint32_t block_num) {
+      control.block_start().connect([this](uint32_t block_num) {
          trace_converter.cached_traces.clear();
          trace_converter.onblock_trace.reset();
       });
