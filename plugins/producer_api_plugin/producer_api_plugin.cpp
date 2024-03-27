@@ -24,7 +24,7 @@ using namespace sysio;
 {std::string("/v1/" #api_name "/" #call_name), \
    api_category::category, \
    [&http, &producer](string&&, string&& body, url_response_callback&& cb) mutable { \
-          (void)http; \
+          (void)&http; (void)&producer; \
           try { \
              INVOKE \
              cb(http_response_code, fc::variant(result)); \
