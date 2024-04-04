@@ -66,7 +66,6 @@ namespace sysio::trace_api {
       const auto offset = file.tellp();
       file.write(data.data(), data.size());
       file.flush();
-      file.sync();
       return offset;
    }
 
