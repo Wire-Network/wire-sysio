@@ -1,0 +1,1 @@
+cd ~/wire_sysio/build && sudo apt-get update && sudo apt-get install -y ./wire_sysio[-_][0-9]*.deb --allow-downgrades

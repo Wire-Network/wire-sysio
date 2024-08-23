@@ -1,0 +1,24 @@
+[submodule "libraries/appbase"]
+	path = libraries/appbase
+	url = https://github.com/Wire-Network/appbase
+[submodule "libraries/chainbase"]
+	path = libraries/chainbase
+	url = https://github.com/Wire-Network/chainbase
+[submodule "libraries/eos-vm"]
+	path = libraries/eos-vm
+	url = https://github.com/Wire-Network/eos-vm
+[submodule "libraries/softfloat"]
+	path = libraries/softfloat
+	url = https://github.com/Wire-Network/berkeley-softfloat-3
+[submodule "libraries/yubihsm"]
+	path = libraries/yubihsm
+	url = https://github.com/Yubico/yubihsm-shell
+[submodule "tests/abieos"]
+	path = tests/abieos
+	url = https://github.com/Wire-Network/abieos
+[submodule "wasm-spec-tests"]
+	path = wasm-spec-tests
+	url = https://github.com/Wire-Network/wasm-spec-tests
+[submodule "libraries/fc"]
+	path = libraries/fc
+	url = https://github.com/Wire-Network/fc

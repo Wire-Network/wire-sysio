@@ -1,0 +1,5 @@
+add_subdirectory( nodeos )
+add_subdirectory( cleos )
+add_subdirectory( keosd )
+add_subdirectory( sysio-launcher )
+add_subdirectory( sysio-blocklog )
