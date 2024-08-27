@@ -12,7 +12,7 @@
 	url = ../berkeley-softfloat-3
 [submodule "libraries/yubihsm"]
 	path = libraries/yubihsm
-	url = https://github.com/Yubico/yubihsm-shell
+	url = ../yubihsm-shell
 [submodule "tests/abieos"]
 	path = tests/abieos
 	url = ../abieos
