@@ -153,13 +153,13 @@ public:
 
       if (!in_chain) {
          bfs::remove(bfs::path(pending_path), ec);
-         EOS_THROW(snapshot_finalization_exception,
+         SYS_THROW(snapshot_finalization_exception,
                    "Snapshotted block was forked out of the chain.  ID: ${block_id}",
                    ("block_id", block_id));
       }
 
       bfs::rename(bfs::path(pending_path), bfs::path(final_path), ec);
-      EOS_ASSERT(!ec, snapshot_finalization_exception,
+      SYS_ASSERT(!ec, snapshot_finalization_exception,
                  "Unable to finalize valid snapshot of block number ${bn}: [code: ${ec}] ${message}",
                  ("bn", get_height())
                  ("ec", ec.value())
@@ -449,7 +449,7 @@ class producer_plugin_impl : public std::enable_shared_from_this<producer_plugin
 
          fc_dlog(_log, "received incoming block ${n} ${id}", ("n", blk_num)("id", id));
 
-         EOS_ASSERT( block->timestamp < (fc::time_point::now() + fc::seconds( 7 )), block_from_the_future,
+         SYS_ASSERT( block->timestamp < (fc::time_point::now() + fc::seconds( 7 )), block_from_the_future,
                      "received a block from the future, ignoring it: ${id}", ("id", id) );
 
          /* de-dupe here... no point in aborting block if we already know the block */
@@ -806,7 +806,7 @@ void new_chain_banner(const sysio::chain::controller& db)
       "*******************************\n"
       "*                             *\n"
       "*   ------ NEW CHAIN ------   *\n"
-      "*   -  Welcome to EOSIO!  -   *\n"
+      "*   -  Welcome to SYSIO!  -   *\n"
       "*   -----------------------   *\n"
       "*                             *\n"
       "*******************************\n"
@@ -853,11 +853,11 @@ void producer_plugin::set_program_options(
                 default_priv_key.get_public_key().to_string() + "=KEY:" + default_priv_key.to_string()),
           "Key=Value pairs in the form <public-key>=<provider-spec>\n"
           "Where:\n"
-          "   <public-key>    \tis a string form of a vaild EOSIO public key\n\n"
+          "   <public-key>    \tis a string form of a vaild SYSIO public key\n\n"
           "   <provider-spec> \tis a string in the form <provider-type>:<data>\n\n"
-          "   <provider-type> \tis KEY, or KEOSD\n\n"
-          "   KEY:<data>      \tis a string form of a valid EOSIO private key which maps to the provided public key\n\n"
-          "   KEOSD:<data>    \tis the URL where keosd is available and the approptiate wallet(s) are unlocked")
+          "   <provider-type> \tis KEY, or KSYSD\n\n"
+          "   KEY:<data>      \tis a string form of a valid SYSIO private key which maps to the provided public key\n\n"
+          "   KSYSD:<data>    \tis the URL where keosd is available and the approptiate wallet(s) are unlocked")
          ("keosd-provider-timeout", boost::program_options::value<int32_t>()->default_value(5),
           "Limits the maximum time (in milliseconds) that is allowed for sending blocks to a keosd provider for signing")
          ("greylist-account", boost::program_options::value<vector<string>>()->composing()->multitoken(),
@@ -923,7 +923,7 @@ chain::signature_type producer_plugin::sign_compact(const chain::public_key_type
 {
   if(key != chain::public_key_type()) {
     auto private_key_itr = my->_signature_providers.find(key);
-    EOS_ASSERT(private_key_itr != my->_signature_providers.end(), producer_priv_key_not_found, "Local producer has no private key in config.ini corresponding to public key ${key}", ("key", key));
+    SYS_ASSERT(private_key_itr != my->_signature_providers.end(), producer_priv_key_not_found, "Local producer has no private key in config.ini corresponding to public key ${key}", ("key", key));
 
     return private_key_itr->second(digest);
   }
@@ -979,7 +979,7 @@ make_keosd_signature_provider(const std::shared_ptr<producer_plugin_impl>& impl,
 void producer_plugin::plugin_initialize(const boost::program_options::variables_map& options)
 { try {
    my->chain_plug = app().find_plugin<chain_plugin>();
-   EOS_ASSERT( my->chain_plug, plugin_config_exception, "chain_plugin not found" );
+   SYS_ASSERT( my->chain_plug, plugin_config_exception, "chain_plugin not found" );
    my->_options = &options;
    LOAD_VALUE_SET(options, "producer-name", my->_producers)
 
@@ -1006,12 +1006,12 @@ void producer_plugin::plugin_initialize(const boost::program_options::variables_
       for (const auto& key_spec_pair : key_spec_pairs) {
          try {
             auto delim = key_spec_pair.find("=");
-            EOS_ASSERT(delim != std::string::npos, plugin_config_exception, "Missing \"=\" in the key spec pair");
+            SYS_ASSERT(delim != std::string::npos, plugin_config_exception, "Missing \"=\" in the key spec pair");
             auto pub_key_str = key_spec_pair.substr(0, delim);
             auto spec_str = key_spec_pair.substr(delim + 1);
 
             auto spec_delim = spec_str.find(":");
-            EOS_ASSERT(spec_delim != std::string::npos, plugin_config_exception, "Missing \":\" in the key spec pair");
+            SYS_ASSERT(spec_delim != std::string::npos, plugin_config_exception, "Missing \":\" in the key spec pair");
             auto spec_type_str = spec_str.substr(0, spec_delim);
             auto spec_data = spec_str.substr(spec_delim + 1);
 
@@ -1019,7 +1019,7 @@ void producer_plugin::plugin_initialize(const boost::program_options::variables_
 
             if (spec_type_str == "KEY") {
                my->_signature_providers[pubkey] = make_key_signature_provider(private_key_type(spec_data));
-            } else if (spec_type_str == "KEOSD") {
+            } else if (spec_type_str == "KSYSD") {
                my->_signature_providers[pubkey] = make_keosd_signature_provider(my, spec_data, pubkey);
             }
 
@@ -1034,32 +1034,32 @@ void producer_plugin::plugin_initialize(const boost::program_options::variables_
    my->_account_fails.set_max_failures_per_account( options.at("subjective-account-max-failures").as<uint32_t>() );
 
    my->_produce_time_offset_us = options.at("produce-time-offset-us").as<int32_t>();
-   EOS_ASSERT( my->_produce_time_offset_us <= 0 && my->_produce_time_offset_us >= -config::block_interval_us, plugin_config_exception,
+   SYS_ASSERT( my->_produce_time_offset_us <= 0 && my->_produce_time_offset_us >= -config::block_interval_us, plugin_config_exception,
                "produce-time-offset-us ${o} must be 0 .. -${bi}", ("bi", config::block_interval_us)("o", my->_produce_time_offset_us) );
 
    my->_last_block_time_offset_us = options.at("last-block-time-offset-us").as<int32_t>();
-   EOS_ASSERT( my->_last_block_time_offset_us <= 0 && my->_last_block_time_offset_us >= -config::block_interval_us, plugin_config_exception,
+   SYS_ASSERT( my->_last_block_time_offset_us <= 0 && my->_last_block_time_offset_us >= -config::block_interval_us, plugin_config_exception,
                "last-block-time-offset-us ${o} must be 0 .. -${bi}", ("bi", config::block_interval_us)("o", my->_last_block_time_offset_us) );
 
    uint32_t cpu_effort_pct = options.at("cpu-effort-percent").as<uint32_t>();
-   EOS_ASSERT( cpu_effort_pct >= 0 && cpu_effort_pct <= 100, plugin_config_exception,
+   SYS_ASSERT( cpu_effort_pct >= 0 && cpu_effort_pct <= 100, plugin_config_exception,
                "cpu-effort-percent ${pct} must be 0 - 100", ("pct", cpu_effort_pct) );
       cpu_effort_pct *= config::percent_1;
    int32_t cpu_effort_offset_us =
-         -EOS_PERCENT( config::block_interval_us, chain::config::percent_100 - cpu_effort_pct );
+         -SYS_PERCENT( config::block_interval_us, chain::config::percent_100 - cpu_effort_pct );
 
    uint32_t last_block_cpu_effort_pct = options.at("last-block-cpu-effort-percent").as<uint32_t>();
-   EOS_ASSERT( last_block_cpu_effort_pct >= 0 && last_block_cpu_effort_pct <= 100, plugin_config_exception,
+   SYS_ASSERT( last_block_cpu_effort_pct >= 0 && last_block_cpu_effort_pct <= 100, plugin_config_exception,
                "last-block-cpu-effort-percent ${pct} must be 0 - 100", ("pct", last_block_cpu_effort_pct) );
       last_block_cpu_effort_pct *= config::percent_1;
    int32_t last_block_cpu_effort_offset_us =
-         -EOS_PERCENT( config::block_interval_us, chain::config::percent_100 - last_block_cpu_effort_pct );
+         -SYS_PERCENT( config::block_interval_us, chain::config::percent_100 - last_block_cpu_effort_pct );
 
    my->_produce_time_offset_us = std::min( my->_produce_time_offset_us, cpu_effort_offset_us );
    my->_last_block_time_offset_us = std::min( my->_last_block_time_offset_us, last_block_cpu_effort_offset_us );
 
    my->_max_block_cpu_usage_threshold_us = options.at( "max-block-cpu-usage-threshold-us" ).as<uint32_t>();
-   EOS_ASSERT( my->_max_block_cpu_usage_threshold_us < config::block_interval_us, plugin_config_exception,
+   SYS_ASSERT( my->_max_block_cpu_usage_threshold_us < config::block_interval_us, plugin_config_exception,
                "max-block-cpu-usage-threshold-us ${t} must be 0 .. ${bi}", ("bi", config::block_interval_us)("t", my->_max_block_cpu_usage_threshold_us) );
 
    my->_max_block_net_usage_threshold_bytes = options.at( "max-block-net-usage-threshold-bytes" ).as<uint32_t>();
@@ -1071,7 +1071,7 @@ void producer_plugin::plugin_initialize(const boost::program_options::variables_
    }
 
    fc::microseconds subjective_account_decay_time = fc::minutes(options.at( "subjective-account-decay-time-minutes" ).as<uint32_t>());
-   EOS_ASSERT( subjective_account_decay_time.count() > 0, plugin_config_exception,
+   SYS_ASSERT( subjective_account_decay_time.count() > 0, plugin_config_exception,
                "subjective-account-decay-time-minutes ${dt} must be greater than 0", ("dt", subjective_account_decay_time.to_seconds() / 60));
    my->_subjective_billing.set_expired_accumulator_average_window( subjective_account_decay_time );
 
@@ -1081,7 +1081,7 @@ void producer_plugin::plugin_initialize(const boost::program_options::variables_
 
    auto max_incoming_transaction_queue_size = options.at("incoming-transaction-queue-size-mb").as<uint16_t>() * 1024*1024;
 
-   EOS_ASSERT( max_incoming_transaction_queue_size > 0, plugin_config_exception,
+   SYS_ASSERT( max_incoming_transaction_queue_size > 0, plugin_config_exception,
                "incoming-transaction-queue-size-mb ${mb} must be greater than 0", ("mb", max_incoming_transaction_queue_size) );
 
    my->_unapplied_transactions.set_max_transaction_queue_size( max_incoming_transaction_queue_size );
@@ -1110,7 +1110,7 @@ void producer_plugin::plugin_initialize(const boost::program_options::variables_
    }
 
    auto thread_pool_size = options.at( "producer-threads" ).as<uint16_t>();
-   EOS_ASSERT( thread_pool_size > 0, plugin_config_exception,
+   SYS_ASSERT( thread_pool_size > 0, plugin_config_exception,
                "producer-threads ${num} must be greater than 0", ("num", thread_pool_size));
    my->_thread_pool.emplace( "prod", thread_pool_size );
 
@@ -1125,7 +1125,7 @@ void producer_plugin::plugin_initialize(const boost::program_options::variables_
          my->_snapshots_dir = sd;
       }
 
-      EOS_ASSERT( fc::is_directory(my->_snapshots_dir), snapshot_directory_not_found_exception,
+      SYS_ASSERT( fc::is_directory(my->_snapshots_dir), snapshot_directory_not_found_exception,
                   "No such directory '${dir}'", ("dir", my->_snapshots_dir.generic_string()) );
 
       if (auto resmon_plugin = app().find_plugin<resource_monitor_plugin>()) {
@@ -1174,13 +1174,13 @@ void producer_plugin::plugin_startup()
    ilog("producer plugin:  plugin_startup() begin");
 
    chain::controller& chain = my->chain_plug->chain();
-   EOS_ASSERT( my->_producers.empty() || chain.get_read_mode() == chain::db_read_mode::SPECULATIVE, plugin_config_exception,
+   SYS_ASSERT( my->_producers.empty() || chain.get_read_mode() == chain::db_read_mode::SPECULATIVE, plugin_config_exception,
               "node cannot have any producer-name configured because block production is impossible when read_mode is not \"speculative\"" );
 
-   EOS_ASSERT( my->_producers.empty() || chain.get_validation_mode() == chain::validation_mode::FULL, plugin_config_exception,
+   SYS_ASSERT( my->_producers.empty() || chain.get_validation_mode() == chain::validation_mode::FULL, plugin_config_exception,
               "node cannot have any producer-name configured because block production is not safe when validation_mode is not \"full\"" );
 
-   EOS_ASSERT( my->_producers.empty() || my->chain_plug->accept_transactions(), plugin_config_exception,
+   SYS_ASSERT( my->_producers.empty() || my->chain_plug->accept_transactions(), plugin_config_exception,
               "node cannot have any producer-name configured because no block production is possible with no [api|p2p]-accepted-transactions" );
 
    my->_accepted_block_connection.emplace(chain.accepted_block.connect( [this]( const auto& bsp ){ my->on_block( bsp ); } ));
@@ -1327,7 +1327,7 @@ producer_plugin::runtime_options producer_plugin::get_runtime_options() const {
 }
 
 void producer_plugin::add_greylist_accounts(const greylist_params& params) {
-   EOS_ASSERT(params.accounts.size() > 0, chain::invalid_http_request, "At least one account is required");
+   SYS_ASSERT(params.accounts.size() > 0, chain::invalid_http_request, "At least one account is required");
 
    chain::controller& chain = my->chain_plug->chain();
    for (auto &acc : params.accounts) {
@@ -1336,7 +1336,7 @@ void producer_plugin::add_greylist_accounts(const greylist_params& params) {
 }
 
 void producer_plugin::remove_greylist_accounts(const greylist_params& params) {
-   EOS_ASSERT(params.accounts.size() > 0, chain::invalid_http_request, "At least one account is required");
+   SYS_ASSERT(params.accounts.size() > 0, chain::invalid_http_request, "At least one account is required");
 
    chain::controller& chain = my->chain_plug->chain();
    for (auto &acc : params.accounts) {
@@ -1368,7 +1368,7 @@ producer_plugin::whitelist_blacklist producer_plugin::get_whitelist_blacklist() 
 }
 
 void producer_plugin::set_whitelist_blacklist(const producer_plugin::whitelist_blacklist& params) {
-   EOS_ASSERT(params.actor_whitelist || params.actor_blacklist || params.contract_whitelist || params.contract_blacklist || params.action_blacklist || params.key_blacklist,
+   SYS_ASSERT(params.actor_whitelist || params.actor_blacklist || params.contract_whitelist || params.contract_blacklist || params.action_blacklist || params.key_blacklist,
               chain::invalid_http_request,
               "At least one of actor_whitelist, actor_blacklist, contract_whitelist, contract_blacklist, action_blacklist, and key_blacklist is required"
              );
@@ -1445,7 +1445,7 @@ void producer_plugin::create_snapshot(producer_plugin::next_function<producer_pl
 
          boost::system::error_code ec;
          bfs::rename(temp_path, snapshot_path, ec);
-         EOS_ASSERT(!ec, snapshot_finalization_exception,
+         SYS_ASSERT(!ec, snapshot_finalization_exception,
                "Unable to finalize valid snapshot of block number ${bn}: [code: ${ec}] ${message}",
                ("bn", head_block_num)
                ("ec", ec.value())
@@ -1477,7 +1477,7 @@ void producer_plugin::create_snapshot(producer_plugin::next_function<producer_pl
 
          boost::system::error_code ec;
          bfs::rename(temp_path, pending_path, ec);
-         EOS_ASSERT(!ec, snapshot_finalization_exception,
+         SYS_ASSERT(!ec, snapshot_finalization_exception,
                "Unable to promote temp snapshot to pending for block number ${bn}: [code: ${ec}] ${message}",
                ("bn", head_block_num)
                ("ec", ec.value())
@@ -1497,13 +1497,13 @@ void producer_plugin::schedule_protocol_feature_activations( const scheduled_pro
    const chain::controller& chain = my->chain_plug->chain();
    std::set<digest_type> set_of_features_to_activate( schedule.protocol_features_to_activate.begin(),
                                                       schedule.protocol_features_to_activate.end() );
-   EOS_ASSERT( set_of_features_to_activate.size() == schedule.protocol_features_to_activate.size(),
+   SYS_ASSERT( set_of_features_to_activate.size() == schedule.protocol_features_to_activate.size(),
                invalid_protocol_features_to_activate, "duplicate digests" );
    chain.validate_protocol_features( schedule.protocol_features_to_activate );
    const auto& pfs = chain.get_protocol_feature_manager().get_protocol_feature_set();
    for (auto &feature_digest : set_of_features_to_activate) {
       const auto& pf = pfs.get_protocol_feature(feature_digest);
-      EOS_ASSERT( !pf.preactivation_required, protocol_feature_exception,
+      SYS_ASSERT( !pf.preactivation_required, protocol_feature_exception,
                   "protocol feature requires preactivation: ${digest}",
                   ("digest", feature_digest));
    }
@@ -2039,7 +2039,7 @@ bool producer_plugin_impl::process_unapplied_trxs( const fc::time_point& deadlin
 
             auto prev_billed_cpu_time_us = trx->billed_cpu_time_us;
             if( prev_billed_cpu_time_us > 0 && !_subjective_billing.is_account_disabled( first_auth ) && !rl.is_unlimited_cpu( first_auth )) {
-               uint64_t prev_billed_plus100_us = prev_billed_cpu_time_us + EOS_PERCENT( prev_billed_cpu_time_us, 100 * config::percent_1 );
+               uint64_t prev_billed_plus100_us = prev_billed_cpu_time_us + SYS_PERCENT( prev_billed_cpu_time_us, 100 * config::percent_1 );
                if( prev_billed_plus100_us < max_trx_time.count() ) max_trx_time = fc::microseconds( prev_billed_plus100_us );
             }
 
@@ -2288,7 +2288,7 @@ void producer_plugin_impl::schedule_production_loop() {
    } else if (_pending_block_mode == pending_block_mode::speculating && !_producers.empty() && !production_disabled_by_policy()){
       chain::controller& chain = chain_plug->chain();
       fc_dlog(_log, "Speculative Block Created; Scheduling Speculative/Production Change");
-      EOS_ASSERT( chain.is_building_block(), missing_pending_block_state, "speculating without pending_block_state" );
+      SYS_ASSERT( chain.is_building_block(), missing_pending_block_state, "speculating without pending_block_state" );
       schedule_delayed_production_loop(weak_from_this(), calculate_producer_wake_up_time(chain.pending_block_time()));
    } else {
       fc_dlog(_log, "Speculative Block Created");
@@ -2304,13 +2304,13 @@ void producer_plugin_impl::schedule_maybe_produce_block( bool exhausted ) {
 
    if( !exhausted && deadline > fc::time_point::now() ) {
       // ship this block off no later than its deadline
-      EOS_ASSERT( chain.is_building_block(), missing_pending_block_state,
+      SYS_ASSERT( chain.is_building_block(), missing_pending_block_state,
                   "producing without pending_block_state, start_block succeeded" );
       _timer.expires_at( epoch + boost::posix_time::microseconds( deadline.time_since_epoch().count() ) );
       fc_dlog( _log, "Scheduling Block Production on Normal Block #${num} for ${time}",
                ("num", chain.head_block_num() + 1)( "time", deadline ) );
    } else {
-      EOS_ASSERT( chain.is_building_block(), missing_pending_block_state, "producing without pending_block_state" );
+      SYS_ASSERT( chain.is_building_block(), missing_pending_block_state, "producing without pending_block_state" );
       _timer.expires_from_now( boost::posix_time::microseconds( 0 ) );
       fc_dlog( _log, "Scheduling Block Production on ${desc} Block #${num} immediately",
                ("num", chain.head_block_num() + 1)("desc", block_is_exhausted() ? "Exhausted" : "Deadline exceeded") );
@@ -2401,9 +2401,9 @@ static auto maybe_make_debug_time_logger() -> std::optional<decltype(make_debug_
 
 void producer_plugin_impl::produce_block() {
    //ilog("produce_block ${t}", ("t", fc::time_point::now())); // for testing _produce_time_offset_us
-   EOS_ASSERT(_pending_block_mode == pending_block_mode::producing, producer_exception, "called produce_block while not actually producing");
+   SYS_ASSERT(_pending_block_mode == pending_block_mode::producing, producer_exception, "called produce_block while not actually producing");
    chain::controller& chain = chain_plug->chain();
-   EOS_ASSERT(chain.is_building_block(), missing_pending_block_state, "pending_block_state does not exist but it should, another plugin may have corrupted it");
+   SYS_ASSERT(chain.is_building_block(), missing_pending_block_state, "pending_block_state does not exist but it should, another plugin may have corrupted it");
 
    const auto& auth = chain.pending_block_signing_authority();
    std::vector<std::reference_wrapper<const signature_provider_type>> relevant_providers;
@@ -2417,7 +2417,7 @@ void producer_plugin_impl::produce_block() {
       }
    });
 
-   EOS_ASSERT(relevant_providers.size() > 0, producer_priv_key_not_found, "Attempting to produce a block for which we don't have any relevant private keys");
+   SYS_ASSERT(relevant_providers.size() > 0, producer_priv_key_not_found, "Attempting to produce a block for which we don't have any relevant private keys");
 
    if (_protocol_features_signaled) {
       _protocol_features_to_activate.clear(); // clear _protocol_features_to_activate as it is already set in pending_block

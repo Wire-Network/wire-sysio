@@ -1,10 +1,10 @@
 #pragma once
 
 #include <sysio/chain/wasm_interface.hpp>
-#ifdef EOSIO_EOS_VM_OC_RUNTIME_ENABLED
+#ifdef SYSIO_SYS_VM_OC_RUNTIME_ENABLED
 #include <sysio/chain/webassembly/eos-vm-oc.hpp>
 #else
-#define _REGISTER_EOSVMOC_INTRINSIC(CLS, MOD, METHOD, WASM_SIG, NAME, SIG)
+#define _REGISTER_SYSVMOC_INTRINSIC(CLS, MOD, METHOD, WASM_SIG, NAME, SIG)
 #endif
 #include <sysio/chain/webassembly/runtime_interface.hpp>
 #include <sysio/chain/wasm_sysio_injection.hpp>
@@ -47,7 +47,7 @@ namespace sysio { namespace chain {
       struct by_first_block_num;
       struct by_last_block_num;
 
-#ifdef EOSIO_EOS_VM_OC_RUNTIME_ENABLED
+#ifdef SYSIO_SYS_VM_OC_RUNTIME_ENABLED
       struct eosvmoc_tier {
          eosvmoc_tier(const boost::filesystem::path& d, const eosvmoc::config& c, const chainbase::database& db)
           : cc(d, c, db), exec(cc),
@@ -59,11 +59,11 @@ namespace sysio { namespace chain {
 #endif
 
       wasm_interface_impl(wasm_interface::vm_type vm, bool eosvmoc_tierup, const chainbase::database& d, const boost::filesystem::path data_dir, const eosvmoc::config& eosvmoc_config, bool profile) : db(d), wasm_runtime_time(vm) {
-#ifdef EOSIO_EOS_VM_RUNTIME_ENABLED
+#ifdef SYSIO_SYS_VM_RUNTIME_ENABLED
          if(vm == wasm_interface::vm_type::eos_vm)
             runtime_interface = std::make_unique<webassembly::eos_vm_runtime::eos_vm_runtime<sysio::vm::interpreter>>();
 #endif
-#ifdef EOSIO_EOS_VM_JIT_RUNTIME_ENABLED
+#ifdef SYSIO_SYS_VM_JIT_RUNTIME_ENABLED
          if(vm == wasm_interface::vm_type::eos_vm_jit && profile) {
             sysio::vm::set_profile_interval_us(200);
             runtime_interface = std::make_unique<webassembly::eos_vm_runtime::eos_vm_profile_runtime>();
@@ -71,16 +71,16 @@ namespace sysio { namespace chain {
          if(vm == wasm_interface::vm_type::eos_vm_jit && !profile)
             runtime_interface = std::make_unique<webassembly::eos_vm_runtime::eos_vm_runtime<sysio::vm::jit>>();
 #endif
-#ifdef EOSIO_EOS_VM_OC_RUNTIME_ENABLED
+#ifdef SYSIO_SYS_VM_OC_RUNTIME_ENABLED
          if(vm == wasm_interface::vm_type::eos_vm_oc)
             runtime_interface = std::make_unique<webassembly::eosvmoc::eosvmoc_runtime>(data_dir, eosvmoc_config, d);
 #endif
          if(!runtime_interface)
-            EOS_THROW(wasm_exception, "${r} wasm runtime not supported on this platform and/or configuration", ("r", vm));
+            SYS_THROW(wasm_exception, "${r} wasm runtime not supported on this platform and/or configuration", ("r", vm));
 
-#ifdef EOSIO_EOS_VM_OC_RUNTIME_ENABLED
+#ifdef SYSIO_SYS_VM_OC_RUNTIME_ENABLED
          if(eosvmoc_tierup) {
-            EOS_ASSERT(vm != wasm_interface::vm_type::eos_vm_oc, wasm_exception, "You can't use EOS VM OC as the base runtime when tier up is activated");
+            SYS_ASSERT(vm != wasm_interface::vm_type::eos_vm_oc, wasm_exception, "You can't use SYS VM OC as the base runtime when tier up is activated");
             eosvmoc.emplace(data_dir, eosvmoc_config, d);
          }
 #endif
@@ -98,8 +98,8 @@ namespace sysio { namespace chain {
          std::vector<uint8_t> mem_image;
 
          for(const DataSegment& data_segment : module.dataSegments) {
-            EOS_ASSERT(data_segment.baseOffset.type == InitializerExpression::Type::i32_const, wasm_exception, "");
-            EOS_ASSERT(module.memories.defs.size(), wasm_exception, "");
+            SYS_ASSERT(data_segment.baseOffset.type == InitializerExpression::Type::i32_const, wasm_exception, "");
+            SYS_ASSERT(module.memories.defs.size(), wasm_exception, "");
             const U32 base_offset = data_segment.baseOffset.i32;
             const Uptr memory_size = (module.memories.defs[0].type.size.min << IR::numBytesPerPageLog2);
             if(base_offset >= memory_size || base_offset + data_segment.data.size() > memory_size)
@@ -124,7 +124,7 @@ namespace sysio { namespace chain {
          //anything last used before or on the LIB can be evicted
          const auto first_it = wasm_instantiation_cache.get<by_last_block_num>().begin();
          const auto last_it  = wasm_instantiation_cache.get<by_last_block_num>().upper_bound(lib);
-#ifdef EOSIO_EOS_VM_OC_RUNTIME_ENABLED
+#ifdef SYSIO_SYS_VM_OC_RUNTIME_ENABLED
          if(eosvmoc) for(auto it = first_it; it != last_it; it++)
             eosvmoc->cc.free_code(it->code_hash, it->vm_version);
 #endif
@@ -169,9 +169,9 @@ namespace sysio { namespace chain {
                WASM::serialize(stream, module);
                module.userSections.clear();
             } catch (const Serialization::FatalSerializationException& e) {
-               EOS_ASSERT(false, wasm_serialization_error, e.message.c_str());
+               SYS_ASSERT(false, wasm_serialization_error, e.message.c_str());
             } catch (const IR::ValidationException& e) {
-               EOS_ASSERT(false, wasm_serialization_error, e.message.c_str());
+               SYS_ASSERT(false, wasm_serialization_error, e.message.c_str());
             }
 
             wasm_instantiation_cache.modify(it, [&](auto& c) {
@@ -203,7 +203,7 @@ namespace sysio { namespace chain {
       const chainbase::database& db;
       const wasm_interface::vm_type wasm_runtime_time;
 
-#ifdef EOSIO_EOS_VM_OC_RUNTIME_ENABLED
+#ifdef SYSIO_SYS_VM_OC_RUNTIME_ENABLED
       std::optional<eosvmoc_tier> eosvmoc;
 #endif
    };

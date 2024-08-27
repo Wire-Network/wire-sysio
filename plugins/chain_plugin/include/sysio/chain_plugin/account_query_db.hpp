@@ -119,14 +119,14 @@ namespace fc {
          if(vo.contains("actor"))
             from_variant(vo["actor"], a.actor);
          else
-            EOS_THROW(sysio::chain::invalid_http_request, "Missing Actor field");
+            SYS_THROW(sysio::chain::invalid_http_request, "Missing Actor field");
 
          if(vo.contains("permission") && vo.size() == 2)
             from_variant(vo["permission"], a.permission);
          else if (vo.size() == 1)
             a.permission = {};
          else
-            EOS_THROW(sysio::chain::invalid_http_request, "Unrecognized fields in account");
+            SYS_THROW(sysio::chain::invalid_http_request, "Unrecognized fields in account");
       }
    }
 }

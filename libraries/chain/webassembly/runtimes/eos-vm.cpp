@@ -7,7 +7,7 @@
 //eos-vm includes
 #include <sysio/vm/backend.hpp>
 #include <sysio/chain/webassembly/preconditions.hpp>
-#ifdef EOSIO_EOS_VM_OC_RUNTIME_ENABLED
+#ifdef SYSIO_SYS_VM_OC_RUNTIME_ENABLED
 #include <sysio/chain/webassembly/eos-vm-oc.hpp>
 #endif
 #include <boost/hana/string.hpp>
@@ -70,19 +70,19 @@ void validate(const bytes& code, const whitelisted_intrinsics_type& intrinsics) 
       // check that the imports are all currently enabled
       const auto& imports = bkend.get_module().imports;
       for(std::uint32_t i = 0; i < imports.size(); ++i) {
-         EOS_ASSERT(std::string_view((char*)imports[i].module_str.raw(), imports[i].module_str.size()) == "env" &&
+         SYS_ASSERT(std::string_view((char*)imports[i].module_str.raw(), imports[i].module_str.size()) == "env" &&
                     is_intrinsic_whitelisted(intrinsics, std::string_view((char*)imports[i].field_str.raw(), imports[i].field_str.size())),
                     wasm_serialization_error, "${module}.${fn} unresolveable",
                     ("module", std::string((char*)imports[i].module_str.raw(), imports[i].module_str.size()))
                     ("fn", std::string((char*)imports[i].field_str.raw(), imports[i].field_str.size())));
       }
    } catch(vm::exception& e) {
-      EOS_THROW(wasm_serialization_error, e.detail());
+      SYS_THROW(wasm_serialization_error, e.detail());
    }
 }
 
 void validate( const bytes& code, const wasm_config& cfg, const whitelisted_intrinsics_type& intrinsics ) {
-   EOS_ASSERT(code.size() <= cfg.max_module_bytes, wasm_serialization_error, "Code too large");
+   SYS_ASSERT(code.size() <= cfg.max_module_bytes, wasm_serialization_error, "Code too large");
    wasm_code_ptr code_ptr((uint8_t*)code.data(), code.size());
    try {
       eos_vm_null_backend_t<wasm_config> bkend(code_ptr, code.size(), nullptr, cfg);
@@ -91,7 +91,7 @@ void validate( const bytes& code, const wasm_config& cfg, const whitelisted_intr
       // check that the imports are all currently enabled
       const auto& imports = bkend.get_module().imports;
       for(std::uint32_t i = 0; i < imports.size(); ++i) {
-         EOS_ASSERT(std::string_view((char*)imports[i].module_str.raw(), imports[i].module_str.size()) == "env" &&
+         SYS_ASSERT(std::string_view((char*)imports[i].module_str.raw(), imports[i].module_str.size()) == "env" &&
                     is_intrinsic_whitelisted(intrinsics, std::string_view((char*)imports[i].field_str.raw(), imports[i].field_str.size())),
                     wasm_serialization_error, "${module}.${fn} unresolveable",
                     ("module", std::string((char*)imports[i].module_str.raw(), imports[i].module_str.size()))
@@ -99,11 +99,11 @@ void validate( const bytes& code, const wasm_config& cfg, const whitelisted_intr
       }
       // check apply
       uint32_t apply_idx = bkend.get_module().get_exported_function("apply");
-      EOS_ASSERT(apply_idx < std::numeric_limits<uint32_t>::max(), wasm_serialization_error, "apply not exported");
+      SYS_ASSERT(apply_idx < std::numeric_limits<uint32_t>::max(), wasm_serialization_error, "apply not exported");
       const vm::func_type& apply_type = bkend.get_module().get_function_type(apply_idx);
-      EOS_ASSERT((apply_type == vm::host_function{{vm::i64, vm::i64, vm::i64}, {}}), wasm_serialization_error, "apply has wrong type");
+      SYS_ASSERT((apply_type == vm::host_function{{vm::i64, vm::i64, vm::i64}, {}}), wasm_serialization_error, "apply has wrong type");
    } catch(vm::exception& e) {
-      EOS_THROW(wasm_serialization_error, e.detail());
+      SYS_THROW(wasm_serialization_error, e.detail());
    }
 }
 
@@ -290,8 +290,8 @@ struct host_function_registrator {
    constexpr host_function_registrator(Mod mod_name, Name fn_name) {
       using rhf_t = eos_vm_host_functions_t;
       rhf_t::add<HostFunction, Preconditions...>(mod_name.c_str(), fn_name.c_str());
-#ifdef EOSIO_EOS_VM_OC_RUNTIME_ENABLED
-      constexpr bool is_injected = (Mod() == BOOST_HANA_STRING(EOSIO_INJECTED_MODULE_NAME));
+#ifdef SYSIO_SYS_VM_OC_RUNTIME_ENABLED
+      constexpr bool is_injected = (Mod() == BOOST_HANA_STRING(SYSIO_INJECTED_MODULE_NAME));
       eosvmoc::register_eosvm_oc<HostFunction, is_injected, std::tuple<Preconditions...>>(
           mod_name + BOOST_HANA_STRING(".") + fn_name);
 #endif
@@ -300,7 +300,7 @@ struct host_function_registrator {
 
 #define REGISTER_INJECTED_HOST_FUNCTION(NAME, ...)                                                                     \
    static host_function_registrator<&interface::NAME, ##__VA_ARGS__> NAME##_registrator_impl() {                       \
-      return {BOOST_HANA_STRING(EOSIO_INJECTED_MODULE_NAME), BOOST_HANA_STRING(#NAME)};                                \
+      return {BOOST_HANA_STRING(SYSIO_INJECTED_MODULE_NAME), BOOST_HANA_STRING(#NAME)};                                \
    }                                                                                                                   \
    inline static auto NAME##_registrator = NAME##_registrator_impl();
 

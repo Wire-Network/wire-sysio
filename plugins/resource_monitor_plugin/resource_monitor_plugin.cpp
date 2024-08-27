@@ -61,13 +61,13 @@ public:
       dlog("plugin_initialize");
    
       auto interval = options.at("resource-monitor-interval-seconds").as<uint32_t>();
-      EOS_ASSERT(interval >= monitor_interval_min && interval <= monitor_interval_max, chain::plugin_config_exception,
+      SYS_ASSERT(interval >= monitor_interval_min && interval <= monitor_interval_max, chain::plugin_config_exception,
          "\"resource-monitor-interval-seconds\" must be between ${monitor_interval_min} and ${monitor_interval_max}", ("monitor_interval_min", monitor_interval_min) ("monitor_interval_max", monitor_interval_max));
       space_handler.set_sleep_time(interval);
       ilog("Monitoring interval set to ${interval}", ("interval", interval));
    
       auto threshold = options.at("resource-monitor-space-threshold").as<uint32_t>();
-      EOS_ASSERT(threshold >= space_threshold_min  && threshold <= space_threshold_max, chain::plugin_config_exception,
+      SYS_ASSERT(threshold >= space_threshold_min  && threshold <= space_threshold_max, chain::plugin_config_exception,
          "\"resource-monitor-space-threshold\" must be between ${space_threshold_min} and ${space_threshold_max}", ("space_threshold_min", space_threshold_min) ("space_threshold_max", space_threshold_max));
       space_handler.set_threshold(threshold, threshold - space_threshold_warning_diff);
       ilog("Space usage threshold set to ${threshold}", ("threshold", threshold));
@@ -83,7 +83,7 @@ public:
       }
 
       auto warning_interval = options.at("resource-monitor-warning-interval").as<uint32_t>();
-      EOS_ASSERT(warning_interval >= warning_interval_min && warning_interval <= warning_interval_max, chain::plugin_config_exception,
+      SYS_ASSERT(warning_interval >= warning_interval_min && warning_interval <= warning_interval_max, chain::plugin_config_exception,
          "\"resource-monitor-warning-interval\" must be between ${warning_interval_min} and ${warning_interval_max}", ("warning_interval_min", warning_interval_min) ("warning_interval_max", warning_interval_max));
       space_handler.set_warning_interval(warning_interval);
       ilog("Warning interval set to ${warning_interval}", ("warning_interval", warning_interval));

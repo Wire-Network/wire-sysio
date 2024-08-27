@@ -1,4 +1,4 @@
-if( EOSIO_COMPILE_TEST_CONTRACTS )
+if( SYSIO_COMPILE_TEST_CONTRACTS )
    add_contract( action_results action_results action_results.cpp )
 else()
    configure_file( ${CMAKE_CURRENT_SOURCE_DIR}/action_results.wasm ${CMAKE_CURRENT_BINARY_DIR}/action_results.wasm COPYONLY )

@@ -25,7 +25,7 @@ namespace sysio::resource_monitor {
       // warning_threshold must be less than shutdown_threshold.
       // set them together so it is simpler to check.
       void set_threshold(uint32_t new_threshold, uint32_t new_warning_threshold) {
-         EOS_ASSERT(new_warning_threshold < new_threshold, chain::plugin_config_exception,
+         SYS_ASSERT(new_warning_threshold < new_threshold, chain::plugin_config_exception,
                     "warning_threshold ${new_warning_threshold} must be less than threshold ${new_threshold}", ("new_warning_threshold", new_warning_threshold) ("new_threshold", new_threshold));
 
          shutdown_threshold = new_threshold;
@@ -78,7 +78,7 @@ namespace sysio::resource_monitor {
          // Get detailed information of the path
          struct stat statbuf;
          auto status = space_provider.get_stat(path_name.string().c_str(), &statbuf);
-         EOS_ASSERT(status == 0, chain::plugin_config_exception,
+         SYS_ASSERT(status == 0, chain::plugin_config_exception,
                     "Failed to run stat on ${path} with status ${status}", ("path", path_name.string())("status", status));
 
          dlog("${path_name}'s file system to be monitored", ("path_name", path_name.string()));
@@ -98,7 +98,7 @@ namespace sysio::resource_monitor {
          // available amount, we use minimum available amount as threshold. 
          boost::system::error_code ec;
          auto info = space_provider.get_space(path_name, ec);
-         EOS_ASSERT(!ec, chain::plugin_config_exception,
+         SYS_ASSERT(!ec, chain::plugin_config_exception,
             "Unable to get space info for ${path_name}: [code: ${ec}] ${message}",
             ("path_name", path_name.string())
             ("ec", ec.value())

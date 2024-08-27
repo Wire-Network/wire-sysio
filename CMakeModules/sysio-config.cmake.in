@@ -1,9 +1,9 @@
-if(NOT EOSIO_ROOT)
-   list(APPEND CMAKE_MODULE_PATH @EOS_ROOT_DIR@/cmake/sysio)
+if(NOT SYSIO_ROOT)
+   list(APPEND CMAKE_MODULE_PATH @SYS_ROOT_DIR@/cmake/sysio)
 else()
-   # legacy behavior for anyone configuring with -DEOSIO_ROOT=/foo or such
-   list(APPEND CMAKE_MODULE_PATH ${EOSIO_ROOT}/lib/cmake/sysio)
-   list(APPEND CMAKE_MODULE_PATH ${EOSIO_ROOT}/lib64/cmake/sysio)
+   # legacy behavior for anyone configuring with -DSYSIO_ROOT=/foo or such
+   list(APPEND CMAKE_MODULE_PATH ${SYSIO_ROOT}/lib/cmake/sysio)
+   list(APPEND CMAKE_MODULE_PATH ${SYSIO_ROOT}/lib64/cmake/sysio)
 endif()
-include(EosioTester)
-include(EosioCheckVersion)
+include(SysioTester)
+include(SysioCheckVersion)

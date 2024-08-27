@@ -182,11 +182,11 @@ Config Options for sysio::chain_plugin:
                                         locked in to memory, and will use huge
                                         pages if available.
 
-  --eos-vm-oc-cache-size-mb arg (=1024) Maximum size (in MiB) of the EOS VM OC
+  --eos-vm-oc-cache-size-mb arg (=1024) Maximum size (in MiB) of the SYS VM OC
                                         code cache
-  --eos-vm-oc-compile-threads arg (=1)  Number of threads to use for EOS VM OC
+  --eos-vm-oc-compile-threads arg (=1)  Number of threads to use for SYS VM OC
                                         tier-up
-  --eos-vm-oc-enable                    Enable EOS VM OC tier-up runtime
+  --eos-vm-oc-enable                    Enable SYS VM OC tier-up runtime
   --enable-account-queries arg (=0)     enable queries to find accounts by
                                         various metadata.
   --max-nonprivileged-inline-action-size arg (=4096)

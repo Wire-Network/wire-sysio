@@ -112,7 +112,7 @@ const static uint32_t   setcode_ram_bytes_multiplier       = 10;     ///< multip
 
 const static uint32_t   hashing_checktime_block_size       = 10*1024;  /// call checktime from hashing intrinsic once per this number of bytes
 
-#ifdef EOSIO_EOS_VM_JIT_RUNTIME_ENABLED
+#ifdef SYSIO_SYS_VM_JIT_RUNTIME_ENABLED
 const static sysio::chain::wasm_interface::vm_type default_wasm_runtime = sysio::chain::wasm_interface::vm_type::eos_vm_jit;
 #else
 const static sysio::chain::wasm_interface::vm_type default_wasm_runtime = sysio::chain::wasm_interface::vm_type::eos_vm;
@@ -149,11 +149,11 @@ constexpr uint64_t billable_size_v = ((billable_size<T>::value + billable_alignm
 
 } } } // namespace sysio::chain::config
 
-constexpr uint64_t EOS_PERCENT(uint64_t value, uint32_t percentage) {
+constexpr uint64_t SYS_PERCENT(uint64_t value, uint32_t percentage) {
    return (value * percentage) / sysio::chain::config::percent_100;
 }
 
 template<typename Number>
-Number EOS_PERCENT_CEIL(Number value, uint32_t percentage) {
+Number SYS_PERCENT_CEIL(Number value, uint32_t percentage) {
    return ((value * percentage) + sysio::chain::config::percent_100 - sysio::chain::config::percent_1)  / sysio::chain::config::percent_100;
 }

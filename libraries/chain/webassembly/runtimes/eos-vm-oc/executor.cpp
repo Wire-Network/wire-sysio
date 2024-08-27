@@ -22,7 +22,7 @@
 
 #if defined(__has_feature)
 #if __has_feature(shadow_call_stack)
-#error EOS VM OC is not compatible with Clang ShadowCallStack
+#error SYS VM OC is not compatible with Clang ShadowCallStack
 #endif
 #endif
 
@@ -55,12 +55,12 @@ static void segv_handler(int sig, siginfo_t* info, void* ctx)  {
    //was the segfault within code?
    if((uintptr_t)info->si_addr >= cb_in_main_segment->execution_thread_code_start &&
       (uintptr_t)info->si_addr < cb_in_main_segment->execution_thread_code_start+cb_in_main_segment->execution_thread_code_length)
-         siglongjmp(*cb_in_main_segment->jmp, EOSVMOC_EXIT_CHECKTIME_FAIL);
+         siglongjmp(*cb_in_main_segment->jmp, SYSVMOC_EXIT_CHECKTIME_FAIL);
 
    //was the segfault within data?
    if((uintptr_t)info->si_addr >= cb_in_main_segment->execution_thread_memory_start &&
       (uintptr_t)info->si_addr < cb_in_main_segment->execution_thread_memory_start+cb_in_main_segment->execution_thread_memory_length)
-         siglongjmp(*cb_in_main_segment->jmp, EOSVMOC_EXIT_SEGV);
+         siglongjmp(*cb_in_main_segment->jmp, SYSVMOC_EXIT_SEGV);
 
 notus:
    if(chained_handler) {
@@ -72,14 +72,14 @@ notus:
    __builtin_unreachable();
 }
 
-static intrinsic grow_memory_intrinsic EOSVMOC_INTRINSIC_INIT_PRIORITY("eosvmoc_internal.grow_memory", IR::FunctionType::get(IR::ResultType::i32,{IR::ValueType::i32,IR::ValueType::i32}),
+static intrinsic grow_memory_intrinsic SYSVMOC_INTRINSIC_INIT_PRIORITY("eosvmoc_internal.grow_memory", IR::FunctionType::get(IR::ResultType::i32,{IR::ValueType::i32,IR::ValueType::i32}),
   (void*)&eos_vm_oc_grow_memory,
   std::integral_constant<std::size_t, find_intrinsic_index("eosvmoc_internal.grow_memory")>::value
 );
 
 //This is effectively overriding the sysio_exit intrinsic in wasm_interface
 static void sysio_exit(int32_t code) {
-   siglongjmp(*eos_vm_oc_get_jmp_buf(), EOSVMOC_EXIT_CLEAN_EXIT);
+   siglongjmp(*eos_vm_oc_get_jmp_buf(), SYSVMOC_EXIT_CLEAN_EXIT);
    __builtin_unreachable();
 }
 static intrinsic sysio_exit_intrinsic("env.sysio_exit", IR::FunctionType::get(IR::ResultType::none,{IR::ValueType::i32}), (void*)&sysio_exit,
@@ -88,34 +88,34 @@ static intrinsic sysio_exit_intrinsic("env.sysio_exit", IR::FunctionType::get(IR
 
 static void throw_internal_exception(const char* const s) {
    *reinterpret_cast<std::exception_ptr*>(eos_vm_oc_get_exception_ptr()) = std::make_exception_ptr(wasm_execution_error(FC_LOG_MESSAGE(error, s)));
-   siglongjmp(*eos_vm_oc_get_jmp_buf(), EOSVMOC_EXIT_EXCEPTION);
+   siglongjmp(*eos_vm_oc_get_jmp_buf(), SYSVMOC_EXIT_EXCEPTION);
    __builtin_unreachable();
 }
 
-#define DEFINE_EOSVMOC_TRAP_INTRINSIC(module,name) \
+#define DEFINE_SYSVMOC_TRAP_INTRINSIC(module,name) \
 	void name(); \
-	static intrinsic name##Function EOSVMOC_INTRINSIC_INIT_PRIORITY(#module "." #name,IR::FunctionType::get(),(void*)&name, \
+	static intrinsic name##Function SYSVMOC_INTRINSIC_INIT_PRIORITY(#module "." #name,IR::FunctionType::get(),(void*)&name, \
      std::integral_constant<std::size_t, find_intrinsic_index(#module "." #name)>::value \
    ); \
 	void name()
 
-DEFINE_EOSVMOC_TRAP_INTRINSIC(eosvmoc_internal,depth_assert) {
+DEFINE_SYSVMOC_TRAP_INTRINSIC(eosvmoc_internal,depth_assert) {
    throw_internal_exception("Exceeded call depth maximum");
 }
 
-DEFINE_EOSVMOC_TRAP_INTRINSIC(eosvmoc_internal,div0_or_overflow) {
+DEFINE_SYSVMOC_TRAP_INTRINSIC(eosvmoc_internal,div0_or_overflow) {
    throw_internal_exception("Division by 0 or integer overflow trapped");
 }
 
-DEFINE_EOSVMOC_TRAP_INTRINSIC(eosvmoc_internal,indirect_call_mismatch) {
+DEFINE_SYSVMOC_TRAP_INTRINSIC(eosvmoc_internal,indirect_call_mismatch) {
    throw_internal_exception("Indirect call function type mismatch");
 }
 
-DEFINE_EOSVMOC_TRAP_INTRINSIC(eosvmoc_internal,indirect_call_oob) {
+DEFINE_SYSVMOC_TRAP_INTRINSIC(eosvmoc_internal,indirect_call_oob) {
    throw_internal_exception("Indirect call index out of bounds");
 }
 
-DEFINE_EOSVMOC_TRAP_INTRINSIC(eosvmoc_internal,unreachable) {
+DEFINE_SYSVMOC_TRAP_INTRINSIC(eosvmoc_internal,unreachable) {
    throw_internal_exception("Unreachable reached");
 }
 
@@ -139,7 +139,7 @@ executor::executor(const code_cache_base& cc) {
 
    uint64_t current_gs;
    if(arch_prctl(ARCH_GET_GS, &current_gs) || current_gs)
-      wlog("x86_64 GS register is not set as expected. EOS VM OC may not run correctly on this platform");
+      wlog("x86_64 GS register is not set as expected. SYS VM OC may not run correctly on this platform");
 
    struct stat s;
    FC_ASSERT(fstat(cc.fd(), &s) == 0, "executor failed to get code cache size");
@@ -163,7 +163,7 @@ void executor::execute(const code_descriptor& code, memory& mem, apply_context& 
       max_pages = config.max_pages;
    }
    stack.reset(max_call_depth);
-   EOS_ASSERT(code.starting_memory_pages <= (int)max_pages, wasm_execution_error, "Initial memory out of range");
+   SYS_ASSERT(code.starting_memory_pages <= (int)max_pages, wasm_execution_error, "Initial memory out of range");
 
    //prepare initial memory, mutable globals, and table data
    if(code.starting_memory_pages > 0 ) {
@@ -250,13 +250,13 @@ void executor::execute(const code_descriptor& code, memory& mem, apply_context& 
          });
          break;
       //case 1: clean sysio_exit
-      case EOSVMOC_EXIT_CHECKTIME_FAIL:
+      case SYSVMOC_EXIT_CHECKTIME_FAIL:
          context.trx_context.checktime();
          break;
-      case EOSVMOC_EXIT_SEGV:
-         EOS_ASSERT(false, wasm_execution_error, "access violation");
+      case SYSVMOC_EXIT_SEGV:
+         SYS_ASSERT(false, wasm_execution_error, "access violation");
          break;
-      case EOSVMOC_EXIT_EXCEPTION: //exception
+      case SYSVMOC_EXIT_EXCEPTION: //exception
          std::rethrow_exception(*cb->eptr);
          break;
    }

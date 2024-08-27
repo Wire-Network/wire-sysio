@@ -319,7 +319,7 @@ struct state_history_plugin_impl : std::enable_shared_from_this<state_history_pl
          if (!ec)
             return;
          elog("${w}: ${m}", ("w", what)("m", ec.message()));
-         EOS_ASSERT(false, plugin_exception, "unable to open listen socket");
+         SYS_ASSERT(false, plugin_exception, "unable to open listen socket");
       };
 
       acceptor->open(endpoint.protocol(), ec);
@@ -366,7 +366,7 @@ struct state_history_plugin_impl : std::enable_shared_from_this<state_history_pl
          // the exception would be caught and drop before reaching main(). The exception is
          // to ensure the block won't be commited.
          appbase::app().quit();
-         EOS_THROW(
+         SYS_THROW(
              chain::state_history_write_exception,
              "State history encountered an Error which it cannot recover from.  Please resolve the error and relaunch "
              "the process");
@@ -395,7 +395,7 @@ struct state_history_plugin_impl : std::enable_shared_from_this<state_history_pl
       auto traces_bin = state_history::zlib_compress_bytes(
           trace_converter.pack(chain_plug->chain().db(), trace_debug_mode, block_state));
 
-      EOS_ASSERT(traces_bin.size() == (uint32_t)traces_bin.size(), plugin_exception, "traces is too big");
+      SYS_ASSERT(traces_bin.size() == (uint32_t)traces_bin.size(), plugin_exception, "traces is too big");
 
       state_history_log_header header{.magic        = ship_magic(ship_current_version, 0),
                                       .block_id     = block_state->id,
@@ -458,11 +458,11 @@ void state_history_plugin::set_program_options(options_description& cli, options
 
 void state_history_plugin::plugin_initialize(const variables_map& options) {
    try {
-      EOS_ASSERT(options.at("disable-replay-opts").as<bool>(), plugin_exception,
+      SYS_ASSERT(options.at("disable-replay-opts").as<bool>(), plugin_exception,
                  "state_history_plugin requires --disable-replay-opts");
 
       my->chain_plug = app().find_plugin<chain_plugin>();
-      EOS_ASSERT(my->chain_plug, chain::missing_chain_plugin_exception, "");
+      SYS_ASSERT(my->chain_plug, chain::missing_chain_plugin_exception, "");
       auto& chain = my->chain_plug->chain();
       my->applied_transaction_connection.emplace(
           chain.applied_transaction.connect([&](std::tuple<const transaction_trace_ptr&, const packed_transaction_ptr&> t) {
@@ -505,7 +505,7 @@ void state_history_plugin::plugin_initialize(const variables_map& options) {
          ship_log_prune_conf->prune_blocks = options.at("state-history-log-retain-blocks").as<uint32_t>();
          //the arbitrary limit of 1000 here is mainly so that there is enough buffer for newly applied forks to be delivered to clients
          // before getting pruned out. ideally pruning would have been smart enough to know not to prune reversible blocks
-         EOS_ASSERT(ship_log_prune_conf->prune_blocks >= 1000, plugin_exception, "state-history-log-retain-blocks must be 1000 blocks or greater");
+         SYS_ASSERT(ship_log_prune_conf->prune_blocks >= 1000, plugin_exception, "state-history-log-retain-blocks must be 1000 blocks or greater");
       }
 
       if (options.at("trace-history").as<bool>())

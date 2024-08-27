@@ -44,7 +44,7 @@ class transaction_metadata {
 
       static void check_variable_sig_size(const packed_transaction_ptr& trx, uint32_t max) {
          for(const signature_type& sig : trx->get_signed_transaction().signatures)
-            EOS_ASSERT(sig.variable_size() <= max, sig_variable_size_limit_exception,
+            SYS_ASSERT(sig.variable_size() <= max, sig_variable_size_limit_exception,
                   "signature variable length component size (${s}) greater than subjective maximum (${m})", ("s", sig.variable_size())("m", max));
       }
 

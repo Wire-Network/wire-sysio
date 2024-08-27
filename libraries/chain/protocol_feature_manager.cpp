@@ -276,7 +276,7 @@ Enables usage of EM ( Ethereum Message ) keys and signatures.
 
    const char* builtin_protocol_feature_codename( builtin_protocol_feature_t codename ) {
       auto itr = builtin_protocol_feature_codenames.find( codename );
-      EOS_ASSERT( itr != builtin_protocol_feature_codenames.end(), protocol_feature_validation_exception,
+      SYS_ASSERT( itr != builtin_protocol_feature_codenames.end(), protocol_feature_validation_exception,
                   "Unsupported builtin_protocol_feature_t passed to builtin_protocol_feature_codename: ${codename}",
                   ("codename", static_cast<uint32_t>(codename)) );
 
@@ -298,7 +298,7 @@ Enables usage of EM ( Ethereum Message ) keys and signatures.
          break;
          default:
          {
-            EOS_THROW( protocol_feature_validation_exception,
+            SYS_THROW( protocol_feature_validation_exception,
                        "Unsupported protocol_feature_t passed to constructor: ${type}",
                        ("type", static_cast<uint32_t>(feature_type)) );
          }
@@ -313,7 +313,7 @@ Enables usage of EM ( Ethereum Message ) keys and signatures.
       if( protocol_feature_type == builtin_protocol_feature::feature_type_string ) {
          _type = protocol_feature_t::builtin;
       } else {
-         EOS_THROW( protocol_feature_validation_exception,
+         SYS_THROW( protocol_feature_validation_exception,
                     "Unsupported protocol feature type: ${type}", ("type", protocol_feature_type) );
       }
    }
@@ -328,7 +328,7 @@ Enables usage of EM ( Ethereum Message ) keys and signatures.
    ,_codename(codename)
    {
       auto itr = builtin_protocol_feature_codenames.find( codename );
-      EOS_ASSERT( itr != builtin_protocol_feature_codenames.end(), protocol_feature_validation_exception,
+      SYS_ASSERT( itr != builtin_protocol_feature_codenames.end(), protocol_feature_validation_exception,
                   "Unsupported builtin_protocol_feature_t passed to constructor: ${codename}",
                   ("codename", static_cast<uint32_t>(codename)) );
 
@@ -345,7 +345,7 @@ Enables usage of EM ( Ethereum Message ) keys and signatures.
          }
       }
 
-      EOS_THROW( protocol_feature_validation_exception,
+      SYS_THROW( protocol_feature_validation_exception,
                  "Unsupported builtin protocol feature codename: ${codename}",
                  ("codename", builtin_feature_codename) );
    }
@@ -364,7 +364,7 @@ Enables usage of EM ( Ethereum Message ) keys and signatures.
    fc::variant protocol_feature::to_variant( bool include_subjective_restrictions,
                                              fc::mutable_variant_object* additional_fields )const
    {
-      EOS_ASSERT( builtin_feature, protocol_feature_exception, "not a builtin protocol feature" );
+      SYS_ASSERT( builtin_feature, protocol_feature_exception, "not a builtin protocol feature" );
 
       fc::mutable_variant_object mvo;
 
@@ -444,7 +444,7 @@ Enables usage of EM ( Ethereum Message ) keys and signatures.
    const protocol_feature& protocol_feature_set::get_protocol_feature( const digest_type& feature_digest )const {
       auto itr = _recognized_protocol_features.find( feature_digest );
 
-      EOS_ASSERT( itr != _recognized_protocol_features.end(), protocol_feature_exception,
+      SYS_ASSERT( itr != _recognized_protocol_features.end(), protocol_feature_exception,
                   "unrecognized protocol feature with digest: ${digest}",
                   ("digest", feature_digest)
       );
@@ -474,7 +474,7 @@ Enables usage of EM ( Ethereum Message ) keys and signatures.
    ) {
       auto itr = builtin_protocol_feature_codenames.find( codename );
 
-      EOS_ASSERT( itr != builtin_protocol_feature_codenames.end(), protocol_feature_validation_exception,
+      SYS_ASSERT( itr != builtin_protocol_feature_codenames.end(), protocol_feature_validation_exception,
                   "Unsupported builtin_protocol_feature_t: ${codename}",
                   ("codename", static_cast<uint32_t>(codename)) );
 
@@ -490,14 +490,14 @@ Enables usage of EM ( Ethereum Message ) keys and signatures.
 
    const protocol_feature& protocol_feature_set::add_feature( const builtin_protocol_feature& f ) {
       auto builtin_itr = builtin_protocol_feature_codenames.find( f._codename );
-      EOS_ASSERT( builtin_itr != builtin_protocol_feature_codenames.end(), protocol_feature_validation_exception,
+      SYS_ASSERT( builtin_itr != builtin_protocol_feature_codenames.end(), protocol_feature_validation_exception,
                   "Builtin protocol feature has unsupported builtin_protocol_feature_t: ${codename}",
                   ("codename", static_cast<uint32_t>( f._codename )) );
 
       uint32_t indx = static_cast<uint32_t>( f._codename );
 
       if( indx < _recognized_builtin_protocol_features.size() ) {
-         EOS_ASSERT( _recognized_builtin_protocol_features[indx] == _recognized_protocol_features.end(),
+         SYS_ASSERT( _recognized_builtin_protocol_features[indx] == _recognized_protocol_features.end(),
                      protocol_feature_exception,
                      "builtin protocol feature with codename '${codename}' already added",
                      ("codename", f.builtin_feature_codename) );
@@ -511,7 +511,7 @@ Enables usage of EM ( Ethereum Message ) keys and signatures.
 
       for( const auto& d : f.dependencies ) {
          auto itr = _recognized_protocol_features.find( d );
-         EOS_ASSERT( itr != _recognized_protocol_features.end(), protocol_feature_exception,
+         SYS_ASSERT( itr != _recognized_protocol_features.end(), protocol_feature_exception,
             "builtin protocol feature with codename '${codename}' and digest of ${digest} has a dependency on a protocol feature with digest ${dependency_digest} that is not recognized",
             ("codename", f.builtin_feature_codename)
             ("digest",  feature_digest)
@@ -538,14 +538,14 @@ Enables usage of EM ( Ethereum Message ) keys and signatures.
          missing_builtins_with_names.reserve( missing_builtins.size() );
          for( const auto& builtin_codename : missing_builtins ) {
             auto itr = builtin_protocol_feature_codenames.find( builtin_codename );
-            EOS_ASSERT( itr != builtin_protocol_feature_codenames.end(),
+            SYS_ASSERT( itr != builtin_protocol_feature_codenames.end(),
                         protocol_feature_exception,
                         "Unexpected error"
             );
             missing_builtins_with_names.emplace_back( itr->second.codename );
          }
 
-         EOS_THROW(  protocol_feature_validation_exception,
+         SYS_THROW(  protocol_feature_validation_exception,
                      "Not all the builtin dependencies of the builtin protocol feature with codename '${codename}' and digest of ${digest} were satisfied.",
                      ("missing_dependencies", missing_builtins_with_names)
          );
@@ -561,7 +561,7 @@ Enables usage of EM ( Ethereum Message ) keys and signatures.
          f._codename
       } );
 
-      EOS_ASSERT( res.second, protocol_feature_exception,
+      SYS_ASSERT( res.second, protocol_feature_exception,
                   "builtin protocol feature with codename '${codename}' has a digest of ${digest} but another protocol feature with the same digest has already been added",
                   ("codename", f.builtin_feature_codename)("digest", feature_digest) );
 
@@ -586,7 +586,7 @@ Enables usage of EM ( Ethereum Message ) keys and signatures.
    }
 
    void protocol_feature_manager::init( chainbase::database& db ) {
-      EOS_ASSERT( !is_initialized(), protocol_feature_exception, "cannot initialize protocol_feature_manager twice" );
+      SYS_ASSERT( !is_initialized(), protocol_feature_exception, "cannot initialize protocol_feature_manager twice" );
 
 
       auto reset_initialized = fc::make_scoped_exit( [this]() { _initialized = false; } );
@@ -600,17 +600,17 @@ Enables usage of EM ( Ethereum Message ) keys and signatures.
    }
 
    const protocol_feature* protocol_feature_manager::const_iterator::get_pointer()const {
-      //EOS_ASSERT( _pfm, protocol_feature_iterator_exception, "cannot dereference singular iterator" );
-      //EOS_ASSERT( _index != end_index, protocol_feature_iterator_exception, "cannot dereference end iterator" );
+      //SYS_ASSERT( _pfm, protocol_feature_iterator_exception, "cannot dereference singular iterator" );
+      //SYS_ASSERT( _index != end_index, protocol_feature_iterator_exception, "cannot dereference end iterator" );
       return &*(_pfm->_activated_protocol_features[_index].iterator_to_protocol_feature);
    }
 
    uint32_t protocol_feature_manager::const_iterator::activation_ordinal()const {
-      EOS_ASSERT( _pfm,
+      SYS_ASSERT( _pfm,
                    protocol_feature_iterator_exception,
                   "called activation_ordinal() on singular iterator"
       );
-      EOS_ASSERT( _index != end_index,
+      SYS_ASSERT( _index != end_index,
                    protocol_feature_iterator_exception,
                   "called activation_ordinal() on end iterator"
       );
@@ -619,11 +619,11 @@ Enables usage of EM ( Ethereum Message ) keys and signatures.
    }
 
    uint32_t protocol_feature_manager::const_iterator::activation_block_num()const {
-      EOS_ASSERT( _pfm,
+      SYS_ASSERT( _pfm,
                    protocol_feature_iterator_exception,
                   "called activation_block_num() on singular iterator"
       );
-      EOS_ASSERT( _index != end_index,
+      SYS_ASSERT( _index != end_index,
                    protocol_feature_iterator_exception,
                   "called activation_block_num() on end iterator"
       );
@@ -632,8 +632,8 @@ Enables usage of EM ( Ethereum Message ) keys and signatures.
    }
 
    protocol_feature_manager::const_iterator& protocol_feature_manager::const_iterator::operator++() {
-      EOS_ASSERT( _pfm, protocol_feature_iterator_exception, "cannot increment singular iterator" );
-      EOS_ASSERT( _index != end_index, protocol_feature_iterator_exception, "cannot increment end iterator" );
+      SYS_ASSERT( _pfm, protocol_feature_iterator_exception, "cannot increment singular iterator" );
+      SYS_ASSERT( _index != end_index, protocol_feature_iterator_exception, "cannot increment end iterator" );
 
       ++_index;
       if( _index >= _pfm->_activated_protocol_features.size() ) {
@@ -644,15 +644,15 @@ Enables usage of EM ( Ethereum Message ) keys and signatures.
    }
 
    protocol_feature_manager::const_iterator& protocol_feature_manager::const_iterator::operator--() {
-      EOS_ASSERT( _pfm, protocol_feature_iterator_exception, "cannot decrement singular iterator" );
+      SYS_ASSERT( _pfm, protocol_feature_iterator_exception, "cannot decrement singular iterator" );
       if( _index == end_index ) {
-         EOS_ASSERT( _pfm->_activated_protocol_features.size() > 0,
+         SYS_ASSERT( _pfm->_activated_protocol_features.size() > 0,
                      protocol_feature_iterator_exception,
                      "cannot decrement end iterator when no protocol features have been activated"
          );
          _index = _pfm->_activated_protocol_features.size() - 1;
       } else {
-         EOS_ASSERT( _index > 0,
+         SYS_ASSERT( _index > 0,
                      protocol_feature_iterator_exception,
                      "cannot decrement iterator at the beginning of protocol feature activation list" )
          ;
@@ -721,16 +721,16 @@ Enables usage of EM ( Ethereum Message ) keys and signatures.
    void protocol_feature_manager::activate_feature( const digest_type& feature_digest,
                                                     uint32_t current_block_num )
    {
-      EOS_ASSERT( is_initialized(), protocol_feature_exception, "protocol_feature_manager is not yet initialized" );
+      SYS_ASSERT( is_initialized(), protocol_feature_exception, "protocol_feature_manager is not yet initialized" );
 
       auto itr = _protocol_feature_set.find( feature_digest );
 
-      EOS_ASSERT( itr != _protocol_feature_set.end(), protocol_feature_exception,
+      SYS_ASSERT( itr != _protocol_feature_set.end(), protocol_feature_exception,
                   "unrecognized protocol feature digest: ${digest}", ("digest", feature_digest) );
 
       if( _activated_protocol_features.size() > 0 ) {
          const auto& last = _activated_protocol_features.back();
-         EOS_ASSERT( last.activation_block_num <= current_block_num,
+         SYS_ASSERT( last.activation_block_num <= current_block_num,
                      protocol_feature_exception,
                      "last protocol feature activation block num is ${last_activation_block_num} yet "
                      "attempting to activate protocol feature with a current block num of ${current_block_num}"
@@ -740,21 +740,21 @@ Enables usage of EM ( Ethereum Message ) keys and signatures.
          );
       }
 
-      EOS_ASSERT( itr->builtin_feature,
+      SYS_ASSERT( itr->builtin_feature,
                   protocol_feature_exception,
                   "invariant failure: encountered non-builtin protocol feature which is not yet supported"
       );
 
       uint32_t indx = static_cast<uint32_t>( *itr->builtin_feature );
 
-      EOS_ASSERT( indx < _builtin_protocol_features.size(), protocol_feature_exception,
+      SYS_ASSERT( indx < _builtin_protocol_features.size(), protocol_feature_exception,
                   "invariant failure while trying to activate feature with digest '${digest}': "
                   "unsupported builtin_protocol_feature_t ${codename}",
                   ("digest", feature_digest)
                   ("codename", indx)
       );
 
-      EOS_ASSERT( _builtin_protocol_features[indx].activation_block_num == builtin_protocol_feature_entry::not_active,
+      SYS_ASSERT( _builtin_protocol_features[indx].activation_block_num == builtin_protocol_feature_entry::not_active,
                   protocol_feature_exception,
                   "cannot activate already activated builtin feature with digest: ${digest}",
                   ("digest", feature_digest)
@@ -771,7 +771,7 @@ Enables usage of EM ( Ethereum Message ) keys and signatures.
    }
 
    void protocol_feature_manager::popped_blocks_to( uint32_t block_num ) {
-      EOS_ASSERT( is_initialized(), protocol_feature_exception, "protocol_feature_manager is not yet initialized" );
+      SYS_ASSERT( is_initialized(), protocol_feature_exception, "protocol_feature_manager is not yet initialized" );
 
       while( _head_of_builtin_activation_list != builtin_protocol_feature_entry::no_previous ) {
          auto& e = _builtin_protocol_features[_head_of_builtin_activation_list];

@@ -27,7 +27,7 @@
 #include <fstream>
 #include <string.h>
 
-#if defined(EOSIO_EOS_VM_RUNTIME_ENABLED) || defined(EOSIO_EOS_VM_JIT_RUNTIME_ENABLED)
+#if defined(SYSIO_SYS_VM_RUNTIME_ENABLED) || defined(SYSIO_SYS_VM_JIT_RUNTIME_ENABLED)
 #include <sysio/vm/allocator.hpp>
 #endif
 
@@ -51,9 +51,9 @@ namespace sysio { namespace chain {
          Serialization::MemoryInputStream stream((U8*)code.data(), code.size());
          WASM::serialize(stream, module);
       } catch(const Serialization::FatalSerializationException& e) {
-         EOS_ASSERT(false, wasm_serialization_error, e.message.c_str());
+         SYS_ASSERT(false, wasm_serialization_error, e.message.c_str());
       } catch(const IR::ValidationException& e) {
-         EOS_ASSERT(false, wasm_serialization_error, e.message.c_str());
+         SYS_ASSERT(false, wasm_serialization_error, e.message.c_str());
       }
 
       wasm_validations::wasm_binary_validation validator(control, module);
@@ -81,18 +81,18 @@ namespace sysio { namespace chain {
    void wasm_interface::apply( const digest_type& code_hash, const uint8_t& vm_type, const uint8_t& vm_version, apply_context& context ) {
       if(substitute_apply && substitute_apply(code_hash, vm_type, vm_version, context))
          return;
-#ifdef EOSIO_EOS_VM_OC_RUNTIME_ENABLED
+#ifdef SYSIO_SYS_VM_OC_RUNTIME_ENABLED
       if(my->eosvmoc) {
          const chain::eosvmoc::code_descriptor* cd = nullptr;
          try {
             cd = my->eosvmoc->cc.get_descriptor_for_code(code_hash, vm_version);
          }
          catch(...) {
-            //swallow errors here, if EOS VM OC has gone in to the weeds we shouldn't bail: continue to try and run baseline
-            //In the future, consider moving bits of EOS VM that can fire exceptions and such out of this call path
+            //swallow errors here, if SYS VM OC has gone in to the weeds we shouldn't bail: continue to try and run baseline
+            //In the future, consider moving bits of SYS VM that can fire exceptions and such out of this call path
             static bool once_is_enough;
             if(!once_is_enough)
-               elog("EOS VM OC has encountered an unexpected failure");
+               elog("SYS VM OC has encountered an unexpected failure");
             once_is_enough = true;
          }
          if(cd) {

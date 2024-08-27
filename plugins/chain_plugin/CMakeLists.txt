@@ -6,9 +6,9 @@ add_library( chain_plugin
              trx_retry_db.cpp
              ${HEADERS} )
 
-if(EOSIO_ENABLE_DEVELOPER_OPTIONS)
-    message(WARNING "EOSIO Developer Options are enabled; these are NOT supported")
-    target_compile_definitions(chain_plugin PUBLIC EOSIO_DEVELOPER)
+if(SYSIO_ENABLE_DEVELOPER_OPTIONS)
+    message(WARNING "SYSIO Developer Options are enabled; these are NOT supported")
+    target_compile_definitions(chain_plugin PUBLIC SYSIO_DEVELOPER)
 endif()
 
 target_link_libraries( chain_plugin producer_plugin sysio_chain appbase resource_monitor_plugin )

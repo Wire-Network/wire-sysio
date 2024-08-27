@@ -605,7 +605,7 @@ namespace sysio { namespace chain { namespace wasm_injections {
          void inject() {
 
             for ( auto& fd : _module->functions.defs ) {
-               wasm_ops::EOSIO_OperatorDecoderStream<pre_op_injectors> pre_decoder(fd.code);
+               wasm_ops::SYSIO_OperatorDecoderStream<pre_op_injectors> pre_decoder(fd.code);
                wasm_ops::instruction_stream pre_code(fd.code.size()*2);
 
                while ( pre_decoder ) {
@@ -623,7 +623,7 @@ namespace sysio { namespace chain { namespace wasm_injections {
                fd.code = pre_code.get();
             }
             for ( auto& fd : _module->functions.defs ) {
-               wasm_ops::EOSIO_OperatorDecoderStream<post_op_injectors> post_decoder(fd.code);
+               wasm_ops::SYSIO_OperatorDecoderStream<post_op_injectors> post_decoder(fd.code);
                wasm_ops::instruction_stream post_code(fd.code.size()*2);
 
                while ( post_decoder ) {

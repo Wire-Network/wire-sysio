@@ -20,5 +20,5 @@
 
 
 ```sh
-cleos system rex rentnet accountname1 accountname2 "1 EOS" 0
+cleos system rex rentnet accountname1 accountname2 "1 SYS" 0
 ```

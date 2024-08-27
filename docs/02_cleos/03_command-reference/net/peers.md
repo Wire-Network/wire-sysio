@@ -48,7 +48,7 @@ cleos -u http://127.0.0.1:8001 net peers
       "network_version": 1210,
       "chain_id": "60fb0eb4742886af8a0e147f4af6fd363e8e8d8f18bdf73a10ee0134fec1c551",
       "node_id": "58ed23173cd4ed89ae90c2e65f5c29bb51e233e78d730d72220b6d84543bfc08",
-      "key": "EOS1111111111111111111111111111111114T1Anm",
+      "key": "SYS1111111111111111111111111111111114T1Anm",
       "time": "1621013128445696000",
       "token": "0000000000000000000000000000000000000000000000000000000000000000",
       "sig": "SIG_K1_111111111111111111111111111111111111111111111111111111111111111116uk5ne",
@@ -58,7 +58,7 @@ cleos -u http://127.0.0.1:8001 net peers
       "head_num": 128,
       "head_id": "0000008072eb0fc043770e44a5db5dedfbd86db9aa5c41b28618f1b9343c2d22",
       "os": "osx",
-      "agent": "EOS Test Agent",
+      "agent": "SYS Test Agent",
       "generation": 4
     }
   },{
@@ -69,7 +69,7 @@ cleos -u http://127.0.0.1:8001 net peers
       "network_version": 1210,
       "chain_id": "60fb0eb4742886af8a0e147f4af6fd363e8e8d8f18bdf73a10ee0134fec1c551",
       "node_id": "2101bd8d770e8eabb3e69cb981db4350b494a04cd5b7a7cea0cd3070aa722306",
-      "key": "EOS1111111111111111111111111111111114T1Anm",
+      "key": "SYS1111111111111111111111111111111114T1Anm",
       "time": "1621013129884873000",
       "token": "0000000000000000000000000000000000000000000000000000000000000000",
       "sig": "SIG_K1_111111111111111111111111111111111111111111111111111111111111111116uk5ne",
@@ -79,7 +79,7 @@ cleos -u http://127.0.0.1:8001 net peers
       "head_num": 130,
       "head_id": "0000008248cc3498b4bbf14a183711d9a73a36517a8069367a343bd4060fed14",
       "os": "osx",
-      "agent": "EOS Test Agent",
+      "agent": "SYS Test Agent",
       "generation": 3
     }
   },{
@@ -94,7 +94,7 @@ cleos -u http://127.0.0.1:8001 net peers
       "network_version": 1210,
       "chain_id": "60fb0eb4742886af8a0e147f4af6fd363e8e8d8f18bdf73a10ee0134fec1c551",
       "node_id": "d9eb85085d09581521d0ec53b87a9657d0176c74fdf8657c56b09a91b3821c6f",
-      "key": "EOS1111111111111111111111111111111114T1Anm",
+      "key": "SYS1111111111111111111111111111111114T1Anm",
       "time": "1621013127894327000",
       "token": "0000000000000000000000000000000000000000000000000000000000000000",
       "sig": "SIG_K1_111111111111111111111111111111111111111111111111111111111111111116uk5ne",
@@ -104,7 +104,7 @@ cleos -u http://127.0.0.1:8001 net peers
       "head_num": 126,
       "head_id": "0000007eccafd4f32a437b5fd8b111b326e2da8d0bcb832036984841b81ab64e",
       "os": "osx",
-      "agent": "EOS Test Agent",
+      "agent": "SYS Test Agent",
       "generation": 4
     }
   }

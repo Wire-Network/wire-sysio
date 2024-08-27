@@ -22,8 +22,8 @@ class PluginHttpTest(unittest.TestCase):
     http_post_str = " -X POST -d "
     http_post_invalid_param = " '{invalid}' "
     empty_content_str = " ' { } '  "
-    EOSIO_ACCT_PRIVATE_DEFAULT_KEY = "5KQwrPbwdL6PhXujxW37FSSQZ1JiwsST4cqQzDeyXtP79zkvFD3"
-    EOSIO_ACCT_PUBLIC_DEFAULT_KEY = "EOS6MRyAjQq8ud7hVNYcfnVPJqcVpscN5So8BhtHuGYqET5GDW5CV"
+    SYSIO_ACCT_PRIVATE_DEFAULT_KEY = "5KQwrPbwdL6PhXujxW37FSSQZ1JiwsST4cqQzDeyXtP79zkvFD3"
+    SYSIO_ACCT_PUBLIC_DEFAULT_KEY = "SYS6MRyAjQq8ud7hVNYcfnVPJqcVpscN5So8BhtHuGYqET5GDW5CV"
 
     # make a fresh data dir
     def createDataDir(self):
@@ -71,8 +71,8 @@ class PluginHttpTest(unittest.TestCase):
         abiFile = "%s.abi" % (contract)
 
         sysioAccount = Account("sysio")
-        sysioAccount.ownerPrivateKey = sysioAccount.activePrivateKey = self.EOSIO_ACCT_PRIVATE_DEFAULT_KEY
-        sysioAccount.ownerPublicKey = sysioAccount.activePublicKey = self.EOSIO_ACCT_PUBLIC_DEFAULT_KEY
+        sysioAccount.ownerPrivateKey = sysioAccount.activePrivateKey = self.SYSIO_ACCT_PRIVATE_DEFAULT_KEY
+        sysioAccount.ownerPublicKey = sysioAccount.activePublicKey = self.SYSIO_ACCT_PUBLIC_DEFAULT_KEY
 
         testWalletName = "test"
         walletAccounts = [sysioAccount]
@@ -611,7 +611,7 @@ class PluginHttpTest(unittest.TestCase):
                                              self.http_post_str,
                                              "\"code\":\"sysio.token\"",
                                              "\"action\":\"issue\"",
-                                             "\"args\":{\"to\":\"sysio.token\", \"quantity\":\"1.0000\%20EOS\",\"memo\":\"m\"}")
+                                             "\"args\":{\"to\":\"sysio.token\", \"quantity\":\"1.0000\%20SYS\",\"memo\":\"m\"}")
         ret_json = Utils.runCmdReturnJson(valid_cmd)
         self.assertEqual(ret_json["code"], 500)
 
@@ -665,9 +665,9 @@ class PluginHttpTest(unittest.TestCase):
                      "\"actions\": [{\"code\": \"currency\",\"type\":\"transfer\",\"recipients\": [\"initb\", \"initc\"],\"authorization\": [{\"account\": \"initb\", \"permission\": \"active\"}],\"data\":\"000000000041934b000000008041934be803000000000000\"}]",
                      "\"signatures\": []",
                      "\"authorizations\": []",
-                     "\"EOS4toFS3YXEQCkuuw1aqDLrtHim86Gz9u3hBdcBw5KNPZcursVHq\"",
-                     "\"EOS7d9A3uLe6As66jzN8j44TXJUqJSK3bFjjEEqR4oTvNAB3iM9SA\"",
-                     "\"EOS6MRyAjQq8ud7hVNYcfnVPJqcVpscN5So8BhtHuGYqET5GDW5CV\"")
+                     "\"SYS4toFS3YXEQCkuuw1aqDLrtHim86Gz9u3hBdcBw5KNPZcursVHq\"",
+                     "\"SYS7d9A3uLe6As66jzN8j44TXJUqJSK3bFjjEEqR4oTvNAB3iM9SA\"",
+                     "\"SYS6MRyAjQq8ud7hVNYcfnVPJqcVpscN5So8BhtHuGYqET5GDW5CV\"")
         ret_json = Utils.runCmdReturnJson(valid_cmd)
         self.assertEqual(ret_json["code"], 500)
 
@@ -1227,7 +1227,7 @@ class PluginHttpTest(unittest.TestCase):
                                                                         "\"signatures\": [\"SIG_K1_KeqfqiZu1GwUxQb7jzK9Fdks6HFaVBQ9AJtCZZj56eG9qGgvVMVtx8EerBdnzrhFoX437sgwtojf2gfz6S516Ty7c22oEp\"]",
                                                                         "\"context_free_data\": []")
         valid_cmd = default_cmd + self.http_post_str + ("'[%s, %s, %s]'") % (signed_transaction,
-                                                                             "[\"EOS696giL6VxeJhtEgKtWPK8aQeT8YXNjw2a7vE5wHunffhfa5QSQ\"]",
+                                                                             "[\"SYS696giL6VxeJhtEgKtWPK8aQeT8YXNjw2a7vE5wHunffhfa5QSQ\"]",
                                                                              "\"cf057bbfb72640471fd910bcb67639c22df9f92470936cddc1ade0e2f2e7dc4f\"")
         ret_json = Utils.runCmdReturnJson(valid_cmd)
         self.assertEqual(ret_json["code"], 500)

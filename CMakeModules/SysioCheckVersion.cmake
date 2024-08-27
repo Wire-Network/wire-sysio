@@ -16,7 +16,7 @@ function(EXTRACT_MAJOR_MINOR_FROM_VERSION version success major minor)
    set(${success} TRUE      PARENT_SCOPE)
 endfunction(EXTRACT_MAJOR_MINOR_FROM_VERSION)
 
-function(EOSIO_CHECK_VERSION output version hard_min soft_max hard_max) # optional 6th argument for error message
+function(SYSIO_CHECK_VERSION output version hard_min soft_max hard_max) # optional 6th argument for error message
    set(${output} "INVALID" PARENT_SCOPE)
 
    EXTRACT_MAJOR_MINOR_FROM_VERSION("${version}" success major minor)
@@ -87,4 +87,4 @@ function(EOSIO_CHECK_VERSION output version hard_min soft_max hard_max) # option
    endif()
 
    set(${output} "MATCH" PARENT_SCOPE)
-endfunction(EOSIO_CHECK_VERSION)
+endfunction(SYSIO_CHECK_VERSION)

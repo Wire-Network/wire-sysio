@@ -1,18 +1,18 @@
 #!/bin/bash
 #
 # sysio-tn_down.sh is used by the sysio-tn_bounce.sh and sysio-tn_roll.sh scripts.
-# It is intended to terminate specific EOS.IO daemon processes.
+# It is intended to terminate specific SYS.IO daemon processes.
 #
 
 
-if [ "$PWD" != "$EOSIO_HOME" ]; then
-    echo $0 must only be run from $EOSIO_HOME
+if [ "$PWD" != "$SYSIO_HOME" ]; then
+    echo $0 must only be run from $SYSIO_HOME
     exit -1
 fi
 
 prog=nodeos
 
-DD=var/lib/node_$EOSIO_NODE
+DD=var/lib/node_$SYSIO_NODE
 runtest=`cat $DD/$prog.pid`
 echo runtest = $runtest
 running=`ps -e | grep $runtest | grep -cv grep `

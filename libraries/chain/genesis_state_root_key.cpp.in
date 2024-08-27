@@ -2,6 +2,6 @@
 
 namespace sysio { namespace chain {
 
-const string genesis_state::sysio_root_key = "${EOSIO_ROOT_KEY}";
+const string genesis_state::sysio_root_key = "${SYSIO_ROOT_KEY}";
 
 } } // namespace sysio::chain

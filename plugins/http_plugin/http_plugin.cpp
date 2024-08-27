@@ -253,14 +253,14 @@ class http_plugin_impl : public std::enable_shared_from_this<http_plugin_impl> {
 
                fc::ec_key ecdh = EC_KEY_new_by_curve_name(https_ecdh_curve == SECP384R1 ? NID_secp384r1 : NID_X9_62_prime256v1);
                if (!ecdh)
-                  EOS_THROW(chain::http_exception, "Failed to set NID_secp384r1");
+                  SYS_THROW(chain::http_exception, "Failed to set NID_secp384r1");
                if(SSL_CTX_set_tmp_ecdh(ctx->native_handle(), (EC_KEY*)ecdh) != 1)
-                  EOS_THROW(chain::http_exception, "Failed to set ECDH PFS");
+                  SYS_THROW(chain::http_exception, "Failed to set ECDH PFS");
 
                if(SSL_CTX_set_cipher_list(ctx->native_handle(), \
                   "EECDH+ECDSA+AESGCM:EECDH+aRSA+AESGCM:EECDH+ECDSA+SHA384:EECDH+ECDSA+SHA256:AES256:" \
                   "!DHE:!RSA:!AES128:!RC4:!DES:!3DES:!DSS:!SRP:!PSK:!EXP:!MD5:!LOW:!aNULL:!eNULL") != 1)
-                  EOS_THROW(chain::http_exception, "Failed to set HTTPS cipher list");
+                  SYS_THROW(chain::http_exception, "Failed to set HTTPS cipher list");
             } catch (const fc::exception& e) {
                fc_elog( logger, "https server initialization error: ${w}", ("w", e.to_detail_string()) );
             } catch(std::exception& e) {
@@ -718,11 +718,11 @@ class http_plugin_impl : public std::enable_shared_from_this<http_plugin_impl> {
          verbose_http_errors = options.at( "verbose-http-errors" ).as<bool>();
 
          my->thread_pool_size = options.at( "http-threads" ).as<uint16_t>();
-         EOS_ASSERT( my->thread_pool_size > 0, chain::plugin_config_exception,
+         SYS_ASSERT( my->thread_pool_size > 0, chain::plugin_config_exception,
                      "http-threads ${num} must be greater than 0", ("num", my->thread_pool_size));
 
          auto max_bytes_mb = options.at( "http-max-bytes-in-flight-mb" ).as<int64_t>();
-         EOS_ASSERT( (max_bytes_mb >= -1 && max_bytes_mb < std::numeric_limits<int64_t>::max() / (1024 * 1024)), chain::plugin_config_exception,
+         SYS_ASSERT( (max_bytes_mb >= -1 && max_bytes_mb < std::numeric_limits<int64_t>::max() / (1024 * 1024)), chain::plugin_config_exception,
                      "http-max-bytes-in-flight-mb (${max_bytes_mb}) must be equal to or greater than -1 and less than ${max}", ("max_bytes_mb", max_bytes_mb) ("max", std::numeric_limits<int64_t>::max() / (1024 * 1024)) );
          if ( max_bytes_mb == -1 ) {
             my->max_bytes_in_flight = std::numeric_limits<size_t>::max();

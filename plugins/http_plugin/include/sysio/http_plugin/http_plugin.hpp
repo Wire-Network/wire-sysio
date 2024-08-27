@@ -222,7 +222,7 @@ namespace sysio {
    T parse_params(const std::string& body) {
       if constexpr (params_type == http_params_types::params_required) {
          if (is_empty_content(body)) {
-            EOS_THROW(chain::invalid_http_request, "A Request body is required");
+            SYS_THROW(chain::invalid_http_request, "A Request body is required");
          }
       }
 
@@ -236,14 +236,14 @@ namespace sysio {
                   return {};
                }
                if constexpr (params_type == http_params_types::no_params) {
-                  EOS_THROW(chain::invalid_http_request, "no parameter should be given");
+                  SYS_THROW(chain::invalid_http_request, "no parameter should be given");
                }
             }
             return fc::json::from_string(body).as<T>();
-         } catch (const chain::chain_exception& e) { // EOS_RETHROW_EXCEPTIONS does not re-type these so, re-code it
+         } catch (const chain::chain_exception& e) { // SYS_RETHROW_EXCEPTIONS does not re-type these so, re-code it
             throw fc::exception(e);
          }
-      } EOS_RETHROW_EXCEPTIONS(chain::invalid_http_request, "Unable to parse valid input from POST body");
+      } SYS_RETHROW_EXCEPTIONS(chain::invalid_http_request, "Unable to parse valid input from POST body");
    }
 }
 

@@ -38,7 +38,7 @@ using namespace sysio;
 #define INVOKE_R_R_R(api_handle, call_name, in_param0, in_param1) \
      const auto& params = parse_params<fc::variants, http_params_types::params_required>(body);\
      if (params.size() != 2) { \
-        EOS_THROW(chain::invalid_http_request, "Missing valid input from POST body"); \
+        SYS_THROW(chain::invalid_http_request, "Missing valid input from POST body"); \
      } \
      auto result = api_handle.call_name(params.at(0).as<in_param0>(), params.at(1).as<in_param1>());
 
@@ -46,7 +46,7 @@ using namespace sysio;
 #define INVOKE_R_R_R_R(api_handle, call_name, in_param0, in_param1, in_param2) \
      const auto& params = parse_params<fc::variants, http_params_types::params_required>(body);\
      if (params.size() != 3) { \
-        EOS_THROW(chain::invalid_http_request, "Missing valid input from POST body"); \
+        SYS_THROW(chain::invalid_http_request, "Missing valid input from POST body"); \
      } \
      auto result = api_handle.call_name(params.at(0).as<in_param0>(), params.at(1).as<in_param1>(), params.at(2).as<in_param2>());
 
@@ -62,7 +62,7 @@ using namespace sysio;
 #define INVOKE_V_R_R(api_handle, call_name, in_param0, in_param1) \
      const auto& params = parse_params<fc::variants, http_params_types::params_required>(body);\
      if (params.size() != 2) { \
-        EOS_THROW(chain::invalid_http_request, "Missing valid input from POST body"); \
+        SYS_THROW(chain::invalid_http_request, "Missing valid input from POST body"); \
      } \
      api_handle.call_name(params.at(0).as<in_param0>(), params.at(1).as<in_param1>()); \
      sysio::detail::wallet_api_plugin_empty result;
@@ -70,7 +70,7 @@ using namespace sysio;
 #define INVOKE_V_R_R_R(api_handle, call_name, in_param0, in_param1, in_param2) \
      const auto& params = parse_params<fc::variants, http_params_types::params_required>(body);\
      if (params.size() != 3) { \
-        EOS_THROW(chain::invalid_http_request, "Missing valid input from POST body"); \
+        SYS_THROW(chain::invalid_http_request, "Missing valid input from POST body"); \
      } \
      api_handle.call_name(params.at(0).as<in_param0>(), params.at(1).as<in_param1>(), params.at(2).as<in_param2>()); \
      sysio::detail::wallet_api_plugin_empty result;

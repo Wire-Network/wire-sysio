@@ -23,7 +23,7 @@ void sub_chain_plugin::set_program_options(options_description&, options_descrip
 void sub_chain_plugin::plugin_initialize(const variables_map& options) {
    try {
       if (!options.count("s-chain-contract") || !options.count("s-chain-actions")) {
-         EOS_ASSERT(false, plugin_config_exception, "sub_chain_plugin requires both --s-chain-contract and --s-chain-actions to be set");
+         SYS_ASSERT(false, plugin_config_exception, "sub_chain_plugin requires both --s-chain-contract and --s-chain-actions to be set");
       }
       else {
          std::string contract_name_str = options.at("s-chain-contract").as<std::string>();
@@ -36,7 +36,7 @@ void sub_chain_plugin::plugin_initialize(const variables_map& options) {
          }
       }
       // my->chain_plug = app().find_plugin<chain_plugin>();
-      // EOS_ASSERT( my->chain_plug, chain::missing_chain_plugin_exception, ""  );
+      // SYS_ASSERT( my->chain_plug, chain::missing_chain_plugin_exception, ""  );
 
    } FC_LOG_AND_RETHROW()
 }

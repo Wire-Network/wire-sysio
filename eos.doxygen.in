@@ -5,7 +5,7 @@
 #---------------------------------------------------------------------------
 DOXYFILE_ENCODING      = UTF-8
 PROJECT_NAME           = "LEAP"
-PROJECT_NUMBER         = "${DOXY_EOS_VERSION}"
+PROJECT_NUMBER         = "${DOXY_SYS_VERSION}"
 PROJECT_BRIEF          =
 PROJECT_LOGO           = eos-logo.png
 OUTPUT_DIRECTORY       =

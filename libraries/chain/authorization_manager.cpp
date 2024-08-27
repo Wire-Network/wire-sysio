@@ -64,19 +64,19 @@ namespace sysio { namespace chain {
 
             value.parent = 0;
             if (value.id == 0) {
-               EOS_ASSERT(row.parent == permission_name(), snapshot_exception, "Unexpected parent name on reserved permission 0");
-               EOS_ASSERT(row.name == permission_name(), snapshot_exception, "Unexpected permission name on reserved permission 0");
-               EOS_ASSERT(row.owner == name(), snapshot_exception, "Unexpected owner name on reserved permission 0");
-               EOS_ASSERT(row.auth.accounts.size() == 0,  snapshot_exception, "Unexpected auth accounts on reserved permission 0");
-               EOS_ASSERT(row.auth.keys.size() == 0,  snapshot_exception, "Unexpected auth keys on reserved permission 0");
-               EOS_ASSERT(row.auth.waits.size() == 0,  snapshot_exception, "Unexpected auth waits on reserved permission 0");
-               EOS_ASSERT(row.auth.threshold == 0,  snapshot_exception, "Unexpected auth threshold on reserved permission 0");
-               EOS_ASSERT(row.last_updated == time_point(),  snapshot_exception, "Unexpected auth last updated on reserved permission 0");
+               SYS_ASSERT(row.parent == permission_name(), snapshot_exception, "Unexpected parent name on reserved permission 0");
+               SYS_ASSERT(row.name == permission_name(), snapshot_exception, "Unexpected permission name on reserved permission 0");
+               SYS_ASSERT(row.owner == name(), snapshot_exception, "Unexpected owner name on reserved permission 0");
+               SYS_ASSERT(row.auth.accounts.size() == 0,  snapshot_exception, "Unexpected auth accounts on reserved permission 0");
+               SYS_ASSERT(row.auth.keys.size() == 0,  snapshot_exception, "Unexpected auth keys on reserved permission 0");
+               SYS_ASSERT(row.auth.waits.size() == 0,  snapshot_exception, "Unexpected auth waits on reserved permission 0");
+               SYS_ASSERT(row.auth.threshold == 0,  snapshot_exception, "Unexpected auth threshold on reserved permission 0");
+               SYS_ASSERT(row.last_updated == time_point(),  snapshot_exception, "Unexpected auth last updated on reserved permission 0");
                value.parent = 0;
             } else if ( row.parent != permission_name()){
                const auto& parent = db.get<permission_object, by_owner>(boost::make_tuple(row.owner, row.parent));
 
-               EOS_ASSERT(parent.id != 0, snapshot_exception, "Unexpected mapping to reserved permission 0");
+               SYS_ASSERT(parent.id != 0, snapshot_exception, "Unexpected mapping to reserved permission 0");
                value.parent = parent.id;
             }
 
@@ -138,7 +138,7 @@ namespace sysio { namespace chain {
                                                                     )
    {
       for(const key_weight& k: auth.keys)
-         EOS_ASSERT(k.key.which() < _db.get<protocol_state_object>().num_supported_key_types, unactivated_key_type,
+         SYS_ASSERT(k.key.which() < _db.get<protocol_state_object>().num_supported_key_types, unactivated_key_type,
            "Unactivated key type used when creating permission");
 
       auto creation_time = initial_creation_time;
@@ -173,7 +173,7 @@ namespace sysio { namespace chain {
                                                                     )
    {
       for(const key_weight& k: auth.keys)
-         EOS_ASSERT(k.key.which() < _db.get<protocol_state_object>().num_supported_key_types, unactivated_key_type,
+         SYS_ASSERT(k.key.which() < _db.get<protocol_state_object>().num_supported_key_types, unactivated_key_type,
            "Unactivated key type used when creating permission");
 
       auto creation_time = initial_creation_time;
@@ -202,7 +202,7 @@ namespace sysio { namespace chain {
 
    void authorization_manager::modify_permission( const permission_object& permission, const authority& auth ) {
       for(const key_weight& k: auth.keys)
-         EOS_ASSERT(k.key.which() < _db.get<protocol_state_object>().num_supported_key_types, unactivated_key_type,
+         SYS_ASSERT(k.key.which() < _db.get<protocol_state_object>().num_supported_key_types, unactivated_key_type,
            "Unactivated key type used when modifying permission");
 
       _db.modify( permission, [&](permission_object& po) {
@@ -225,7 +225,7 @@ namespace sysio { namespace chain {
    void authorization_manager::remove_permission( const permission_object& permission ) {
       const auto& index = _db.template get_index<permission_index, by_parent>();
       auto range = index.equal_range(permission.id);
-      EOS_ASSERT( range.first == range.second, action_validate_exception,
+      SYS_ASSERT( range.first == range.second, action_validate_exception,
                   "Cannot remove a permission which has children. Remove the children first.");
 
       _db.get_mutable_index<permission_usage_index>().remove_object( permission.usage_id._id );
@@ -250,15 +250,15 @@ namespace sysio { namespace chain {
 
    const permission_object*  authorization_manager::find_permission( const permission_level& level )const
    { try {
-      EOS_ASSERT( !level.actor.empty() && !level.permission.empty(), invalid_permission, "Invalid permission" );
+      SYS_ASSERT( !level.actor.empty() && !level.permission.empty(), invalid_permission, "Invalid permission" );
       return _db.find<permission_object, by_owner>( boost::make_tuple(level.actor,level.permission) );
-   } EOS_RETHROW_EXCEPTIONS( chain::permission_query_exception, "Failed to retrieve permission: ${level}", ("level", level) ) }
+   } SYS_RETHROW_EXCEPTIONS( chain::permission_query_exception, "Failed to retrieve permission: ${level}", ("level", level) ) }
 
    const permission_object&  authorization_manager::get_permission( const permission_level& level )const
    { try {
-      EOS_ASSERT( !level.actor.empty() && !level.permission.empty(), invalid_permission, "Invalid permission" );
+      SYS_ASSERT( !level.actor.empty() && !level.permission.empty(), invalid_permission, "Invalid permission" );
       return _db.get<permission_object, by_owner>( boost::make_tuple(level.actor,level.permission) );
-   } EOS_RETHROW_EXCEPTIONS( chain::permission_query_exception, "Failed to retrieve permission: ${level}", ("level", level) ) }
+   } SYS_RETHROW_EXCEPTIONS( chain::permission_query_exception, "Failed to retrieve permission: ${level}", ("level", level) ) }
 
    std::optional<permission_name> authorization_manager::lookup_linked_permission( account_name authorizer_account,
                                                                                    account_name scope,
@@ -290,7 +290,7 @@ namespace sysio { namespace chain {
    {
       // Special case native actions cannot be linked to a minimum permission, so there is no need to check.
       if( scope == config::system_account_name ) {
-          EOS_ASSERT( act_name != updateauth::get_name() &&
+          SYS_ASSERT( act_name != updateauth::get_name() &&
                      act_name != deleteauth::get_name() &&
                      act_name != linkauth::get_name() &&
                      act_name != unlinkauth::get_name() &&
@@ -315,24 +315,24 @@ namespace sysio { namespace chain {
                                                                const vector<permission_level>& auths
                                                              )const
    {
-      EOS_ASSERT( auths.size() == 1, irrelevant_auth_exception,
+      SYS_ASSERT( auths.size() == 1, irrelevant_auth_exception,
                   "updateauth action should only have one declared authorization" );
       const auto& auth = auths[0];
 
       // ** OR statement is custom, added to allow for sysio to add 'auth.ext' and 'auth.session' to users via our custom 'onlinkauth' from system contract.
-      EOS_ASSERT( (auth.actor == update.account || auth.actor == name("sysio")), irrelevant_auth_exception,
+      SYS_ASSERT( (auth.actor == update.account || auth.actor == name("sysio")), irrelevant_auth_exception,
                   "the owner of the affected permission needs to be the actor of the declared authorization" );
 
       // ** New: Prevents users from updating / adding 'auth.ext' and 'auth.session' special permissions.
       if(update.permission == name("auth.ext") || update.permission == name("auth.session")) {
-         EOS_ASSERT( auth.actor == name("sysio"), invalid_permission, "Special permission, only assignable by 'sysio' as a result of 'onlinkauth'" );
+         SYS_ASSERT( auth.actor == name("sysio"), invalid_permission, "Special permission, only assignable by 'sysio' as a result of 'onlinkauth'" );
       } else {
          const auto* min_permission = find_permission({update.account, update.permission});
          if( !min_permission ) { // creating a new permission
             min_permission = &get_permission({update.account, update.parent});
          }
 
-         EOS_ASSERT( get_permission(auth).satisfies( *min_permission,
+         SYS_ASSERT( get_permission(auth).satisfies( *min_permission,
                                                    _db.get_index<permission_index>().indices() ),
                      irrelevant_auth_exception,
                      "updateauth action declares irrelevant authority '${auth}'; minimum authority is ${min}",
@@ -344,15 +344,15 @@ namespace sysio { namespace chain {
                                                                const vector<permission_level>& auths
                                                              )const
    {
-      EOS_ASSERT( auths.size() == 1, irrelevant_auth_exception,
+      SYS_ASSERT( auths.size() == 1, irrelevant_auth_exception,
                   "deleteauth action should only have one declared authorization" );
       const auto& auth = auths[0];
-      EOS_ASSERT( auth.actor == del.account, irrelevant_auth_exception,
+      SYS_ASSERT( auth.actor == del.account, irrelevant_auth_exception,
                   "the owner of the permission to delete needs to be the actor of the declared authorization" );
 
       const auto& min_permission = get_permission({del.account, del.permission});
 
-      EOS_ASSERT( get_permission(auth).satisfies( min_permission,
+      SYS_ASSERT( get_permission(auth).satisfies( min_permission,
                                                   _db.get_index<permission_index>().indices() ),
                   irrelevant_auth_exception,
                   "updateauth action declares irrelevant authority '${auth}'; minimum authority is ${min}",
@@ -363,24 +363,24 @@ namespace sysio { namespace chain {
                                                              const vector<permission_level>& auths
                                                            )const
    {
-      EOS_ASSERT( auths.size() == 1, irrelevant_auth_exception,
+      SYS_ASSERT( auths.size() == 1, irrelevant_auth_exception,
                   "link action should only have one declared authorization" );
       const auto& auth = auths[0];
-      EOS_ASSERT( auth.actor == link.account, irrelevant_auth_exception,
+      SYS_ASSERT( auth.actor == link.account, irrelevant_auth_exception,
                   "the owner of the linked permission needs to be the actor of the declared authorization" );
 
       if( link.code == config::system_account_name
             || !_control.is_builtin_activated( builtin_protocol_feature_t::fix_linkauth_restriction ) ) 
       {
-         EOS_ASSERT( link.type != updateauth::get_name(),  action_validate_exception,
+         SYS_ASSERT( link.type != updateauth::get_name(),  action_validate_exception,
                      "Cannot link sysio::updateauth to a minimum permission" );
-         EOS_ASSERT( link.type != deleteauth::get_name(),  action_validate_exception,
+         SYS_ASSERT( link.type != deleteauth::get_name(),  action_validate_exception,
                      "Cannot link sysio::deleteauth to a minimum permission" );
-         EOS_ASSERT( link.type != linkauth::get_name(),    action_validate_exception,
+         SYS_ASSERT( link.type != linkauth::get_name(),    action_validate_exception,
                      "Cannot link sysio::linkauth to a minimum permission" );
-         EOS_ASSERT( link.type != unlinkauth::get_name(),  action_validate_exception,
+         SYS_ASSERT( link.type != unlinkauth::get_name(),  action_validate_exception,
                      "Cannot link sysio::unlinkauth to a minimum permission" );
-         EOS_ASSERT( link.type != canceldelay::get_name(), action_validate_exception,
+         SYS_ASSERT( link.type != canceldelay::get_name(), action_validate_exception,
                      "Cannot link sysio::canceldelay to a minimum permission" );
       }
 
@@ -389,7 +389,7 @@ namespace sysio { namespace chain {
       if( !linked_permission_name ) // if action is linked to sysio.any permission
          return;
 
-      EOS_ASSERT( get_permission(auth).satisfies( get_permission({link.account, *linked_permission_name}),
+      SYS_ASSERT( get_permission(auth).satisfies( get_permission({link.account, *linked_permission_name}),
                                                   _db.get_index<permission_index>().indices()              ),
                   irrelevant_auth_exception,
                   "link action declares irrelevant authority '${auth}'; minimum authority is ${min}",
@@ -400,21 +400,21 @@ namespace sysio { namespace chain {
                                                                const vector<permission_level>& auths
                                                              )const
    {
-      EOS_ASSERT( auths.size() == 1, irrelevant_auth_exception,
+      SYS_ASSERT( auths.size() == 1, irrelevant_auth_exception,
                   "unlink action should only have one declared authorization" );
       const auto& auth = auths[0];
-      EOS_ASSERT( auth.actor == unlink.account, irrelevant_auth_exception,
+      SYS_ASSERT( auth.actor == unlink.account, irrelevant_auth_exception,
                   "the owner of the linked permission needs to be the actor of the declared authorization" );
 
       const auto unlinked_permission_name = lookup_linked_permission(unlink.account, unlink.code, unlink.type);
-      EOS_ASSERT( unlinked_permission_name, transaction_exception,
+      SYS_ASSERT( unlinked_permission_name, transaction_exception,
                   "cannot unlink non-existent permission link of account '${account}' for actions matching '${code}::${action}'",
                   ("account", unlink.account)("code", unlink.code)("action", unlink.type) );
 
       if( *unlinked_permission_name == config::sysio_any_name )
          return;
 
-      EOS_ASSERT( get_permission(auth).satisfies( get_permission({unlink.account, *unlinked_permission_name}),
+      SYS_ASSERT( get_permission(auth).satisfies( get_permission({unlink.account, *unlinked_permission_name}),
                                                   _db.get_index<permission_index>().indices()                  ),
                   irrelevant_auth_exception,
                   "unlink action declares irrelevant authority '${auth}'; minimum authority is ${min}",
@@ -425,11 +425,11 @@ namespace sysio { namespace chain {
                                                                             const vector<permission_level>& auths
                                                                           )const
    {
-      EOS_ASSERT( auths.size() == 1, irrelevant_auth_exception,
+      SYS_ASSERT( auths.size() == 1, irrelevant_auth_exception,
                   "canceldelay action should only have one declared authorization" );
       const auto& auth = auths[0];
 
-      EOS_ASSERT( get_permission(auth).satisfies( get_permission(cancel.canceling_auth),
+      SYS_ASSERT( get_permission(auth).satisfies( get_permission(cancel.canceling_auth),
                                                   _db.get_index<permission_index>().indices() ),
                   irrelevant_auth_exception,
                   "canceldelay action declares irrelevant authority '${auth}'; specified authority to satisfy is ${min}",
@@ -440,7 +440,7 @@ namespace sysio { namespace chain {
       const auto& generated_transaction_idx = _control.db().get_index<generated_transaction_multi_index>();
       const auto& generated_index = generated_transaction_idx.indices().get<by_trx_id>();
       const auto& itr = generated_index.lower_bound(trx_id);
-      EOS_ASSERT( itr != generated_index.end() && itr->sender == account_name() && itr->trx_id == trx_id,
+      SYS_ASSERT( itr != generated_index.end() && itr->sender == account_name() && itr->trx_id == trx_id,
                   tx_not_found,
                  "cannot cancel trx_id=${tid}, there is no deferred transaction with that transaction id",
                  ("tid", trx_id) );
@@ -457,7 +457,7 @@ namespace sysio { namespace chain {
          if( found ) break;
       }
 
-      EOS_ASSERT( found, action_validate_exception,
+      SYS_ASSERT( found, action_validate_exception,
                   "canceling_auth in canceldelay action was not found as authorization in the original delayed transaction" );
 
       return (itr->delay_until - itr->published);
@@ -524,7 +524,7 @@ namespace sysio { namespace chain {
                auto min_permission_name = lookup_minimum_permission(declared_auth.actor, act.account, act.name);
                if( min_permission_name ) { // since special cases were already handled, it should only be false if the permission is sysio.any
                   const auto& min_permission = get_permission({declared_auth.actor, *min_permission_name});
-                  EOS_ASSERT( get_permission(declared_auth).satisfies( min_permission,
+                  SYS_ASSERT( get_permission(declared_auth).satisfies( min_permission,
                                                                        _db.get_index<permission_index>().indices() ),
                               irrelevant_auth_exception,
                               "action declares irrelevant authority '${auth}'; minimum authority is ${min}",
@@ -550,7 +550,7 @@ namespace sysio { namespace chain {
       // ascending order of the actor name with ties broken by ascending order of the permission name.
       for( const auto& p : permissions_to_satisfy ) {
          checktime(); // TODO: this should eventually move into authority_checker instead
-         EOS_ASSERT( checker.satisfied( p.first, p.second ) || check_but_dont_fail, unsatisfied_authorization,
+         SYS_ASSERT( checker.satisfied( p.first, p.second ) || check_but_dont_fail, unsatisfied_authorization,
                      "transaction declares authority '${auth}', "
                      "but does not have signatures for it under a provided delay of ${provided_delay} ms, "
                      "provided permissions ${provided_permissions}, provided keys ${provided_keys}, "
@@ -565,7 +565,7 @@ namespace sysio { namespace chain {
       }
 
       if( !allow_unused_keys  || check_but_dont_fail) {
-         EOS_ASSERT( checker.all_keys_used(), tx_irrelevant_sig,
+         SYS_ASSERT( checker.all_keys_used(), tx_irrelevant_sig,
                      "transaction bears irrelevant signatures from these keys: ${keys}",
                      ("keys", checker.unused_keys()) );
       }
@@ -593,7 +593,7 @@ namespace sysio { namespace chain {
                                         checktime
                                       );
 
-      EOS_ASSERT( checker.satisfied({account, permission}), unsatisfied_authorization,
+      SYS_ASSERT( checker.satisfied({account, permission}), unsatisfied_authorization,
                   "permission '${auth}' was not satisfied under a provided delay of ${provided_delay} ms, "
                   "provided permissions ${provided_permissions}, provided keys ${provided_keys}, "
                   "and a delay max limit of ${delay_max_limit_ms} ms",
@@ -605,7 +605,7 @@ namespace sysio { namespace chain {
                 );
 
       if( !allow_unused_keys ) {
-         EOS_ASSERT( checker.all_keys_used(), tx_irrelevant_sig,
+         SYS_ASSERT( checker.all_keys_used(), tx_irrelevant_sig,
                      "irrelevant keys provided: ${keys}",
                      ("keys", checker.unused_keys()) );
       }
@@ -626,7 +626,7 @@ namespace sysio { namespace chain {
 
       for (const auto& act : trx.actions ) {
          for (const auto& declared_auth : act.authorization) {
-            EOS_ASSERT( checker.satisfied(declared_auth), unsatisfied_authorization,
+            SYS_ASSERT( checker.satisfied(declared_auth), unsatisfied_authorization,
                         "transaction declares authority '${auth}', but does not have signatures for it.",
                         ("auth", declared_auth) );
          }

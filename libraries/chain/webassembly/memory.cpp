@@ -3,7 +3,7 @@
 namespace sysio { namespace chain { namespace webassembly {
    void* interface::memcpy( memcpy_params args ) const {
       auto [dest, src, length] = args;
-      EOS_ASSERT((size_t)(std::abs((ptrdiff_t)(char*)dest - (ptrdiff_t)(const char*)src)) >= length,
+      SYS_ASSERT((size_t)(std::abs((ptrdiff_t)(char*)dest - (ptrdiff_t)(const char*)src)) >= length,
             overlapping_memory_error, "memcpy can only accept non-aliasing pointers");
       return (char *)std::memcpy((char*)dest, (const char*)src, length);
    }

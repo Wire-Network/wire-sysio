@@ -53,8 +53,8 @@ namespace sysio { namespace chain {
             block_log_impl(std::optional<block_log_prune_config> prune_conf) :
               prune_config(prune_conf) {
                if(prune_config) {
-                  EOS_ASSERT(prune_config->prune_blocks, block_log_exception, "block log prune configuration requires at least one block");
-                  EOS_ASSERT(__builtin_popcount(prune_config->prune_threshold) == 1, block_log_exception, "block log prune threshold must be power of 2");
+                  SYS_ASSERT(prune_config->prune_blocks, block_log_exception, "block log prune configuration requires at least one block");
+                  SYS_ASSERT(__builtin_popcount(prune_config->prune_threshold) == 1, block_log_exception, "block log prune threshold must be power of 2");
                   //switch this over to the mask that will be used
                   prune_config->prune_threshold = ~(prune_config->prune_threshold-1);
                }
@@ -196,14 +196,14 @@ namespace sysio { namespace chain {
 
          void skip( size_t s ) {
             auto status = fseek(_file, s, SEEK_CUR);
-            EOS_ASSERT( status == 0, block_log_exception,
+            SYS_ASSERT( status == 0, block_log_exception,
                         "Could not seek past ${bytes} bytes in Block log file at '${blocks_log}'. Returned status: ${status}",
                         ("bytes", s)("blocks_log", _filename)("status", status) );
          }
 
          bool read( char* d, size_t s ) {
             size_t result = fread( d, 1, s, _file );
-            EOS_ASSERT( result == s, block_log_exception,
+            SYS_ASSERT( result == s, block_log_exception,
                         "only able to read ${act} bytes of the expected ${exp} bytes in file: ${file}",
                         ("act",result)("exp",s)("file", _filename) );
             return true;
@@ -275,8 +275,8 @@ namespace sysio { namespace chain {
          my->version = 0;
          fc::raw::unpack(my->block_file, my->version);
          const bool is_currently_pruned = detail::is_pruned_log_and_mask_version(my->version);
-         EOS_ASSERT( my->version > 0, block_log_exception, "Block log was not setup properly" );
-         EOS_ASSERT( is_supported_version(my->version), block_log_unsupported_version,
+         SYS_ASSERT( my->version > 0, block_log_exception, "Block log was not setup properly" );
+         SYS_ASSERT( is_supported_version(my->version), block_log_unsupported_version,
                      "Unsupported version of block log. Block log version is ${version} while code supports version(s) [${min},${max}]",
                      ("version", my->version)("min", block_log::min_supported_version)("max", block_log::max_supported_version) );
 
@@ -285,7 +285,7 @@ namespace sysio { namespace chain {
          if (my->version > 1){
             my->first_block_num = 0;
             fc::raw::unpack(my->block_file, my->first_block_num);
-            EOS_ASSERT(my->first_block_num > 0, block_log_exception, "Block log is malformed, first recorded block number is 0 but must be greater than or equal to 1");
+            SYS_ASSERT(my->first_block_num > 0, block_log_exception, "Block log is malformed, first recorded block number is 0 but must be greater than or equal to 1");
          } else {
             my->first_block_num = 1;
          }
@@ -361,7 +361,7 @@ namespace sysio { namespace chain {
 
    void detail::block_log_impl::append(const signed_block_ptr& b) {
       try {
-         EOS_ASSERT( genesis_written_to_block_log, block_log_append_fail, "Cannot append to block log until the genesis is first written" );
+         SYS_ASSERT( genesis_written_to_block_log, block_log_append_fail, "Cannot append to block log until the genesis is first written" );
 
          check_open_files();
 
@@ -372,7 +372,7 @@ namespace sysio { namespace chain {
             block_file.skip(-sizeof(uint32_t));
          uint64_t pos = block_file.tellp();
 
-         EOS_ASSERT(index_file.tellp() == sizeof(uint64_t) * (b->block_num() - index_first_block_num),
+         SYS_ASSERT(index_file.tellp() == sizeof(uint64_t) * (b->block_num() - index_first_block_num),
                    block_log_append_fail,
                    "Append to index file occuring at wrong position.",
                    ("position", (uint64_t) index_file.tellp())
@@ -440,7 +440,7 @@ namespace sysio { namespace chain {
       block_file.seek(0);
       fc::raw::unpack(block_file, old_version);
       fc::raw::unpack(block_file, old_first_block_num);
-      EOS_ASSERT(is_pruned_log_and_mask_version(old_version), block_log_exception, "Trying to vacuumed a non-pruned block log");
+      SYS_ASSERT(is_pruned_log_and_mask_version(old_version), block_log_exception, "Trying to vacuumed a non-pruned block log");
 
       if(block_log::contains_genesis_state(old_version, old_first_block_num)) {
          //we'll always write a v3 log, but need to possibly mutate the genesis_state to a chainid should we have pruned a log starting with a genesis_state
@@ -452,7 +452,7 @@ namespace sysio { namespace chain {
          fc::raw::pack(block_file, block_log::max_supported_version);
          fc::raw::pack(block_file, first_block_num);
          if(first_block_num == 1) {
-            EOS_ASSERT(old_first_block_num == 1, block_log_exception, "expected an old first blocknum of 1");
+            SYS_ASSERT(old_first_block_num == 1, block_log_exception, "expected an old first blocknum of 1");
             fc::raw::pack(block_file, gs);
          }
          else
@@ -595,7 +595,7 @@ namespace sysio { namespace chain {
    }
 
    void block_log::reset( const chain_id_type& chain_id, uint32_t first_block_num ) {
-      EOS_ASSERT( first_block_num > 1, block_log_exception,
+      SYS_ASSERT( first_block_num > 1, block_log_exception,
                   "Block log version ${ver} needs to be created with a genesis state if starting from block number 1." );
       my->reset(chain_id, signed_block_ptr(), first_block_num);
    }
@@ -633,7 +633,7 @@ namespace sysio { namespace chain {
          uint64_t pos = get_block_pos(block_num);
          if (pos != npos) {
             b = read_block(pos);
-            EOS_ASSERT(b->block_num() == block_num, reversible_blocks_exception,
+            SYS_ASSERT(b->block_num() == block_num, reversible_blocks_exception,
                       "Wrong block was read from block log.", ("returned", b->block_num())("expected", block_num));
          }
          return b;
@@ -646,7 +646,7 @@ namespace sysio { namespace chain {
          if (pos != npos) {
             block_header bh;
             read_block_header(bh, pos);
-            EOS_ASSERT(bh.block_num() == block_num, reversible_blocks_exception,
+            SYS_ASSERT(bh.block_num() == block_num, reversible_blocks_exception,
                        "Wrong block header was read from block log.", ("returned", bh.block_num())("expected", block_num));
             return bh.calculate_id();
          }
@@ -750,7 +750,7 @@ namespace sysio { namespace chain {
 
    fc::path block_log::repair_log(const fc::path& data_dir, uint32_t truncate_at_block, const char* reversible_block_dir_name) {
       ilog("Recovering Block Log...");
-      EOS_ASSERT( fc::is_directory(data_dir) && fc::is_regular_file(data_dir / "blocks.log"), block_log_not_found,
+      SYS_ASSERT( fc::is_directory(data_dir) && fc::is_regular_file(data_dir / "blocks.log"), block_log_not_found,
                  "Block log not found in '${blocks_dir}'", ("blocks_dir", data_dir)          );
 
       auto now = fc::time_point::now();
@@ -761,10 +761,10 @@ namespace sysio { namespace chain {
       }
       auto backup_dir = blocks_dir.parent_path();
       auto blocks_dir_name = blocks_dir.filename();
-      EOS_ASSERT( blocks_dir_name.generic_string() != ".", block_log_exception, "Invalid path to blocks directory" );
+      SYS_ASSERT( blocks_dir_name.generic_string() != ".", block_log_exception, "Invalid path to blocks directory" );
       backup_dir = backup_dir / blocks_dir_name.generic_string().append("-").append( now );
 
-      EOS_ASSERT( !fc::exists(backup_dir), block_log_backup_dir_exist,
+      SYS_ASSERT( !fc::exists(backup_dir), block_log_backup_dir_exist,
                  "Cannot move existing blocks directory to already existing directory '${new_blocks_dir}'",
                  ("new_blocks_dir", backup_dir) );
 
@@ -792,8 +792,8 @@ namespace sysio { namespace chain {
 
       uint32_t version = 0;
       old_block_stream.read( (char*)&version, sizeof(version) );
-      EOS_ASSERT( version > 0, block_log_exception, "Block log was not setup properly" );
-      EOS_ASSERT( is_supported_version(version), block_log_unsupported_version,
+      SYS_ASSERT( version > 0, block_log_exception, "Block log was not setup properly" );
+      SYS_ASSERT( is_supported_version(version), block_log_unsupported_version,
                  "Unsupported version of block log. Block log version is ${version} while code supports version(s) [${min},${max}]",
                  ("version", version)("min", block_log::min_supported_version)("max", block_log::max_supported_version) );
 
@@ -806,7 +806,7 @@ namespace sysio { namespace chain {
          // this assert is only here since repair_log is only used for --hard-replay-blockchain, which removes any
          // existing state, if another API needs to use it, this can be removed and the check for the first block's
          // previous block id will need to accommodate this.
-         EOS_ASSERT( first_block_num == 1, block_log_exception,
+         SYS_ASSERT( first_block_num == 1, block_log_exception,
                      "Block log ${file} must contain a genesis state and start at block number 1.  This block log "
                      "starts at block number ${first_block_num}.",
                      ("file", (backup_dir / "blocks.log").generic_string())("first_block_num", first_block_num));
@@ -828,7 +828,7 @@ namespace sysio { namespace chain {
          new_block_stream << chain_id;
       }
       else {
-         EOS_THROW( block_log_exception,
+         SYS_THROW( block_log_exception,
                     "Block log ${file} is not supported. version: ${ver} and first_block_num: ${fbn} does not contain "
                     "a genesis_state nor a chain_id.",
                     ("file", (backup_dir / "blocks.log").generic_string())("ver", version)("fbn", first_block_num));
@@ -839,7 +839,7 @@ namespace sysio { namespace chain {
          std::decay_t<decltype(npos)> actual_totem;
          old_block_stream.read ( (char*)&actual_totem, sizeof(actual_totem) );
 
-         EOS_ASSERT(actual_totem == expected_totem, block_log_exception,
+         SYS_ASSERT(actual_totem == expected_totem, block_log_exception,
                     "Expected separator between block log header and blocks was not found( expected: ${e}, actual: ${a} )",
                     ("e", fc::to_hex((char*)&expected_totem, sizeof(expected_totem) ))("a", fc::to_hex((char*)&actual_totem, sizeof(actual_totem) )));
 
@@ -940,7 +940,7 @@ namespace sysio { namespace chain {
 
    template <typename ChainContext, typename Lambda>
    std::optional<ChainContext> detail::block_log_impl::extract_chain_context( const fc::path& data_dir, Lambda&& lambda ) {
-      EOS_ASSERT( fc::is_directory(data_dir) && fc::is_regular_file(data_dir / "blocks.log"), block_log_not_found,
+      SYS_ASSERT( fc::is_directory(data_dir) && fc::is_regular_file(data_dir / "blocks.log"), block_log_not_found,
                   "Block log not found in '${blocks_dir}'", ("blocks_dir", data_dir)          );
 
       std::fstream  block_stream;
@@ -949,7 +949,7 @@ namespace sysio { namespace chain {
       uint32_t version = 0;
       block_stream.read( (char*)&version, sizeof(version) );
       is_pruned_log_and_mask_version(version);
-      EOS_ASSERT( version >= block_log::min_supported_version && version <= block_log::max_supported_version, block_log_unsupported_version,
+      SYS_ASSERT( version >= block_log::min_supported_version && version <= block_log::max_supported_version, block_log_unsupported_version,
                   "Unsupported version of block log. Block log version is ${version} while code supports version(s) [${min},${max}]",
                   ("version", version)("min", block_log::min_supported_version)("max", block_log::max_supported_version) );
 
@@ -982,7 +982,7 @@ namespace sysio { namespace chain {
             fc::raw::unpack(block_stream, gs);
             return gs.compute_chain_id();
          }
-         EOS_ASSERT( contains_chain_id(version, first_block_num), block_log_exception,
+         SYS_ASSERT( contains_chain_id(version, first_block_num), block_log_exception,
                      "Block log error! version: ${version} with first_block_num: ${num} does not contain a "
                      "chain id or genesis state, so the chain id cannot be determined.",
                      ("version", version)("num", first_block_num) );
@@ -1016,35 +1016,35 @@ namespace sysio { namespace chain {
    uint32_t detail::reverse_iterator::open(const fc::path& block_file_name) {
       _block_file_name = block_file_name.generic_string();
       _file.reset( FC_FOPEN(_block_file_name.c_str(), "r"));
-      EOS_ASSERT( _file, block_log_exception, "Could not open Block log file at '${blocks_log}'", ("blocks_log", _block_file_name) );
+      SYS_ASSERT( _file, block_log_exception, "Could not open Block log file at '${blocks_log}'", ("blocks_log", _block_file_name) );
       _end_of_buffer_position = _unset_position;
 
       //read block log to see if version 1 or 2 and get first blocknum (implicit 1 if version 1)
       _version = 0;
       auto size = fread((char*)&_version, sizeof(_version), 1, _file.get());
-      EOS_ASSERT( size == 1, block_log_exception, "Block log file at '${blocks_log}' could not be read.", ("file", _block_file_name) );
+      SYS_ASSERT( size == 1, block_log_exception, "Block log file at '${blocks_log}' could not be read.", ("file", _block_file_name) );
       const bool is_prune_log = is_pruned_log_and_mask_version(_version);
-      EOS_ASSERT( block_log::is_supported_version(_version), block_log_unsupported_version,
+      SYS_ASSERT( block_log::is_supported_version(_version), block_log_unsupported_version,
                   "block log version ${v} is not supported", ("v", _version));
       if (_version == 1) {
          _first_block_num = 1;
       }
       else {
          size = fread((char*)&_first_block_num, sizeof(_first_block_num), 1, _file.get());
-         EOS_ASSERT( size == 1, block_log_exception, "Block log file at '${blocks_log}' not formatted consistently with version ${v}.", ("file", _block_file_name)("v", _version) );
+         SYS_ASSERT( size == 1, block_log_exception, "Block log file at '${blocks_log}' not formatted consistently with version ${v}.", ("file", _block_file_name)("v", _version) );
       }
 
       auto status = fseek(_file.get(), 0, SEEK_END);
-      EOS_ASSERT( status == 0, block_log_exception, "Could not open Block log file at '${blocks_log}'. Returned status: ${status}", ("blocks_log", _block_file_name)("status", status) );
+      SYS_ASSERT( status == 0, block_log_exception, "Could not open Block log file at '${blocks_log}'. Returned status: ${status}", ("blocks_log", _block_file_name)("status", status) );
 
       auto eof_position_in_file = ftell(_file.get());
-      EOS_ASSERT( eof_position_in_file > 0, block_log_exception, "Block log file at '${blocks_log}' could not be read.", ("blocks_log", _block_file_name) );
+      SYS_ASSERT( eof_position_in_file > 0, block_log_exception, "Block log file at '${blocks_log}' could not be read.", ("blocks_log", _block_file_name) );
 
       if(is_prune_log) {
          fseek(_file.get(), -sizeof(uint32_t), SEEK_CUR);
          uint32_t prune_count;
          size = fread((char*)&prune_count, sizeof(prune_count), 1, _file.get());
-         EOS_ASSERT( size == 1, block_log_exception, "Block log file at '${blocks_log}' not formatted consistently with pruned version ${v}.", ("file", _block_file_name)("v", _version) );
+         SYS_ASSERT( size == 1, block_log_exception, "Block log file at '${blocks_log}' not formatted consistently with pruned version ${v}.", ("file", _block_file_name)("v", _version) );
          _prune_block_limit = prune_count;
          eof_position_in_file -= sizeof(prune_count);
       }
@@ -1070,9 +1070,9 @@ namespace sysio { namespace chain {
       else {
          const auto blknum_offset_pos = block_pos + trim_data::blknum_offset;
          auto status = fseek(_file.get(), blknum_offset_pos, SEEK_SET);
-         EOS_ASSERT( status == 0, block_log_exception, "Could not seek in '${blocks_log}' to position: ${pos}. Returned status: ${status}", ("blocks_log", _block_file_name)("pos", blknum_offset_pos)("status", status) );
+         SYS_ASSERT( status == 0, block_log_exception, "Could not seek in '${blocks_log}' to position: ${pos}. Returned status: ${status}", ("blocks_log", _block_file_name)("pos", blknum_offset_pos)("status", status) );
          auto size = fread((void*)&bnum, sizeof(bnum), 1, _file.get());
-         EOS_ASSERT( size == 1, block_log_exception, "Could not read in '${blocks_log}' at position: ${pos}", ("blocks_log", _block_file_name)("pos", blknum_offset_pos) );
+         SYS_ASSERT( size == 1, block_log_exception, "Could not read in '${blocks_log}' at position: ${pos}", ("blocks_log", _block_file_name)("pos", blknum_offset_pos) );
       }
       _last_block_num = fc::endian_reverse_u32(bnum) + 1;                     //convert from big endian to little endian and add 1
       _blocks_expected = _last_block_num - _first_block_num + 1;
@@ -1080,7 +1080,7 @@ namespace sysio { namespace chain {
    }
 
    uint64_t detail::reverse_iterator::previous() {
-      EOS_ASSERT( _current_position_in_file != block_log::npos,
+      SYS_ASSERT( _current_position_in_file != block_log::npos,
                   block_log_exception,
                   "Block log file at '${blocks_log}' first block already returned by former call to previous(), it is no longer valid to call this function.", ("blocks_log", _block_file_name) );
 
@@ -1100,7 +1100,7 @@ namespace sysio { namespace chain {
       ++_blocks_found;
       if (block_location_in_file == block_log::npos) {
          _current_position_in_file = block_location_in_file;
-         EOS_ASSERT( _blocks_found != _blocks_expected,
+         SYS_ASSERT( _blocks_found != _blocks_expected,
                     block_log_exception,
                     "Block log file at '${blocks_log}' formatting indicated last block: ${last_block_num}, first block: ${first_block_num}, but found ${num} blocks",
                     ("blocks_log", _block_file_name)("last_block_num", _last_block_num)("first_block_num", _first_block_num)("num", _blocks_found) );
@@ -1108,7 +1108,7 @@ namespace sysio { namespace chain {
       else {
          const uint64_t previous_position_in_file = _current_position_in_file;
          _current_position_in_file = block_location_in_file - _position_size;
-         EOS_ASSERT( _current_position_in_file < previous_position_in_file,
+         SYS_ASSERT( _current_position_in_file < previous_position_in_file,
                      block_log_exception,
                      "Block log file at '${blocks_log}' formatting is incorrect, indicates position later location in file: ${pos}, which was retrieved at: ${orig_pos}.",
                      ("blocks_log", _block_file_name)("pos", _current_position_in_file)("orig_pos", previous_position_in_file) );
@@ -1118,7 +1118,7 @@ namespace sysio { namespace chain {
    }
 
    void detail::reverse_iterator::update_buffer() {
-      EOS_ASSERT( _current_position_in_file != block_log::npos, block_log_exception, "Block log file not setup properly" );
+      SYS_ASSERT( _current_position_in_file != block_log::npos, block_log_exception, "Block log file not setup properly" );
 
       // since we need to read in a new section, just need to ensure the next position is at the very end of the buffer
       _end_of_buffer_position = _current_position_in_file + _position_size;
@@ -1130,10 +1130,10 @@ namespace sysio { namespace chain {
       }
 
       auto status = fseek(_file.get(), _start_of_buffer_position, SEEK_SET);
-      EOS_ASSERT( status == 0, block_log_exception, "Could not seek in '${blocks_log}' to position: ${pos}. Returned status: ${status}", ("blocks_log", _block_file_name)("pos", _start_of_buffer_position)("status", status) );
+      SYS_ASSERT( status == 0, block_log_exception, "Could not seek in '${blocks_log}' to position: ${pos}. Returned status: ${status}", ("blocks_log", _block_file_name)("pos", _start_of_buffer_position)("status", status) );
       char* buf = _buffer_ptr.get();
       auto size = fread((void*)buf, (_end_of_buffer_position - _start_of_buffer_position), 1, _file.get());//read tail of blocks.log file into buf
-      EOS_ASSERT( size == 1, block_log_exception, "blocks.log read fails" );
+      SYS_ASSERT( size == 1, block_log_exception, "blocks.log read fails" );
    }
 
    detail::index_writer::index_writer(const fc::path& block_index_name, uint32_t blocks_expected)
@@ -1151,7 +1151,7 @@ namespace sysio { namespace chain {
    }
 
    void detail::index_writer::write(uint64_t pos) {
-      EOS_ASSERT( _blocks_remaining, block_log_exception, "No more blocks were expected for the block log index" );
+      SYS_ASSERT( _blocks_remaining, block_log_exception, "No more blocks were expected for the block log index" );
 
       char* base = (char*)_mapped_file_region->get_address();
       base += --_blocks_remaining*sizeof(uint64_t);
@@ -1189,7 +1189,7 @@ namespace sysio { namespace chain {
 
    bool block_log::trim_blocklog_front(const fc::path& block_dir, const fc::path& temp_dir, uint32_t truncate_at_block) {
       using namespace std;
-      EOS_ASSERT( block_dir != temp_dir, block_log_exception, "block_dir and temp_dir need to be different directories" );
+      SYS_ASSERT( block_dir != temp_dir, block_log_exception, "block_dir and temp_dir need to be different directories" );
       ilog("In directory ${dir} will trim all blocks before block ${n} from blocks.log and blocks.index.",
            ("dir", block_dir.generic_string())("n", truncate_at_block));
       trim_data original_block_log(block_dir);
@@ -1240,7 +1240,7 @@ namespace sysio { namespace chain {
       const uint64_t original_file_block_pos = original_block_log.block_pos(truncate_at_block);
       const uint64_t pos_delta = original_file_block_pos - new_block_file_first_block_pos;
       auto status = fseek(original_block_log.blk_in, 0, SEEK_END);
-      EOS_ASSERT( status == 0, block_log_exception, "blocks.log seek failed" );
+      SYS_ASSERT( status == 0, block_log_exception, "blocks.log seek failed" );
 
       // all blocks to copy to the new blocklog
       const uint64_t to_write = ftell(original_block_log.blk_in) - original_file_block_pos;
@@ -1266,7 +1266,7 @@ namespace sysio { namespace chain {
          const auto start_of_blk_buffer_pos = original_file_block_pos + to_write_remaining - read_size;
          status = fseek(original_block_log.blk_in, start_of_blk_buffer_pos, SEEK_SET);
          const auto num_read = fread(buf, read_size, 1, original_block_log.blk_in);
-         EOS_ASSERT( num_read == 1, block_log_exception, "blocks.log read failed" );
+         SYS_ASSERT( num_read == 1, block_log_exception, "blocks.log read failed" );
 
          // walk this memory section to adjust block position to match the adjusted location
          // of the block start and store in the new index file
@@ -1313,15 +1313,15 @@ namespace sysio { namespace chain {
       block_file_name = block_dir / "blocks.log";
       index_file_name = block_dir / "blocks.index";
       blk_in = FC_FOPEN(block_file_name.generic_string().c_str(), "rb");
-      EOS_ASSERT( blk_in != nullptr, block_log_not_found, "cannot read file ${file}", ("file",block_file_name.string()) );
+      SYS_ASSERT( blk_in != nullptr, block_log_not_found, "cannot read file ${file}", ("file",block_file_name.string()) );
       ind_in = FC_FOPEN(index_file_name.generic_string().c_str(), "rb");
-      EOS_ASSERT( ind_in != nullptr, block_log_not_found, "cannot read file ${file}", ("file",index_file_name.string()) );
+      SYS_ASSERT( ind_in != nullptr, block_log_not_found, "cannot read file ${file}", ("file",index_file_name.string()) );
       auto size = fread((void*)&version,sizeof(version), 1, blk_in);
-      EOS_ASSERT( size == 1, block_log_unsupported_version, "invalid format for file ${file}", ("file",block_file_name.string()));
+      SYS_ASSERT( size == 1, block_log_unsupported_version, "invalid format for file ${file}", ("file",block_file_name.string()));
       ilog("block log version= ${version}",("version",version));
       bool is_pruned = detail::is_pruned_log_and_mask_version(version);
-      EOS_ASSERT( !is_pruned, block_log_unsupported_version, "Block log is currently in pruned format, it must be vacuumed before doing this operation");
-      EOS_ASSERT( block_log::is_supported_version(version), block_log_unsupported_version, "block log version ${v} is not supported", ("v",version));
+      SYS_ASSERT( !is_pruned, block_log_unsupported_version, "Block log is currently in pruned format, it must be vacuumed before doing this operation");
+      SYS_ASSERT( block_log::is_supported_version(version), block_log_unsupported_version, "block log version ${v} is not supported", ("v",version));
 
       detail::fileptr_datastream ds(blk_in, block_file_name.string());
       if (version == 1) {
@@ -1332,7 +1332,7 @@ namespace sysio { namespace chain {
       }
       else {
          size = fread((void *) &first_block, sizeof(first_block), 1, blk_in);
-         EOS_ASSERT(size == 1, block_log_exception, "invalid format for file ${file}",
+         SYS_ASSERT(size == 1, block_log_exception, "invalid format for file ${file}",
                     ("file", block_file_name.string()));
          if (block_log::contains_genesis_state(version, first_block)) {
             genesis_state gs;
@@ -1343,7 +1343,7 @@ namespace sysio { namespace chain {
             ds >> chain_id;
          }
          else {
-            EOS_THROW( block_log_exception,
+            SYS_THROW( block_log_exception,
                        "Block log ${file} is not supported. version: ${ver} and first_block: ${first_block} does not contain "
                        "a genesis_state nor a chain_id.",
                        ("file", block_file_name.string())("ver", version)("first_block", first_block));
@@ -1353,9 +1353,9 @@ namespace sysio { namespace chain {
          std::decay_t<decltype(block_log::npos)> actual_totem;
          size = fread ( (char*)&actual_totem, sizeof(actual_totem), 1, blk_in);
 
-         EOS_ASSERT(size == 1, block_log_exception,
+         SYS_ASSERT(size == 1, block_log_exception,
                     "Expected to read ${size} bytes, but did not read any bytes", ("size", sizeof(actual_totem)));
-         EOS_ASSERT(actual_totem == expected_totem, block_log_exception,
+         SYS_ASSERT(actual_totem == expected_totem, block_log_exception,
                     "Expected separator between block log header and blocks was not found( expected: ${e}, actual: ${a} )",
                     ("e", fc::to_hex((char*)&expected_totem, sizeof(expected_totem) ))("a", fc::to_hex((char*)&actual_totem, sizeof(actual_totem) )));
       }
@@ -1363,12 +1363,12 @@ namespace sysio { namespace chain {
       const uint64_t start_of_blocks = ftell(blk_in);
 
       const auto status = fseek(ind_in, 0, SEEK_END);                //get length of blocks.index (gives number of blocks)
-      EOS_ASSERT( status == 0, block_log_exception, "cannot seek to ${file} end", ("file", index_file_name.string()) );
+      SYS_ASSERT( status == 0, block_log_exception, "cannot seek to ${file} end", ("file", index_file_name.string()) );
       const uint64_t file_end = ftell(ind_in);                //get length of blocks.index (gives number of blocks)
       last_block = first_block + file_end/sizeof(uint64_t) - 1;
 
       first_block_pos = block_pos(first_block);
-      EOS_ASSERT(start_of_blocks == first_block_pos, block_log_exception,
+      SYS_ASSERT(start_of_blocks == first_block_pos, block_log_exception,
                  "Block log ${file} was determined to have its first block at ${determined}, but the block index "
                  "indicates the first block is at ${index}",
                  ("file", block_file_name.string())("determined", start_of_blocks)("index",first_block_pos));
@@ -1385,10 +1385,10 @@ namespace sysio { namespace chain {
 
    uint64_t trim_data::block_index(uint32_t n) const {
       using namespace std;
-      EOS_ASSERT( first_block <= n, block_log_exception,
+      SYS_ASSERT( first_block <= n, block_log_exception,
                   "cannot seek in ${file} to block number ${b}, block number ${first} is the first block",
                   ("file", index_file_name.string())("b",n)("first",first_block) );
-      EOS_ASSERT( n <= last_block, block_log_exception,
+      SYS_ASSERT( n <= last_block, block_log_exception,
                   "cannot seek in ${file} to block number ${b}, block number ${last} is the last block",
                   ("file", index_file_name.string())("b",n)("last",last_block) );
       return sizeof(uint64_t) * (n - first_block);
@@ -1402,24 +1402,24 @@ namespace sysio { namespace chain {
       }
       const uint64_t index_pos = block_index(n);
       auto status = fseek(ind_in, index_pos, SEEK_SET);
-      EOS_ASSERT( status == 0, block_log_exception, "cannot seek to ${file} ${pos} from beginning of file for block ${b}", ("file", index_file_name.string())("pos", index_pos)("b",n) );
+      SYS_ASSERT( status == 0, block_log_exception, "cannot seek to ${file} ${pos} from beginning of file for block ${b}", ("file", index_file_name.string())("pos", index_pos)("b",n) );
       const uint64_t pos = ftell(ind_in);
-      EOS_ASSERT( pos == index_pos, block_log_exception, "cannot seek to ${file} entry for block ${b}", ("file", index_file_name.string())("b",n) );
+      SYS_ASSERT( pos == index_pos, block_log_exception, "cannot seek to ${file} entry for block ${b}", ("file", index_file_name.string())("b",n) );
       uint64_t block_n_pos;
       auto size = fread((void*)&block_n_pos, sizeof(block_n_pos), 1, ind_in);                   //filepos of block n
-      EOS_ASSERT( size == 1, block_log_exception, "cannot read ${file} entry for block ${b}", ("file", index_file_name.string())("b",n) );
+      SYS_ASSERT( size == 1, block_log_exception, "cannot read ${file} entry for block ${b}", ("file", index_file_name.string())("b",n) );
 
       //read blocks.log and verify block number n is found at the determined file position
       const auto calc_blknum_pos = block_n_pos + blknum_offset;
       status = fseek(blk_in, calc_blknum_pos, SEEK_SET);
-      EOS_ASSERT( status == 0, block_log_exception, "cannot seek to ${file} ${pos} from beginning of file", ("file", block_file_name.string())("pos", calc_blknum_pos) );
+      SYS_ASSERT( status == 0, block_log_exception, "cannot seek to ${file} ${pos} from beginning of file", ("file", block_file_name.string())("pos", calc_blknum_pos) );
       const uint64_t block_offset_pos = ftell(blk_in);
-      EOS_ASSERT( block_offset_pos == calc_blknum_pos, block_log_exception, "cannot seek to ${file} ${pos} from beginning of file", ("file", block_file_name.string())("pos", calc_blknum_pos) );
+      SYS_ASSERT( block_offset_pos == calc_blknum_pos, block_log_exception, "cannot seek to ${file} ${pos} from beginning of file", ("file", block_file_name.string())("pos", calc_blknum_pos) );
       uint32_t prior_blknum;
       size = fread((void*)&prior_blknum, sizeof(prior_blknum), 1, blk_in);     //read bigendian block number of prior block
-      EOS_ASSERT( size == 1, block_log_exception, "cannot read prior block");
+      SYS_ASSERT( size == 1, block_log_exception, "cannot read prior block");
       const uint32_t bnum = fc::endian_reverse_u32(prior_blknum) + 1;          //convert to little endian, add 1 since prior block
-      EOS_ASSERT( bnum == n, block_log_exception,
+      SYS_ASSERT( bnum == n, block_log_exception,
                   "At position ${pos} in ${file} expected to find ${exp_bnum} but found ${act_bnum}",
                   ("pos",block_offset_pos)("file", block_file_name.string())("exp_bnum",n)("act_bnum",bnum) );
 

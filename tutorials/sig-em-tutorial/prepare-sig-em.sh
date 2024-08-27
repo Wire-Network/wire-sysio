@@ -5,8 +5,8 @@ cleos -u http://0.0.0.0:8000 push action sysio.token issue '[ "sysio", "10000000
 
 # Create accounts
 cleos wallet import --private-key 5JJPh8dLzbz1XYnGoUaCr3LQDj9aWeA52sqGQgqgarYKYpYzsbY
-cleos -u http://0.0.0.0:8000 system newaccount sysio settle.wns EOS5bVXRvVGsAfDWCQ1v5m5JRx42AAy6HtskiBpYXxedW8wxGeShb EOS5bVXRvVGsAfDWCQ1v5m5JRx42AAy6HtskiBpYXxedW8wxGeShb --stake-net '1000.0000 SYS' --stake-cpu '1000.0000 SYS'  --buy-ram-kbytes 2048
-cleos -u http://0.0.0.0:8000 system newaccount sysio auth.msg EOS5bVXRvVGsAfDWCQ1v5m5JRx42AAy6HtskiBpYXxedW8wxGeShb EOS5bVXRvVGsAfDWCQ1v5m5JRx42AAy6HtskiBpYXxedW8wxGeShb --stake-net '1000.0000 SYS' --stake-cpu '1000.0000 SYS'  --buy-ram-kbytes 2048
+cleos -u http://0.0.0.0:8000 system newaccount sysio settle.wns SYS5bVXRvVGsAfDWCQ1v5m5JRx42AAy6HtskiBpYXxedW8wxGeShb SYS5bVXRvVGsAfDWCQ1v5m5JRx42AAy6HtskiBpYXxedW8wxGeShb --stake-net '1000.0000 SYS' --stake-cpu '1000.0000 SYS'  --buy-ram-kbytes 2048
+cleos -u http://0.0.0.0:8000 system newaccount sysio auth.msg SYS5bVXRvVGsAfDWCQ1v5m5JRx42AAy6HtskiBpYXxedW8wxGeShb SYS5bVXRvVGsAfDWCQ1v5m5JRx42AAy6HtskiBpYXxedW8wxGeShb --stake-net '1000.0000 SYS' --stake-cpu '1000.0000 SYS'  --buy-ram-kbytes 2048
 
 # Compile and deploy auth.msg contract
 cd contracts/auth.msg

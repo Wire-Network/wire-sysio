@@ -43,7 +43,7 @@ namespace sysio { namespace chain { namespace webassembly {
       rhs <<= 64;
       rhs |=  lb;
 
-      EOS_ASSERT(rhs != 0, arithmetic_exception, "divide by zero");
+      SYS_ASSERT(rhs != 0, arithmetic_exception, "divide by zero");
 
       lhs /= rhs;
 
@@ -60,7 +60,7 @@ namespace sysio { namespace chain { namespace webassembly {
       rhs <<= 64;
       rhs |=  lb;
 
-      EOS_ASSERT(rhs != 0, arithmetic_exception, "divide by zero");
+      SYS_ASSERT(rhs != 0, arithmetic_exception, "divide by zero");
 
       lhs /= rhs;
       *ret = lhs;
@@ -90,7 +90,7 @@ namespace sysio { namespace chain { namespace webassembly {
       rhs <<= 64;
       rhs |=  lb;
 
-      EOS_ASSERT(rhs != 0, arithmetic_exception, "divide by zero");
+      SYS_ASSERT(rhs != 0, arithmetic_exception, "divide by zero");
 
       lhs %= rhs;
       *ret = lhs;
@@ -106,7 +106,7 @@ namespace sysio { namespace chain { namespace webassembly {
       rhs <<= 64;
       rhs |=  lb;
 
-      EOS_ASSERT(rhs != 0, arithmetic_exception, "divide by zero");
+      SYS_ASSERT(rhs != 0, arithmetic_exception, "divide by zero");
 
       lhs %= rhs;
       *ret = lhs;

@@ -110,7 +110,7 @@ struct trx_retry_db_impl {
    }
 
    void track_transaction( packed_transaction_ptr ptrx, std::optional<uint16_t> num_blocks, next_function<std::unique_ptr<fc::variant>> next ) {
-      EOS_ASSERT( _tracked_trxs.memory_size() < _max_mem_usage_size, tx_resource_exhaustion,
+      SYS_ASSERT( _tracked_trxs.memory_size() < _max_mem_usage_size, tx_resource_exhaustion,
                   "Transaction exceeded  transaction-retry-max-storage-size-gb limit: ${m} bytes", ("m", _tracked_trxs.memory_size()) );
       auto i = _tracked_trxs.index().get<by_trx_id>().find( ptrx->id() );
       if( i == _tracked_trxs.index().end() ) {

@@ -1,5 +1,5 @@
-if( EOSIO_COMPILE_TEST_CONTRACTS )
-   set(EOSIO_WASM_OLD_BEHAVIOR "Off")
+if( SYSIO_COMPILE_TEST_CONTRACTS )
+   set(SYSIO_WASM_OLD_BEHAVIOR "Off")
    find_package( sysio.cdt REQUIRED )
 endif()
 

@@ -26,7 +26,7 @@ namespace sysio { namespace chain {
 
       sysio::chain::abi_def get_abi()const {
          sysio::chain::abi_def a;
-         EOS_ASSERT( abi.size() != 0, abi_not_found_exception, "No ABI set on account ${n}", ("n",name) );
+         SYS_ASSERT( abi.size() != 0, abi_not_found_exception, "No ABI set on account ${n}", ("n",name) );
 
          fc::datastream<const char*> ds( abi.data(), abi.size() );
          fc::raw::unpack( ds, a );

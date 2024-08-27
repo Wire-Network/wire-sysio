@@ -36,7 +36,7 @@ template<>
 chain_apis::read_only::get_transaction_status_params
 parse_params<chain_apis::read_only::get_transaction_status_params, http_params_types::params_required>(const std::string& body) {
    if (body.empty()) {
-      EOS_THROW(chain::invalid_http_request, "A Request body is required");
+      SYS_THROW(chain::invalid_http_request, "A Request body is required");
    }
 
    try {
@@ -44,7 +44,7 @@ parse_params<chain_apis::read_only::get_transaction_status_params, http_params_t
       if( v.id == transaction_id_type() ) throw false;
       return v;
    } catch( ... ) {
-      EOS_THROW(chain::invalid_http_request, "Invalid transaction id");
+      SYS_THROW(chain::invalid_http_request, "Invalid transaction id");
    }
 }
 

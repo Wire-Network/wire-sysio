@@ -24,7 +24,7 @@ if [ $# -eq 0 ] || [ -z "$1" ]
       exit -1
 fi
 
-CORE_SYM=EOS
+CORE_SYM=SYS
 # CMAKE_C_COMPILER requires absolute path
 DEP_DIR=`realpath $1`
 LEAP_DIR=$2

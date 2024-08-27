@@ -49,7 +49,7 @@ namespace sysio { namespace chain { namespace webassembly {
                                                    legacy_span<const char> pubkeys_data,
                                                    legacy_span<const char> perms_data,
                                                    uint64_t delay_us ) const {
-      EOS_ASSERT( delay_us <= static_cast<uint64_t>(std::numeric_limits<int64_t>::max()),
+      SYS_ASSERT( delay_us <= static_cast<uint64_t>(std::numeric_limits<int64_t>::max()),
                   action_validate_exception, "provided delay is too large" );
 
       flat_set<public_key_type> provided_keys;
@@ -82,7 +82,7 @@ namespace sysio { namespace chain { namespace webassembly {
 
    int64_t interface::get_account_creation_time( account_name account ) const {
       const auto* acct = context.db.find<account_object, by_name>(account);
-      EOS_ASSERT( acct != nullptr, action_validate_exception,
+      SYS_ASSERT( acct != nullptr, action_validate_exception,
                   "account '${account}' does not exist", ("account", account) );
       return time_point(acct->creation_date).time_since_epoch().count();
    }

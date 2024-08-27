@@ -17,9 +17,9 @@ else()
    endif()
 endif()
 
-if("eos-vm-oc" IN_LIST EOSIO_WASM_RUNTIMES)
+if("eos-vm-oc" IN_LIST SYSIO_WASM_RUNTIMES)
    enable_language(ASM)
-   set(CHAIN_EOSVMOC_SOURCES webassembly/runtimes/eos-vm-oc/code_cache.cpp
+   set(CHAIN_SYSVMOC_SOURCES webassembly/runtimes/eos-vm-oc/code_cache.cpp
                              webassembly/runtimes/eos-vm-oc/executor.cpp
                              webassembly/runtimes/eos-vm-oc/memory.cpp
                              webassembly/runtimes/eos-vm-oc/intrinsic.cpp
@@ -36,21 +36,21 @@ if("eos-vm-oc" IN_LIST EOSIO_WASM_RUNTIMES)
 
    if(LLVM_VERSION VERSION_LESS 7.1 AND CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
       enable_language(ASM-LLVMWAR)
-      list(APPEND CHAIN_EOSVMOC_SOURCES webassembly/runtimes/eos-vm-oc/llvmWARshim.llvmwar)
+      list(APPEND CHAIN_SYSVMOC_SOURCES webassembly/runtimes/eos-vm-oc/llvmWARshim.llvmwar)
    else()
-      list(APPEND CHAIN_EOSVMOC_SOURCES webassembly/runtimes/eos-vm-oc/llvmWARshim.cpp)
+      list(APPEND CHAIN_SYSVMOC_SOURCES webassembly/runtimes/eos-vm-oc/llvmWARshim.cpp)
    endif()
 
    llvm_map_components_to_libnames(LLVM_LIBS support core passes mcjit native orcjit)
    include_directories(${LLVM_INCLUDE_DIRS})
    add_definitions(${LLVM_DEFINITIONS})
 
-   option(EOSVMOC_ENABLE_DEVELOPER_OPTIONS "enable developer options for EOS VM OC" OFF)
+   option(SYSVMOC_ENABLE_DEVELOPER_OPTIONS "enable developer options for SYS VM OC" OFF)
 endif()
 
-if("eos-vm" IN_LIST EOSIO_WASM_RUNTIMES OR "eos-vm-jit" IN_LIST EOSIO_WASM_RUNTIMES)
-   set(CHAIN_EOSVM_SOURCES "webassembly/runtimes/eos-vm.cpp")
-   set(CHAIN_EOSVM_LIBRARIES eos-vm)
+if("eos-vm" IN_LIST SYSIO_WASM_RUNTIMES OR "eos-vm-jit" IN_LIST SYSIO_WASM_RUNTIMES)
+   set(CHAIN_SYSVM_SOURCES "webassembly/runtimes/eos-vm.cpp")
+   set(CHAIN_SYSVM_LIBRARIES eos-vm)
 endif()
 
 set(CHAIN_WEBASSEMBLY_SOURCES
@@ -106,8 +106,8 @@ add_library( sysio_chain
               snapshot.cpp
               deep_mind.cpp
 
-             ${CHAIN_EOSVMOC_SOURCES}
-             ${CHAIN_EOSVM_SOURCES}
+             ${CHAIN_SYSVMOC_SOURCES}
+             ${CHAIN_SYSVM_SOURCES}
              ${CHAIN_WEBASSEMBLY_SOURCES}
 
              authority.cpp
@@ -126,7 +126,7 @@ add_library( sysio_chain
              )
 
 target_link_libraries( sysio_chain PUBLIC fc chainbase Logging IR WAST WASM Runtime
-                       softfloat builtins ${CHAIN_EOSVM_LIBRARIES} ${LLVM_LIBS} ${CHAIN_RT_LINKAGE}
+                       softfloat builtins ${CHAIN_SYSVM_LIBRARIES} ${LLVM_LIBS} ${CHAIN_RT_LINKAGE}
                      )
 target_include_directories( sysio_chain
                             PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/include" "${CMAKE_CURRENT_BINARY_DIR}/include"
@@ -136,19 +136,19 @@ target_include_directories( sysio_chain
 add_library(sysio_chain_wrap INTERFACE )
 target_link_libraries(sysio_chain_wrap INTERFACE sysio_chain)
 
-if("eos-vm-oc" IN_LIST EOSIO_WASM_RUNTIMES)
+if("eos-vm-oc" IN_LIST SYSIO_WASM_RUNTIMES)
    target_link_libraries(sysio_chain_wrap INTERFACE "-Wl,-wrap=main")
 endif()
 
-foreach(RUNTIME ${EOSIO_WASM_RUNTIMES})
+foreach(RUNTIME ${SYSIO_WASM_RUNTIMES})
    string(TOUPPER "${RUNTIME}" RUNTIMEUC)
    string(REPLACE "-" "_" RUNTIMEUC ${RUNTIMEUC})
-   target_compile_definitions(sysio_chain PUBLIC "EOSIO_${RUNTIMEUC}_RUNTIME_ENABLED")
+   target_compile_definitions(sysio_chain PUBLIC "SYSIO_${RUNTIMEUC}_RUNTIME_ENABLED")
 endforeach()
 
-if(EOSVMOC_ENABLE_DEVELOPER_OPTIONS)
-   message(WARNING "EOS VM OC Developer Options are enabled; these are NOT supported")
-   target_compile_definitions(sysio_chain PUBLIC EOSIO_EOS_VM_OC_DEVELOPER)
+if(SYSVMOC_ENABLE_DEVELOPER_OPTIONS)
+   message(WARNING "SYS VM OC Developer Options are enabled; these are NOT supported")
+   target_compile_definitions(sysio_chain PUBLIC SYSIO_SYS_VM_OC_DEVELOPER)
 endif()
 
 install( TARGETS sysio_chain

@@ -652,9 +652,9 @@ using namespace IR;
 // Decodes an operator from an input stream and dispatches by opcode.
 // This code is from wasm-jit/Include/IR/Operators.h
 template <class Op_Types>
-struct EOSIO_OperatorDecoderStream
+struct SYSIO_OperatorDecoderStream
 {
-   EOSIO_OperatorDecoderStream(const std::vector<U8>& codeBytes)
+   SYSIO_OperatorDecoderStream(const std::vector<U8>& codeBytes)
    : start(codeBytes.data()), nextByte(codeBytes.data()), end(codeBytes.data()+codeBytes.size()) {
      if(!_cached_ops)
         _cached_ops = cached_ops<Op_Types>::get_cached_ops();
@@ -663,14 +663,14 @@ struct EOSIO_OperatorDecoderStream
    operator bool() const { return nextByte < end; }
 
    instr* decodeOp() {
-      EOS_ASSERT(nextByte + sizeof(IR::Opcode) <= end, wasm_exception, "");
+      SYS_ASSERT(nextByte + sizeof(IR::Opcode) <= end, wasm_exception, "");
       IR::Opcode opcode = *(IR::Opcode*)nextByte;  
       switch(opcode)
       {
       #define VISIT_OPCODE(opcode,name,nameString,Imm,...) \
          case IR::Opcode::name: \
          { \
-            EOS_ASSERT(nextByte + sizeof(IR::OpcodeAndImm<IR::Imm>) <= end, wasm_exception, ""); \
+            SYS_ASSERT(nextByte + sizeof(IR::OpcodeAndImm<IR::Imm>) <= end, wasm_exception, ""); \
             IR::OpcodeAndImm<IR::Imm>* encodedOperator = (IR::OpcodeAndImm<IR::Imm>*)nextByte; \
             nextByte += sizeof(IR::OpcodeAndImm<IR::Imm>); \
             auto op = _cached_ops->at(BOOST_PP_CAT(name, _code)); \
@@ -701,7 +701,7 @@ private:
 };
 
 template <class Op_Types>
-const std::vector<instr*>* EOSIO_OperatorDecoderStream<Op_Types>::_cached_ops;
+const std::vector<instr*>* SYSIO_OperatorDecoderStream<Op_Types>::_cached_ops;
 
 }}} // namespace sysio, chain, wasm_ops
 

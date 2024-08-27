@@ -64,7 +64,7 @@ namespace {
       try {
          f();
       } catch (const yield_exception& ) {
-         EOS_THROW(chain::controller_emit_signal_exception, "Trace API encountered an Error which it cannot recover from.  Please resolve the error and relaunch the process")
+         SYS_THROW(chain::controller_emit_signal_exception, "Trace API encountered an Error which it cannot recover from.  Please resolve the error and relaunch the process")
       }
    }
 
@@ -127,14 +127,14 @@ struct trace_api_common_impl {
       slice_stride = options.at("trace-slice-stride").as<uint32_t>();
 
       const int32_t blocks = options.at("trace-minimum-irreversible-history-blocks").as<int32_t>();
-      EOS_ASSERT(blocks >= -1, chain::plugin_config_exception,
+      SYS_ASSERT(blocks >= -1, chain::plugin_config_exception,
                  "\"trace-minimum-irreversible-history-blocks\" must be greater to or equal to -1.");
       if (blocks > manual_slice_file_value) {
          minimum_irreversible_history_blocks = blocks;
       }
 
       const int32_t uncompressed_blocks = options.at("trace-minimum-uncompressed-irreversible-history-blocks").as<int32_t>();
-      EOS_ASSERT(uncompressed_blocks >= -1, chain::plugin_config_exception,
+      SYS_ASSERT(uncompressed_blocks >= -1, chain::plugin_config_exception,
                  "\"trace-minimum-uncompressed-irreversible-history-blocks\" must be greater to or equal to -1.");
 
       if (uncompressed_blocks > manual_slice_file_value) {
@@ -205,7 +205,7 @@ struct trace_api_rpc_plugin_impl : public std::enable_shared_from_this<trace_api
       });
 
       if( options.count("trace-rpc-abi") ) {
-         EOS_ASSERT(options.count("trace-no-abis") == 0, chain::plugin_config_exception,
+         SYS_ASSERT(options.count("trace-no-abis") == 0, chain::plugin_config_exception,
                     "Trace API is configured with ABIs however trace-no-abis is set");
          const std::vector<std::string> key_value_pairs = options["trace-rpc-abi"].as<std::vector<std::string>>();
          for (const auto& entry : key_value_pairs) {
@@ -220,7 +220,7 @@ struct trace_api_rpc_plugin_impl : public std::enable_shared_from_this<trace_api
             }
          }
       } else {
-         EOS_ASSERT(options.count("trace-no-abis") != 0, chain::plugin_config_exception,
+         SYS_ASSERT(options.count("trace-no-abis") != 0, chain::plugin_config_exception,
                     "Trace API is not configured with ABIs and trace-no-abis is not set");
       }
 
