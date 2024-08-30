@@ -6,7 +6,7 @@
 
 int arch_prctl(int code, unsigned long* addr);
 
-#define SYSVMOC_MEMORY_PTR_cb_ptr GS_PTR struct eos_vm_oc_control_block* const cb_ptr = ((GS_PTR struct eos_vm_oc_control_block* const)(SYS_VM_OC_CONTROL_BLOCK_OFFSET));
+#define SYSVMOC_MEMORY_PTR_cb_ptr GS_PTR struct eos_vm_oc_control_block* const cb_ptr = ((GS_PTR struct eos_vm_oc_control_block* const)(EOS_VM_OC_CONTROL_BLOCK_OFFSET));
 
 int32_t eos_vm_oc_grow_memory(int32_t grow, int32_t max) {
    SYSVMOC_MEMORY_PTR_cb_ptr;
@@ -20,7 +20,7 @@ int32_t eos_vm_oc_grow_memory(int32_t grow, int32_t max) {
    if(previous_page_count + grow_amount > max_pages)
       return (int32_t)-1;
 
-   int64_t max_segments = cb_ptr->execution_thread_memory_length / SYS_VM_OC_MEMORY_STRIDE - 1;
+   int64_t max_segments = cb_ptr->execution_thread_memory_length / EOS_VM_OC_MEMORY_STRIDE - 1;
    int was_extended = previous_page_count > max_segments;
    int will_be_extended = previous_page_count + grow_amount > max_segments;
    char* extended_memory_start = cb_ptr->full_linear_memory_start + max_segments * 64*1024;
@@ -39,7 +39,7 @@ int32_t eos_vm_oc_grow_memory(int32_t grow, int32_t max) {
 
    uint64_t current_gs;
    arch_prctl(ARCH_GET_GS, &current_gs);
-   current_gs += gs_diff * SYS_VM_OC_MEMORY_STRIDE;
+   current_gs += gs_diff * EOS_VM_OC_MEMORY_STRIDE;
    arch_prctl(ARCH_SET_GS, (unsigned long*)current_gs);
    cb_ptr->current_linear_memory_pages += grow_amount;
    cb_ptr->first_invalid_memory_address += grow_amount*64*1024;

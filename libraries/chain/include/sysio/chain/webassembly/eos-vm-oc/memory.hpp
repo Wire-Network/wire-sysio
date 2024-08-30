@@ -50,8 +50,8 @@ class memory {
       // The maximum amount of data that PIC code can include in the prologue
       static constexpr uintptr_t max_prologue_size = mutable_global_size + table_size;
 
-      static_assert(-cb_offset == SYS_VM_OC_CONTROL_BLOCK_OFFSET, "SYS VM OC control block offset has slid out of place somehow");
-      static_assert(stride == SYS_VM_OC_MEMORY_STRIDE, "SYS VM OC memory stride has slid out of place somehow");
+      static_assert(-cb_offset == EOS_VM_OC_CONTROL_BLOCK_OFFSET, "SYS VM OC control block offset has slid out of place somehow");
+      static_assert(stride == EOS_VM_OC_MEMORY_STRIDE, "SYS VM OC memory stride has slid out of place somehow");
 
    private:
       uint8_t* mapbase;
