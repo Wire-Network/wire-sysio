@@ -212,19 +212,19 @@ void chain_plugin::set_program_options(options_description& cli, options_descrip
    std::string wasm_runtime_opt = "Override default WASM runtime (";
    std::string wasm_runtime_desc;
    std::string delim;
-#ifdef SYSIO_SYS_VM_JIT_RUNTIME_ENABLED
+#ifdef EOSIO_EOS_VM_JIT_RUNTIME_ENABLED
    wasm_runtime_opt += " \"eos-vm-jit\"";
    wasm_runtime_desc += "\"eos-vm-jit\" : A WebAssembly runtime that compiles WebAssembly code to native x86 code prior to execution.\n";
    delim = ", ";
 #endif
 
-#ifdef SYSIO_SYS_VM_RUNTIME_ENABLED
+#ifdef EOSIO_EOS_VM_RUNTIME_ENABLED
    wasm_runtime_opt += delim + "\"eos-vm\"";
    wasm_runtime_desc += "\"eos-vm\" : A WebAssembly interpreter.\n";
    delim = ", ";
 #endif
 
-#ifdef SYSIO_SYS_VM_OC_DEVELOPER
+#ifdef EOSIO_EOS_VM_OC_DEVELOPER
    wasm_runtime_opt += delim + "\"eos-vm-oc\"";
    wasm_runtime_desc += "\"eos-vm-oc\" : Unsupported. Instead, use one of the other runtimes along with the option enable-eos-vm-oc.\n";
 #endif
@@ -239,7 +239,7 @@ void chain_plugin::set_program_options(options_description& cli, options_descrip
           "the location of the protocol_features directory (absolute path or relative to application config dir)")
          ("checkpoint", bpo::value<vector<string>>()->composing(), "Pairs of [BLOCK_NUM,BLOCK_ID] that should be enforced as checkpoints.")
          ("wasm-runtime", bpo::value<sysio::chain::wasm_interface::vm_type>()->value_name("runtime")->notifier([](const auto& vm){
-#ifndef SYSIO_SYS_VM_OC_DEVELOPER
+#ifndef EOSIO_EOS_VM_OC_DEVELOPER
             //throwing an exception here (like SYS_ASSERT) is just gobbled up with a "Failed to initialize" error :(
             if(vm == wasm_interface::vm_type::eos_vm_oc) {
                elog("SYS VM OC is a tier-up compiler and works in conjunction with the configured base WASM runtime. Enable SYS VM OC via 'eos-vm-oc-enable' option");
@@ -306,7 +306,7 @@ void chain_plugin::set_program_options(options_description& cli, options_descrip
 #endif
          )
 
-#ifdef SYSIO_SYS_VM_OC_RUNTIME_ENABLED
+#ifdef EOSIO_EOS_VM_OC_RUNTIME_ENABLED
          ("eos-vm-oc-cache-size-mb", bpo::value<uint64_t>()->default_value(eosvmoc::config().cache_size / (1024u*1024u)), "Maximum size (in MiB) of the SYS VM OC code cache")
          ("eos-vm-oc-compile-threads", bpo::value<uint64_t>()->default_value(1u)->notifier([](const auto t) {
                if(t == 0) {
@@ -1064,7 +1064,7 @@ void chain_plugin::plugin_initialize(const variables_map& options) {
 
       my->chain_config->db_map_mode = options.at("database-map-mode").as<pinnable_mapped_file::map_mode>();
 
-#ifdef SYSIO_SYS_VM_OC_RUNTIME_ENABLED
+#ifdef EOSIO_EOS_VM_OC_RUNTIME_ENABLED
       if( options.count("eos-vm-oc-cache-size-mb") )
          my->chain_config->eosvmoc_config.cache_size = options.at( "eos-vm-oc-cache-size-mb" ).as<uint64_t>() * 1024u * 1024u;
       if( options.count("eos-vm-oc-compile-threads") )

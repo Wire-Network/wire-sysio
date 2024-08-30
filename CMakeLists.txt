@@ -4,6 +4,7 @@ project(wire-sysio)
 include(CTest) # Suppresses DartConfiguration.tcl error
 enable_testing()
 
+
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/CMakeModules")
 
 include(GNUInstallDirs)
@@ -146,6 +147,7 @@ if(GPERFTOOLS_FOUND)
     set(CMAKE_CXX_STANDARD_LIBRARIES "${CMAKE_CXX_STANDARD_LIBRARIES} ${GPERFTOOLS_TCMALLOC}")
 endif()
 
+add_definitions(-DEOSIO_EOS_VM_RUNTIME_ENABLED)
 add_subdirectory(libraries)
 add_subdirectory(plugins)
 add_subdirectory(programs)
@@ -156,9 +158,9 @@ add_subdirectory(tools)
 
 option(DISABLE_WASM_SPEC_TESTS "Disable building of wasm spec unit tests" OFF)
 
-#if(NOT DISABLE_WASM_SPEC_TESTS)
-#  add_subdirectory(wasm-spec-tests/generated-tests)
-#endif()
+# if(NOT DISABLE_WASM_SPEC_TESTS)
+#   add_subdirectory(wasm-spec-tests/generated-tests)
+# endif()
 
 install(FILES testnet.template DESTINATION ${CMAKE_INSTALL_FULL_SYSCONFDIR}/sysio/launcher COMPONENT dev EXCLUDE_FROM_ALL)
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/testnet.template ${CMAKE_CURRENT_BINARY_DIR}/etc/sysio/launcher/testnet.template COPYONLY)
@@ -181,7 +183,7 @@ install(FILES ${CMAKE_SOURCE_DIR}/CMakeModules/SysioCheckVersion.cmake DESTINATI
 
 configure_file(${CMAKE_SOURCE_DIR}/LICENSE
                ${CMAKE_BINARY_DIR}/licenses/wire-sysio/LICENSE COPYONLY)
-# configure_file(${CMAKE_SOURCE_DIR}/libraries/softfloat/COPYING.txt ${CMAKE_BINARY_DIR}/licenses//wire-sysio/LICENSE.softfloat COPYONLY)
+configure_file(${CMAKE_SOURCE_DIR}/libraries/softfloat/COPYING.txt ${CMAKE_BINARY_DIR}/licenses//wire-sysio/LICENSE.softfloat COPYONLY)
 configure_file(${CMAKE_SOURCE_DIR}/libraries/wasm-jit/LICENSE
                ${CMAKE_BINARY_DIR}/licenses//wire-sysio/LICENSE.wavm COPYONLY)
 configure_file(${CMAKE_SOURCE_DIR}/libraries/fc/secp256k1/secp256k1/COPYING
@@ -190,7 +192,7 @@ configure_file(${CMAKE_SOURCE_DIR}/libraries/fc/include/fc/crypto/webauthn_json/
                ${CMAKE_BINARY_DIR}/licenses//wire-sysio/LICENSE.rapidjson COPYONLY)
 configure_file(${CMAKE_SOURCE_DIR}/libraries/fc/src/network/LICENSE.go
                ${CMAKE_BINARY_DIR}/licenses//wire-sysio/LICENSE.go COPYONLY)
-# configure_file(${CMAKE_SOURCE_DIR}/libraries/yubihsm/LICENSE ${CMAKE_BINARY_DIR}/licenses//wire-sysio/LICENSE.yubihsm COPYONLY)
+configure_file(${CMAKE_SOURCE_DIR}/libraries/yubihsm/LICENSE ${CMAKE_BINARY_DIR}/licenses//wire-sysio/LICENSE.yubihsm COPYONLY)
 configure_file(${CMAKE_SOURCE_DIR}/libraries/eos-vm/LICENSE
                ${CMAKE_BINARY_DIR}/licenses//wire-sysio/LICENSE.eos-vm COPYONLY)
 configure_file(${CMAKE_SOURCE_DIR}/programs/cleos/LICENSE.CLI11
