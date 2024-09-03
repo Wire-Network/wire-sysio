@@ -18,7 +18,7 @@
 	url = ../abieos
 [submodule "wasm-spec-tests"]
 	path = wasm-spec-tests
-	url = https://github.com/Wire-Network/wasm-spec-tests
+	url = ../wasm-spec-tests
 [submodule "libraries/fc"]
 	path = libraries/fc
 	url = ../fc
