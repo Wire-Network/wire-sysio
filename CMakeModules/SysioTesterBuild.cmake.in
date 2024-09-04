@@ -80,7 +80,7 @@ if(UNIX AND NOT APPLE)
 endif()
 
 set(SYSIO_WASM_RUNTIMES @SYSIO_WASM_RUNTIMES@)
-if("eos-vm-oc" IN_LIST SYSIO_WASM_RUNTIMES)
+if("sys-vm-oc" IN_LIST SYSIO_WASM_RUNTIMES)
    set(WRAP_MAIN "-Wl,-wrap=main")
 endif()
 

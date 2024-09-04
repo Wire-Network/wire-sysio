@@ -17,28 +17,28 @@ else()
    endif()
 endif()
 
-if("eos-vm-oc" IN_LIST SYSIO_WASM_RUNTIMES)
+if("sys-vm-oc" IN_LIST SYSIO_WASM_RUNTIMES)
    enable_language(ASM)
-   set(CHAIN_SYSVMOC_SOURCES webassembly/runtimes/eos-vm-oc/code_cache.cpp
-                             webassembly/runtimes/eos-vm-oc/executor.cpp
-                             webassembly/runtimes/eos-vm-oc/memory.cpp
-                             webassembly/runtimes/eos-vm-oc/intrinsic.cpp
-                             webassembly/runtimes/eos-vm-oc/LLVMJIT.cpp
-                             webassembly/runtimes/eos-vm-oc/LLVMEmitIR.cpp
-                             webassembly/runtimes/eos-vm-oc/compile_monitor.cpp
-                             webassembly/runtimes/eos-vm-oc/compile_trampoline.cpp
-                             webassembly/runtimes/eos-vm-oc/ipc_helpers.cpp
-                             webassembly/runtimes/eos-vm-oc/gs_seg_helpers.c
-                             webassembly/runtimes/eos-vm-oc/stack.cpp
-                             webassembly/runtimes/eos-vm-oc/switch_stack_linux.s
-                             webassembly/runtimes/eos-vm-oc.cpp
-                             webassembly/runtimes/eos-vm-oc/default_real_main.cpp)
+   set(CHAIN_SYSVMOC_SOURCES webassembly/runtimes/sys-vm-oc/code_cache.cpp
+                             webassembly/runtimes/sys-vm-oc/executor.cpp
+                             webassembly/runtimes/sys-vm-oc/memory.cpp
+                             webassembly/runtimes/sys-vm-oc/intrinsic.cpp
+                             webassembly/runtimes/sys-vm-oc/LLVMJIT.cpp
+                             webassembly/runtimes/sys-vm-oc/LLVMEmitIR.cpp
+                             webassembly/runtimes/sys-vm-oc/compile_monitor.cpp
+                             webassembly/runtimes/sys-vm-oc/compile_trampoline.cpp
+                             webassembly/runtimes/sys-vm-oc/ipc_helpers.cpp
+                             webassembly/runtimes/sys-vm-oc/gs_seg_helpers.c
+                             webassembly/runtimes/sys-vm-oc/stack.cpp
+                             webassembly/runtimes/sys-vm-oc/switch_stack_linux.s
+                             webassembly/runtimes/sys-vm-oc.cpp
+                             webassembly/runtimes/sys-vm-oc/default_real_main.cpp)
 
    if(LLVM_VERSION VERSION_LESS 7.1 AND CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
       enable_language(ASM-LLVMWAR)
-      list(APPEND CHAIN_SYSVMOC_SOURCES webassembly/runtimes/eos-vm-oc/llvmWARshim.llvmwar)
+      list(APPEND CHAIN_SYSVMOC_SOURCES webassembly/runtimes/sys-vm-oc/llvmWARshim.llvmwar)
    else()
-      list(APPEND CHAIN_SYSVMOC_SOURCES webassembly/runtimes/eos-vm-oc/llvmWARshim.cpp)
+      list(APPEND CHAIN_SYSVMOC_SOURCES webassembly/runtimes/sys-vm-oc/llvmWARshim.cpp)
    endif()
 
    llvm_map_components_to_libnames(LLVM_LIBS support core passes mcjit native orcjit)
@@ -48,9 +48,9 @@ if("eos-vm-oc" IN_LIST SYSIO_WASM_RUNTIMES)
    option(SYSVMOC_ENABLE_DEVELOPER_OPTIONS "enable developer options for SYS VM OC" OFF)
 endif()
 
-if("eos-vm" IN_LIST SYSIO_WASM_RUNTIMES OR "eos-vm-jit" IN_LIST SYSIO_WASM_RUNTIMES)
-   set(CHAIN_SYSVM_SOURCES "webassembly/runtimes/eos-vm.cpp")
-   set(CHAIN_SYSVM_LIBRARIES eos-vm)
+if("sys-vm" IN_LIST SYSIO_WASM_RUNTIMES OR "sys-vm-jit" IN_LIST SYSIO_WASM_RUNTIMES)
+   set(CHAIN_SYSVM_SOURCES "webassembly/runtimes/sys-vm.cpp")
+   set(CHAIN_SYSVM_LIBRARIES sys-vm)
 endif()
 
 set(CHAIN_WEBASSEMBLY_SOURCES
@@ -136,7 +136,7 @@ target_include_directories( sysio_chain
 add_library(sysio_chain_wrap INTERFACE )
 target_link_libraries(sysio_chain_wrap INTERFACE sysio_chain)
 
-if("eos-vm-oc" IN_LIST SYSIO_WASM_RUNTIMES)
+if("sys-vm-oc" IN_LIST SYSIO_WASM_RUNTIMES)
    target_link_libraries(sysio_chain_wrap INTERFACE "-Wl,-wrap=main")
 endif()
 
@@ -148,7 +148,7 @@ endforeach()
 
 if(SYSVMOC_ENABLE_DEVELOPER_OPTIONS)
    message(WARNING "SYS VM OC Developer Options are enabled; these are NOT supported")
-   target_compile_definitions(sysio_chain PUBLIC EOSIO_EOS_VM_OC_DEVELOPER)
+   target_compile_definitions(sysio_chain PUBLIC SYSIO_SYS_VM_OC_DEVELOPER)
 endif()
 
 install( TARGETS sysio_chain

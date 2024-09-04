@@ -7,7 +7,7 @@
 //eos-vm includes
 #include <sysio/vm/backend.hpp>
 #include <sysio/chain/webassembly/preconditions.hpp>
-#ifdef EOSIO_EOS_VM_OC_RUNTIME_ENABLED
+#ifdef SYSIO_SYS_VM_OC_RUNTIME_ENABLED
 #include <sysio/chain/webassembly/eos-vm-oc.hpp>
 #endif
 #include <boost/hana/string.hpp>
@@ -290,7 +290,7 @@ struct host_function_registrator {
    constexpr host_function_registrator(Mod mod_name, Name fn_name) {
       using rhf_t = eos_vm_host_functions_t;
       rhf_t::add<HostFunction, Preconditions...>(mod_name.c_str(), fn_name.c_str());
-#ifdef EOSIO_EOS_VM_OC_RUNTIME_ENABLED
+#ifdef SYSIO_SYS_VM_OC_RUNTIME_ENABLED
       constexpr bool is_injected = (Mod() == BOOST_HANA_STRING(SYSIO_INJECTED_MODULE_NAME));
       eosvmoc::register_eosvm_oc<HostFunction, is_injected, std::tuple<Preconditions...>>(
           mod_name + BOOST_HANA_STRING(".") + fn_name);

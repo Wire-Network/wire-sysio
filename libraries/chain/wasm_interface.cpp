@@ -1,5 +1,5 @@
 #include <sysio/chain/webassembly/interface.hpp>
-#include <sysio/chain/webassembly/eos-vm.hpp>
+#include <sysio/chain/webassembly/sys-vm.hpp>
 #include <sysio/chain/wasm_interface.hpp>
 #include <sysio/chain/apply_context.hpp>
 #include <sysio/chain/controller.hpp>
@@ -27,7 +27,7 @@
 #include <fstream>
 #include <string.h>
 
-#if defined(EOSIO_EOS_VM_RUNTIME_ENABLED) || defined(EOSIO_EOS_VM_JIT_RUNTIME_ENABLED)
+#if defined(SYSIO_SYS_VM_RUNTIME_ENABLED) || defined(SYSIO_SYS_VM_JIT_RUNTIME_ENABLED)
 #include <sysio/vm/allocator.hpp>
 #endif
 
@@ -81,7 +81,7 @@ namespace sysio { namespace chain {
    void wasm_interface::apply( const digest_type& code_hash, const uint8_t& vm_type, const uint8_t& vm_version, apply_context& context ) {
       if(substitute_apply && substitute_apply(code_hash, vm_type, vm_version, context))
          return;
-#ifdef EOSIO_EOS_VM_OC_RUNTIME_ENABLED
+#ifdef SYSIO_SYS_VM_OC_RUNTIME_ENABLED
       if(my->eosvmoc) {
          const chain::eosvmoc::code_descriptor* cd = nullptr;
          try {
@@ -114,11 +114,11 @@ namespace sysio { namespace chain {
 std::istream& operator>>(std::istream& in, wasm_interface::vm_type& runtime) {
    std::string s;
    in >> s;
-   if (s == "eos-vm")
+   if (s == "sys-vm")
       runtime = sysio::chain::wasm_interface::vm_type::eos_vm;
-   else if (s == "eos-vm-jit")
+   else if (s == "sys-vm-jit")
       runtime = sysio::chain::wasm_interface::vm_type::eos_vm_jit;
-   else if (s == "eos-vm-oc")
+   else if (s == "sys-vm-oc")
       runtime = sysio::chain::wasm_interface::vm_type::eos_vm_oc;
    else
       in.setstate(std::ios_base::failbit);

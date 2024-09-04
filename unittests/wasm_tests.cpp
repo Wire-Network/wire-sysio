@@ -1807,7 +1807,7 @@ static char reset_memory_fail1_wast[] = R"======(
 )
 )======";
 
-// In a previous version of eos-vm, this would leave
+// In a previous version of sys-vm, this would leave
 // memory incorrectly accessible to the next action.
 static char reset_memory_fail2_wast[] = R"======(
 (module
@@ -1850,7 +1850,7 @@ BOOST_FIXTURE_TEST_CASE( reset_memory_fail, TESTER ) try {
    produce_block();
 } FC_LOG_AND_RETHROW()
 
-// TODO: Update to use eos-vm once merged
+// TODO: Update to use sys-vm once merged
 BOOST_AUTO_TEST_CASE( code_size )  try {
    using namespace IR;
    using namespace Runtime;

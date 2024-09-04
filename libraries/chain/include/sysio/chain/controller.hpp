@@ -10,7 +10,7 @@
 #include <sysio/chain/account_object.hpp>
 #include <sysio/chain/snapshot.hpp>
 #include <sysio/chain/protocol_feature_manager.hpp>
-#include <sysio/chain/webassembly/eos-vm-oc/config.hpp>
+#include <sysio/chain/webassembly/sys-vm-oc/config.hpp>
 #include <sysio/chain/s_root_extension.hpp>
 
 namespace chainbase {
@@ -317,7 +317,7 @@ namespace sysio { namespace chain {
          void enable_deep_mind( deep_mind_handler* logger );
          uint32_t earliest_available_block_num() const;
 
-#if defined(EOSIO_EOS_VM_RUNTIME_ENABLED) || defined(EOSIO_EOS_VM_JIT_RUNTIME_ENABLED)
+#if defined(SYSIO_SYS_VM_RUNTIME_ENABLED) || defined(SYSIO_SYS_VM_JIT_RUNTIME_ENABLED)
          vm::wasm_allocator&  get_wasm_allocator();
 #endif
 

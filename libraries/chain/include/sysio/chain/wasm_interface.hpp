@@ -34,11 +34,11 @@ namespace sysio { namespace chain {
          static std::string vm_type_string(vm_type vmtype) {
              switch (vmtype) {
              case vm_type::eos_vm:
-                return "eos-vm";
+                return "sys-vm";
              case vm_type::eos_vm_oc:
-                return "eos-vm-oc";
+                return "sys-vm-oc";
              default:
-                 return "eos-vm-jit";
+                 return "sys-vm-jit";
              }
          }
 

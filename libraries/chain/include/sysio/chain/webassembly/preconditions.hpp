@@ -2,7 +2,7 @@
 
 #include <sysio/chain/types.hpp>
 #include <sysio/chain/webassembly/common.hpp>
-#include <sysio/chain/webassembly/eos-vm.hpp>
+#include <sysio/chain/webassembly/sys-vm.hpp>
 
 #include <sysio/vm/backend.hpp>
 #include <sysio/vm/host_function.hpp>

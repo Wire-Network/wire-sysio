@@ -4,9 +4,9 @@
 [submodule "libraries/chainbase"]
 	path = libraries/chainbase
 	url = ../chainbase
-[submodule "libraries/eos-vm"]
-	path = libraries/eos-vm
-	url = ../eos-vm
+# [submodule "libraries/eos-vm"]
+# 	path = libraries/eos-vm
+# 	url = ../eos-vm
 [submodule "libraries/softfloat"]
 	path = libraries/softfloat
 	url = ../berkeley-softfloat-3
@@ -22,3 +22,6 @@
 [submodule "libraries/fc"]
 	path = libraries/fc
 	url = ../fc
+[submodule "libraries/sys-vm"]
+	path = libraries/sys-vm
+	url = ../eos-vm

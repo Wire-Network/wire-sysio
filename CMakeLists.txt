@@ -62,7 +62,7 @@ option(ENABLE_OC "Enable eosvm-oc on supported platforms" ON)
 # WASM runtimes to enable
 if(ENABLE_OC AND CMAKE_SIZEOF_VOID_P EQUAL 8 AND NOT WIN32)
    if("${CMAKE_SYSTEM_NAME}" STREQUAL "Linux" AND "${CMAKE_SYSTEM_PROCESSOR}" STREQUAL "x86_64")
-      list(APPEND SYSIO_WASM_RUNTIMES eos-vm-oc)
+      list(APPEND SYSIO_WASM_RUNTIMES sys-vm-oc)
       find_package(LLVM REQUIRED CONFIG)
       if(LLVM_VERSION_MAJOR VERSION_LESS 7 OR LLVM_VERSION_MAJOR VERSION_GREATER_EQUAL 12)
           message(FATAL_ERROR "Leap requires an LLVM version 7 through 11")
@@ -72,9 +72,9 @@ endif()
 
 if(CMAKE_SIZEOF_VOID_P EQUAL 8 AND NOT WIN32)
    if(CMAKE_SYSTEM_PROCESSOR STREQUAL x86_64 OR CMAKE_SYSTEM_PROCESSOR STREQUAL amd64)
-      list(APPEND SYSIO_WASM_RUNTIMES eos-vm eos-vm-jit)
+      list(APPEND SYSIO_WASM_RUNTIMES sys-vm sys-vm-jit)
    else()
-      list(APPEND SYSIO_WASM_RUNTIMES eos-vm)
+      list(APPEND SYSIO_WASM_RUNTIMES sys-vm)
    endif()
 endif()
 
@@ -147,7 +147,7 @@ if(GPERFTOOLS_FOUND)
     set(CMAKE_CXX_STANDARD_LIBRARIES "${CMAKE_CXX_STANDARD_LIBRARIES} ${GPERFTOOLS_TCMALLOC}")
 endif()
 
-add_definitions(-DEOSIO_EOS_VM_RUNTIME_ENABLED)
+add_definitions(-DSYSIO_SYS_VM_RUNTIME_ENABLED)
 add_subdirectory(libraries)
 add_subdirectory(plugins)
 add_subdirectory(programs)
@@ -193,8 +193,8 @@ configure_file(${CMAKE_SOURCE_DIR}/libraries/fc/include/fc/crypto/webauthn_json/
 configure_file(${CMAKE_SOURCE_DIR}/libraries/fc/src/network/LICENSE.go
                ${CMAKE_BINARY_DIR}/licenses//wire-sysio/LICENSE.go COPYONLY)
 configure_file(${CMAKE_SOURCE_DIR}/libraries/yubihsm/LICENSE ${CMAKE_BINARY_DIR}/licenses//wire-sysio/LICENSE.yubihsm COPYONLY)
-configure_file(${CMAKE_SOURCE_DIR}/libraries/eos-vm/LICENSE
-               ${CMAKE_BINARY_DIR}/licenses//wire-sysio/LICENSE.eos-vm COPYONLY)
+configure_file(${CMAKE_SOURCE_DIR}/libraries/sys-vm/LICENSE
+               ${CMAKE_BINARY_DIR}/licenses//wire-sysio/LICENSE.sys-vm COPYONLY)
 configure_file(${CMAKE_SOURCE_DIR}/programs/cleos/LICENSE.CLI11
                ${CMAKE_BINARY_DIR}/programs/cleos/LICENSE.CLI11 COPYONLY)
 
@@ -207,7 +207,7 @@ install(FILES libraries/fc/secp256k1/secp256k1/COPYING DESTINATION ${CMAKE_INSTA
 install(FILES libraries/fc/include/fc/crypto/webauthn_json/license.txt DESTINATION ${CMAKE_INSTALL_FULL_DATAROOTDIR}/licenses/wire-sysio/ RENAME LICENSE.rapidjson COMPONENT base)
 install(FILES libraries/fc/src/network/LICENSE.go DESTINATION ${CMAKE_INSTALL_FULL_DATAROOTDIR}/licenses/wire-sysio/ COMPONENT base)
 install(FILES libraries/yubihsm/LICENSE DESTINATION ${CMAKE_INSTALL_FULL_DATAROOTDIR}/licenses/wire-sysio/ RENAME LICENSE.yubihsm COMPONENT base)
-install(FILES libraries/eos-vm/LICENSE DESTINATION ${CMAKE_INSTALL_FULL_DATAROOTDIR}/licenses/wire-sysio/ RENAME LICENSE.eos-vm COMPONENT base)
+install(FILES libraries/sys-vm/LICENSE DESTINATION ${CMAKE_INSTALL_FULL_DATAROOTDIR}/licenses/wire-sysio/ RENAME LICENSE.sys-vm COMPONENT base)
 install(FILES libraries/fc/libraries/ff/LICENSE DESTINATION ${CMAKE_INSTALL_FULL_DATAROOTDIR}/licenses/wire-sysio/ RENAME LICENSE.libff COMPONENT base)
 install(FILES programs/cleos/LICENSE.CLI11 DESTINATION ${CMAKE_INSTALL_FULL_DATAROOTDIR}/licenses/wire-sysio/ COMPONENT base)
 

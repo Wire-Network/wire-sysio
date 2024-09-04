@@ -403,11 +403,11 @@ namespace sysio { namespace testing {
             cfg.eosvmoc_config.cache_size = 1024*1024*8;
 
             for(int i = 0; i < boost::unit_test::framework::master_test_suite().argc; ++i) {
-               if(boost::unit_test::framework::master_test_suite().argv[i] == std::string("--eos-vm"))
+               if(boost::unit_test::framework::master_test_suite().argv[i] == std::string("--sys-vm"))
                   cfg.wasm_runtime = chain::wasm_interface::vm_type::eos_vm;
-               else if(boost::unit_test::framework::master_test_suite().argv[i] == std::string("--eos-vm-jit"))
+               else if(boost::unit_test::framework::master_test_suite().argv[i] == std::string("--sys-vm-jit"))
                   cfg.wasm_runtime = chain::wasm_interface::vm_type::eos_vm_jit;
-               else if(boost::unit_test::framework::master_test_suite().argv[i] == std::string("--eos-vm-oc"))
+               else if(boost::unit_test::framework::master_test_suite().argv[i] == std::string("--sys-vm-oc"))
                   cfg.wasm_runtime = chain::wasm_interface::vm_type::eos_vm_oc;
             }
             auto gen = default_genesis();
