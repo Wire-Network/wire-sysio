@@ -135,7 +135,7 @@ endif()
 message(STATUS "Using '${CORE_SYMBOL_NAME}' as CORE symbol name")
 
 if("${SYSIO_ROOT_KEY}" STREQUAL "")
-   set(SYSIO_ROOT_KEY "EOS6MRyAjQq8ud7hVNYcfnVPJqcVpscN5So8BhtHuGYqET5GDW5CV")
+   set(SYSIO_ROOT_KEY "SYS6MRyAjQq8ud7hVNYcfnVPJqcVpscN5So8BhtHuGYqET5GDW5CV")
 endif()
 
 message(STATUS "Using '${SYSIO_ROOT_KEY}' as public key for 'sysio' account")
@@ -158,9 +158,9 @@ add_subdirectory(tools)
 
 option(DISABLE_WASM_SPEC_TESTS "Disable building of wasm spec unit tests" OFF)
 
-# if(NOT DISABLE_WASM_SPEC_TESTS)
-#   add_subdirectory(wasm-spec-tests/generated-tests)
-# endif()
+if(NOT DISABLE_WASM_SPEC_TESTS)
+  add_subdirectory(wasm-spec-tests/generated-tests)
+endif()
 
 install(FILES testnet.template DESTINATION ${CMAKE_INSTALL_FULL_SYSCONFDIR}/sysio/launcher COMPONENT dev EXCLUDE_FROM_ALL)
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/testnet.template ${CMAKE_CURRENT_BINARY_DIR}/etc/sysio/launcher/testnet.template COPYONLY)
