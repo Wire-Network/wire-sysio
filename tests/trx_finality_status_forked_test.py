@@ -50,7 +50,7 @@ killEosInstances=not dontKill
 killWallet=not dontKill
 
 WalletdName=Utils.EosWalletName
-ClientName="cleos"
+ClientName="clio"
 
 SYSIO_ACCT_PRIVATE_DEFAULT_KEY = "5KQwrPbwdL6PhXujxW37FSSQZ1JiwsST4cqQzDeyXtP79zkvFD3"
 SYSIO_ACCT_PUBLIC_DEFAULT_KEY = "SYS6MRyAjQq8ud7hVNYcfnVPJqcVpscN5So8BhtHuGYqET5GDW5CV"
@@ -62,17 +62,17 @@ try:
     cluster.killall(allInstances=killAll)
     cluster.cleanup()
     Print("Stand up cluster")
-    specificExtraNodeosArgs={}
+    specificExtraNodeopArgs={}
     # producer nodes will be mapped to 0 through totalProducerNodes-1, so the number totalProducerNodes will be the non-producing node
-    specificExtraNodeosArgs[totalProducerNodes]="--plugin sysio::test_control_api_plugin"
+    specificExtraNodeopArgs[totalProducerNodes]="--plugin sysio::test_control_api_plugin"
 
     # ensure that transactions don't get cleaned up too early
     successDuration = 360
     failure_duration = 360
-    extraNodeosArgs=" --transaction-finality-status-max-storage-size-gb 1 " + \
+    extraNodeopArgs=" --transaction-finality-status-max-storage-size-gb 1 " + \
                    f"--transaction-finality-status-success-duration-sec {successDuration} --transaction-finality-status-failure-duration-sec {failure_duration}"
-    extraNodeosArgs+=" --plugin sysio::trace_api_plugin --trace-no-abis"
-    extraNodeosArgs+=" --http-max-response-time-ms 990000"
+    extraNodeopArgs+=" --plugin sysio::trace_api_plugin --trace-no-abis"
+    extraNodeopArgs+=" --http-max-response-time-ms 990000"
 
 
     # ***   setup topogrophy   ***
@@ -81,8 +81,8 @@ try:
     # and the only connection between those 2 groups is through the bridge node
     if cluster.launch(prodCount=2, topo="bridge", pnodes=totalProducerNodes,
                       totalNodes=totalNodes, totalProducers=totalProducers,
-                      useBiosBootFile=False, specificExtraNodeosArgs=specificExtraNodeosArgs,
-                      extraNodeosArgs=extraNodeosArgs) is False:
+                      useBiosBootFile=False, specificExtraNodeopArgs=specificExtraNodeopArgs,
+                      extraNodeopArgs=extraNodeopArgs) is False:
         Utils.cmdError("launcher")
         Utils.errorExit("Failed to stand up eos cluster.")
     Print("Validating system accounts after bootstrap")

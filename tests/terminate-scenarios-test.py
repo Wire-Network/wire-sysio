@@ -10,9 +10,9 @@ import random
 ###############################################################
 # terminate-scenarios-test
 #
-# Tests terminate scenarios for nodeos.  Uses "-c" flag to indicate "replay" (--replay-blockchain), "resync"
+# Tests terminate scenarios for nodeop.  Uses "-c" flag to indicate "replay" (--replay-blockchain), "resync"
 # (--delete-all-blocks), "hardReplay"(--hard-replay-blockchain), and "none" to indicate what kind of restart flag should
-# be used. This is one of the only test that actually verify that nodeos terminates with a good exit status.
+# be used. This is one of the only test that actually verify that nodeop terminates with a good exit status.
 #
 ###############################################################
 
@@ -61,8 +61,8 @@ try:
     pnodes, topo, delay, chainSyncStrategyStr))
 
     Print("Stand up cluster")
-    traceNodeosArgs=" --plugin sysio::trace_api_plugin --trace-no-abis "
-    if cluster.launch(pnodes=pnodes, totalNodes=total_nodes, topo=topo, delay=delay, extraNodeosArgs=traceNodeosArgs) is False:
+    traceNodeopArgs=" --plugin sysio::trace_api_plugin --trace-no-abis "
+    if cluster.launch(pnodes=pnodes, totalNodes=total_nodes, topo=topo, delay=delay, extraNodeopArgs=traceNodeopArgs) is False:
         errorExit("Failed to stand up eos cluster.")
 
     Print ("Wait for Cluster stabilization")
@@ -73,7 +73,7 @@ try:
     Print("Kill %d cluster node instances." % (killCount))
     if cluster.killSomeEosInstances(killCount, killSignal) is False:
         errorExit("Failed to kill Eos instances")
-    Print("nodeos instances killed.")
+    Print("nodeop instances killed.")
 
     Print ("Relaunch dead cluster nodes instances.")
     nodeArg = "--terminate-at-block %d" % terminate if terminate > 0 else ""
@@ -82,7 +82,7 @@ try:
             nodeArg += " --truncate-at-block %d" % terminate
     if cluster.relaunchEosInstances(cachePopen=True, nodeArgs=nodeArg) is False:
         errorExit("Failed to relaunch Eos instances")
-    Print("nodeos instances relaunched.")
+    Print("nodeop instances relaunched.")
 
     testSuccessful=True
 finally:

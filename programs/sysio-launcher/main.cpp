@@ -403,8 +403,8 @@ struct launcher_def {
    bfs::path data_dir_base;
    bool skip_transaction_signatures = false;
    string eosd_extra_args;
-   std::map<uint,string> specific_nodeos_args;
-   std::map<uint,string> specific_nodeos_installation_paths;
+   std::map<uint,string> specific_nodeop_args;
+   std::map<uint,string> specific_nodeop_installation_paths;
    testnet_def network;
    string gelf_endpoint;
    vector <string> aliases;
@@ -573,8 +573,8 @@ launcher_def::initialize (const variables_map &vmap) {
      server_ident_file = vmap["servers"].as<string>();
   }
 
-  retrieve_paired_array_parameters(vmap, "specific-num", "specific-" + string(node_executable_name), specific_nodeos_args);
-  retrieve_paired_array_parameters(vmap, "spcfc-inst-num", "spcfc-inst-" + string(node_executable_name), specific_nodeos_installation_paths);
+  retrieve_paired_array_parameters(vmap, "specific-num", "specific-" + string(node_executable_name), specific_nodeop_args);
+  retrieve_paired_array_parameters(vmap, "spcfc-inst-num", "spcfc-inst-" + string(node_executable_name), specific_nodeop_installation_paths);
 
   using namespace std::chrono;
   system_clock::time_point now = system_clock::now();
@@ -641,7 +641,7 @@ launcher_def::initialize (const variables_map &vmap) {
         cerr << "\"--specific-num\" provided value= " << num << " is higher than \"--nodes\" provided value=" << total_nodes << endl;
         exit (-1);
       }
-      specific_nodeos_args[num] = specific_args[i];
+      specific_nodeop_args[num] = specific_args[i];
     }
   }
 
@@ -1582,23 +1582,23 @@ launcher_def::launch (eosd_def &instance, string &gts) {
   info.remote = !host->is_local();
 
   string install_path;
-  if (instance.name != "bios" && !specific_nodeos_installation_paths.empty()) {
+  if (instance.name != "bios" && !specific_nodeop_installation_paths.empty()) {
      const auto node_num = boost::lexical_cast<uint16_t,string>(instance.get_node_num());
-     if (specific_nodeos_installation_paths.count(node_num)) {
-        install_path = specific_nodeos_installation_paths[node_num] + "/";
+     if (specific_nodeop_installation_paths.count(node_num)) {
+        install_path = specific_nodeop_installation_paths[node_num] + "/";
      }
   }
-  string eosdcmd = install_path + "programs/nodeos/" + string(node_executable_name) + " ";
+  string eosdcmd = install_path + "programs/nodeop/" + string(node_executable_name) + " ";
   if (skip_transaction_signatures) {
     eosdcmd += "--skip-transaction-signatures ";
   }
   if (!eosd_extra_args.empty()) {
     eosdcmd += eosd_extra_args + " ";
   }
-  if (instance.name != "bios" && !specific_nodeos_args.empty()) {
+  if (instance.name != "bios" && !specific_nodeop_args.empty()) {
      const auto node_num = boost::lexical_cast<uint16_t,string>(instance.get_node_num());
-     if (specific_nodeos_args.count(node_num)) {
-        eosdcmd += specific_nodeos_args[node_num] + " ";
+     if (specific_nodeop_args.count(node_num)) {
+        eosdcmd += specific_nodeop_args[node_num] + " ";
      }
   }
 
@@ -1820,10 +1820,10 @@ launcher_def::bounce (const string& node_numbers) {
       const string node_num = node.get_node_num();
       cout << "Bouncing " << node.name << endl;
       string cmd = "./scripts/sysio-tn_bounce.sh " + eosd_extra_args;
-      if (node_num != "bios" && !specific_nodeos_args.empty()) {
+      if (node_num != "bios" && !specific_nodeop_args.empty()) {
          const auto node_num_i = boost::lexical_cast<uint16_t,string>(node_num);
-         if (specific_nodeos_args.count(node_num_i)) {
-            cmd += " " + specific_nodeos_args[node_num_i];
+         if (specific_nodeop_args.count(node_num_i)) {
+            cmd += " " + specific_nodeop_args[node_num_i];
          }
       }
 

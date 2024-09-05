@@ -61,20 +61,20 @@ killAll=args.clean_run
 testSuccessful=False
 killEosInstances=not dontKill
 
-specificExtraNodeosArgs={}
+specificExtraNodeopArgs={}
 producerNodeId=0
 syncingNodeId=1
 
-specificExtraNodeosArgs[producerNodeId]=" --p2p-listen-endpoint 0.0.0.0:{}".format(9876+producerNodeId)
-specificExtraNodeosArgs[syncingNodeId]="--p2p-peer-address 0.0.0.0:{}".format(9876+producerNodeId)
+specificExtraNodeopArgs[producerNodeId]=" --p2p-listen-endpoint 0.0.0.0:{}".format(9876+producerNodeId)
+specificExtraNodeopArgs[syncingNodeId]="--p2p-peer-address 0.0.0.0:{}".format(9876+producerNodeId)
 
 try:
     TestHelper.printSystemInfo("BEGIN")
     cluster.killall(allInstances=killAll)
     cluster.cleanup()
-    traceNodeosArgs=" --plugin sysio::trace_api_plugin --trace-no-abis --plugin sysio::producer_plugin --produce-time-offset-us 0 --last-block-time-offset-us 0 --cpu-effort-percent 100 \
+    traceNodeopArgs=" --plugin sysio::trace_api_plugin --trace-no-abis --plugin sysio::producer_plugin --produce-time-offset-us 0 --last-block-time-offset-us 0 --cpu-effort-percent 100 \
         --last-block-cpu-effort-percent 100 --producer-threads 1 --plugin sysio::net_plugin --net-threads 1"
-    if cluster.launch(pnodes=1, totalNodes=totalNodes, totalProducers=1, useBiosBootFile=False, specificExtraNodeosArgs=specificExtraNodeosArgs, extraNodeosArgs=traceNodeosArgs) is False:
+    if cluster.launch(pnodes=1, totalNodes=totalNodes, totalProducers=1, useBiosBootFile=False, specificExtraNodeopArgs=specificExtraNodeopArgs, extraNodeopArgs=traceNodeopArgs) is False:
         Utils.cmdError("launcher")
         Utils.errorExit("Failed to stand up eos cluster.")
 

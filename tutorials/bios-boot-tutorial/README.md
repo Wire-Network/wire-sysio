@@ -45,5 +45,5 @@ The last command in the previous step printed the contracts directory. Make note
 $ cd ~
 $ git clone https://github.com/AntelopeIO/wire_sysio
 $ cd ./wire_sysio/tutorials/bios-boot-tutorial/
-$ python3 bios-boot-tutorial.py --cleos=cleos --nodeos=nodeos --keosd=keosd --contracts-dir="${CONTRACTS_DIRECTORY}" -w -a
+$ python3 bios-boot-tutorial.py --clio=clio --nodeop=nodeop --kiod=kiod --contracts-dir="${CONTRACTS_DIRECTORY}" -w -a
 ```

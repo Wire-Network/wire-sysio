@@ -4,7 +4,7 @@
    continued to produce blocks and update state but the blocks log was
    "corrupted" in that it no longer contained all the irreversible blocks.
    It was also observed that when file system which "data/state"
-   belons to is running out of space, nodeos will crash with SIGBUS as
+   belons to is running out of space, nodeop will crash with SIGBUS as
    the state file is unable to acquire new pages.
 
    The solution is to have a dedicated plugin to monitor resource 
@@ -51,7 +51,7 @@ public:
          ( "resource-monitor-space-threshold", bpo::value<uint32_t>()->default_value(def_space_threshold),
            "Threshold in terms of percentage of used space vs total space. If used space is above (threshold - 5%), a warning is generated.  Unless resource-monitor-not-shutdown-on-threshold-exceeded is enabled, a graceful shutdown is initiated if used space is above the threshold. The value should be between 6 and 99" )
          ( "resource-monitor-not-shutdown-on-threshold-exceeded",
-           "Used to indicate nodeos will not shutdown when threshold is exceeded." )
+           "Used to indicate nodeop will not shutdown when threshold is exceeded." )
          ( "resource-monitor-warning-interval", bpo::value<uint32_t>()->default_value(def_monitor_warning_interval),
            "Number of resource monitor intervals between two consecutive warnings when the threshold is hit. Should be between 1 and 450" )
          ;

@@ -1,1 +1,1 @@
-python3 bios-boot-tutorial.py --cleos=cleos --nodeos=nodeos --keosd=keosd --contracts-dir="~/system-contracts-3.1/build/contracts" -w -a --user-limit=10 --producer-limit=3
+python3 bios-boot-tutorial.py --clio=clio --nodeop=nodeop --kiod=kiod --contracts-dir="~/system-contracts-3.1/build/contracts" -w -a --user-limit=10 --producer-limit=3

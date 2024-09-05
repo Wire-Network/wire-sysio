@@ -54,14 +54,14 @@ class Utils:
     Debug=False
     FNull = open(os.devnull, 'w')
 
-    EosClientPath="programs/cleos/cleos"
-    MiscEosClientArgs="--no-auto-keosd"
+    EosClientPath="programs/clio/clio"
+    MiscEosClientArgs="--no-auto-kiod"
 
-    EosWalletName="keosd"
-    EosWalletPath="programs/keosd/"+ EosWalletName
+    EosWalletName="kiod"
+    EosWalletPath="programs/kiod/"+ EosWalletName
 
-    EosServerName="nodeos"
-    EosServerPath="programs/nodeos/"+ EosServerName
+    EosServerName="nodeop"
+    EosServerPath="programs/nodeop/"+ EosServerName
 
     EosLauncherPath="programs/sysio-launcher/sysio-launcher"
     ShuttingDown=False

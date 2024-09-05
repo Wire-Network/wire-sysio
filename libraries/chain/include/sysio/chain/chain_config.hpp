@@ -305,8 +305,8 @@ inline DataStream &operator<<(DataStream &s, const sysio::chain::data_entry<sysi
    //this approach allows to spam this function with big buffer so changing this behavior
    //moreover:
    //The contract has no way to know that the value was skipped and is likely to behave incorrectly.
-   //When the protocol feature is not activated, the old version of nodeos that doesn't know about 
-   //the entry MUST behave the same as the new version of nodeos that does.
+   //When the protocol feature is not activated, the old version of nodeop that doesn't know about 
+   //the entry MUST behave the same as the new version of nodeop that does.
    //Skipping known but unactivated entries violates this.
    SYS_ASSERT(entry.is_allowed(), unsupported_feature, "config id ${id} is no allowed", ("id", entry.id));
    

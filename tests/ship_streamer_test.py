@@ -60,15 +60,15 @@ try:
     cluster.killall(allInstances=killAll)
     cluster.cleanup()
     Print("Stand up cluster")
-    specificExtraNodeosArgs={}
+    specificExtraNodeopArgs={}
     # non-producing nodes are at the end of the cluster's nodes, so reserving the last one for state_history_plugin
     shipNodeNum = totalNodes - 1
-    specificExtraNodeosArgs[shipNodeNum]="--plugin sysio::state_history_plugin --disable-replay-opts --trace-history --sync-fetch-span 200 --plugin sysio::net_api_plugin "
-    traceNodeosArgs=" --plugin sysio::trace_api_plugin --trace-no-abis "
+    specificExtraNodeopArgs[shipNodeNum]="--plugin sysio::state_history_plugin --disable-replay-opts --trace-history --sync-fetch-span 200 --plugin sysio::net_api_plugin "
+    traceNodeopArgs=" --plugin sysio::trace_api_plugin --trace-no-abis "
 
     if cluster.launch(pnodes=totalProducerNodes,
                       totalNodes=totalNodes, totalProducers=totalProducers,
-                      useBiosBootFile=False, specificExtraNodeosArgs=specificExtraNodeosArgs, extraNodeosArgs=traceNodeosArgs) is False:
+                      useBiosBootFile=False, specificExtraNodeopArgs=specificExtraNodeopArgs, extraNodeopArgs=traceNodeopArgs) is False:
         Utils.cmdError("launcher")
         Utils.errorExit("Failed to stand up eos cluster.")
 
@@ -122,7 +122,7 @@ try:
             block_num += 1
         assert block_num-1 == end_block_num, f"{block_num-1} != {end_block_num}"
 
-    Print("Shutdown state_history_plugin nodeos")
+    Print("Shutdown state_history_plugin nodeop")
     shipNode.kill(signal.SIGTERM)
 
     testSuccessful = True

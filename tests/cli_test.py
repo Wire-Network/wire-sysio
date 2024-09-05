@@ -8,17 +8,17 @@ import subprocess
 import re
 
 
-def nodeos_help_test():
-    """Test that nodeos help contains option descriptions"""
-    help_text = subprocess.check_output(["./programs/nodeos/nodeos", "--help"])
+def nodeop_help_test():
+    """Test that nodeop help contains option descriptions"""
+    help_text = subprocess.check_output(["./programs/nodeop/nodeop", "--help"])
 
     assert(re.search(b'Application.*Options', help_text))
     assert(re.search(b'Options for .*_plugin', help_text))
 
 
-def cleos_help_test(args):
-    """Test that cleos help contains option and subcommand descriptions"""
-    help_text = subprocess.check_output(["./programs/cleos/cleos"] + args)
+def clio_help_test(args):
+    """Test that clio help contains option and subcommand descriptions"""
+    help_text = subprocess.check_output(["./programs/clio/clio"] + args)
 
     assert(b'Options:' in help_text)
     assert(b'Subcommands:' in help_text)
@@ -27,7 +27,7 @@ def cleos_help_test(args):
 def cli11_bugfix_test():
     """Test that subcommand names can be used as option arguments"""
     completed_process = subprocess.run(
-        ['./programs/cleos/cleos', '--no-auto-keosd', '-u', 'http://localhost:0/',
+        ['./programs/clio/clio', '--no-auto-kiod', '-u', 'http://localhost:0/',
          'push', 'action', 'accout', 'action', '["data"]', '-p', 'wallet'],
         check=False,
         stderr=subprocess.PIPE)
@@ -38,7 +38,7 @@ def cli11_bugfix_test():
 
     # Make sure that the command failed because of the connection error,
     # not the command line parsing error.
-    assert(b'Failed http request to nodeos' in completed_process.stderr)
+    assert(b'Failed http request to nodeop' in completed_process.stderr)
 
 
 def cli11_optional_option_arg_test():
@@ -46,18 +46,18 @@ def cli11_optional_option_arg_test():
     chain = 'cf057bbfb72640471fd910bcb67639c22df9f92470936cddc1ade0e2f2e7dc4f'
     key = '5Jgfqh3svgBZvCAQkcnUX8sKmVUkaUekYDGqFakm52Ttkc5MBA4'
 
-    output = subprocess.check_output(['./programs/cleos/cleos', '--no-auto-keosd', 'sign',
+    output = subprocess.check_output(['./programs/clio/clio', '--no-auto-kiod', 'sign',
                                       '-c', chain, '-k', '{}'],
                                      input=key.encode(),
                                      stderr=subprocess.DEVNULL)
     assert(b'signatures' in output)
 
-    output = subprocess.check_output(['./programs/cleos/cleos', '--no-auto-keosd', 'sign',
+    output = subprocess.check_output(['./programs/clio/clio', '--no-auto-kiod', 'sign',
                                       '-c', chain, '-k', key, '{}'])
     assert(b'signatures' in output)
 
 
-def cleos_sign_test():
+def clio_sign_test():
     """Test that sign can on both regular and packed transactions"""
     chain = 'cf057bbfb72640471fd910bcb67639c22df9f92470936cddc1ade0e2f2e7dc4f'
     key = '5Jgfqh3svgBZvCAQkcnUX8sKmVUkaUekYDGqFakm52Ttkc5MBA4'
@@ -87,7 +87,7 @@ def cleos_sign_test():
         '"context_free_data": []'
     '}')
 
-    output = subprocess.check_output(['./programs/cleos/cleos', '--no-auto-keosd', 'sign',
+    output = subprocess.check_output(['./programs/clio/clio', '--no-auto-kiod', 'sign',
                                       '-c', chain, '-k', key, trx])
     # make sure it is signed
     assert(b'signatures' in output)
@@ -105,7 +105,7 @@ def cleos_sign_test():
 
     # Test packed transaction is unpacked. Only with options --print-request and --public-key
     # the sign request is dumped to stderr.
-    cmd = ['./programs/cleos/cleos', '--print-request', '--no-auto-keosd', 'sign', '-c', chain, '--public-key', 'SYS8Dq1KosJ9PMn1vKQK3TbiihgfUiDBUsz471xaCE6eYUssPB1KY', packed_trx]
+    cmd = ['./programs/clio/clio', '--print-request', '--no-auto-kiod', 'sign', '-c', chain, '--public-key', 'SYS8Dq1KosJ9PMn1vKQK3TbiihgfUiDBUsz471xaCE6eYUssPB1KY', packed_trx]
     outs=None
     errs=None
     try:
@@ -125,20 +125,20 @@ def cleos_sign_test():
     assert(b'"data": "000000000000a6690000000000ea305501000000000000000453595300000000016d"' in errs)
 
     # Test packed transaction is signed.
-    output = subprocess.check_output(['./programs/cleos/cleos', '--no-auto-keosd', 'sign',
+    output = subprocess.check_output(['./programs/clio/clio', '--no-auto-kiod', 'sign',
                                       '-c', chain, '-k', key, packed_trx])
     # Make sure signatures not empty
     assert(b'signatures' in output)
     assert(b'"signatures": []' not in output)
 
-nodeos_help_test()
+nodeop_help_test()
 
-cleos_help_test(['--help'])
-cleos_help_test(['system', '--help'])
-cleos_help_test(['version', '--help'])
-cleos_help_test(['wallet', '--help'])
+clio_help_test(['--help'])
+clio_help_test(['system', '--help'])
+clio_help_test(['version', '--help'])
+clio_help_test(['wallet', '--help'])
 
 cli11_bugfix_test()
 
 cli11_optional_option_arg_test()
-cleos_sign_test()
+clio_sign_test()

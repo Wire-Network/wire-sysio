@@ -54,7 +54,7 @@ killEosInstances=not dontKill
 killWallet=not dontKill
 
 WalletdName=Utils.EosWalletName
-ClientName="cleos"
+ClientName="clio"
 
 SYSIO_ACCT_PRIVATE_DEFAULT_KEY = "5KQwrPbwdL6PhXujxW37FSSQZ1JiwsST4cqQzDeyXtP79zkvFD3"
 SYSIO_ACCT_PUBLIC_DEFAULT_KEY = "SYS6MRyAjQq8ud7hVNYcfnVPJqcVpscN5So8BhtHuGYqET5GDW5CV"
@@ -68,12 +68,12 @@ try:
     Print("Stand up cluster")
     successDuration = 60
     failure_duration = 40
-    extraNodeosArgs=" --transaction-finality-status-max-storage-size-gb 1 " + \
+    extraNodeopArgs=" --transaction-finality-status-max-storage-size-gb 1 " + \
                    f"--transaction-finality-status-success-duration-sec {successDuration} --transaction-finality-status-failure-duration-sec {failure_duration}"
-    extraNodeosArgs+=" --plugin sysio::trace_api_plugin --trace-no-abis"
-    extraNodeosArgs+=" --http-max-response-time-ms 990000"
+    extraNodeopArgs+=" --plugin sysio::trace_api_plugin --trace-no-abis"
+    extraNodeopArgs+=" --http-max-response-time-ms 990000"
     if cluster.launch(prodCount=prodCount, onlyBios=False, pnodes=pnodes, totalNodes=totalNodes, totalProducers=pnodes*prodCount,
-                      useBiosBootFile=False, topo="line", extraNodeosArgs=extraNodeosArgs) is False:
+                      useBiosBootFile=False, topo="line", extraNodeopArgs=extraNodeopArgs) is False:
         Utils.errorExit("Failed to stand up eos cluster.")
 
     Print("Validating system accounts after bootstrap")

@@ -66,7 +66,7 @@ namespace sysio::resource_monitor {
             } else if ( info.available < fs.warning_available && output_threshold_warning ) {
                wlog("Space usage warning: ${path}'s file system approaching threshold. available: ${available}, warning_available: ${warning_available}", ("path", fs.path_name.string()) ("available", info.available) ("warning_available", fs.warning_available));
                if ( shutdown_on_exceeded) {
-                  wlog("nodeos will shutdown when space usage exceeds threshold ${threshold}%", ("threshold", shutdown_threshold));
+                  wlog("nodeop will shutdown when space usage exceeds threshold ${threshold}%", ("threshold", shutdown_threshold));
                }
             }
          }
@@ -116,7 +116,7 @@ namespace sysio::resource_monitor {
    void space_monitor_loop() {
       if ( is_threshold_exceeded() && shutdown_on_exceeded ) {
          elog("Shutting down, file system exceeded threshold");
-         appbase::app().quit(); // This will gracefully stop Nodeos
+         appbase::app().quit(); // This will gracefully stop Nodeop
          return;
       }
       update_warning_interval_counter();

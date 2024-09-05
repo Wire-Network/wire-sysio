@@ -12,17 +12,17 @@ from testUtils import Utils
 Wallet=namedtuple("Wallet", "name password host port")
 # pylint: disable=too-many-instance-attributes
 class WalletMgr(object):
-    __walletLogOutFile="var/test_keosd_out.log"
-    __walletLogErrFile="var/test_keosd_err.log"
+    __walletLogOutFile="var/test_kiod_out.log"
+    __walletLogErrFile="var/test_kiod_err.log"
     __walletDataDir="var/test_wallet_0"
     __MaxPort=9999
 
     # pylint: disable=too-many-arguments
-    # walletd [True|False] True=Launch wallet(keosd) process; False=Manage launch process externally.
-    def __init__(self, walletd, nodeosPort=8888, nodeosHost="localhost", port=9899, host="localhost"):
+    # walletd [True|False] True=Launch wallet(kiod) process; False=Manage launch process externally.
+    def __init__(self, walletd, nodeopPort=8888, nodeopHost="localhost", port=9899, host="localhost"):
         self.walletd=walletd
-        self.nodeosPort=nodeosPort
-        self.nodeosHost=nodeosHost
+        self.nodeopPort=nodeopPort
+        self.nodeopHost=nodeopHost
         self.port=port
         self.host=host
         self.wallets={}
@@ -35,7 +35,7 @@ class WalletMgr(object):
         return " --wallet-url http://%s:%d" % (self.host, self.port)
 
     def getArgs(self):
-        return " --url http://%s:%d%s %s" % (self.nodeosHost, self.nodeosPort, self.getWalletEndpointArgs(), Utils.MiscEosClientArgs)
+        return " --url http://%s:%d%s %s" % (self.nodeopHost, self.nodeopPort, self.getWalletEndpointArgs(), Utils.MiscEosClientArgs)
 
     def isLaunched(self):
         return self.__walletPid is not None
@@ -56,7 +56,7 @@ class WalletMgr(object):
 
     def launch(self):
         if not self.walletd:
-            Utils.Print("ERROR: Wallet Manager wasn't configured to launch keosd")
+            Utils.Print("ERROR: Wallet Manager wasn't configured to launch kiod")
             return False
 
         if self.isLaunched():
@@ -87,7 +87,7 @@ class WalletMgr(object):
             popen=subprocess.Popen(cmd.split(), stdout=sout, stderr=serr)
             self.__walletPid=popen.pid
 
-        # Give keosd time to warm up
+        # Give kiod time to warm up
         time.sleep(2)
 
         try:

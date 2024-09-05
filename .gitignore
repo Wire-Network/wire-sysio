@@ -46,17 +46,17 @@ libraries/wasm-jit/Source/Programs/Disassemble
 libraries/wasm-jit/Source/Programs/Test
 libraries/wasm-jit/Source/Programs/wavm
 
-programs/cleos/cleos
+programs/clio/clio
 programs/js_operation_serializer/js_operation_serializer
 programs/data-dir
 programs/sysio-abigen/sysio-abigen
-programs/cleos/config.hpp
+programs/clio/config.hpp
 programs/sysio-applesedemo/sysio-applesedemo
 programs/sysio-launcher/config.hpp
 programs/sysio-launcher/sysio-launcher
-programs/keosd/keosd
-programs/nodeos/config.hpp
-programs/nodeos/nodeos
+programs/kiod/kiod
+programs/nodeop/config.hpp
+programs/nodeop/nodeop
 
 scripts/tn_init.sh
 

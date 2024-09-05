@@ -30,11 +30,11 @@ done
 
 SYSIO_STUFF_DIR=$(mktemp -d)
 trap "rm -rf $SYSIO_STUFF_DIR" EXIT
-NODSYS_LAUNCH_PARAMS="./programs/nodeos/nodeos --resource-monitor-not-shutdown-on-threshold-exceeded -d $SYSIO_STUFF_DIR --config-dir $SYSIO_STUFF_DIR \
+NODSYS_LAUNCH_PARAMS="./programs/nodeop/nodeop --resource-monitor-not-shutdown-on-threshold-exceeded -d $SYSIO_STUFF_DIR --config-dir $SYSIO_STUFF_DIR \
 --chain-state-db-size-mb 8 --chain-state-db-guard-size-mb 0 \
 -e -psysio"
 
-run_nodeos() {
+run_nodeop() {
    if (( $VERBOSE == 0 )); then
       $NODSYS_LAUNCH_PARAMS --http-server-address '' --p2p-listen-endpoint '' "$@" 2>/dev/null &
    else
@@ -43,7 +43,7 @@ run_nodeos() {
 }
 
 run_expect_success() {
-   run_nodeos "$@"
+   run_nodeop "$@"
    local NODSYS_PID=$!
    sleep 10
    kill $NODSYS_PID
@@ -51,7 +51,7 @@ run_expect_success() {
 }
 
 run_and_kill() {
-   run_nodeos "$@"
+   run_nodeop "$@"
    local NODSYS_PID=$!
    sleep 10
    kill -KILL $NODSYS_PID
@@ -59,7 +59,7 @@ run_and_kill() {
 }
 
 run_expect_failure() {
-   run_nodeos "$@"
+   run_nodeop "$@"
    local NODSYS_PID=$!
    MYPID=$$
    (sleep 20; kill -ALRM $MYPID) & local TIMER_PID=$!

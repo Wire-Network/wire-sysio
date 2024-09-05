@@ -65,7 +65,7 @@ try:
         walletMgr.cleanup()
         print("Stand up walletd")
         if walletMgr.launch() is False:
-            errorExit("Failed to stand up keosd.")
+            errorExit("Failed to stand up kiod.")
         else:
             cluster.killall(allInstances=killAll)
             cluster.cleanup()
@@ -77,8 +77,8 @@ try:
 
     Print("Stand up cluster")
     if cluster.launch(pnodes=pnodes, totalNodes=total_nodes, topo=topo, delay=delay,
-                      extraNodeosArgs=" --http-max-response-time-ms 990000 --disable-subjective-api-billing false --plugin sysio::trace_api_plugin --trace-no-abis ",
-                      specificExtraNodeosArgs=specificArgs ) is False:
+                      extraNodeopArgs=" --http-max-response-time-ms 990000 --disable-subjective-api-billing false --plugin sysio::trace_api_plugin --trace-no-abis ",
+                      specificExtraNodeopArgs=specificArgs ) is False:
        errorExit("Failed to stand up eos cluster.")
 
     Print ("Wait for Cluster stabilization")

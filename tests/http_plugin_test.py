@@ -31,7 +31,7 @@ cluster=Cluster(walletd=True)
 
 testSuccessful=False
 
-ClientName="cleos"
+ClientName="clio"
 timeout = .5 * 12 * 2 + 60 # time for finalization with 1 producer + 60 seconds padding
 Utils.setIrreversibleTimeout(timeout)
 
@@ -42,7 +42,7 @@ try:
     # standup cluster with HTTPS enabled, but not configured
     # HTTP should still work
     extraArgs={ 0 : "--https-server-address 127.0.0.1:5555" }
-    # specificExtraNodeosArgs=extraArgs
+    # specificExtraNodeopArgs=extraArgs
 
     if cluster.launch(dontBootstrap=True, loadSystemContract=False) is False:
         cmdError("launcher")

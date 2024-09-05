@@ -25,9 +25,9 @@ else()
     set(VERSION_FULL "${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_PATCH}")
 endif()
 
-set(CLI_CLIENT_EXECUTABLE_NAME cleos)
-set(NODE_EXECUTABLE_NAME nodeos)
-set(KEY_STORE_EXECUTABLE_NAME keosd)
+set(CLI_CLIENT_EXECUTABLE_NAME clio)
+set(NODE_EXECUTABLE_NAME nodeop)
+set(KEY_STORE_EXECUTABLE_NAME kiod)
 
 if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
     if(CMAKE_CXX_COMPILER_VERSION VERSION_LESS 8.0)
@@ -49,7 +49,7 @@ endif()
 
 set(CMAKE_EXPORT_COMPILE_COMMANDS "ON")
 set(BUILD_DOXYGEN FALSE CACHE BOOL "Build doxygen documentation on every make")
-set(ENABLE_MULTIVERSION_PROTOCOL_TEST FALSE CACHE BOOL "Enable nodeos multiversion protocol test")
+set(ENABLE_MULTIVERSION_PROTOCOL_TEST FALSE CACHE BOOL "Enable nodeop multiversion protocol test")
 
 # add defaults for openssl
 if(APPLE AND UNIX AND "${OPENSSL_ROOT_DIR}" STREQUAL "")
@@ -195,8 +195,8 @@ configure_file(${CMAKE_SOURCE_DIR}/libraries/fc/src/network/LICENSE.go
 configure_file(${CMAKE_SOURCE_DIR}/libraries/yubihsm/LICENSE ${CMAKE_BINARY_DIR}/licenses//wire-sysio/LICENSE.yubihsm COPYONLY)
 configure_file(${CMAKE_SOURCE_DIR}/libraries/sys-vm/LICENSE
                ${CMAKE_BINARY_DIR}/licenses//wire-sysio/LICENSE.sys-vm COPYONLY)
-configure_file(${CMAKE_SOURCE_DIR}/programs/cleos/LICENSE.CLI11
-               ${CMAKE_BINARY_DIR}/programs/cleos/LICENSE.CLI11 COPYONLY)
+configure_file(${CMAKE_SOURCE_DIR}/programs/clio/LICENSE.CLI11
+               ${CMAKE_BINARY_DIR}/programs/clio/LICENSE.CLI11 COPYONLY)
 
 
 
@@ -209,7 +209,7 @@ install(FILES libraries/fc/src/network/LICENSE.go DESTINATION ${CMAKE_INSTALL_FU
 install(FILES libraries/yubihsm/LICENSE DESTINATION ${CMAKE_INSTALL_FULL_DATAROOTDIR}/licenses/wire-sysio/ RENAME LICENSE.yubihsm COMPONENT base)
 install(FILES libraries/sys-vm/LICENSE DESTINATION ${CMAKE_INSTALL_FULL_DATAROOTDIR}/licenses/wire-sysio/ RENAME LICENSE.sys-vm COMPONENT base)
 install(FILES libraries/fc/libraries/ff/LICENSE DESTINATION ${CMAKE_INSTALL_FULL_DATAROOTDIR}/licenses/wire-sysio/ RENAME LICENSE.libff COMPONENT base)
-install(FILES programs/cleos/LICENSE.CLI11 DESTINATION ${CMAKE_INSTALL_FULL_DATAROOTDIR}/licenses/wire-sysio/ COMPONENT base)
+install(FILES programs/clio/LICENSE.CLI11 DESTINATION ${CMAKE_INSTALL_FULL_DATAROOTDIR}/licenses/wire-sysio/ COMPONENT base)
 
 add_custom_target(dev-install
 COMMAND “${CMAKE_COMMAND}” –build “${CMAKE_BINARY_DIR}”

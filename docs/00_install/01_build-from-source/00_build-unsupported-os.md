@@ -51,7 +51,7 @@ ctest -j $(nproc) -LE _tests
 ctest -j $(nproc) -L wasm_spec_tests
 ```
 
-Some other tests are available and recommended but be aware they can be sensitive to other software running on the same host and they may **SIGKILL** other nodeos instances running on the host.
+Some other tests are available and recommended but be aware they can be sensitive to other software running on the same host and they may **SIGKILL** other nodeop instances running on the host.
 ```
 cd build
 

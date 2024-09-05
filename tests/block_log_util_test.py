@@ -14,7 +14,7 @@ from TestHelper import TestHelper
 
 ###############################################################
 # block_log_util_test
-#  Test verifies that the blockLogUtil is still compatible with nodeos
+#  Test verifies that the blockLogUtil is still compatible with nodeop
 ###############################################################
 
 Print=Utils.Print
@@ -51,7 +51,7 @@ killEosInstances=not dontKill
 killWallet=not dontKill
 
 WalletdName=Utils.EosWalletName
-ClientName="cleos"
+ClientName="clio"
 
 try:
     TestHelper.printSystemInfo("BEGIN")
@@ -60,8 +60,8 @@ try:
     cluster.killall(allInstances=killAll)
     cluster.cleanup()
     Print("Stand up cluster")
-    traceNodeosArgs=" --plugin sysio::trace_api_plugin --trace-no-abis "
-    if cluster.launch(prodCount=prodCount, onlyBios=False, pnodes=pnodes, totalNodes=totalNodes, totalProducers=pnodes*prodCount, useBiosBootFile=False, extraNodeosArgs=traceNodeosArgs) is False:
+    traceNodeopArgs=" --plugin sysio::trace_api_plugin --trace-no-abis "
+    if cluster.launch(prodCount=prodCount, onlyBios=False, pnodes=pnodes, totalNodes=totalNodes, totalProducers=pnodes*prodCount, useBiosBootFile=False, extraNodeopArgs=traceNodeopArgs) is False:
         Utils.errorExit("Failed to stand up eos cluster.")
 
     Print("Validating system accounts after bootstrap")

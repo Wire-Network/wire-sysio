@@ -40,7 +40,7 @@ killEosInstances=not dontKill
 killWallet=not dontKill
 
 WalletdName=Utils.EosWalletName
-ClientName="cleos"
+ClientName="clio"
 timeout = .5 * 12 * 2 + 60 # time for finalization with 1 producer + 60 seconds padding
 Utils.setIrreversibleTimeout(timeout)
 
@@ -55,8 +55,8 @@ try:
         Print("Stand up cluster")
         pnodes=4
         abs_path = os.path.abspath(os.getcwd() + '/unittests/contracts/sysio.token/sysio.token.abi')
-        traceNodeosArgs=" --plugin sysio::trace_api_plugin --trace-rpc-abi sysio.token=" + abs_path
-        if cluster.launch(pnodes=pnodes, totalNodes=pnodes, extraNodeosArgs=traceNodeosArgs) is False:
+        traceNodeopArgs=" --plugin sysio::trace_api_plugin --trace-rpc-abi sysio.token=" + abs_path
+        if cluster.launch(pnodes=pnodes, totalNodes=pnodes, extraNodeopArgs=traceNodeopArgs) is False:
             cmdError("launcher")
             errorExit("Failed to stand up eos cluster.")
     else:

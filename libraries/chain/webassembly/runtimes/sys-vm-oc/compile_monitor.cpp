@@ -36,7 +36,7 @@ static void copy_memfd_contents_to_pointer(void* dst, int fd) {
 struct compile_monitor_session {
    compile_monitor_session(boost::asio::io_context& context, local::datagram_protocol::socket&& n, wrapped_fd&& c, wrapped_fd& t) :
       _ctx(context),
-      _nodeos_instance_socket(std::move(n)),
+      _nodeop_instance_socket(std::move(n)),
       _cache_fd(std::move(c)),
       _trampoline_socket(t) {
 
@@ -47,20 +47,20 @@ struct compile_monitor_session {
       FC_ASSERT(_code_mapping != MAP_FAILED, "failed to mmap cache file");
       _allocator = reinterpret_cast<allocator_t*>(_code_mapping);
       
-      read_message_from_nodeos();
+      read_message_from_nodeop();
    }
 
    ~compile_monitor_session() {
       munmap(_code_mapping, _code_size);
    }
    
-   void read_message_from_nodeos() {
-      _nodeos_instance_socket.async_wait(local::datagram_protocol::socket::wait_read, [this](auto ec) {
+   void read_message_from_nodeop() {
+      _nodeop_instance_socket.async_wait(local::datagram_protocol::socket::wait_read, [this](auto ec) {
          if(ec) {
             connection_dead_signal();
             return;
          }
-         auto [success, message, fds] = read_message_with_fds(_nodeos_instance_socket);
+         auto [success, message, fds] = read_message_with_fds(_nodeop_instance_socket);
          if(!success) {
             connection_dead_signal();
             return;
@@ -86,7 +86,7 @@ struct compile_monitor_session {
             }
          }, message);
 
-         read_message_from_nodeos();
+         read_message_from_nodeop();
       });
    }
 
@@ -103,7 +103,7 @@ struct compile_monitor_session {
       eosvmoc_message trampoline_compile_request = compile_wasm_message{code_id};
       if(write_message_with_fds(_trampoline_socket, trampoline_compile_request, fds_pass_to_trampoline) == false) {
          wasm_compilation_result_message reply{code_id, compilation_result_unknownfailure{}, _allocator->get_free_memory()};
-         write_message_with_fds(_nodeos_instance_socket, reply);
+         write_message_with_fds(_nodeop_instance_socket, reply);
          return;
       }
 
@@ -157,7 +157,7 @@ struct compile_monitor_session {
             _allocator->deallocate(mem_ptr);
          }
 
-         write_message_with_fds(_nodeos_instance_socket, reply);
+         write_message_with_fds(_nodeop_instance_socket, reply);
 
          //either way, we are done
          _ctx.post([this, current_compile_it]() {
@@ -171,7 +171,7 @@ struct compile_monitor_session {
 
 private:
    boost::asio::io_context& _ctx;
-   local::datagram_protocol::socket _nodeos_instance_socket;
+   local::datagram_protocol::socket _nodeop_instance_socket;
    wrapped_fd  _cache_fd;
    wrapped_fd& _trampoline_socket;
 
@@ -183,20 +183,20 @@ private:
 };
 
 struct compile_monitor {
-   compile_monitor(boost::asio::io_context& ctx, local::datagram_protocol::socket&& n, wrapped_fd&& t) : _nodeos_socket(std::move(n)), _trampoline_socket(std::move(t)) {
+   compile_monitor(boost::asio::io_context& ctx, local::datagram_protocol::socket&& n, wrapped_fd&& t) : _nodeop_socket(std::move(n)), _trampoline_socket(std::move(t)) {
       //the only duty of compile_monitor is to create a compile_monitor_session when a code_cache instance
-      // in nodeos wants one
+      // in nodeop wants one
       wait_for_new_incomming_session(ctx);
    }
 
    void wait_for_new_incomming_session(boost::asio::io_context& ctx) {
-      _nodeos_socket.async_wait(boost::asio::local::datagram_protocol::socket::wait_read, [this, &ctx](auto ec) {
+      _nodeop_socket.async_wait(boost::asio::local::datagram_protocol::socket::wait_read, [this, &ctx](auto ec) {
          if(ec) {
             ctx.stop();
             return;
          }
-         auto [success, message, fds] = read_message_with_fds(_nodeos_socket);
-         if(!success) {   //failure reading indicates that nodeos has shut down
+         auto [success, message, fds] = read_message_with_fds(_nodeop_socket);
+         if(!success) {   //failure reading indicates that nodeop has shut down
             ctx.stop();
             return;
          }
@@ -213,31 +213,31 @@ struct compile_monitor {
                   _compile_sessions.erase(it);
                });
             });
-            write_message_with_fds(_nodeos_socket, initalize_response_message());
+            write_message_with_fds(_nodeop_socket, initalize_response_message());
          }
          catch(const std::exception& e) {
-            write_message_with_fds(_nodeos_socket, initalize_response_message{e.what()});
+            write_message_with_fds(_nodeop_socket, initalize_response_message{e.what()});
          }
          catch(...) {
-            write_message_with_fds(_nodeos_socket, initalize_response_message{"Failed to create compile process"});
+            write_message_with_fds(_nodeop_socket, initalize_response_message{"Failed to create compile process"});
          }
 
          wait_for_new_incomming_session(ctx);
       });
    }
 
-   local::datagram_protocol::socket _nodeos_socket;
+   local::datagram_protocol::socket _nodeop_socket;
    wrapped_fd _trampoline_socket;
 
    std::list<compile_monitor_session> _compile_sessions;
 };
 
-void launch_compile_monitor(int nodeos_fd) {
+void launch_compile_monitor(int nodeop_fd) {
    prctl(PR_SET_NAME, "oc-monitor");
    prctl(PR_SET_PDEATHSIG, SIGKILL);
 
    //first off, let's disable shutdown signals to us; we want all shutdown indicators to come from
-   // nodeos shutting us down
+   // nodeop shutting us down
    sigset_t set;
    sigemptyset(&set);
    sigaddset(&set, SIGHUP);
@@ -263,10 +263,10 @@ void launch_compile_monitor(int nodeos_fd) {
 
    {
       boost::asio::io_context ctx;
-      boost::asio::local::datagram_protocol::socket nodeos_socket(ctx);
-      nodeos_socket.assign(boost::asio::local::datagram_protocol(), nodeos_fd);
+      boost::asio::local::datagram_protocol::socket nodeop_socket(ctx);
+      nodeop_socket.assign(boost::asio::local::datagram_protocol(), nodeop_fd);
       wrapped_fd trampoline_socket(socks[0]);
-      compile_monitor monitor(ctx, std::move(nodeos_socket), std::move(trampoline_socket));
+      compile_monitor monitor(ctx, std::move(nodeop_socket), std::move(trampoline_socket));
       ctx.run();
       if(monitor._compile_sessions.size())
          std::cerr << "ERROR: SYS VM OC compiler monitor exiting with active sessions" << std::endl;

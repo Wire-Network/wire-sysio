@@ -51,19 +51,19 @@ EOF
 
 ### Launch producer
 ```bash
-$ ./nodeos -d ~/eos.data/producer_node --config-dir ~/eos.data/producer_node -l ~/eos.data/logging.json --http-server-address "" -p sysio -e
+$ ./nodeop -d ~/eos.data/producer_node --config-dir ~/eos.data/producer_node -l ~/eos.data/logging.json --http-server-address "" -p sysio -e
 ```
 
 ### Launch non-producer that will generate transactions
 ```bash
-$ ./nodeos -d ~/eos.data/generator_node --config-dir ~/eos.data/generator_node -l ~/eos.data/logging.json --plugin sysio::txn_test_gen_plugin --plugin sysio::chain_api_plugin --p2p-peer-address localhost:9876 --p2p-listen-endpoint localhost:5555
+$ ./nodeop -d ~/eos.data/generator_node --config-dir ~/eos.data/generator_node -l ~/eos.data/logging.json --plugin sysio::txn_test_gen_plugin --plugin sysio::chain_api_plugin --p2p-peer-address localhost:9876 --p2p-listen-endpoint localhost:5555
 ```
 
 ### Create a wallet on the non-producer and set bios contract
 ```bash
-$ ./cleos wallet create --to-console
-$ ./cleos wallet import --private-key 5KQwrPbwdL6PhXujxW37FSSQZ1JiwsST4cqQzDeyXtP79zkvFD3
-$ ./cleos set contract sysio ~/eos/build.release/contracts/sysio.bios/ 
+$ ./clio wallet create --to-console
+$ ./clio wallet import --private-key 5KQwrPbwdL6PhXujxW37FSSQZ1JiwsST4cqQzDeyXtP79zkvFD3
+$ ./clio set contract sysio ~/eos/build.release/contracts/sysio.bios/ 
 ```
 
 ### Initialize the accounts txn_test_gen_plugin uses

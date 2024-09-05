@@ -63,20 +63,20 @@ try:
     walletMgr.cleanup()
 
     # set the last two nodes as speculative
-    specificExtraNodeosArgs={}
-    specificExtraNodeosArgs[1]="--read-mode speculative "
-    specificExtraNodeosArgs[2]="--read-mode speculative "
+    specificExtraNodeopArgs={}
+    specificExtraNodeopArgs[1]="--read-mode speculative "
+    specificExtraNodeopArgs[2]="--read-mode speculative "
 
     Print("Stand up cluster")
-    traceNodeosArgs=" --plugin sysio::trace_api_plugin --trace-no-abis "
+    traceNodeopArgs=" --plugin sysio::trace_api_plugin --trace-no-abis "
     if cluster.launch(
             pnodes=pnodes,
             totalNodes=total_nodes,
             totalProducers=1,
             useBiosBootFile=False,
             topo="mesh",
-            specificExtraNodeosArgs=specificExtraNodeosArgs,
-            extraNodeosArgs=traceNodeosArgs) is False:
+            specificExtraNodeopArgs=specificExtraNodeopArgs,
+            extraNodeopArgs=traceNodeopArgs) is False:
         errorExit("Failed to stand up eos cluster.")
 
     producingNode=cluster.getNode(0)
@@ -95,7 +95,7 @@ try:
     for clusterNode in cluster.nodes:
         clusterNode.kill(signal.SIGTERM)
     cluster.biosNode.kill(signal.SIGTERM)
-    Print("All nodeos instances killed.")
+    Print("All nodeop instances killed.")
 
     # Remove both state and blocks such that no replay happens
     Print("Remove producer node's state and blocks directories")

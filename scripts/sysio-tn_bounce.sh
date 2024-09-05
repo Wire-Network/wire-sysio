@@ -13,8 +13,8 @@
 
 pushd $SYSIO_HOME
 
-if [ ! -f programs/nodeos/nodeos ]; then
-    echo unable to locate binary for nodeos
+if [ ! -f programs/nodeop/nodeop ]; then
+    echo unable to locate binary for nodeop
     exit 1
 fi
 
