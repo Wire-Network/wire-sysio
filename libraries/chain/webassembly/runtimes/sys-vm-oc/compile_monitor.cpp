@@ -1,11 +1,11 @@
 #include <signal.h>
 #include <sys/prctl.h>
 
-#include <sysio/chain/webassembly/eos-vm-oc/ipc_protocol.hpp>
-#include <sysio/chain/webassembly/eos-vm-oc/compile_monitor.hpp>
-#include <sysio/chain/webassembly/eos-vm-oc/ipc_helpers.hpp>
-#include <sysio/chain/webassembly/eos-vm-oc/compile_trampoline.hpp>
-#include <sysio/chain/webassembly/eos-vm-oc/code_cache.hpp>
+#include <sysio/chain/webassembly/sys-vm-oc/ipc_protocol.hpp>
+#include <sysio/chain/webassembly/sys-vm-oc/compile_monitor.hpp>
+#include <sysio/chain/webassembly/sys-vm-oc/ipc_helpers.hpp>
+#include <sysio/chain/webassembly/sys-vm-oc/compile_trampoline.hpp>
+#include <sysio/chain/webassembly/sys-vm-oc/code_cache.hpp>
 
 #include <sysio/chain/exceptions.hpp>
 

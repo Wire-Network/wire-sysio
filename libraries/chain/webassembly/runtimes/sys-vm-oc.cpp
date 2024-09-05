@@ -1,4 +1,4 @@
-#include <sysio/chain/webassembly/eos-vm-oc.hpp>
+#include <sysio/chain/webassembly/sys-vm-oc.hpp>
 #include <sysio/chain/wasm_sysio_constraints.hpp>
 #include <sysio/chain/wasm_sysio_injection.hpp>
 #include <sysio/chain/apply_context.hpp>

@@ -1,7 +1,7 @@
 #pragma once
 
-#include <sysio/chain/webassembly/eos-vm-oc/config.hpp>
-#include <sysio/chain/webassembly/eos-vm-oc/eos-vm-oc.hpp>
+#include <sysio/chain/webassembly/sys-vm-oc/config.hpp>
+#include <sysio/chain/webassembly/sys-vm-oc/sys-vm-oc.hpp>
 #include <sysio/chain/types.hpp>
 
 namespace sysio { namespace chain { namespace eosvmoc {

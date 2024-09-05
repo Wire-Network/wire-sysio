@@ -1,14 +1,14 @@
-#include <sysio/chain/webassembly/eos-vm.hpp>
+#include <sysio/chain/webassembly/sys-vm.hpp>
 #include <sysio/chain/webassembly/interface.hpp>
 #include <sysio/chain/apply_context.hpp>
 #include <sysio/chain/transaction_context.hpp>
 #include <sysio/chain/global_property_object.hpp>
 #include <sysio/chain/wasm_sysio_constraints.hpp>
-//eos-vm includes
+//sys-vm includes
 #include <sysio/vm/backend.hpp>
 #include <sysio/chain/webassembly/preconditions.hpp>
 #ifdef SYSIO_SYS_VM_OC_RUNTIME_ENABLED
-#include <sysio/chain/webassembly/eos-vm-oc.hpp>
+#include <sysio/chain/webassembly/sys-vm-oc.hpp>
 #endif
 #include <boost/hana/string.hpp>
 #include <boost/hana/equal.hpp>
@@ -52,7 +52,7 @@ namespace {
 
 // Used on setcode.  Must not reject anything that WAVM accepts
 // For the moment, this runs after WAVM validation, as I am not
-// sure that eos-vm will replicate WAVM's parsing exactly.
+// sure that sys-vm will replicate WAVM's parsing exactly.
 struct setcode_options {
    static constexpr bool forbid_export_mutable_globals = false;
    static constexpr bool allow_code_after_function_end = true;
@@ -152,7 +152,7 @@ class eos_vm_instantiated_module : public wasm_instantiated_module_interface {
          } catch(sysio::vm::wasm_memory_exception& e) {
             FC_THROW_EXCEPTION(wasm_execution_error, "access violation");
          } catch(sysio::vm::exception& e) {
-            FC_THROW_EXCEPTION(wasm_execution_error, "eos-vm system failure");
+            FC_THROW_EXCEPTION(wasm_execution_error, "sys-vm system failure");
          }
          _runtime->_bkend = nullptr;
       }
@@ -197,7 +197,7 @@ class eos_vm_profiling_module : public wasm_instantiated_module_interface {
          } catch(sysio::vm::wasm_memory_exception& e) {
             FC_THROW_EXCEPTION(wasm_execution_error, "access violation");
          } catch(sysio::vm::exception& e) {
-            FC_THROW_EXCEPTION(wasm_execution_error, "eos-vm system failure");
+            FC_THROW_EXCEPTION(wasm_execution_error, "sys-vm system failure");
          }
       }
 
@@ -251,7 +251,7 @@ std::unique_ptr<wasm_instantiated_module_interface> eos_vm_runtime<Impl>::instan
       eos_vm_host_functions_t::resolve(bkend->get_module());
       return std::make_unique<eos_vm_instantiated_module<Impl>>(this, std::move(bkend));
    } catch(sysio::vm::exception& e) {
-      FC_THROW_EXCEPTION(wasm_execution_error, "Error building eos-vm interp: ${e}", ("e", e.what()));
+      FC_THROW_EXCEPTION(wasm_execution_error, "Error building sys-vm interp: ${e}", ("e", e.what()));
    }
 }
 
@@ -277,7 +277,7 @@ std::unique_ptr<wasm_instantiated_module_interface> eos_vm_profile_runtime::inst
       eos_vm_host_functions_t::resolve(bkend->get_module());
       return std::make_unique<eos_vm_profiling_module>(std::move(bkend), code_bytes, code_size);
    } catch(sysio::vm::exception& e) {
-      FC_THROW_EXCEPTION(wasm_execution_error, "Error building eos-vm interp: ${e}", ("e", e.what()));
+      FC_THROW_EXCEPTION(wasm_execution_error, "Error building sys-vm interp: ${e}", ("e", e.what()));
    }
 }
 #endif

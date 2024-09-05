@@ -1,7 +1,7 @@
-#include <sysio/chain/webassembly/eos-vm-oc/ipc_helpers.hpp>
-#include <sysio/chain/webassembly/eos-vm-oc/ipc_protocol.hpp>
-#include <sysio/chain/webassembly/eos-vm-oc/memory.hpp>
-#include <sysio/chain/webassembly/eos-vm-oc/intrinsic.hpp>
+#include <sysio/chain/webassembly/sys-vm-oc/ipc_helpers.hpp>
+#include <sysio/chain/webassembly/sys-vm-oc/ipc_protocol.hpp>
+#include <sysio/chain/webassembly/sys-vm-oc/memory.hpp>
+#include <sysio/chain/webassembly/sys-vm-oc/intrinsic.hpp>
 #include <sysio/chain/wasm_sysio_injection.hpp>
 
 #include <sys/prctl.h>

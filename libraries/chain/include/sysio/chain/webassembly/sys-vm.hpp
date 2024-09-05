@@ -8,7 +8,7 @@
 #include <sysio/chain/whitelisted_intrinsics.hpp>
 #include <softfloat_types.h>
 
-//eos-vm includes
+//sys-vm includes
 #include <sysio/vm/backend.hpp>
 #include <sysio/vm/profile.hpp>
 

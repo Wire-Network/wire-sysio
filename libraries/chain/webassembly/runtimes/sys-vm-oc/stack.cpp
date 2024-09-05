@@ -1,4 +1,4 @@
-#include <sysio/chain/webassembly/eos-vm-oc/stack.hpp>
+#include <sysio/chain/webassembly/sys-vm-oc/stack.hpp>
 #include <fc/exception/exception.hpp>
 #include <sys/mman.h>
 

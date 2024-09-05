@@ -1,9 +1,9 @@
 #pragma once
 
 #include <sysio/chain/wasm_sysio_constraints.hpp>
-#include <sysio/chain/webassembly/eos-vm-oc/eos-vm-oc.hpp>
-#include <sysio/chain/webassembly/eos-vm-oc/intrinsic_mapping.hpp>
-#include <sysio/chain/webassembly/eos-vm-oc/gs_seg_helpers.h>
+#include <sysio/chain/webassembly/sys-vm-oc/sys-vm-oc.hpp>
+#include <sysio/chain/webassembly/sys-vm-oc/intrinsic_mapping.hpp>
+#include <sysio/chain/webassembly/sys-vm-oc/gs_seg_helpers.h>
 
 #include <stdint.h>
 #include <stddef.h>

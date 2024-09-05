@@ -1,4 +1,4 @@
-#include <sysio/chain/webassembly/eos-vm-oc/gs_seg_helpers.h>
+#include <sysio/chain/webassembly/sys-vm-oc/gs_seg_helpers.h>
 
 #include <asm/prctl.h>
 #include <sys/prctl.h>

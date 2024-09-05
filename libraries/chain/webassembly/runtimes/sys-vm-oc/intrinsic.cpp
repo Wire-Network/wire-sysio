@@ -1,4 +1,4 @@
-#include <sysio/chain/webassembly/eos-vm-oc/intrinsic.hpp>
+#include <sysio/chain/webassembly/sys-vm-oc/intrinsic.hpp>
 
 namespace sysio { namespace chain { namespace eosvmoc {
 

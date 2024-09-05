@@ -1,12 +1,12 @@
 #include <fc/log/logger_config.hpp> //set_thread_name
 
-#include <sysio/chain/webassembly/eos-vm-oc/code_cache.hpp>
-#include <sysio/chain/webassembly/eos-vm-oc/config.hpp>
+#include <sysio/chain/webassembly/sys-vm-oc/code_cache.hpp>
+#include <sysio/chain/webassembly/sys-vm-oc/config.hpp>
 #include <sysio/chain/webassembly/common.hpp>
-#include <sysio/chain/webassembly/eos-vm-oc/memory.hpp>
-#include <sysio/chain/webassembly/eos-vm-oc/eos-vm-oc.hpp>
-#include <sysio/chain/webassembly/eos-vm-oc/intrinsic.hpp>
-#include <sysio/chain/webassembly/eos-vm-oc/compile_monitor.hpp>
+#include <sysio/chain/webassembly/sys-vm-oc/memory.hpp>
+#include <sysio/chain/webassembly/sys-vm-oc/sys-vm-oc.hpp>
+#include <sysio/chain/webassembly/sys-vm-oc/intrinsic.hpp>
+#include <sysio/chain/webassembly/sys-vm-oc/compile_monitor.hpp>
 #include <sysio/chain/exceptions.hpp>
 
 #include <unistd.h>

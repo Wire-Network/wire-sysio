@@ -1,4 +1,4 @@
-#include <sysio/chain/webassembly/eos-vm-oc/ipc_helpers.hpp>
+#include <sysio/chain/webassembly/sys-vm-oc/ipc_helpers.hpp>
 #include <sysio/chain/exceptions.hpp>
 
 namespace sysio { namespace chain { namespace eosvmoc {

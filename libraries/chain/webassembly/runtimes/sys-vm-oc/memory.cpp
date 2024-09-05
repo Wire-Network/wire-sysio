@@ -1,6 +1,6 @@
-#include <sysio/chain/webassembly/eos-vm-oc/memory.hpp>
-#include <sysio/chain/webassembly/eos-vm-oc/intrinsic.hpp>
-#include <sysio/chain/webassembly/eos-vm-oc/intrinsic_mapping.hpp>
+#include <sysio/chain/webassembly/sys-vm-oc/memory.hpp>
+#include <sysio/chain/webassembly/sys-vm-oc/intrinsic.hpp>
+#include <sysio/chain/webassembly/sys-vm-oc/intrinsic_mapping.hpp>
 
 #include <fc/scoped_exit.hpp>
 

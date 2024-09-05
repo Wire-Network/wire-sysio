@@ -1,9 +1,9 @@
 #pragma once
 
-#include <sysio/chain/webassembly/eos-vm-oc/config.hpp>
+#include <sysio/chain/webassembly/sys-vm-oc/config.hpp>
 
 #include <boost/asio/local/datagram_protocol.hpp>
-#include <sysio/chain/webassembly/eos-vm-oc/ipc_helpers.hpp>
+#include <sysio/chain/webassembly/sys-vm-oc/ipc_helpers.hpp>
 
 namespace sysio { namespace chain { namespace eosvmoc {
 

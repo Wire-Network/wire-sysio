@@ -1,6 +1,6 @@
 #pragma once
 
-#include <sysio/chain/webassembly/eos-vm-oc/ipc_protocol.hpp>
+#include <sysio/chain/webassembly/sys-vm-oc/ipc_protocol.hpp>
 
 #include <boost/asio/local/datagram_protocol.hpp>
 

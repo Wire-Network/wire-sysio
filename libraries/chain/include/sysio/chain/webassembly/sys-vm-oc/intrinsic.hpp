@@ -1,6 +1,6 @@
 #pragma once
 
-#include <sysio/chain/webassembly/eos-vm-oc/intrinsic_mapping.hpp>
+#include <sysio/chain/webassembly/sys-vm-oc/intrinsic_mapping.hpp>
 
 #include <map>
 #include <string>

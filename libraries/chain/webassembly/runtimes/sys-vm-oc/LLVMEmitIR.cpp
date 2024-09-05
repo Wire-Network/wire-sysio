@@ -43,8 +43,8 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 #include "llvm/Transforms/InstCombine/InstCombine.h"
 #include "llvm/Transforms/Utils.h"
 
-#include <sysio/chain/webassembly/eos-vm-oc/intrinsic.hpp>
-#include <sysio/chain/webassembly/eos-vm-oc/memory.hpp>
+#include <sysio/chain/webassembly/sys-vm-oc/intrinsic.hpp>
+#include <sysio/chain/webassembly/sys-vm-oc/memory.hpp>
 
 #define ENABLE_LOGGING 0
 #define ENABLE_FUNCTION_ENTER_EXIT_HOOKS 0

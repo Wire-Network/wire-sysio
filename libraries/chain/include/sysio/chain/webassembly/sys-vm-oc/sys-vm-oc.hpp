@@ -1,7 +1,7 @@
 #pragma once
 
 #include <sysio/chain/types.hpp>
-#include <sysio/chain/webassembly/eos-vm-oc/eos-vm-oc.h>
+#include <sysio/chain/webassembly/sys-vm-oc/sys-vm-oc.h>
 
 #include <exception>
 

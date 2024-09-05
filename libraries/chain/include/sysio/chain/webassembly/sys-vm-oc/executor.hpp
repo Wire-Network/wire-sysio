@@ -1,6 +1,6 @@
 #pragma once
 
-#include <sysio/chain/webassembly/eos-vm-oc/stack.hpp>
+#include <sysio/chain/webassembly/sys-vm-oc/stack.hpp>
 
 #include <stdint.h>
 #include <stddef.h>

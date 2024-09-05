@@ -1,9 +1,9 @@
-#include <sysio/chain/webassembly/eos-vm-oc/executor.hpp>
-#include <sysio/chain/webassembly/eos-vm-oc/code_cache.hpp>
-#include <sysio/chain/webassembly/eos-vm-oc/memory.hpp>
-#include <sysio/chain/webassembly/eos-vm-oc/intrinsic_mapping.hpp>
-#include <sysio/chain/webassembly/eos-vm-oc/intrinsic.hpp>
-#include <sysio/chain/webassembly/eos-vm-oc/eos-vm-oc.h>
+#include <sysio/chain/webassembly/sys-vm-oc/executor.hpp>
+#include <sysio/chain/webassembly/sys-vm-oc/code_cache.hpp>
+#include <sysio/chain/webassembly/sys-vm-oc/memory.hpp>
+#include <sysio/chain/webassembly/sys-vm-oc/intrinsic_mapping.hpp>
+#include <sysio/chain/webassembly/sys-vm-oc/intrinsic.hpp>
+#include <sysio/chain/webassembly/sys-vm-oc/sys-vm-oc.h>
 #include <sysio/chain/wasm_sysio_constraints.hpp>
 #include <sysio/chain/apply_context.hpp>
 #include <sysio/chain/transaction_context.hpp>

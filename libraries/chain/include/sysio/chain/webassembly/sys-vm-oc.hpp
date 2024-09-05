@@ -7,12 +7,12 @@
 #include <softfloat.hpp>
 #include "IR/Types.h"
 
-#include <sysio/chain/webassembly/eos-vm-oc/eos-vm-oc.hpp>
-#include <sysio/chain/webassembly/eos-vm-oc/memory.hpp>
-#include <sysio/chain/webassembly/eos-vm-oc/executor.hpp>
-#include <sysio/chain/webassembly/eos-vm-oc/code_cache.hpp>
-#include <sysio/chain/webassembly/eos-vm-oc/config.hpp>
-#include <sysio/chain/webassembly/eos-vm-oc/intrinsic.hpp>
+#include <sysio/chain/webassembly/sys-vm-oc/sys-vm-oc.hpp>
+#include <sysio/chain/webassembly/sys-vm-oc/memory.hpp>
+#include <sysio/chain/webassembly/sys-vm-oc/executor.hpp>
+#include <sysio/chain/webassembly/sys-vm-oc/code_cache.hpp>
+#include <sysio/chain/webassembly/sys-vm-oc/config.hpp>
+#include <sysio/chain/webassembly/sys-vm-oc/intrinsic.hpp>
 
 #include <boost/hana/string.hpp>
 

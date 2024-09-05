@@ -2,8 +2,8 @@
 
 #include <boost/lockfree/spsc_queue.hpp>
 
-#include <sysio/chain/webassembly/eos-vm-oc/eos-vm-oc.hpp>
-#include <sysio/chain/webassembly/eos-vm-oc/ipc_helpers.hpp>
+#include <sysio/chain/webassembly/sys-vm-oc/sys-vm-oc.hpp>
+#include <sysio/chain/webassembly/sys-vm-oc/ipc_helpers.hpp>
 #include <boost/multi_index_container.hpp>
 #include <boost/multi_index/hashed_index.hpp>
 #include <boost/multi_index/sequenced_index.hpp>
