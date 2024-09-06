@@ -99,7 +99,7 @@ try:
 
     node = cluster.getNode()
 
-    Print(node.getEosAccount("account1"))
+    Print(node.getSysioAccount("account1"))
 
     testSuccessful = True
 finally:

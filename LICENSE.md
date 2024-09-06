@@ -2,11 +2,11 @@ Wire Network<br />
 Copyright (c) 2024 WIRE NETWORK, INC. and its contributors. All Rights Reserved.<br />
 This software is owned and created by Wire Network, but it builds upon AntelopeIO/leap and EOSIO/eos.
 
-AntelopeIO/leap<br />
+AntelopeIO/wasm-spec-tests<br />
 Copyright (c) 2021-2022 EOS Network Foundation (ENF) and its contributors.  All rights reserved. <br />
 This ENF software is based upon:
 
-EOSIO/eos<br />
+EOSIO/wasm-spec-tests<br />
 Copyright (c) 2017-2021 block.one and its contributors.  All rights reserved.
 
 ---

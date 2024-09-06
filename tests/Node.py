@@ -221,7 +221,7 @@ class Node(object):
             assert(account)
             assert(isinstance(account, Account))
             if Utils.Debug: Utils.Print("Validating account %s" % (account.name))
-            accountInfo=self.getEosAccount(account.name, exitOnError=True)
+            accountInfo=self.getSysioAccount(account.name, exitOnError=True)
             try:
                 assert(accountInfo["account_name"] == account.name)
             except (AssertionError, TypeError, KeyError) as _:
@@ -408,12 +408,12 @@ class Node(object):
 
         return self.waitForTransBlockIfNeeded(trans, waitForTransBlock, exitOnError=exitOnError)
 
-    def getEosAccount(self, name, exitOnError=False, returnType=ReturnType.json):
+    def getSysioAccount(self, name, exitOnError=False, returnType=ReturnType.json):
         assert(isinstance(name, str))
         cmdDesc="get account"
         jsonFlag="-j" if returnType==ReturnType.json else ""
         cmd="%s %s %s" % (cmdDesc, jsonFlag, name)
-        msg="( getEosAccount(name=%s) )" % (name);
+        msg="( getSysioAccount(name=%s) )" % (name);
         return self.processClioCmd(cmd, cmdDesc, silentErrors=False, exitOnError=exitOnError, exitMsg=msg, returnType=returnType)
 
     def getTable(self, contract, scope, table, exitOnError=False):
@@ -460,7 +460,7 @@ class Node(object):
     # Verifies account. Returns "get account" json return object
     def verifyAccount(self, account):
         assert(account)
-        ret = self.getEosAccount(account.name)
+        ret = self.getSysioAccount(account.name)
         if ret is not None:
             account_name = ret["account_name"]
             if account_name is None:
@@ -470,7 +470,7 @@ class Node(object):
 
     def verifyAccountMdb(self, account):
         assert(account)
-        ret=self.getEosAccountFromDb(account.name)
+        ret=self.getSysioAccountFromDb(account.name)
         if ret is not None:
             account_name=ret["name"]
             if account_name is None:
@@ -665,7 +665,7 @@ class Node(object):
 
     # Gets subjective bill info for an account
     def getAccountSubjectiveInfo(self, account):
-        acct = self.getEosAccount(account)
+        acct = self.getSysioAccount(account)
         return acct["subjective_cpu_bill_limit"]
 
     # Gets accounts mapped to key. Returns json object

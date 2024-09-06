@@ -181,8 +181,8 @@ install(FILES ${CMAKE_BINARY_DIR}/modules/SysioTester.cmake DESTINATION ${CMAKE_
 install(FILES ${CMAKE_SOURCE_DIR}/CMakeModules/SysioCheckVersion.cmake DESTINATION ${CMAKE_INSTALL_FULL_LIBDIR}/cmake/sysio COMPONENT dev EXCLUDE_FROM_ALL)
 
 
-configure_file(${CMAKE_SOURCE_DIR}/LICENSE
-               ${CMAKE_BINARY_DIR}/licenses/wire-sysio/LICENSE COPYONLY)
+configure_file(${CMAKE_SOURCE_DIR}/LICENSE.md
+               ${CMAKE_BINARY_DIR}/licenses/wire-sysio/LICENSE.md COPYONLY)
 configure_file(${CMAKE_SOURCE_DIR}/libraries/softfloat/COPYING.txt ${CMAKE_BINARY_DIR}/licenses//wire-sysio/LICENSE.softfloat COPYONLY)
 configure_file(${CMAKE_SOURCE_DIR}/libraries/wasm-jit/LICENSE
                ${CMAKE_BINARY_DIR}/licenses//wire-sysio/LICENSE.wavm COPYONLY)
@@ -193,7 +193,7 @@ configure_file(${CMAKE_SOURCE_DIR}/libraries/fc/include/fc/crypto/webauthn_json/
 configure_file(${CMAKE_SOURCE_DIR}/libraries/fc/src/network/LICENSE.go
                ${CMAKE_BINARY_DIR}/licenses//wire-sysio/LICENSE.go COPYONLY)
 configure_file(${CMAKE_SOURCE_DIR}/libraries/yubihsm/LICENSE ${CMAKE_BINARY_DIR}/licenses//wire-sysio/LICENSE.yubihsm COPYONLY)
-configure_file(${CMAKE_SOURCE_DIR}/libraries/sys-vm/LICENSE
+configure_file(${CMAKE_SOURCE_DIR}/libraries/sys-vm/LICENSE.md
                ${CMAKE_BINARY_DIR}/licenses//wire-sysio/LICENSE.sys-vm COPYONLY)
 configure_file(${CMAKE_SOURCE_DIR}/programs/clio/LICENSE.CLI11
                ${CMAKE_BINARY_DIR}/programs/clio/LICENSE.CLI11 COPYONLY)
