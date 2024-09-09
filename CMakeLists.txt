@@ -200,14 +200,14 @@ configure_file(${CMAKE_SOURCE_DIR}/programs/clio/LICENSE.CLI11
 
 
 
-install(FILES LICENSE DESTINATION ${CMAKE_INSTALL_FULL_DATAROOTDIR}/licenses/wire-sysio/ COMPONENT base)
+install(FILES LICENSE.md DESTINATION ${CMAKE_INSTALL_FULL_DATAROOTDIR}/licenses/wire-sysio/ COMPONENT base)
 install(FILES libraries/softfloat/COPYING.txt DESTINATION ${CMAKE_INSTALL_FULL_DATAROOTDIR}/licenses/wire-sysio/ RENAME LICENSE.softfloat COMPONENT base)
 install(FILES libraries/wasm-jit/LICENSE DESTINATION ${CMAKE_INSTALL_FULL_DATAROOTDIR}/licenses/wire-sysio/ RENAME LICENSE.wavm COMPONENT base)
 install(FILES libraries/fc/secp256k1/secp256k1/COPYING DESTINATION ${CMAKE_INSTALL_FULL_DATAROOTDIR}/licenses/wire-sysio/ RENAME LICENSE.secp256k1 COMPONENT base)
 install(FILES libraries/fc/include/fc/crypto/webauthn_json/license.txt DESTINATION ${CMAKE_INSTALL_FULL_DATAROOTDIR}/licenses/wire-sysio/ RENAME LICENSE.rapidjson COMPONENT base)
 install(FILES libraries/fc/src/network/LICENSE.go DESTINATION ${CMAKE_INSTALL_FULL_DATAROOTDIR}/licenses/wire-sysio/ COMPONENT base)
 install(FILES libraries/yubihsm/LICENSE DESTINATION ${CMAKE_INSTALL_FULL_DATAROOTDIR}/licenses/wire-sysio/ RENAME LICENSE.yubihsm COMPONENT base)
-install(FILES libraries/sys-vm/LICENSE DESTINATION ${CMAKE_INSTALL_FULL_DATAROOTDIR}/licenses/wire-sysio/ RENAME LICENSE.sys-vm COMPONENT base)
+install(FILES libraries/sys-vm/LICENSE.md DESTINATION ${CMAKE_INSTALL_FULL_DATAROOTDIR}/licenses/wire-sysio/ RENAME LICENSE.sys-vm COMPONENT base)
 install(FILES libraries/fc/libraries/ff/LICENSE DESTINATION ${CMAKE_INSTALL_FULL_DATAROOTDIR}/licenses/wire-sysio/ RENAME LICENSE.libff COMPONENT base)
 install(FILES programs/clio/LICENSE.CLI11 DESTINATION ${CMAKE_INSTALL_FULL_DATAROOTDIR}/licenses/wire-sysio/ COMPONENT base)
 
