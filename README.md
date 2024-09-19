@@ -2,7 +2,7 @@
 Wire Sysio is a fork of Leap, a C++ implementation of the [Antelope](https://github.com/AntelopeIO) protocol. It contains blockchain node software and supporting tools for developers and node operators.
 
 ## Branches
-The `main` branch is the latest stable branch. 
+The `master` branch is the latest stable branch. 
 
 
 ## Supported Operating Systems
