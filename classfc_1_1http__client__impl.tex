@@ -200,7 +200,8 @@ Definition at line \mbox{\hyperlink{http__client_8cpp_source_l00044}{44}} of fil
 \DoxyCodeLine{00049\ \ \ \ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -264,18 +265,26 @@ Definition at line \mbox{\hyperlink{http__client_8cpp_source_l00222}{222}} of fi
 
 \begin{DoxyCode}{0}
 \DoxyCodeLine{00222\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
-\DoxyCodeLine{00223\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{namespaceupload_a770d9c7b49b1fede80de6078d5e49af7}{dest}}.proto()\ ==\ \textcolor{stringliteral}{"{}http"{}})\ \{}
+\DoxyCodeLine{00223\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (dest.proto()\ ==\ \textcolor{stringliteral}{"{}http"{}})\ \{}
 \DoxyCodeLine{00224\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classfc_1_1http__client__impl_a990909375a32476953646359fa655bfe}{create\_raw\_connection}}(dest,\ deadline);}
-\DoxyCodeLine{00225\ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{namespaceupload_a770d9c7b49b1fede80de6078d5e49af7}{dest}}.proto()\ ==\ \textcolor{stringliteral}{"{}https"{}})\ \{}
+\DoxyCodeLine{00225\ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}\ (dest.proto()\ ==\ \textcolor{stringliteral}{"{}https"{}})\ \{}
 \DoxyCodeLine{00226\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classfc_1_1http__client__impl_ace025982e925427f7cf0d922752cf5f6}{create\_ssl\_connection}}(dest,\ deadline);}
-\DoxyCodeLine{00227\ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{namespaceupload_a770d9c7b49b1fede80de6078d5e49af7}{dest}}.proto()\ ==\ \textcolor{stringliteral}{"{}unix"{}})\ \{}
+\DoxyCodeLine{00227\ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}\ (dest.proto()\ ==\ \textcolor{stringliteral}{"{}unix"{}})\ \{}
 \DoxyCodeLine{00228\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classfc_1_1http__client__impl_ad1a65614cb55eebb7aa11b27920fcb02}{create\_unix\_connection}}(dest,\ deadline);}
 \DoxyCodeLine{00229\ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
-\DoxyCodeLine{00230\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{exception_8hpp_a3a1fa84768603c99866fe61af96c9f36}{FC\_THROW}}(\textcolor{stringliteral}{"{}Unknown\ protocol\ \$\{proto\}"{}},\ (\textcolor{stringliteral}{"{}proto"{}},\ \mbox{\hyperlink{namespaceupload_a770d9c7b49b1fede80de6078d5e49af7}{dest}}.proto()));}
+\DoxyCodeLine{00230\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{exception_8hpp_a3a1fa84768603c99866fe61af96c9f36}{FC\_THROW}}(\textcolor{stringliteral}{"{}Unknown\ protocol\ \$\{proto\}"{}},\ (\textcolor{stringliteral}{"{}proto"{}},\ dest.proto()));}
 \DoxyCodeLine{00231\ \ \ \ \ \ \ \}}
 \DoxyCodeLine{00232\ \ \ \ \}}
 
 \end{DoxyCode}
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=286pt]{classfc_1_1http__client__impl_adc5e459fa78e580e283ce34ed1fc8a01_cgraph}
+\end{center}
+\end{figure}
 \Hypertarget{classfc_1_1http__client__impl_a990909375a32476953646359fa655bfe}\index{fc::http\_client\_impl@{fc::http\_client\_impl}!create\_raw\_connection@{create\_raw\_connection}}
 \index{create\_raw\_connection@{create\_raw\_connection}!fc::http\_client\_impl@{fc::http\_client\_impl}}
 \doxysubsubsection{\texorpdfstring{create\_raw\_connection()}{create\_raw\_connection()}}
@@ -290,9 +299,9 @@ Definition at line \mbox{\hyperlink{http__client_8cpp_source_l00178}{178}} of fi
 \begin{DoxyCode}{0}
 \DoxyCodeLine{00178\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
 \DoxyCodeLine{00179\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ key\ =\ \mbox{\hyperlink{classfc_1_1http__client__impl_af43fb0056658ca9e9973ba62bdafd539}{url\_to\_host\_key}}(dest);}
-\DoxyCodeLine{00180\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ socket\ =\ std::make\_unique<tcp::socket>(\mbox{\hyperlink{classfc_1_1http__client__impl_a44a03d199abd9d82b45859a240932605}{\_ioc}});}
+\DoxyCodeLine{00180\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ \mbox{\hyperlink{namespacewebsocketpp_1_1transport_1_1asio_1_1socket_1_1error_a828ddaa5ed63a761e1b557465a35f05aa0c31b356014843e1d09514e794a539a7}{socket}}\ =\ std::make\_unique<tcp::socket>(\mbox{\hyperlink{classfc_1_1http__client__impl_a44a03d199abd9d82b45859a240932605}{\_ioc}});}
 \DoxyCodeLine{00181\ }
-\DoxyCodeLine{00182\ \ \ \ \ \ \ error\_code\ ec\ =\ \mbox{\hyperlink{classfc_1_1http__client__impl_ae3cda026c82494cd7221856a99b1fb7c}{sync\_connect\_with\_timeout}}(*socket,\ *\mbox{\hyperlink{namespaceupload_a770d9c7b49b1fede80de6078d5e49af7}{dest}}.host(),\ \mbox{\hyperlink{namespaceupload_a770d9c7b49b1fede80de6078d5e49af7}{dest}}.port()\ ?\ std::to\_string(*\mbox{\hyperlink{namespaceupload_a770d9c7b49b1fede80de6078d5e49af7}{dest}}.port())\ :\ \textcolor{stringliteral}{"{}80"{}},\ deadline);}
+\DoxyCodeLine{00182\ \ \ \ \ \ \ error\_code\ ec\ =\ \mbox{\hyperlink{classfc_1_1http__client__impl_ae3cda026c82494cd7221856a99b1fb7c}{sync\_connect\_with\_timeout}}(*socket,\ *dest.host(),\ dest.port()\ ?\ std::to\_string(*dest.port())\ :\ \textcolor{stringliteral}{"{}80"{}},\ deadline);}
 \DoxyCodeLine{00183\ \ \ \ \ \ \ \mbox{\hyperlink{exception_8hpp_abed525eeff3ae581be7e4e2fcd3b7bf4}{FC\_ASSERT}}(!ec,\ \textcolor{stringliteral}{"{}Failed\ to\ connect:\ \$\{message\}"{}},\ (\textcolor{stringliteral}{"{}message"{}},ec.message()));}
 \DoxyCodeLine{00184\ }
 \DoxyCodeLine{00185\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ res\ =\ \mbox{\hyperlink{classfc_1_1http__client__impl_a6510a6dfdc36dbbf803a64bf3acdff23}{\_connections}}.emplace(std::piecewise\_construct,}
@@ -303,7 +312,8 @@ Definition at line \mbox{\hyperlink{http__client_8cpp_source_l00178}{178}} of fi
 \DoxyCodeLine{00190\ \ \ \ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -327,15 +337,15 @@ Definition at line \mbox{\hyperlink{http__client_8cpp_source_l00192}{192}} of fi
 \DoxyCodeLine{00194\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ ssl\_socket\ =\ std::make\_unique<ssl::stream<tcp::socket>>(\mbox{\hyperlink{classfc_1_1http__client__impl_a44a03d199abd9d82b45859a240932605}{\_ioc}},\ \mbox{\hyperlink{classfc_1_1http__client__impl_aa0162152ec93d9dbf957a6031b3d7498}{\_sslc}});}
 \DoxyCodeLine{00195\ }
 \DoxyCodeLine{00196\ \ \ \ \ \ \ \textcolor{comment}{//\ Set\ SNI\ Hostname\ (many\ hosts\ need\ this\ to\ handshake\ successfully)}}
-\DoxyCodeLine{00197\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(!SSL\_set\_tlsext\_host\_name(ssl\_socket-\/>native\_handle(),\ \mbox{\hyperlink{namespaceupload_a770d9c7b49b1fede80de6078d5e49af7}{dest}}.host()-\/>c\_str()))}
+\DoxyCodeLine{00197\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(!SSL\_set\_tlsext\_host\_name(ssl\_socket-\/>native\_handle(),\ dest.host()-\/>c\_str()))}
 \DoxyCodeLine{00198\ \ \ \ \ \ \ \{}
 \DoxyCodeLine{00199\ \ \ \ \ \ \ \ \ \ error\_code\ ec\{\textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{int}\textcolor{keyword}{>}(::ERR\_get\_error()),\ boost::asio::error::get\_ssl\_category()\};}
 \DoxyCodeLine{00200\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{exception_8hpp_a3a1fa84768603c99866fe61af96c9f36}{FC\_THROW}}(\textcolor{stringliteral}{"{}Unable\ to\ set\ SNI\ Host\ Name:\ \$\{msg\}"{}},\ (\textcolor{stringliteral}{"{}msg"{}},\ ec.message()));}
 \DoxyCodeLine{00201\ \ \ \ \ \ \ \}}
 \DoxyCodeLine{00202\ }
-\DoxyCodeLine{00203\ \ \ \ \ \ \ ssl\_socket-\/>set\_verify\_callback(boost::asio::ssl::rfc2818\_verification(*\mbox{\hyperlink{namespaceupload_a770d9c7b49b1fede80de6078d5e49af7}{dest}}.host()));}
+\DoxyCodeLine{00203\ \ \ \ \ \ \ ssl\_socket-\/>set\_verify\_callback(boost::asio::ssl::rfc2818\_verification(*dest.host()));}
 \DoxyCodeLine{00204\ }
-\DoxyCodeLine{00205\ \ \ \ \ \ \ error\_code\ ec\ =\ \mbox{\hyperlink{classfc_1_1http__client__impl_ae3cda026c82494cd7221856a99b1fb7c}{sync\_connect\_with\_timeout}}(ssl\_socket-\/>next\_layer(),\ *\mbox{\hyperlink{namespaceupload_a770d9c7b49b1fede80de6078d5e49af7}{dest}}.host(),\ \mbox{\hyperlink{namespaceupload_a770d9c7b49b1fede80de6078d5e49af7}{dest}}.port()\ ?\ std::to\_string(*\mbox{\hyperlink{namespaceupload_a770d9c7b49b1fede80de6078d5e49af7}{dest}}.port())\ :\ \textcolor{stringliteral}{"{}443"{}},\ deadline);}
+\DoxyCodeLine{00205\ \ \ \ \ \ \ error\_code\ ec\ =\ \mbox{\hyperlink{classfc_1_1http__client__impl_ae3cda026c82494cd7221856a99b1fb7c}{sync\_connect\_with\_timeout}}(ssl\_socket-\/>next\_layer(),\ *dest.host(),\ dest.port()\ ?\ std::to\_string(*dest.port())\ :\ \textcolor{stringliteral}{"{}443"{}},\ deadline);}
 \DoxyCodeLine{00206\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!ec)\ \{}
 \DoxyCodeLine{00207\ \ \ \ \ \ \ \ \ \ ec\ =\ \mbox{\hyperlink{classfc_1_1http__client__impl_a4bc83c5379c9fe7aad1e094e52704b3d}{sync\_do\_with\_deadline}}(ssl\_socket-\/>next\_layer(),\ deadline,\ [\&ssl\_socket](std::optional<error\_code>\&\ final\_ec)\ \{}
 \DoxyCodeLine{00208\ \ \ \ \ \ \ \ \ \ \ \ \ ssl\_socket-\/>async\_handshake(ssl::stream\_base::client,\ [\&final\_ec](const\ error\_code\&\ ec)\ \{}
@@ -353,7 +363,8 @@ Definition at line \mbox{\hyperlink{http__client_8cpp_source_l00192}{192}} of fi
 \DoxyCodeLine{00220\ \ \ \ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -374,10 +385,10 @@ Definition at line \mbox{\hyperlink{http__client_8cpp_source_l00163}{163}} of fi
 \begin{DoxyCode}{0}
 \DoxyCodeLine{00163\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
 \DoxyCodeLine{00164\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ key\ =\ \mbox{\hyperlink{classfc_1_1http__client__impl_af43fb0056658ca9e9973ba62bdafd539}{url\_to\_host\_key}}(dest);}
-\DoxyCodeLine{00165\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ socket\ =\ std::make\_unique<local::stream\_protocol::socket>(\mbox{\hyperlink{classfc_1_1http__client__impl_a44a03d199abd9d82b45859a240932605}{\_ioc}});}
+\DoxyCodeLine{00165\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ \mbox{\hyperlink{namespacewebsocketpp_1_1transport_1_1asio_1_1socket_1_1error_a828ddaa5ed63a761e1b557465a35f05aa0c31b356014843e1d09514e794a539a7}{socket}}\ =\ std::make\_unique<local::stream\_protocol::socket>(\mbox{\hyperlink{classfc_1_1http__client__impl_a44a03d199abd9d82b45859a240932605}{\_ioc}});}
 \DoxyCodeLine{00166\ }
 \DoxyCodeLine{00167\ \ \ \ \ \ \ error\_code\ ec;}
-\DoxyCodeLine{00168\ \ \ \ \ \ \ socket-\/>connect(local::stream\_protocol::endpoint(*\mbox{\hyperlink{namespaceupload_a770d9c7b49b1fede80de6078d5e49af7}{dest}}.host()),\ ec);}
+\DoxyCodeLine{00168\ \ \ \ \ \ \ \mbox{\hyperlink{namespacewebsocketpp_1_1transport_1_1asio_1_1socket_1_1error_a828ddaa5ed63a761e1b557465a35f05aa0c31b356014843e1d09514e794a539a7}{socket}}-\/>connect(local::stream\_protocol::endpoint(*dest.host()),\ ec);}
 \DoxyCodeLine{00169\ \ \ \ \ \ \ \mbox{\hyperlink{exception_8hpp_abed525eeff3ae581be7e4e2fcd3b7bf4}{FC\_ASSERT}}(!ec,\ \textcolor{stringliteral}{"{}Failed\ to\ connect:\ \$\{message\}"{}},\ (\textcolor{stringliteral}{"{}message"{}},ec.message()));}
 \DoxyCodeLine{00170\ }
 \DoxyCodeLine{00171\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ res\ =\ \mbox{\hyperlink{classfc_1_1http__client__impl_a6510a6dfdc36dbbf803a64bf3acdff23}{\_connections}}.emplace(std::piecewise\_construct,}
@@ -388,11 +399,12 @@ Definition at line \mbox{\hyperlink{http__client_8cpp_source_l00163}{163}} of fi
 \DoxyCodeLine{00176\ \ \ \ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
-\includegraphics[width=339pt]{classfc_1_1http__client__impl_ad1a65614cb55eebb7aa11b27920fcb02_cgraph}
+\includegraphics[width=350pt]{classfc_1_1http__client__impl_ad1a65614cb55eebb7aa11b27920fcb02_cgraph}
 \end{center}
 \end{figure}
 \Hypertarget{classfc_1_1http__client__impl_a764b1e3131ad81b70f4adea624d63591}\index{fc::http\_client\_impl@{fc::http\_client\_impl}!get\_connection@{get\_connection}}
@@ -469,17 +481,17 @@ Definition at line \mbox{\hyperlink{http__client_8cpp_source_l00303}{303}} of fi
 \DoxyCodeLine{00303\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
 \DoxyCodeLine{00304\ \ \ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1http__client__impl_abeb49b911fe34bce2e6491ca68304f12}{deadline\_type}}\ epoch(boost::gregorian::date(1970,\ 1,\ 1));}
 \DoxyCodeLine{00305\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ deadline\ =\ epoch\ +\ boost::posix\_time::microseconds(\_deadline.\mbox{\hyperlink{classfc_1_1time__point_abfea5efbe9ef58024cda814395ee9945}{time\_since\_epoch}}().\mbox{\hyperlink{classfc_1_1microseconds_a20fba59ec7e1f50c6b8f2c9443cc9b92}{count}}());}
-\DoxyCodeLine{00306\ \ \ \ \ \ \ \mbox{\hyperlink{exception_8hpp_abed525eeff3ae581be7e4e2fcd3b7bf4}{FC\_ASSERT}}(\mbox{\hyperlink{namespaceupload_a770d9c7b49b1fede80de6078d5e49af7}{dest}}.host(),\ \textcolor{stringliteral}{"{}No\ host\ set\ on\ URL"{}});}
+\DoxyCodeLine{00306\ \ \ \ \ \ \ \mbox{\hyperlink{exception_8hpp_abed525eeff3ae581be7e4e2fcd3b7bf4}{FC\_ASSERT}}(dest.host(),\ \textcolor{stringliteral}{"{}No\ host\ set\ on\ URL"{}});}
 \DoxyCodeLine{00307\ }
-\DoxyCodeLine{00308\ \ \ \ \ \ \ \textcolor{keywordtype}{string}\ path\ =\ \mbox{\hyperlink{namespaceupload_a770d9c7b49b1fede80de6078d5e49af7}{dest}}.path()\ ?\ \mbox{\hyperlink{namespaceupload_a770d9c7b49b1fede80de6078d5e49af7}{dest}}.path()-\/>generic\_string()\ :\ \textcolor{stringliteral}{"{}/"{}};}
-\DoxyCodeLine{00309\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{namespaceupload_a770d9c7b49b1fede80de6078d5e49af7}{dest}}.query())\ \{}
-\DoxyCodeLine{00310\ \ \ \ \ \ \ \ \ \ path\ =\ path\ +\ \textcolor{stringliteral}{"{}?"{}}\ +\ *\mbox{\hyperlink{namespaceupload_a770d9c7b49b1fede80de6078d5e49af7}{dest}}.query();}
+\DoxyCodeLine{00308\ \ \ \ \ \ \ \textcolor{keywordtype}{string}\ path\ =\ dest.path()\ ?\ dest.path()-\/>generic\_string()\ :\ \textcolor{stringliteral}{"{}/"{}};}
+\DoxyCodeLine{00309\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (dest.query())\ \{}
+\DoxyCodeLine{00310\ \ \ \ \ \ \ \ \ \ path\ =\ path\ +\ \textcolor{stringliteral}{"{}?"{}}\ +\ *dest.query();}
 \DoxyCodeLine{00311\ \ \ \ \ \ \ \}}
 \DoxyCodeLine{00312\ }
-\DoxyCodeLine{00313\ \ \ \ \ \ \ \textcolor{keywordtype}{string}\ host\_str\ =\ *\mbox{\hyperlink{namespaceupload_a770d9c7b49b1fede80de6078d5e49af7}{dest}}.host();}
-\DoxyCodeLine{00314\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{namespaceupload_a770d9c7b49b1fede80de6078d5e49af7}{dest}}.port())\ \{}
-\DoxyCodeLine{00315\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ port\ =\ *\mbox{\hyperlink{namespaceupload_a770d9c7b49b1fede80de6078d5e49af7}{dest}}.port();}
-\DoxyCodeLine{00316\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ proto\_iter\ =\ default\_proto\_ports.find(\mbox{\hyperlink{namespaceupload_a770d9c7b49b1fede80de6078d5e49af7}{dest}}.proto());}
+\DoxyCodeLine{00313\ \ \ \ \ \ \ \textcolor{keywordtype}{string}\ host\_str\ =\ *dest.host();}
+\DoxyCodeLine{00314\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (dest.port())\ \{}
+\DoxyCodeLine{00315\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ port\ =\ *dest.port();}
+\DoxyCodeLine{00316\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ proto\_iter\ =\ default\_proto\_ports.find(dest.proto());}
 \DoxyCodeLine{00317\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (proto\_iter\ !=\ default\_proto\_ports.end()\ \&\&\ proto\_iter-\/>second\ !=\ port)\ \{}
 \DoxyCodeLine{00318\ \ \ \ \ \ \ \ \ \ \ \ \ host\_str\ =\ host\_str\ +\ \textcolor{stringliteral}{"{}:"{}}\ +\ std::to\_string(port);}
 \DoxyCodeLine{00319\ \ \ \ \ \ \ \ \ \ \}}
@@ -551,7 +563,8 @@ Definition at line \mbox{\hyperlink{http__client_8cpp_source_l00303}{303}} of fi
 \DoxyCodeLine{00385\ \ \ \ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -579,7 +592,8 @@ Definition at line \mbox{\hyperlink{http__client_8cpp_source_l00057}{57}} of fil
 \DoxyCodeLine{00063\ \ \ \ \}}
 
 \end{DoxyCode}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -625,14 +639,16 @@ Definition at line \mbox{\hyperlink{http__client_8cpp_source_l00110}{110}} of fi
 \DoxyCodeLine{00133\ \ \ \ \};}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
 \includegraphics[width=350pt]{classfc_1_1http__client__impl_ae3cda026c82494cd7221856a99b1fb7c_cgraph}
 \end{center}
 \end{figure}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -659,7 +675,8 @@ Definition at line \mbox{\hyperlink{http__client_8cpp_source_l00103}{103}} of fi
 \DoxyCodeLine{00107\ \ \ \ \};}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -716,7 +733,8 @@ Definition at line \mbox{\hyperlink{http__client_8cpp_source_l00066}{66}} of fil
 \DoxyCodeLine{00100\ \ \ \ \}}
 
 \end{DoxyCode}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -745,7 +763,8 @@ Definition at line \mbox{\hyperlink{http__client_8cpp_source_l00145}{145}} of fi
 \DoxyCodeLine{00151\ \ \ \ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -774,7 +793,8 @@ Definition at line \mbox{\hyperlink{http__client_8cpp_source_l00136}{136}} of fi
 \DoxyCodeLine{00142\ \ \ \ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -794,17 +814,26 @@ Definition at line \mbox{\hyperlink{http__client_8cpp_source_l00153}{153}} of fi
 
 \begin{DoxyCode}{0}
 \DoxyCodeLine{00153\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
-\DoxyCodeLine{00154\ \ \ \ \ \ \ \mbox{\hyperlink{exception_8hpp_abed525eeff3ae581be7e4e2fcd3b7bf4}{FC\_ASSERT}}(\mbox{\hyperlink{namespaceupload_a770d9c7b49b1fede80de6078d5e49af7}{dest}}.host(),\ \textcolor{stringliteral}{"{}Provided\ URL\ has\ no\ host"{}});}
+\DoxyCodeLine{00154\ \ \ \ \ \ \ \mbox{\hyperlink{exception_8hpp_abed525eeff3ae581be7e4e2fcd3b7bf4}{FC\_ASSERT}}(dest.host(),\ \textcolor{stringliteral}{"{}Provided\ URL\ has\ no\ host"{}});}
 \DoxyCodeLine{00155\ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\_t}}\ port\ =\ 80;}
-\DoxyCodeLine{00156\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{namespaceupload_a770d9c7b49b1fede80de6078d5e49af7}{dest}}.port())\ \{}
-\DoxyCodeLine{00157\ \ \ \ \ \ \ \ \ \ port\ =\ *\mbox{\hyperlink{namespaceupload_a770d9c7b49b1fede80de6078d5e49af7}{dest}}.port();}
+\DoxyCodeLine{00156\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (dest.port())\ \{}
+\DoxyCodeLine{00157\ \ \ \ \ \ \ \ \ \ port\ =\ *dest.port();}
 \DoxyCodeLine{00158\ \ \ \ \ \ \ \}}
 \DoxyCodeLine{00159\ }
-\DoxyCodeLine{00160\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ std::make\_tuple(\mbox{\hyperlink{namespaceupload_a770d9c7b49b1fede80de6078d5e49af7}{dest}}.proto(),\ *\mbox{\hyperlink{namespaceupload_a770d9c7b49b1fede80de6078d5e49af7}{dest}}.host(),\ port);}
+\DoxyCodeLine{00160\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ std::make\_tuple(dest.proto(),\ *dest.host(),\ port);}
 \DoxyCodeLine{00161\ \ \ \ \}}
 
 \end{DoxyCode}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=283pt]{classfc_1_1http__client__impl_af43fb0056658ca9e9973ba62bdafd539_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode

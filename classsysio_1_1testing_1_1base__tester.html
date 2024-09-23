@@ -2478,10 +2478,10 @@ Here is the call graph for this function:</div>
 <div class="line"><span class="lineno">  992</span>      }</div>
 <div class="line"><span class="lineno">  993</span>      <span class="comment">//FC_ASSERT( t_id != 0, &quot;object not found&quot; );</span></div>
 <div class="line"><span class="lineno">  994</span> </div>
-<div class="line"><span class="lineno">  995</span>      <span class="keyword">const</span> <span class="keyword">auto</span>&amp; <a class="code hl_variable" href="namespacehost__functions__tests__1.html#a8496a24b5236a2dc07bb4f2930d88342">idx</a> = db.get_index&lt;<a class="code hl_typedef" href="namespacesysio_1_1chain.html#aac1a2c1330fcb6c8002d59d4d1de5858">chain::key_value_index</a>, chain::by_scope_primary&gt;();</div>
+<div class="line"><span class="lineno">  995</span>      <span class="keyword">const</span> <span class="keyword">auto</span>&amp; idx = db.get_index&lt;<a class="code hl_typedef" href="namespacesysio_1_1chain.html#aac1a2c1330fcb6c8002d59d4d1de5858">chain::key_value_index</a>, chain::by_scope_primary&gt;();</div>
 <div class="line"><span class="lineno">  996</span> </div>
-<div class="line"><span class="lineno">  997</span>      <span class="keyword">auto</span> itr = <a class="code hl_variable" href="namespacehost__functions__tests__1.html#a8496a24b5236a2dc07bb4f2930d88342">idx</a>.lower_bound( boost::make_tuple( t_id-&gt;id, act.to_uint64_t() ) );</div>
-<div class="line"><span class="lineno">  998</span>      <span class="keywordflow">if</span> ( itr == <a class="code hl_variable" href="namespacehost__functions__tests__1.html#a8496a24b5236a2dc07bb4f2930d88342">idx</a>.end() || itr-&gt;t_id != t_id-&gt;id || act.to_uint64_t() != itr-&gt;primary_key ) {</div>
+<div class="line"><span class="lineno">  997</span>      <span class="keyword">auto</span> itr = idx.lower_bound( boost::make_tuple( t_id-&gt;id, act.to_uint64_t() ) );</div>
+<div class="line"><span class="lineno">  998</span>      <span class="keywordflow">if</span> ( itr == idx.end() || itr-&gt;t_id != t_id-&gt;id || act.to_uint64_t() != itr-&gt;primary_key ) {</div>
 <div class="line"><span class="lineno">  999</span>         <span class="keywordflow">return</span> data;</div>
 <div class="line"><span class="lineno"> 1000</span>      }</div>
 <div class="line"><span class="lineno"> 1001</span> </div>
@@ -2489,7 +2489,6 @@ Here is the call graph for this function:</div>
 <div class="line"><span class="lineno"> 1003</span>      <a class="code hl_function" href="yubihsm__pkcs11_8c.html#ae785d5badbf1f08b491af31f32a135a1">memcpy</a>( data.data(), itr-&gt;value.data(), data.size() );</div>
 <div class="line"><span class="lineno"> 1004</span>      <span class="keywordflow">return</span> data;</div>
 <div class="line"><span class="lineno"> 1005</span>   }</div>
-<div class="ttc" id="anamespacehost__functions__tests__1_html_a8496a24b5236a2dc07bb4f2930d88342"><div class="ttname"><a href="namespacehost__functions__tests__1.html#a8496a24b5236a2dc07bb4f2930d88342">host_functions_tests_1.idx</a></div><div class="ttdeci">int idx</div><div class="ttdef"><b>Definition</b> <a href="host__functions__tests__1_8py_source.html#l00021">host_functions_tests_1.py:21</a></div></div>
 <div class="ttc" id="anamespacesysio_1_1chain_html_aac1a2c1330fcb6c8002d59d4d1de5858"><div class="ttname"><a href="namespacesysio_1_1chain.html#aac1a2c1330fcb6c8002d59d4d1de5858">sysio::chain::key_value_index</a></div><div class="ttdeci">chainbase::shared_multi_index_container&lt; key_value_object, indexed_by&lt; ordered_unique&lt; tag&lt; by_id &gt;, member&lt; key_value_object, key_value_object::id_type, &amp;key_value_object::id &gt; &gt;, ordered_unique&lt; tag&lt; by_scope_primary &gt;, composite_key&lt; key_value_object, member&lt; key_value_object, table_id, &amp;key_value_object::t_id &gt;, member&lt; key_value_object, uint64_t, &amp;key_value_object::primary_key &gt; &gt;, composite_key_compare&lt; std::less&lt; table_id &gt;, std::less&lt; uint64_t &gt; &gt; &gt; &gt; &gt; key_value_index</div><div class="ttdef"><b>Definition</b> <a href="contract__table__objects_8hpp_source.html#l00064">contract_table_objects.hpp:64</a></div></div>
 <div class="ttc" id="ayubihsm__pkcs11_8c_html_ae785d5badbf1f08b491af31f32a135a1"><div class="ttname"><a href="yubihsm__pkcs11_8c.html#ae785d5badbf1f08b491af31f32a135a1">memcpy</a></div><div class="ttdeci">memcpy((char *) pInfo-&gt;slotDescription, s, l)</div></div>
 </div><!-- fragment --><div class="dynheader">
@@ -2527,12 +2526,12 @@ Here is the call graph for this function:</div>
 
 <p class="definition">Definition at line <a class="el" href="tester_8cpp_source.html#l00461">461</a> of file <a class="el" href="tester_8cpp_source.html">tester.cpp</a>.</p>
 <div class="fragment"><div class="line"><span class="lineno">  461</span>                                                                             {</div>
-<div class="line"><span class="lineno">  462</span>      <span class="keyword">const</span> <span class="keyword">auto</span>&amp; <a class="code hl_variable" href="namespacehost__functions__tests__1.html#a8496a24b5236a2dc07bb4f2930d88342">idx</a> = <a class="code hl_variable" href="#a92590474f629850d1a6f454697fc7e0d">control</a>-&gt;db().get_index&lt;<a class="code hl_typedef" href="namespacesysio_1_1chain.html#a9e9842ee49526c2423e014a696edc602">generated_transaction_multi_index</a>,by_delay&gt;();</div>
+<div class="line"><span class="lineno">  462</span>      <span class="keyword">const</span> <span class="keyword">auto</span>&amp; idx = <a class="code hl_variable" href="#a92590474f629850d1a6f454697fc7e0d">control</a>-&gt;db().get_index&lt;<a class="code hl_typedef" href="namespacesysio_1_1chain.html#a9e9842ee49526c2423e014a696edc602">generated_transaction_multi_index</a>,by_delay&gt;();</div>
 <div class="line"><span class="lineno">  463</span> </div>
 <div class="line"><span class="lineno">  464</span>      vector&lt;transaction_id_type&gt; result;</div>
 <div class="line"><span class="lineno">  465</span> </div>
-<div class="line"><span class="lineno">  466</span>      <span class="keyword">auto</span> itr = <a class="code hl_variable" href="namespacehost__functions__tests__1.html#a8496a24b5236a2dc07bb4f2930d88342">idx</a>.begin();</div>
-<div class="line"><span class="lineno">  467</span>      <span class="keywordflow">while</span>( itr != <a class="code hl_variable" href="namespacehost__functions__tests__1.html#a8496a24b5236a2dc07bb4f2930d88342">idx</a>.end() &amp;&amp; itr-&gt;delay_until &lt;= <a class="code hl_variable" href="#a92590474f629850d1a6f454697fc7e0d">control</a>-&gt;pending_block_time() ) {</div>
+<div class="line"><span class="lineno">  466</span>      <span class="keyword">auto</span> itr = idx.begin();</div>
+<div class="line"><span class="lineno">  467</span>      <span class="keywordflow">while</span>( itr != idx.end() &amp;&amp; itr-&gt;delay_until &lt;= <a class="code hl_variable" href="#a92590474f629850d1a6f454697fc7e0d">control</a>-&gt;pending_block_time() ) {</div>
 <div class="line"><span class="lineno">  468</span>         result.emplace_back(itr-&gt;trx_id);</div>
 <div class="line"><span class="lineno">  469</span>         ++itr;</div>
 <div class="line"><span class="lineno">  470</span>      }</div>
@@ -4835,130 +4834,131 @@ Here is the call graph for this function:</div>
 <div class="dyncontent">
 <div class="center"><img src="classsysio_1_1testing_1_1base__tester_a35954e928d799fe9aa9482a336a8ca23_cgraph.png" border="0" usemap="#aclasssysio_1_1testing_1_1base__tester_a35954e928d799fe9aa9482a336a8ca23_cgraph" alt=""/></div>
 <map name="aclasssysio_1_1testing_1_1base__tester_a35954e928d799fe9aa9482a336a8ca23_cgraph" id="aclasssysio_1_1testing_1_1base__tester_a35954e928d799fe9aa9482a336a8ca23_cgraph">
-<area shape="rect" title=" " alt="" coords="5,980,145,1021"/>
-<area shape="rect" href="structsysio_1_1chain_1_1transaction.html#aef240445de0470ccc990493a1bb3afec" title=" " alt="" coords="384,1063,565,1088"/>
-<area shape="poly" title=" " alt="" coords="146,1019,193,1030,369,1060,368,1065,192,1035,144,1024"/>
-<area shape="rect" href="programs_2clio_2main_8cpp.html#afe8fe332483247c5c5e9a46ca80bf569" title=" " alt="" coords="201,511,322,536"/>
-<area shape="poly" title=" " alt="" coords="82,979,247,550,252,552,87,981"/>
-<area shape="rect" href="structsysio_1_1chain_1_1signed__transaction.html#a9cf1962f11e84392dbf74aae5d7550a6" title=" " alt="" coords="193,1107,330,1148"/>
-<area shape="poly" title=" " alt="" coords="108,1020,219,1096,216,1100,105,1024"/>
-<area shape="rect" href="classfc_1_1exception.html#a7611ea8fbe25dde56649b685c2298a37" title=" " alt="" coords="620,898,773,938"/>
-<area shape="poly" title=" " alt="" coords="144,977,192,966,302,949,414,935,604,920,604,925,414,941,303,954,193,971,145,983"/>
-<area shape="rect" href="classfc_1_1exception.html#aeea900db85f79e5b4be0710a9df373db" title=" " alt="" coords="200,980,322,1021"/>
-<area shape="poly" title=" " alt="" coords="145,998,185,998,185,1004,145,1004"/>
-<area shape="rect" href="namespacefc_1_1raw.html#a3a18d8161aa5b4f4f02b6fcfdff5e5d1" title=" " alt="" coords="648,1063,745,1088"/>
-<area shape="poly" title=" " alt="" coords="565,1073,632,1073,632,1078,565,1078"/>
-<area shape="rect" href="classfc_1_1sha256_1_1encoder.html#a4d8b8181e912194cf98a56164671adf8" title=" " alt="" coords="825,1179,961,1220"/>
-<area shape="poly" title=" " alt="" coords="527,1086,775,1157,819,1171,817,1176,774,1162,526,1091"/>
-<area shape="poly" title=" " alt="" coords="664,1064,657,1054,661,1044,674,1038,697,1036,721,1039,733,1046,730,1050,719,1044,696,1041,676,1043,665,1048,662,1053,668,1061"/>
-<area shape="rect" href="classfc_1_1sha256.html#ab897537f6c524085b28049be51ed370d" title=" " alt="" coords="1036,1300,1151,1326"/>
-<area shape="poly" title=" " alt="" coords="945,1218,965,1231,980,1246,989,1260,998,1274,1013,1287,1023,1292,1020,1297,1009,1291,994,1277,984,1263,975,1249,961,1235,942,1223"/>
-<area shape="rect" href="classfc_1_1variant.html#a82edd1f33199355d3a1f19bbb92909cc" title=" " alt="" coords="646,544,747,570"/>
-<area shape="poly" title=" " alt="" coords="287,535,329,555,379,572,445,580,512,580,576,575,630,567,631,573,577,581,513,586,445,585,377,577,327,560,284,539"/>
-<area shape="rect" href="programs_2clio_2main_8cpp.html#af931af8e9f099860a2670931f8d3ad2c" title=" " alt="" coords="676,409,717,435"/>
-<area shape="poly" title=" " alt="" coords="322,515,437,499,504,486,570,470,618,454,661,436,663,441,620,459,571,475,505,492,438,504,322,520"/>
-<area shape="rect" href="programs_2clio_2main_8cpp.html#ac9e70fb692ee8a495d50afcfdc622b08" title=" " alt="" coords="391,385,557,411"/>
-<area shape="poly" title=" " alt="" coords="272,508,315,465,344,440,377,420,388,414,390,419,379,425,347,445,319,469,276,512"/>
-<area shape="rect" href="programs_2clio_2main_8cpp.html#a8087b51211b60070a1349708fd0878c4" title=" " alt="" coords="396,843,552,868"/>
-<area shape="poly" title=" " alt="" coords="273,535,459,828,454,831,269,538"/>
-<area shape="rect" href="programs_2clio_2main_8cpp.html#a687676b9096cc5ff8ae265740a1faf4f" title=" " alt="" coords="440,536,508,562"/>
-<area shape="poly" title=" " alt="" coords="322,528,425,540,425,546,321,533"/>
-<area shape="rect" href="structsysio_1_1chain_1_1transaction__header.html#a220798b433002112ac85e5545a99ec51" title=" " alt="" coords="378,320,570,361"/>
-<area shape="poly" title=" " alt="" coords="267,509,307,443,339,404,376,371,383,366,386,371,380,375,343,408,312,446,272,511"/>
-<area shape="rect" href="programs_2clio_2main_8cpp.html#a240824165e34e327e32abf12138d10e6" title=" " alt="" coords="416,435,532,460"/>
-<area shape="poly" title=" " alt="" coords="296,508,377,477,417,463,419,468,379,482,298,513"/>
-<area shape="rect" href="namespacefc.html#accef08adf4ee05c36ccc550d8101b08f" title=" " alt="" coords="837,544,949,570"/>
-<area shape="poly" title=" " alt="" coords="748,554,821,554,821,560,748,560"/>
-<area shape="poly" title=" " alt="" coords="860,545,853,535,857,526,871,519,893,517,917,520,929,527,927,532,915,525,893,523,872,525,861,529,859,535,864,542"/>
-<area shape="rect" href="namespacesysio_1_1client_1_1http.html#a1f247437c0bb15fa7286d76c8139d41c" title=" " alt="" coords="832,384,954,425"/>
-<area shape="poly" title=" " alt="" coords="718,418,817,409,817,414,718,423"/>
-<area shape="rect" href="namespacesysio_1_1client_1_1http.html#aa22792d25e080a60a880b433d1ef8933" title=" " alt="" coords="832,295,954,336"/>
-<area shape="poly" title=" " alt="" coords="716,408,821,346,832,341,835,345,824,351,719,412"/>
-<area shape="poly" title=" " alt="" coords="855,384,854,375,860,366,873,360,893,358,914,360,927,367,925,371,913,365,893,363,874,365,863,370,859,376,861,383"/>
-<area shape="rect" href="namespacefc.html#af7aa87352b9164f6299f4300a2c85b05" title=" " alt="" coords="1022,295,1166,336"/>
-<area shape="poly" title=" " alt="" coords="935,382,1010,346,1025,340,1027,345,1012,351,937,386"/>
-<area shape="rect" href="namespacesysio_1_1client_1_1http.html#a4d32eca0ecac32376ce5478f3d8f9f98" title=" " alt="" coords="1033,384,1154,425"/>
-<area shape="poly" title=" " alt="" coords="954,402,1018,402,1018,408,954,408"/>
-<area shape="rect" href="namespacesysio_1_1client_1_1http.html#a162de4256c3fbe69ad6a62bc40b444b2" title=" " alt="" coords="1033,474,1154,514"/>
-<area shape="poly" title=" " alt="" coords="942,423,1033,464,1031,469,940,428"/>
-<area shape="rect" href="namespacesysio_1_1client_1_1http.html#ad1b87692ec6218b59d58a092106040f9" title=" " alt="" coords="1022,79,1166,120"/>
-<area shape="poly" title=" " alt="" coords="926,382,945,366,961,346,974,317,981,291,981,240,980,216,983,190,991,164,1009,137,1018,127,1022,131,1013,140,996,166,988,191,985,216,986,240,986,291,979,319,965,349,949,369,930,386"/>
-<area shape="rect" href="classfc_1_1url.html#ad51c6edfcf040bbaac94de66393214ed" title=" " alt="" coords="1268,116,1353,142"/>
-<area shape="poly" title=" " alt="" coords="925,382,944,365,961,346,972,323,978,301,979,260,983,220,992,200,1009,180,1027,169,1052,159,1116,145,1188,135,1253,129,1253,135,1188,140,1117,150,1054,164,1029,174,1013,184,997,203,988,221,984,260,983,302,977,325,965,349,948,369,929,386"/>
-<area shape="rect" href="classfc_1_1json.html#afad69f9f9c2a9f0105aae99f532f90cb" title=" " alt="" coords="1025,5,1162,31"/>
-<area shape="poly" title=" " alt="" coords="927,382,946,366,961,346,978,304,984,264,982,227,976,190,972,154,973,118,984,80,1009,42,1012,39,1016,42,1013,45,988,83,978,118,977,154,981,189,987,226,989,264,983,305,965,349,949,369,930,386"/>
-<area shape="rect" href="classfc_1_1variant.html#a531450deac912ee3e1bc606422714a68" title=" " alt="" coords="1032,655,1156,680"/>
-<area shape="poly" title=" " alt="" coords="911,424,965,506,988,549,1013,590,1039,618,1065,642,1062,646,1035,622,1009,593,983,552,961,509,907,427"/>
-<area shape="rect" href="classfc_1_1time__point.html#aeccf1b70aa34b132c5269313b8a50573" title=" " alt="" coords="1011,1001,1176,1027"/>
-<area shape="poly" title=" " alt="" coords="915,424,942,461,965,506,982,562,990,611,992,656,990,697,990,783,997,831,1013,887,1042,943,1074,988,1070,991,1037,945,1009,888,992,832,985,783,985,697,986,656,985,612,977,564,961,509,937,464,910,427"/>
-<area shape="rect" href="classfc_1_1url.html#a10ff9ce7fa8d6bfb6eec81652c4f0df9" title=" " alt="" coords="1050,195,1137,220"/>
-<area shape="poly" title=" " alt="" coords="923,382,943,365,961,346,976,317,982,291,990,265,1009,238,1034,221,1037,225,1013,241,994,267,987,292,981,319,965,349,947,369,927,386"/>
-<area shape="rect" href="classfc_1_1json.html#ae6c022ab581a9552ae2c97ff5d73aaf8" title=" " alt="" coords="1032,539,1155,580"/>
-<area shape="poly" title=" " alt="" coords="912,424,954,473,982,500,1013,524,1021,529,1018,534,1009,528,979,504,950,477,907,427"/>
-<area shape="rect" href="classfc_1_1json.html#aa6541960d7f05567559b866cfaf88dfa" title=" " alt="" coords="1249,576,1372,602"/>
-<area shape="poly" title=" " alt="" coords="920,382,961,346,974,328,982,311,992,295,1010,281,1055,261,1095,253,1135,259,1178,281,1211,309,1239,343,1261,381,1278,421,1300,499,1309,560,1304,561,1294,500,1273,423,1256,384,1234,346,1208,313,1175,286,1133,264,1095,259,1057,267,1012,286,996,298,987,313,979,330,965,349,924,386"/>
-<area shape="poly" title=" " alt="" coords="1055,384,1054,375,1060,366,1073,360,1094,358,1116,360,1129,366,1126,371,1114,365,1094,363,1075,365,1063,370,1059,376,1061,383"/>
-<area shape="poly" title=" " alt="" coords="1055,474,1054,464,1060,455,1073,449,1094,447,1116,450,1129,456,1126,461,1114,455,1094,452,1075,454,1063,459,1059,465,1061,473"/>
-<area shape="poly" title=" " alt="" coords="1055,79,1054,69,1060,60,1073,55,1094,53,1116,55,1129,61,1126,66,1114,60,1094,58,1075,60,1063,64,1059,70,1061,78"/>
-<area shape="poly" title=" " alt="" coords="1167,107,1254,119,1253,124,1166,112"/>
-<area shape="rect" href="classfc_1_1variant.html#afaae1df286ff97c83301eda21dbd51ea" title=" " alt="" coords="1242,1100,1379,1126"/>
-<area shape="poly" title=" " alt="" coords="1158,676,1178,691,1197,717,1209,743,1216,768,1218,793,1214,843,1202,892,1191,941,1187,989,1189,1013,1196,1038,1208,1062,1226,1087,1231,1092,1227,1095,1222,1091,1204,1065,1191,1040,1184,1014,1181,989,1186,940,1197,891,1208,842,1213,793,1210,769,1204,744,1192,720,1174,695,1155,680"/>
-<area shape="rect" href="classfc_1_1time__point.html#ab46781dcaab4880902bc136f36e39e5e" title=" " alt="" coords="1244,964,1377,1005"/>
-<area shape="poly" title=" " alt="" coords="1176,1000,1228,993,1229,999,1177,1006"/>
-<area shape="poly" title=" " alt="" coords="1156,565,1234,576,1233,581,1155,570"/>
-<area shape="rect" href="namespacefc.html#af9bea69c5790941ddc601fcd96cce071" title=" " alt="" coords="1445,576,1543,602"/>
-<area shape="poly" title=" " alt="" coords="1372,586,1429,586,1429,592,1372,592"/>
-<area shape="poly" title=" " alt="" coords="1463,577,1457,567,1461,558,1473,552,1494,549,1516,552,1528,558,1525,563,1514,557,1494,555,1475,557,1464,561,1462,567,1467,574"/>
-<area shape="poly" title=" " alt="" coords="855,295,854,285,860,276,873,271,893,269,914,271,927,277,925,282,913,276,893,274,874,276,863,280,859,286,861,294"/>
-<area shape="poly" title=" " alt="" coords="558,405,661,416,660,421,558,410"/>
-<area shape="poly" title=" " alt="" coords="490,867,673,1050,669,1054,487,870"/>
-<area shape="rect" href="classfc_1_1time__point.html#aa164ff1268a16d4b32afcff181f6100e" title=" " alt="" coords="827,843,959,868"/>
-<area shape="poly" title=" " alt="" coords="552,853,811,853,811,858,552,858"/>
-<area shape="poly" title=" " alt="" coords="938,866,1229,957,1228,962,937,872"/>
-<area shape="rect" href="classfc_1_1mock__time__traits.html#a0bed781012a73b8c15882648397b56be" title=" " alt="" coords="1024,835,1164,876"/>
-<area shape="poly" title=" " alt="" coords="960,853,1008,853,1008,858,960,858"/>
-<area shape="rect" href="classfc_1_1mock__time__traits.html#adddeebdf472c33f927827c111ddbf0b1" title=" " alt="" coords="1024,770,1164,810"/>
-<area shape="poly" title=" " alt="" coords="934,840,1014,813,1015,818,936,845"/>
-<area shape="rect" href="classfc_1_1time__point.html#abfea5efbe9ef58024cda814395ee9945" title=" " alt="" coords="1027,704,1160,745"/>
-<area shape="poly" title=" " alt="" coords="906,840,950,800,1010,756,1020,750,1022,755,1012,760,953,804,909,844"/>
-<area shape="rect" href="classfc_1_1mock__time__traits.html#a0d7245b32fd62b3bc712f658250cc4db" title=" " alt="" coords="1224,843,1397,868"/>
-<area shape="poly" title=" " alt="" coords="1164,853,1209,853,1209,858,1164,858"/>
-<area shape="poly" title=" " alt="" coords="508,547,631,552,630,557,508,553"/>
-<area shape="poly" title=" " alt="" coords="507,538,538,528,569,514,623,480,668,443,671,448,626,484,572,519,540,533,509,543"/>
-<area shape="rect" href="namespacefc.html#afb668c55fd6ee73e1fcd67e77d8f6009" title=" " alt="" coords="618,328,775,354"/>
-<area shape="poly" title=" " alt="" coords="571,338,603,338,603,344,571,344"/>
-<area shape="poly" title=" " alt="" coords="532,438,660,424,661,429,533,444"/>
-<area shape="rect" href="structsysio_1_1chain_1_1transaction.html#ad88db1a0d648057a88a0e009affb1372" title=" " alt="" coords="392,1134,556,1174"/>
-<area shape="poly" title=" " alt="" coords="331,1133,377,1139,377,1145,330,1139"/>
-<area shape="poly" title=" " alt="" coords="533,1131,643,1091,645,1096,535,1136"/>
-<area shape="poly" title=" " alt="" coords="556,1160,809,1188,809,1193,556,1166"/>
-<area shape="rect" href="classfc_1_1sha256.html#a474784de7d6213b855abd7e952df5e36" title=" " alt="" coords="637,1215,756,1240"/>
-<area shape="poly" title=" " alt="" coords="539,1172,642,1207,640,1212,537,1178"/>
-<area shape="poly" title=" " alt="" coords="756,1216,809,1209,810,1214,756,1222"/>
-<area shape="rect" href="classfc_1_1sha256_1_1encoder.html#a4a246dfb33e3eb78ba167446bee92e30" title=" " alt="" coords="825,1244,961,1285"/>
-<area shape="poly" title=" " alt="" coords="756,1236,810,1246,809,1252,755,1241"/>
-<area shape="poly" title=" " alt="" coords="712,896,758,843,827,772,913,700,960,667,1010,640,1066,618,1125,603,1182,594,1234,588,1234,594,1183,599,1126,608,1068,623,1012,645,963,672,916,704,830,776,762,846,716,899"/>
-<area shape="poly" title=" " alt="" coords="762,895,835,871,836,876,763,900"/>
-<area shape="rect" href="classfc_1_1variant.html#acbd70a93184e4277631f2a261acb707c" title=" " alt="" coords="823,1129,963,1155"/>
-<area shape="poly" title=" " alt="" coords="718,937,872,1116,868,1119,714,941"/>
-<area shape="poly" title=" " alt="" coords="932,1153,964,1165,988,1177,1012,1185,1058,1194,1094,1197,1130,1195,1176,1185,1232,1162,1279,1133,1282,1137,1234,1167,1177,1190,1131,1200,1094,1203,1057,1199,1010,1190,986,1181,962,1170,930,1158"/>
-<area shape="rect" href="namespacefc.html#a3668095306e6c6c4c53de5d7701e4dde" title=" " alt="" coords="1028,1251,1159,1276"/>
-<area shape="poly" title=" " alt="" coords="943,1153,965,1165,981,1182,989,1198,998,1214,1013,1229,1033,1242,1030,1246,1009,1234,993,1217,985,1201,976,1185,961,1170,941,1158"/>
-<area shape="rect" href="classfc_1_1variant.html#aa475101b0f2181350d76a2fdc6cf7c76" title=" " alt="" coords="1026,1100,1162,1126"/>
-<area shape="poly" title=" " alt="" coords="963,1129,1010,1122,1011,1128,964,1135"/>
-<area shape="rect" href="namespacefc.html#a4e07b3870aa72f8c38bdd5f78044dad1" title=" " alt="" coords="1048,1149,1139,1175"/>
-<area shape="poly" title=" " alt="" coords="964,1147,1034,1154,1033,1159,963,1152"/>
-<area shape="rect" href="namespacefc.html#a7c8b089501fd00e09e068aa02eacf3de" title=" " alt="" coords="1229,1251,1392,1276"/>
-<area shape="poly" title=" " alt="" coords="1160,1261,1214,1261,1214,1266,1160,1266"/>
-<area shape="poly" title=" " alt="" coords="1162,1110,1226,1110,1226,1116,1162,1116"/>
-<area shape="rect" href="namespacefc.html#acd5129981ae93fce3154d3fed6f6acbc" title=" " alt="" coords="835,999,951,1024"/>
-<area shape="poly" title=" " alt="" coords="323,999,819,1008,819,1013,323,1005"/>
-<area shape="poly" title=" " alt="" coords="952,1010,996,1010,995,1016,951,1015"/>
-<area shape="poly" title=" " alt="" coords="951,997,1003,981,1063,958,1122,927,1174,886,1202,854,1226,819,1263,743,1287,672,1301,616,1306,618,1292,673,1268,745,1230,821,1206,857,1178,889,1125,931,1065,963,1005,987,952,1002"/>
-<area shape="rect" href="namespacefc.html#a578c57f57002a845da7e91ee8bf4287a" title=" " alt="" coords="1034,1051,1154,1076"/>
-<area shape="poly" title=" " alt="" coords="946,1022,1027,1044,1026,1049,945,1027"/>
-<area shape="rect" href="namespacefc.html#aee7bbe89bfe8d6273f5212938cc1d458" title=" " alt="" coords="1250,1051,1371,1076"/>
-<area shape="poly" title=" " alt="" coords="1154,1061,1234,1061,1234,1066,1154,1066"/>
+<area shape="rect" title=" " alt="" coords="5,956,145,997"/>
+<area shape="rect" href="structsysio_1_1chain_1_1transaction.html#aef240445de0470ccc990493a1bb3afec" title=" " alt="" coords="384,964,565,989"/>
+<area shape="poly" title=" " alt="" coords="145,974,368,974,368,979,145,979"/>
+<area shape="rect" href="programs_2clio_2main_8cpp.html#afe8fe332483247c5c5e9a46ca80bf569" title=" " alt="" coords="201,441,322,466"/>
+<area shape="poly" title=" " alt="" coords="81,955,248,480,253,482,86,957"/>
+<area shape="rect" href="structsysio_1_1chain_1_1signed__transaction.html#a9cf1962f11e84392dbf74aae5d7550a6" title=" " alt="" coords="193,1035,330,1075"/>
+<area shape="poly" title=" " alt="" coords="126,995,199,1026,196,1031,124,1000"/>
+<area shape="rect" href="classfc_1_1exception.html#a7611ea8fbe25dde56649b685c2298a37" title=" " alt="" coords="620,849,773,890"/>
+<area shape="poly" title=" " alt="" coords="144,962,604,883,605,888,145,967"/>
+<area shape="rect" href="classfc_1_1exception.html#aeea900db85f79e5b4be0710a9df373db" title=" " alt="" coords="200,1117,322,1158"/>
+<area shape="poly" title=" " alt="" coords="99,995,194,1085,221,1106,217,1110,191,1089,95,999"/>
+<area shape="rect" href="namespacefc_1_1raw.html#a3a18d8161aa5b4f4f02b6fcfdff5e5d1" title=" " alt="" coords="648,957,745,982"/>
+<area shape="poly" title=" " alt="" coords="565,971,632,969,632,974,566,976"/>
+<area shape="rect" href="classfc_1_1sha256_1_1encoder.html#a4d8b8181e912194cf98a56164671adf8" title=" " alt="" coords="825,1060,961,1101"/>
+<area shape="poly" title=" " alt="" coords="530,987,810,1057,809,1062,529,992"/>
+<area shape="poly" title=" " alt="" coords="664,958,657,948,661,938,674,932,697,930,721,933,733,940,730,944,719,938,696,935,676,937,665,942,662,948,668,955"/>
+<area shape="rect" href="classfc_1_1sha256.html#ab897537f6c524085b28049be51ed370d" title=" " alt="" coords="1036,1198,1151,1224"/>
+<area shape="poly" title=" " alt="" coords="946,1099,965,1112,980,1129,989,1145,998,1161,1013,1177,1033,1189,1030,1194,1009,1181,993,1164,984,1148,976,1132,961,1116,943,1103"/>
+<area shape="rect" href="classfc_1_1variant.html#a82edd1f33199355d3a1f19bbb92909cc" title=" " alt="" coords="646,266,747,292"/>
+<area shape="poly" title=" " alt="" coords="266,439,281,409,304,371,337,333,377,302,408,288,441,277,508,266,574,263,631,267,630,272,574,269,509,271,442,283,410,293,379,307,340,336,309,374,285,412,271,441"/>
+<area shape="rect" href="programs_2clio_2main_8cpp.html#af931af8e9f099860a2670931f8d3ad2c" title=" " alt="" coords="676,366,717,392"/>
+<area shape="poly" title=" " alt="" coords="322,460,375,465,438,467,505,463,570,451,622,428,666,399,669,404,625,433,571,456,505,469,438,472,375,471,321,466"/>
+<area shape="rect" href="programs_2clio_2main_8cpp.html#ac9e70fb692ee8a495d50afcfdc622b08" title=" " alt="" coords="391,366,557,392"/>
+<area shape="poly" title=" " alt="" coords="289,438,377,400,398,394,400,399,379,406,291,443"/>
+<area shape="rect" href="programs_2clio_2main_8cpp.html#a8087b51211b60070a1349708fd0878c4" title=" " alt="" coords="396,790,552,816"/>
+<area shape="poly" title=" " alt="" coords="273,466,459,775,455,778,268,468"/>
+<area shape="rect" href="programs_2clio_2main_8cpp.html#a687676b9096cc5ff8ae265740a1faf4f" title=" " alt="" coords="440,317,508,342"/>
+<area shape="poly" title=" " alt="" coords="272,439,315,396,344,372,377,351,424,335,426,340,379,356,348,376,319,400,276,442"/>
+<area shape="rect" href="structsysio_1_1chain_1_1transaction__header.html#a220798b433002112ac85e5545a99ec51" title=" " alt="" coords="378,516,570,557"/>
+<area shape="poly" title=" " alt="" coords="298,465,407,507,405,512,296,470"/>
+<area shape="rect" href="programs_2clio_2main_8cpp.html#a240824165e34e327e32abf12138d10e6" title=" " alt="" coords="416,416,532,441"/>
+<area shape="poly" title=" " alt="" coords="321,444,400,434,401,440,322,449"/>
+<area shape="rect" href="namespacefc.html#accef08adf4ee05c36ccc550d8101b08f" title=" " alt="" coords="837,196,949,221"/>
+<area shape="poly" title=" " alt="" coords="734,263,840,224,842,229,736,268"/>
+<area shape="poly" title=" " alt="" coords="860,197,853,187,857,177,871,171,893,169,917,172,929,178,927,183,915,177,893,174,872,176,861,181,859,186,864,194"/>
+<area shape="rect" href="namespacesysio_1_1client_1_1http.html#a1f247437c0bb15fa7286d76c8139d41c" title=" " alt="" coords="832,359,954,399"/>
+<area shape="poly" title=" " alt="" coords="718,376,817,376,817,382,718,382"/>
+<area shape="rect" href="namespacesysio_1_1client_1_1http.html#aa22792d25e080a60a880b433d1ef8933" title=" " alt="" coords="832,269,954,310"/>
+<area shape="poly" title=" " alt="" coords="717,367,831,315,833,319,719,372"/>
+<area shape="poly" title=" " alt="" coords="855,359,854,349,860,340,873,334,893,332,914,334,927,341,925,345,913,340,893,337,874,339,863,344,859,350,861,357"/>
+<area shape="rect" href="namespacefc.html#af7aa87352b9164f6299f4300a2c85b05" title=" " alt="" coords="1022,359,1166,399"/>
+<area shape="poly" title=" " alt="" coords="954,376,1006,376,1006,382,954,382"/>
+<area shape="rect" href="namespacesysio_1_1client_1_1http.html#a4d32eca0ecac32376ce5478f3d8f9f98" title=" " alt="" coords="1033,448,1154,489"/>
+<area shape="poly" title=" " alt="" coords="942,398,1033,439,1031,444,940,402"/>
+<area shape="rect" href="namespacesysio_1_1client_1_1http.html#a162de4256c3fbe69ad6a62bc40b444b2" title=" " alt="" coords="1033,537,1154,578"/>
+<area shape="poly" title=" " alt="" coords="914,398,958,446,1013,498,1049,526,1046,530,1009,502,954,449,910,402"/>
+<area shape="rect" href="namespacesysio_1_1client_1_1http.html#ad1b87692ec6218b59d58a092106040f9" title=" " alt="" coords="1022,29,1166,70"/>
+<area shape="poly" title=" " alt="" coords="926,356,945,340,961,320,975,288,982,258,980,202,979,175,981,147,990,117,1009,87,1018,77,1022,81,1013,90,995,120,986,148,984,175,986,202,987,259,981,290,965,323,949,344,930,360"/>
+<area shape="rect" href="classfc_1_1url.html#ad51c6edfcf040bbaac94de66393214ed" title=" " alt="" coords="1251,66,1335,92"/>
+<area shape="poly" title=" " alt="" coords="926,356,945,340,961,320,973,294,978,269,978,222,978,199,981,176,990,153,1009,130,1026,120,1048,110,1107,96,1235,80,1236,85,1108,101,1050,115,1028,124,1013,134,995,156,986,177,983,199,983,222,984,270,978,296,965,323,948,344,929,360"/>
+<area shape="rect" href="classfc_1_1json.html#afad69f9f9c2a9f0105aae99f532f90cb" title=" " alt="" coords="1025,145,1162,170"/>
+<area shape="poly" title=" " alt="" coords="925,356,944,340,961,320,971,301,977,283,981,248,986,214,995,197,1009,180,1012,177,1015,181,1013,184,999,200,991,216,986,249,982,284,976,303,965,323,948,343,928,360"/>
+<area shape="rect" href="classfc_1_1variant.html#a531450deac912ee3e1bc606422714a68" title=" " alt="" coords="1032,602,1156,628"/>
+<area shape="poly" title=" " alt="" coords="902,399,916,439,939,490,971,543,990,567,1013,588,1020,593,1017,597,1009,592,987,570,966,546,934,492,911,441,897,401"/>
+<area shape="rect" href="classfc_1_1time__point.html#aeccf1b70aa34b132c5269313b8a50573" title=" " alt="" coords="1011,949,1176,974"/>
+<area shape="poly" title=" " alt="" coords="900,399,912,473,934,582,968,708,989,772,1013,834,1043,889,1075,935,1070,938,1039,892,1009,836,984,774,963,710,929,583,907,474,894,400"/>
+<area shape="rect" href="classfc_1_1url.html#a10ff9ce7fa8d6bfb6eec81652c4f0df9" title=" " alt="" coords="1050,194,1137,220"/>
+<area shape="poly" title=" " alt="" coords="922,356,961,320,975,296,982,274,991,252,1009,230,1034,216,1037,221,1013,234,995,255,987,276,980,298,965,323,926,360"/>
+<area shape="rect" href="classfc_1_1json.html#ae6c022ab581a9552ae2c97ff5d73aaf8" title=" " alt="" coords="1032,244,1155,285"/>
+<area shape="poly" title=" " alt="" coords="922,356,1010,301,1031,290,1033,294,1012,305,925,360"/>
+<area shape="rect" href="classfc_1_1json.html#aa6541960d7f05567559b866cfaf88dfa" title=" " alt="" coords="1232,836,1354,861"/>
+<area shape="poly" title=" " alt="" coords="934,356,987,334,1051,319,1085,316,1118,319,1149,328,1178,345,1192,359,1205,379,1227,432,1246,497,1261,569,1282,713,1292,820,1287,820,1277,714,1256,570,1241,498,1222,433,1200,382,1188,363,1175,349,1147,333,1117,324,1085,321,1052,324,989,339,936,361"/>
+<area shape="poly" title=" " alt="" coords="1056,448,1054,438,1060,429,1074,423,1094,421,1115,424,1128,430,1126,435,1114,429,1094,427,1075,429,1063,433,1059,439,1061,447"/>
+<area shape="poly" title=" " alt="" coords="1056,537,1054,527,1060,518,1074,513,1094,511,1115,513,1128,519,1126,524,1114,518,1094,516,1075,518,1063,523,1059,528,1061,536"/>
+<area shape="poly" title=" " alt="" coords="1056,29,1054,19,1060,10,1074,5,1094,3,1115,5,1128,11,1126,16,1114,10,1094,8,1075,10,1063,15,1059,20,1061,28"/>
+<area shape="poly" title=" " alt="" coords="1166,58,1236,68,1235,73,1166,63"/>
+<area shape="rect" href="classfc_1_1variant.html#afaae1df286ff97c83301eda21dbd51ea" title=" " alt="" coords="1224,998,1362,1024"/>
+<area shape="poly" title=" " alt="" coords="1158,624,1178,639,1204,678,1216,717,1216,755,1211,792,1206,830,1203,869,1209,910,1227,954,1241,972,1258,987,1255,991,1237,976,1222,956,1204,911,1198,869,1200,829,1206,791,1211,754,1210,718,1200,681,1174,642,1155,628"/>
+<area shape="rect" href="classfc_1_1time__point.html#ab46781dcaab4880902bc136f36e39e5e" title=" " alt="" coords="1226,903,1360,943"/>
+<area shape="poly" title=" " alt="" coords="1163,946,1211,936,1212,941,1164,951"/>
+<area shape="poly" title=" " alt="" coords="1157,283,1178,301,1202,344,1223,404,1241,476,1256,555,1279,709,1292,820,1286,821,1274,710,1251,556,1235,477,1217,406,1197,346,1174,305,1154,287"/>
+<area shape="rect" href="namespacefc.html#af9bea69c5790941ddc601fcd96cce071" title=" " alt="" coords="1410,836,1508,861"/>
+<area shape="poly" title=" " alt="" coords="1355,846,1394,846,1394,851,1355,851"/>
+<area shape="poly" title=" " alt="" coords="1431,836,1425,827,1428,817,1440,811,1459,809,1479,811,1490,818,1487,823,1477,816,1459,814,1442,816,1432,821,1430,826,1435,834"/>
+<area shape="poly" title=" " alt="" coords="855,269,854,259,860,250,873,245,893,243,914,245,927,251,925,256,913,250,893,248,874,250,863,255,859,260,861,268"/>
+<area shape="poly" title=" " alt="" coords="558,376,660,376,660,382,558,382"/>
+<area shape="poly" title=" " alt="" coords="495,814,667,945,664,949,491,818"/>
+<area shape="rect" href="classfc_1_1time__point.html#aa164ff1268a16d4b32afcff181f6100e" title=" " alt="" coords="827,790,959,816"/>
+<area shape="poly" title=" " alt="" coords="552,800,811,800,811,806,552,806"/>
+<area shape="poly" title=" " alt="" coords="939,814,1212,896,1211,901,938,819"/>
+<area shape="rect" href="classfc_1_1mock__time__traits.html#a0bed781012a73b8c15882648397b56be" title=" " alt="" coords="1024,717,1164,758"/>
+<area shape="poly" title=" " alt="" coords="934,787,1014,761,1015,766,936,792"/>
+<area shape="rect" href="classfc_1_1mock__time__traits.html#adddeebdf472c33f927827c111ddbf0b1" title=" " alt="" coords="1024,783,1164,823"/>
+<area shape="poly" title=" " alt="" coords="960,800,1008,800,1008,806,960,806"/>
+<area shape="rect" href="classfc_1_1time__point.html#abfea5efbe9ef58024cda814395ee9945" title=" " alt="" coords="1027,652,1160,693"/>
+<area shape="poly" title=" " alt="" coords="906,788,950,747,1010,703,1020,698,1022,702,1012,708,953,751,909,791"/>
+<area shape="poly" title=" " alt="" coords="508,319,630,291,631,297,509,325"/>
+<area shape="poly" title=" " alt="" coords="509,334,661,369,660,374,508,340"/>
+<area shape="rect" href="namespacefc.html#afb668c55fd6ee73e1fcd67e77d8f6009" title=" " alt="" coords="618,524,775,549"/>
+<area shape="poly" title=" " alt="" coords="571,534,603,534,603,539,571,539"/>
+<area shape="poly" title=" " alt="" coords="532,413,660,384,661,389,533,418"/>
+<area shape="rect" href="structsysio_1_1chain_1_1transaction.html#ad88db1a0d648057a88a0e009affb1372" title=" " alt="" coords="392,1045,556,1086"/>
+<area shape="poly" title=" " alt="" coords="330,1056,377,1058,377,1063,330,1061"/>
+<area shape="poly" title=" " alt="" coords="522,1042,650,987,652,992,524,1047"/>
+<area shape="poly" title=" " alt="" coords="556,1066,809,1075,809,1080,556,1071"/>
+<area shape="rect" href="classfc_1_1sha256.html#a474784de7d6213b855abd7e952df5e36" title=" " alt="" coords="637,1109,756,1134"/>
+<area shape="poly" title=" " alt="" coords="557,1084,629,1102,628,1107,555,1089"/>
+<area shape="poly" title=" " alt="" coords="755,1107,809,1095,810,1100,756,1112"/>
+<area shape="rect" href="classfc_1_1sha256_1_1encoder.html#a4a246dfb33e3eb78ba167446bee92e30" title=" " alt="" coords="825,1125,961,1166"/>
+<area shape="poly" title=" " alt="" coords="756,1126,810,1133,809,1138,756,1132"/>
+<area shape="poly" title=" " alt="" coords="774,864,1216,848,1217,854,774,870"/>
+<area shape="poly" title=" " alt="" coords="758,846,837,819,839,824,759,851"/>
+<area shape="rect" href="classfc_1_1variant.html#acbd70a93184e4277631f2a261acb707c" title=" " alt="" coords="823,1010,963,1036"/>
+<area shape="poly" title=" " alt="" coords="733,888,776,918,869,997,865,1002,773,922,730,893"/>
+<area shape="poly" title=" " alt="" coords="945,1034,965,1046,982,1070,988,1093,995,1115,1001,1124,1012,1133,1055,1152,1092,1157,1130,1150,1175,1133,1207,1113,1234,1088,1274,1036,1279,1039,1238,1092,1210,1118,1178,1137,1132,1155,1092,1163,1053,1157,1010,1137,998,1128,990,1117,983,1095,977,1072,961,1050,943,1039"/>
+<area shape="rect" href="namespacefc.html#a3668095306e6c6c4c53de5d7701e4dde" title=" " alt="" coords="1028,1097,1159,1122"/>
+<area shape="poly" title=" " alt="" coords="938,1034,964,1046,988,1065,1012,1083,1023,1088,1021,1093,1010,1088,985,1069,962,1051,936,1039"/>
+<area shape="rect" href="classfc_1_1variant.html#aa475101b0f2181350d76a2fdc6cf7c76" title=" " alt="" coords="1026,998,1162,1024"/>
+<area shape="poly" title=" " alt="" coords="963,1016,1010,1013,1010,1019,964,1021"/>
+<area shape="rect" href="namespacefc.html#a4e07b3870aa72f8c38bdd5f78044dad1" title=" " alt="" coords="1048,1048,1139,1073"/>
+<area shape="poly" title=" " alt="" coords="964,1033,1034,1047,1033,1052,963,1039"/>
+<area shape="poly" title=" " alt="" coords="1162,1008,1209,1008,1209,1014,1162,1014"/>
+<area shape="rect" href="namespacefc.html#acd5129981ae93fce3154d3fed6f6acbc" title=" " alt="" coords="835,1300,951,1325"/>
+<area shape="poly" title=" " alt="" coords="324,1152,829,1292,828,1297,322,1157"/>
+<area shape="poly" title=" " alt="" coords="900,1298,929,1246,960,1177,969,1148,972,1122,973,1074,975,1052,980,1030,990,1007,1009,984,1011,982,1015,986,1013,987,995,1010,985,1032,980,1053,978,1075,978,1122,974,1149,966,1179,934,1248,905,1300"/>
+<area shape="poly" title=" " alt="" coords="949,1296,1090,1261,1148,1245,1175,1234,1191,1213,1202,1192,1213,1151,1212,1111,1205,1069,1197,1027,1193,983,1200,938,1209,914,1222,889,1244,867,1248,871,1226,893,1214,916,1205,939,1199,984,1202,1027,1210,1068,1217,1110,1218,1152,1207,1194,1195,1216,1178,1238,1150,1250,1091,1266,951,1302"/>
+<area shape="rect" href="namespacefc.html#a578c57f57002a845da7e91ee8bf4287a" title=" " alt="" coords="1034,1300,1154,1325"/>
+<area shape="poly" title=" " alt="" coords="951,1310,1018,1310,1018,1315,951,1315"/>
+<area shape="rect" href="classfc_1_1variant__object.html#a804706455398e249f6272b3ff19cef5d" title=" " alt="" coords="1018,1349,1169,1374"/>
+<area shape="poly" title=" " alt="" coords="949,1323,1024,1342,1023,1347,948,1328"/>
+<area shape="rect" href="classfc_1_1variant__object.html#acfef67913fd3c24ea8017b3a5ad49144" title=" " alt="" coords="1033,1423,1154,1463"/>
+<area shape="poly" title=" " alt="" coords="916,1324,1049,1411,1046,1416,913,1328"/>
+<area shape="rect" href="classfc_1_1variant__object.html#a0e523ff3ad212b0582ad2ac8a07773ae" title=" " alt="" coords="1033,1488,1154,1529"/>
+<area shape="poly" title=" " alt="" coords="903,1324,943,1394,975,1436,1013,1473,1021,1479,1018,1483,1009,1477,971,1439,939,1397,898,1327"/>
+<area shape="poly" title=" " alt="" coords="1056,1423,1054,1413,1060,1404,1074,1398,1094,1396,1115,1398,1128,1405,1126,1409,1114,1404,1094,1401,1075,1403,1063,1408,1059,1414,1061,1421"/>
 </map>
 </div>
 <div class="dynheader">
@@ -6771,13 +6771,12 @@ Here is the call graph for this function:</div>
 
 <p class="definition">Definition at line <a class="el" href="tester_8cpp_source.html#l01030">1030</a> of file <a class="el" href="tester_8cpp_source.html">tester.cpp</a>.</p>
 <div class="fragment"><div class="line"><span class="lineno"> 1030</span>                                            {</div>
-<div class="line"><span class="lineno"> 1031</span>      vector&lt;uint8_t&gt; <a class="code hl_variable" href="namespacedevelop_build.html#ade64cd34608f9442ef3049116a2da428">v</a>;</div>
+<div class="line"><span class="lineno"> 1031</span>      vector&lt;uint8_t&gt; v;</div>
 <div class="line"><span class="lineno"> 1032</span>      <a class="code hl_function" href="namespacefc.html#accef08adf4ee05c36ccc550d8101b08f">fc::from_variant&lt;uint8_t&gt;</a>(x, v);</div>
-<div class="line"><span class="lineno"> 1033</span>      <span class="keywordtype">string</span> <a class="code hl_variable" href="yubihsm__pkcs11_8c.html#a506da415c9307c897ca9be93acfe1d0f">s</a>(<a class="code hl_variable" href="namespacedevelop_build.html#ade64cd34608f9442ef3049116a2da428">v</a>.size(), 0);</div>
-<div class="line"><span class="lineno"> 1034</span>      <a class="code hl_function" href="namespacefc.html#a79771837fffd80fcc4bc658ee2fc4b2b">copy</a>(<a class="code hl_variable" href="namespacedevelop_build.html#ade64cd34608f9442ef3049116a2da428">v</a>.begin(), <a class="code hl_variable" href="namespacedevelop_build.html#ade64cd34608f9442ef3049116a2da428">v</a>.end(), <a class="code hl_variable" href="yubihsm__pkcs11_8c.html#a506da415c9307c897ca9be93acfe1d0f">s</a>.begin());</div>
+<div class="line"><span class="lineno"> 1033</span>      <span class="keywordtype">string</span> <a class="code hl_variable" href="yubihsm__pkcs11_8c.html#a506da415c9307c897ca9be93acfe1d0f">s</a>(v.size(), 0);</div>
+<div class="line"><span class="lineno"> 1034</span>      <a class="code hl_function" href="namespacefc.html#a79771837fffd80fcc4bc658ee2fc4b2b">copy</a>(v.begin(), v.end(), <a class="code hl_variable" href="yubihsm__pkcs11_8c.html#a506da415c9307c897ca9be93acfe1d0f">s</a>.begin());</div>
 <div class="line"><span class="lineno"> 1035</span>      <span class="keywordflow">return</span> <a class="code hl_variable" href="yubihsm__pkcs11_8c.html#a506da415c9307c897ca9be93acfe1d0f">s</a>;</div>
 <div class="line"><span class="lineno"> 1036</span>   }</div>
-<div class="ttc" id="anamespacedevelop_build_html_ade64cd34608f9442ef3049116a2da428"><div class="ttname"><a href="namespacedevelop_build.html#ade64cd34608f9442ef3049116a2da428">developBuild.v</a></div><div class="ttdeci">v</div><div class="ttdef"><b>Definition</b> <a href="develop_build_8py_source.html#l00006">developBuild.py:6</a></div></div>
 <div class="ttc" id="anamespacefc_html_a79771837fffd80fcc4bc658ee2fc4b2b"><div class="ttname"><a href="namespacefc.html#a79771837fffd80fcc4bc658ee2fc4b2b">fc::copy</a></div><div class="ttdeci">void copy(const path &amp;from, const path &amp;to)</div><div class="ttdef"><b>Definition</b> <a href="filesystem_8cpp_source.html#l00249">filesystem.cpp:249</a></div></div>
 <div class="ttc" id="anamespacefc_html_accef08adf4ee05c36ccc550d8101b08f"><div class="ttname"><a href="namespacefc.html#accef08adf4ee05c36ccc550d8101b08f">fc::from_variant</a></div><div class="ttdeci">void from_variant(const fc::variant &amp;v, sysio::chain::chain_id_type &amp;cid)</div><div class="ttdef"><b>Definition</b> <a href="chain__id__type_8cpp_source.html#l00018">chain_id_type.cpp:18</a></div></div>
 <div class="ttc" id="ayubihsm__pkcs11_8c_html_a506da415c9307c897ca9be93acfe1d0f"><div class="ttname"><a href="yubihsm__pkcs11_8c.html#a506da415c9307c897ca9be93acfe1d0f">s</a></div><div class="ttdeci">char * s</div><div class="ttdef"><b>Definition</b> <a href="yubihsm__pkcs11_8c_source.html#l00524">yubihsm_pkcs11.c:524</a></div></div>
@@ -6880,9 +6879,9 @@ Here is the call graph for this function:</div>
 
 <p class="definition">Definition at line <a class="el" href="tester_8cpp_source.html#l01008">1008</a> of file <a class="el" href="tester_8cpp_source.html">tester.cpp</a>.</p>
 <div class="fragment"><div class="line"><span class="lineno"> 1008</span>                                                               {</div>
-<div class="line"><span class="lineno"> 1009</span>      vector&lt;uint8_t&gt; <a class="code hl_variable" href="namespacedevelop_build.html#ade64cd34608f9442ef3049116a2da428">v</a>(<a class="code hl_variable" href="yubihsm__pkcs11_8c.html#a506da415c9307c897ca9be93acfe1d0f">s</a>.size());</div>
-<div class="line"><span class="lineno"> 1010</span>      <a class="code hl_function" href="namespacefc.html#a79771837fffd80fcc4bc658ee2fc4b2b">copy</a>(<a class="code hl_variable" href="yubihsm__pkcs11_8c.html#a506da415c9307c897ca9be93acfe1d0f">s</a>.begin(), <a class="code hl_variable" href="yubihsm__pkcs11_8c.html#a506da415c9307c897ca9be93acfe1d0f">s</a>.end(), <a class="code hl_variable" href="namespacedevelop_build.html#ade64cd34608f9442ef3049116a2da428">v</a>.begin());</div>
-<div class="line"><span class="lineno"> 1011</span>      <span class="keywordflow">return</span> <a class="code hl_variable" href="namespacedevelop_build.html#ade64cd34608f9442ef3049116a2da428">v</a>;</div>
+<div class="line"><span class="lineno"> 1009</span>      vector&lt;uint8_t&gt; v(<a class="code hl_variable" href="yubihsm__pkcs11_8c.html#a506da415c9307c897ca9be93acfe1d0f">s</a>.size());</div>
+<div class="line"><span class="lineno"> 1010</span>      <a class="code hl_function" href="namespacefc.html#a79771837fffd80fcc4bc658ee2fc4b2b">copy</a>(<a class="code hl_variable" href="yubihsm__pkcs11_8c.html#a506da415c9307c897ca9be93acfe1d0f">s</a>.begin(), <a class="code hl_variable" href="yubihsm__pkcs11_8c.html#a506da415c9307c897ca9be93acfe1d0f">s</a>.end(), v.begin());</div>
+<div class="line"><span class="lineno"> 1011</span>      <span class="keywordflow">return</span> v;</div>
 <div class="line"><span class="lineno"> 1012</span>   };</div>
 </div><!-- fragment --><div class="dynheader">
 Here is the call graph for this function:</div>
@@ -6926,9 +6925,9 @@ Here is the call graph for this function:</div>
 
 <p class="definition">Definition at line <a class="el" href="tester_8cpp_source.html#l01015">1015</a> of file <a class="el" href="tester_8cpp_source.html">tester.cpp</a>.</p>
 <div class="fragment"><div class="line"><span class="lineno"> 1015</span>                                                          {</div>
-<div class="line"><span class="lineno"> 1016</span>      vector&lt;uint8_t&gt; <a class="code hl_variable" href="namespacedevelop_build.html#ade64cd34608f9442ef3049116a2da428">v</a>(<span class="keyword">sizeof</span>(x));</div>
-<div class="line"><span class="lineno"> 1017</span>      *<span class="keyword">reinterpret_cast&lt;</span><a class="code hl_typedef" href="stdint_8h.html#aec6fcb673ff035718c238c8c9d544c47">uint64_t</a>*<span class="keyword">&gt;</span>(<a class="code hl_variable" href="namespacedevelop_build.html#ade64cd34608f9442ef3049116a2da428">v</a>.data()) = x;</div>
-<div class="line"><span class="lineno"> 1018</span>      <span class="keywordflow">return</span> <a class="code hl_variable" href="namespacedevelop_build.html#ade64cd34608f9442ef3049116a2da428">v</a>;</div>
+<div class="line"><span class="lineno"> 1016</span>      vector&lt;uint8_t&gt; v(<span class="keyword">sizeof</span>(x));</div>
+<div class="line"><span class="lineno"> 1017</span>      *<span class="keyword">reinterpret_cast&lt;</span><a class="code hl_typedef" href="stdint_8h.html#aec6fcb673ff035718c238c8c9d544c47">uint64_t</a>*<span class="keyword">&gt;</span>(v.data()) = x;</div>
+<div class="line"><span class="lineno"> 1018</span>      <span class="keywordflow">return</span> v;</div>
 <div class="line"><span class="lineno"> 1019</span>   };</div>
 </div><!-- fragment -->
 </div>

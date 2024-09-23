@@ -1,3 +1,7 @@
 <map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
-<area shape="rect" id="Node000000" href="$unionop.html" title=" " alt="" coords="5,5,44,31"/>
+<area shape="rect" id="Node000000" href="$class_person.html" title=" " alt="" coords="5,31,68,56"/>
+<area shape="rect" id="Node000001" href="$class_dependent.html" title=" " alt="" coords="116,5,200,31"/>
+<area shape="poly" id="edge476_Node000000_Node000001" title=" " alt="" coords="82,31,115,24,116,30,83,37"/>
+<area shape="rect" id="Node000002" href="$class_employee.html" title=" " alt="" coords="118,55,198,80"/>
+<area shape="poly" id="edge477_Node000000_Node000002" title=" " alt="" coords="83,50,118,57,117,62,82,55"/>
 </map>

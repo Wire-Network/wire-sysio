@@ -135,9 +135,9 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:a314057e171f872ad478b3e143121aecd"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a4ce47c481fdc4973ed671a492f455f99" id="r_a4ce47c481fdc4973ed671a492f455f99"><td class="memItemLeft" align="right" valign="top">virtual bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a4ce47c481fdc4973ed671a492f455f99">MatchAndExplain</a> (<a class="el" href="prettywritertest_8cpp.html#a6283df8c4e365cc8a01727e2d7ad44bf">T</a> <a class="el" href="pkcs11_8h.html#a32aff7c6c4cd253fdf6563677afab5ce">value</a>, <a class="el" href="classtesting_1_1_match_result_listener.html">MatchResultListener</a> *listener) const</td></tr>
 <tr class="separator:a4ce47c481fdc4973ed671a492f455f99"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aab6dbbe39ef8337e4686ae0f8c81a2c3" id="r_aab6dbbe39ef8337e4686ae0f8c81a2c3"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aab6dbbe39ef8337e4686ae0f8c81a2c3">DescribeTo</a> (::std::ostream *os) const</td></tr>
+<tr class="memitem:aab6dbbe39ef8337e4686ae0f8c81a2c3" id="r_aab6dbbe39ef8337e4686ae0f8c81a2c3"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aab6dbbe39ef8337e4686ae0f8c81a2c3">DescribeTo</a> (::std::ostream *<a class="el" href="environment_8hpp.html#a3951483d0b31c29ca95336206cd35238">os</a>) const</td></tr>
 <tr class="separator:aab6dbbe39ef8337e4686ae0f8c81a2c3"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a3eff238a812f4a105df1222a28f6cdbf" id="r_a3eff238a812f4a105df1222a28f6cdbf"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a3eff238a812f4a105df1222a28f6cdbf">DescribeNegationTo</a> (::std::ostream *os) const</td></tr>
+<tr class="memitem:a3eff238a812f4a105df1222a28f6cdbf" id="r_a3eff238a812f4a105df1222a28f6cdbf"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a3eff238a812f4a105df1222a28f6cdbf">DescribeNegationTo</a> (::std::ostream *<a class="el" href="environment_8hpp.html#a3951483d0b31c29ca95336206cd35238">os</a>) const</td></tr>
 <tr class="separator:a3eff238a812f4a105df1222a28f6cdbf"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="inherit_header pub_methods_classtesting_1_1_matcher_interface"><td colspan="2" onclick="javascript:dynsection.toggleInherit('pub_methods_classtesting_1_1_matcher_interface')"><img src="closed.png" alt="-"/>&#160;Public Member Functions inherited from <a class="el" href="classtesting_1_1_matcher_interface.html">testing::MatcherInterface&lt; T &gt;</a></td></tr>
 <tr class="inherit_header pub_methods_classtesting_1_1_matcher_describer_interface"><td colspan="2" onclick="javascript:dynsection.toggleInherit('pub_methods_classtesting_1_1_matcher_describer_interface')"><img src="closed.png" alt="-"/>&#160;Public Member Functions inherited from <a class="el" href="classtesting_1_1_matcher_describer_interface.html">testing::MatcherDescriberInterface</a></td></tr>
@@ -226,23 +226,24 @@ template&lt;typename <a class="el" href="prettywritertest_8cpp.html#a6283df8c4e3
 <p class="definition">Definition at line <a class="el" href="gmock-matchers_8h_source.html#l02173">2173</a> of file <a class="el" href="gmock-matchers_8h_source.html">gmock-matchers.h</a>.</p>
 <div class="fragment"><div class="line"><span class="lineno"> 2173</span>                                                          {</div>
 <div class="line"><span class="lineno"> 2174</span>      <span class="comment">// As before, get original precision.</span></div>
-<div class="line"><span class="lineno"> 2175</span>      const ::std::streamsize old_precision = os-&gt;precision(</div>
+<div class="line"><span class="lineno"> 2175</span>      const ::std::streamsize old_precision = <a class="code hl_variable" href="environment_8hpp.html#a3951483d0b31c29ca95336206cd35238">os</a>-&gt;precision(</div>
 <div class="line"><span class="lineno"> 2176</span>          ::std::numeric_limits&lt;FloatType&gt;::digits10 + 2);</div>
 <div class="line"><span class="lineno"> 2177</span>      <span class="keywordflow">if</span> (FloatingPoint&lt;FloatType&gt;(expected_).is_nan()) {</div>
 <div class="line"><span class="lineno"> 2178</span>        <span class="keywordflow">if</span> (nan_eq_nan_) {</div>
-<div class="line"><span class="lineno"> 2179</span>          *os &lt;&lt; <span class="stringliteral">&quot;isn&#39;t NaN&quot;</span>;</div>
+<div class="line"><span class="lineno"> 2179</span>          *<a class="code hl_variable" href="environment_8hpp.html#a3951483d0b31c29ca95336206cd35238">os</a> &lt;&lt; <span class="stringliteral">&quot;isn&#39;t NaN&quot;</span>;</div>
 <div class="line"><span class="lineno"> 2180</span>        } <span class="keywordflow">else</span> {</div>
-<div class="line"><span class="lineno"> 2181</span>          *os &lt;&lt; <span class="stringliteral">&quot;is anything&quot;</span>;</div>
+<div class="line"><span class="lineno"> 2181</span>          *<a class="code hl_variable" href="environment_8hpp.html#a3951483d0b31c29ca95336206cd35238">os</a> &lt;&lt; <span class="stringliteral">&quot;is anything&quot;</span>;</div>
 <div class="line"><span class="lineno"> 2182</span>        }</div>
 <div class="line"><span class="lineno"> 2183</span>      } <span class="keywordflow">else</span> {</div>
-<div class="line"><span class="lineno"> 2184</span>        *os &lt;&lt; <span class="stringliteral">&quot;isn&#39;t approximately &quot;</span> &lt;&lt; expected_;</div>
+<div class="line"><span class="lineno"> 2184</span>        *<a class="code hl_variable" href="environment_8hpp.html#a3951483d0b31c29ca95336206cd35238">os</a> &lt;&lt; <span class="stringliteral">&quot;isn&#39;t approximately &quot;</span> &lt;&lt; expected_;</div>
 <div class="line"><span class="lineno"> 2185</span>        <span class="keywordflow">if</span> (HasMaxAbsError()) {</div>
-<div class="line"><span class="lineno"> 2186</span>          *os &lt;&lt; <span class="stringliteral">&quot; (absolute error &gt; &quot;</span> &lt;&lt; max_abs_error_ &lt;&lt; <span class="stringliteral">&quot;)&quot;</span>;</div>
+<div class="line"><span class="lineno"> 2186</span>          *<a class="code hl_variable" href="environment_8hpp.html#a3951483d0b31c29ca95336206cd35238">os</a> &lt;&lt; <span class="stringliteral">&quot; (absolute error &gt; &quot;</span> &lt;&lt; max_abs_error_ &lt;&lt; <span class="stringliteral">&quot;)&quot;</span>;</div>
 <div class="line"><span class="lineno"> 2187</span>        }</div>
 <div class="line"><span class="lineno"> 2188</span>      }</div>
 <div class="line"><span class="lineno"> 2189</span>      <span class="comment">// Restore original precision.</span></div>
-<div class="line"><span class="lineno"> 2190</span>      os-&gt;precision(old_precision);</div>
+<div class="line"><span class="lineno"> 2190</span>      <a class="code hl_variable" href="environment_8hpp.html#a3951483d0b31c29ca95336206cd35238">os</a>-&gt;precision(old_precision);</div>
 <div class="line"><span class="lineno"> 2191</span>    }</div>
+<div class="ttc" id="aenvironment_8hpp_html_a3951483d0b31c29ca95336206cd35238"><div class="ttname"><a href="environment_8hpp.html#a3951483d0b31c29ca95336206cd35238">os</a></div><div class="ttdeci">os_t os</div><div class="ttdef"><b>Definition</b> <a href="environment_8hpp_source.html#l00023">environment.hpp:23</a></div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -280,21 +281,21 @@ template&lt;typename <a class="el" href="prettywritertest_8cpp.html#a6283df8c4e3
 <div class="line"><span class="lineno"> 2153</span>      <span class="comment">// os-&gt;precision() returns the previously set precision, which we</span></div>
 <div class="line"><span class="lineno"> 2154</span>      <span class="comment">// store to restore the ostream to its original configuration</span></div>
 <div class="line"><span class="lineno"> 2155</span>      <span class="comment">// after outputting.</span></div>
-<div class="line"><span class="lineno"> 2156</span>      const ::std::streamsize old_precision = os-&gt;precision(</div>
+<div class="line"><span class="lineno"> 2156</span>      const ::std::streamsize old_precision = <a class="code hl_variable" href="environment_8hpp.html#a3951483d0b31c29ca95336206cd35238">os</a>-&gt;precision(</div>
 <div class="line"><span class="lineno"> 2157</span>          ::std::numeric_limits&lt;FloatType&gt;::digits10 + 2);</div>
 <div class="line"><span class="lineno"> 2158</span>      <span class="keywordflow">if</span> (FloatingPoint&lt;FloatType&gt;(expected_).is_nan()) {</div>
 <div class="line"><span class="lineno"> 2159</span>        <span class="keywordflow">if</span> (nan_eq_nan_) {</div>
-<div class="line"><span class="lineno"> 2160</span>          *os &lt;&lt; <span class="stringliteral">&quot;is NaN&quot;</span>;</div>
+<div class="line"><span class="lineno"> 2160</span>          *<a class="code hl_variable" href="environment_8hpp.html#a3951483d0b31c29ca95336206cd35238">os</a> &lt;&lt; <span class="stringliteral">&quot;is NaN&quot;</span>;</div>
 <div class="line"><span class="lineno"> 2161</span>        } <span class="keywordflow">else</span> {</div>
-<div class="line"><span class="lineno"> 2162</span>          *os &lt;&lt; <span class="stringliteral">&quot;never matches&quot;</span>;</div>
+<div class="line"><span class="lineno"> 2162</span>          *<a class="code hl_variable" href="environment_8hpp.html#a3951483d0b31c29ca95336206cd35238">os</a> &lt;&lt; <span class="stringliteral">&quot;never matches&quot;</span>;</div>
 <div class="line"><span class="lineno"> 2163</span>        }</div>
 <div class="line"><span class="lineno"> 2164</span>      } <span class="keywordflow">else</span> {</div>
-<div class="line"><span class="lineno"> 2165</span>        *os &lt;&lt; <span class="stringliteral">&quot;is approximately &quot;</span> &lt;&lt; expected_;</div>
+<div class="line"><span class="lineno"> 2165</span>        *<a class="code hl_variable" href="environment_8hpp.html#a3951483d0b31c29ca95336206cd35238">os</a> &lt;&lt; <span class="stringliteral">&quot;is approximately &quot;</span> &lt;&lt; expected_;</div>
 <div class="line"><span class="lineno"> 2166</span>        <span class="keywordflow">if</span> (HasMaxAbsError()) {</div>
-<div class="line"><span class="lineno"> 2167</span>          *os &lt;&lt; <span class="stringliteral">&quot; (absolute error &lt;= &quot;</span> &lt;&lt; max_abs_error_ &lt;&lt; <span class="stringliteral">&quot;)&quot;</span>;</div>
+<div class="line"><span class="lineno"> 2167</span>          *<a class="code hl_variable" href="environment_8hpp.html#a3951483d0b31c29ca95336206cd35238">os</a> &lt;&lt; <span class="stringliteral">&quot; (absolute error &lt;= &quot;</span> &lt;&lt; max_abs_error_ &lt;&lt; <span class="stringliteral">&quot;)&quot;</span>;</div>
 <div class="line"><span class="lineno"> 2168</span>        }</div>
 <div class="line"><span class="lineno"> 2169</span>      }</div>
-<div class="line"><span class="lineno"> 2170</span>      os-&gt;precision(old_precision);</div>
+<div class="line"><span class="lineno"> 2170</span>      <a class="code hl_variable" href="environment_8hpp.html#a3951483d0b31c29ca95336206cd35238">os</a>-&gt;precision(old_precision);</div>
 <div class="line"><span class="lineno"> 2171</span>    }</div>
 </div><!-- fragment -->
 </div>

@@ -168,15 +168,15 @@
 \DoxyCodeLine{\Hypertarget{logger_2basic_8hpp_source_l00176}00176\ \ \ \ \ \textcolor{comment}{//\ which\ would\ be\ obnoxiously\ verbose.}}
 \DoxyCodeLine{\Hypertarget{logger_2basic_8hpp_source_l00177}00177\ \ \ \ \ \textcolor{comment}{//}}
 \DoxyCodeLine{\Hypertarget{logger_2basic_8hpp_source_l00178}00178\ \ \ \ \ \textcolor{comment}{//\ TODO:\ find\ a\ workaround\ for\ this\ or\ make\ this\ format\ user\ settable}}
-\DoxyCodeLine{\Hypertarget{logger_2basic_8hpp_source_l00179}00179\ \ \ \ \ \textcolor{keyword}{static}\ std::ostream\ \&\ timestamp(std::ostream\ \&\ os)\ \{}
+\DoxyCodeLine{\Hypertarget{logger_2basic_8hpp_source_l00179}00179\ \ \ \ \ \textcolor{keyword}{static}\ std::ostream\ \&\ timestamp(std::ostream\ \&\ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}})\ \{}
 \DoxyCodeLine{\Hypertarget{logger_2basic_8hpp_source_l00180}00180\ \ \ \ \ \ \ \ \ std::time\_t\ t\ =\ std::time(NULL);}
 \DoxyCodeLine{\Hypertarget{logger_2basic_8hpp_source_l00181}00181\ \ \ \ \ \ \ \ \ std::tm\ lt\ =\ \mbox{\hyperlink{namespacewebsocketpp_1_1lib_a1b873cb6baa3d85b57573bee059b29f4}{lib::localtime}}(t);}
 \DoxyCodeLine{\Hypertarget{logger_2basic_8hpp_source_l00182}00182\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \#ifdef\ \_WEBSOCKETPP\_PUTTIME\_}}
-\DoxyCodeLine{\Hypertarget{logger_2basic_8hpp_source_l00183}00183\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ os\ <<\ std::put\_time(\&lt,\textcolor{stringliteral}{"{}\%Y-\/\%m-\/\%d\ \%H:\%M:\%S"{}});}
+\DoxyCodeLine{\Hypertarget{logger_2basic_8hpp_source_l00183}00183\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}\ <<\ std::put\_time(\&lt,\textcolor{stringliteral}{"{}\%Y-\/\%m-\/\%d\ \%H:\%M:\%S"{}});}
 \DoxyCodeLine{\Hypertarget{logger_2basic_8hpp_source_l00184}00184\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \#else\ }\textcolor{comment}{//\ Falls\ back\ to\ strftime,\ which\ requires\ a\ temporary\ copy\ of\ the\ string.}}
 \DoxyCodeLine{\Hypertarget{logger_2basic_8hpp_source_l00185}00185\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{char}\ buffer[20];}
 \DoxyCodeLine{\Hypertarget{logger_2basic_8hpp_source_l00186}00186\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{size\_t}\ result\ =\ std::strftime(buffer,\textcolor{keyword}{sizeof}(buffer),\textcolor{stringliteral}{"{}\%Y-\/\%m-\/\%d\ \%H:\%M:\%S"{}},\&lt);}
-\DoxyCodeLine{\Hypertarget{logger_2basic_8hpp_source_l00187}00187\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ os\ <<\ (result\ ==\ 0\ ?\ \textcolor{stringliteral}{"{}Unknown"{}}\ :\ buffer);}
+\DoxyCodeLine{\Hypertarget{logger_2basic_8hpp_source_l00187}00187\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}\ <<\ (result\ ==\ 0\ ?\ \textcolor{stringliteral}{"{}Unknown"{}}\ :\ buffer);}
 \DoxyCodeLine{\Hypertarget{logger_2basic_8hpp_source_l00188}00188\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \#endif}}
 \DoxyCodeLine{\Hypertarget{logger_2basic_8hpp_source_l00189}00189\ \ \ \ \ \}}
 \DoxyCodeLine{\Hypertarget{logger_2basic_8hpp_source_l00190}00190\ }

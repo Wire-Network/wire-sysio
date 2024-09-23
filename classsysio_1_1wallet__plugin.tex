@@ -6,7 +6,8 @@
 
 
 
-Inheritance diagram for sysio\+::wallet\+\_\+plugin\+:\nopagebreak
+Inheritance diagram for sysio\+::wallet\+\_\+plugin\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -15,7 +16,8 @@ Inheritance diagram for sysio\+::wallet\+\_\+plugin\+:\nopagebreak
 \end{figure}
 
 
-Collaboration diagram for sysio\+::wallet\+\_\+plugin\+:\nopagebreak
+Collaboration diagram for sysio\+::wallet\+\_\+plugin\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -180,25 +182,25 @@ Definition at line \mbox{\hyperlink{wallet__plugin_8cpp_source_l00037}{37}} of f
 \DoxyCodeLine{00039\ \ \ \ \textcolor{keywordflow}{try}\ \{}
 \DoxyCodeLine{00040\ \ \ \ \ \ \ wallet\_manager\_ptr\ =\ std::make\_unique<wallet\_manager>();}
 \DoxyCodeLine{00041\ }
-\DoxyCodeLine{00042\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{namespacebenchmark_compile_acf738bbf3b8391aa78929ceeceb8a03b}{options}}.count(\textcolor{stringliteral}{"{}wallet-\/dir"{}}))\ \{}
-\DoxyCodeLine{00043\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ dir\ =\ \mbox{\hyperlink{namespacebenchmark_compile_acf738bbf3b8391aa78929ceeceb8a03b}{options}}.at(\textcolor{stringliteral}{"{}wallet-\/dir"{}}).as<boost::filesystem::path>();}
+\DoxyCodeLine{00042\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (options.count(\textcolor{stringliteral}{"{}wallet-\/dir"{}}))\ \{}
+\DoxyCodeLine{00043\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ dir\ =\ options.at(\textcolor{stringliteral}{"{}wallet-\/dir"{}}).as<boost::filesystem::path>();}
 \DoxyCodeLine{00044\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (dir.is\_relative())}
 \DoxyCodeLine{00045\ \ \ \ \ \ \ \ \ \ \ \ \ dir\ =\ \mbox{\hyperlink{namespaceappbase_a99374dc23934f008a09f2f79be9eae40}{app}}().\mbox{\hyperlink{classappbase_1_1application_a5dfd3cfb1124c57963fa17b3f4aabbe1}{data\_dir}}()\ /\ dir;}
 \DoxyCodeLine{00046\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ !bfs::exists(dir)\ )}
 \DoxyCodeLine{00047\ \ \ \ \ \ \ \ \ \ \ \ \ bfs::create\_directories(dir);}
 \DoxyCodeLine{00048\ \ \ \ \ \ \ \ \ \ wallet\_manager\_ptr-\/>set\_dir(dir);}
 \DoxyCodeLine{00049\ \ \ \ \ \ \ \}}
-\DoxyCodeLine{00050\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{namespacebenchmark_compile_acf738bbf3b8391aa78929ceeceb8a03b}{options}}.count(\textcolor{stringliteral}{"{}unlock-\/timeout"{}}))\ \{}
-\DoxyCodeLine{00051\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ timeout\ =\ \mbox{\hyperlink{namespacebenchmark_compile_acf738bbf3b8391aa78929ceeceb8a03b}{options}}.at(\textcolor{stringliteral}{"{}unlock-\/timeout"{}}).as<\mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\_t}}>();}
+\DoxyCodeLine{00050\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (options.count(\textcolor{stringliteral}{"{}unlock-\/timeout"{}}))\ \{}
+\DoxyCodeLine{00051\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ timeout\ =\ options.at(\textcolor{stringliteral}{"{}unlock-\/timeout"{}}).as<\mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\_t}}>();}
 \DoxyCodeLine{00052\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp_a40c2826a6fba35c1ffbf912bdf559792}{SYS\_ASSERT}}(timeout\ >\ 0,\ chain::invalid\_lock\_timeout\_exception,\ \textcolor{stringliteral}{"{}Please\ specify\ a\ positive\ timeout\ \$\{t\}"{}},\ (\textcolor{stringliteral}{"{}t"{}},\ timeout));}
 \DoxyCodeLine{00053\ \ \ \ \ \ \ \ \ \ std::chrono::seconds\ t(timeout);}
 \DoxyCodeLine{00054\ \ \ \ \ \ \ \ \ \ wallet\_manager\_ptr-\/>set\_timeout(t);}
 \DoxyCodeLine{00055\ \ \ \ \ \ \ \}}
-\DoxyCodeLine{00056\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{namespacebenchmark_compile_acf738bbf3b8391aa78929ceeceb8a03b}{options}}.count(\textcolor{stringliteral}{"{}yubihsm-\/authkey"{}}))\ \{}
-\DoxyCodeLine{00057\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\_t}}\ key\ =\ \mbox{\hyperlink{namespacebenchmark_compile_acf738bbf3b8391aa78929ceeceb8a03b}{options}}.at(\textcolor{stringliteral}{"{}yubihsm-\/authkey"{}}).as<\mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\_t}}>();}
+\DoxyCodeLine{00056\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (options.count(\textcolor{stringliteral}{"{}yubihsm-\/authkey"{}}))\ \{}
+\DoxyCodeLine{00057\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\_t}}\ key\ =\ options.at(\textcolor{stringliteral}{"{}yubihsm-\/authkey"{}}).as<\mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\_t}}>();}
 \DoxyCodeLine{00058\ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{string}\ connector\_endpoint\ =\ \textcolor{stringliteral}{"{}http://localhost:12345"{}};}
-\DoxyCodeLine{00059\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\mbox{\hyperlink{namespacebenchmark_compile_acf738bbf3b8391aa78929ceeceb8a03b}{options}}.count(\textcolor{stringliteral}{"{}yubihsm-\/url"{}}))}
-\DoxyCodeLine{00060\ \ \ \ \ \ \ \ \ \ \ \ \ connector\_endpoint\ =\ \mbox{\hyperlink{namespacebenchmark_compile_acf738bbf3b8391aa78929ceeceb8a03b}{options}}.at(\textcolor{stringliteral}{"{}yubihsm-\/url"{}}).as<\textcolor{keywordtype}{string}>();}
+\DoxyCodeLine{00059\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(options.count(\textcolor{stringliteral}{"{}yubihsm-\/url"{}}))}
+\DoxyCodeLine{00060\ \ \ \ \ \ \ \ \ \ \ \ \ connector\_endpoint\ =\ options.at(\textcolor{stringliteral}{"{}yubihsm-\/url"{}}).as<\textcolor{keywordtype}{string}>();}
 \DoxyCodeLine{00061\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{try}\ \{}
 \DoxyCodeLine{00062\ \ \ \ \ \ \ \ \ \ \ \ \ wallet\_manager\_ptr-\/>own\_and\_use\_wallet(\textcolor{stringliteral}{"{}YubiHSM"{}},\ make\_unique<yubihsm\_wallet>(connector\_endpoint,\ key));}
 \DoxyCodeLine{00063\ \ \ \ \ \ \ \ \ \ \}\mbox{\hyperlink{exception_8hpp_ae70bfa24f5a3bc0917382b3c17fc033c}{FC\_LOG\_AND\_RETHROW}}()}
@@ -207,7 +209,8 @@ Definition at line \mbox{\hyperlink{wallet__plugin_8cpp_source_l00037}{37}} of f
 \DoxyCodeLine{00066\ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode

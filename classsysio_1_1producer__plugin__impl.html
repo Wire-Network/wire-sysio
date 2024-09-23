@@ -1922,10 +1922,10 @@ Here is the call graph for this function:</div>
 <div class="line"><span class="lineno">  414</span> </div>
 <div class="line"><span class="lineno">  415</span>         <span class="keywordflow">while</span> (!snapshots_by_height.empty() &amp;&amp; snapshots_by_height.begin()-&gt;get_height() &lt;= lib_height) {</div>
 <div class="line"><span class="lineno">  416</span>            <span class="keyword">const</span> <span class="keyword">auto</span>&amp; pending = snapshots_by_height.begin();</div>
-<div class="line"><span class="lineno">  417</span>            <span class="keyword">auto</span> <a class="code hl_function" href="namespacecpp_1_1ast.html#a25b104cfd21fb8487a07063b6ce62062">next</a> = pending-&gt;next;</div>
+<div class="line"><span class="lineno">  417</span>            <span class="keyword">auto</span> <a class="code hl_function" href="namespaceutf8.html#afc093dfde66a6f52cb4a5caefe0e580d">next</a> = pending-&gt;next;</div>
 <div class="line"><span class="lineno">  418</span> </div>
 <div class="line"><span class="lineno">  419</span>            <span class="keywordflow">try</span> {</div>
-<div class="line"><span class="lineno">  420</span>               <a class="code hl_function" href="namespacecpp_1_1ast.html#a25b104cfd21fb8487a07063b6ce62062">next</a>(pending-&gt;finalize(chain));</div>
+<div class="line"><span class="lineno">  420</span>               <a class="code hl_function" href="namespaceutf8.html#afc093dfde66a6f52cb4a5caefe0e580d">next</a>(pending-&gt;finalize(chain));</div>
 <div class="line"><span class="lineno">  421</span>            } <a class="code hl_define" href="chain_2include_2sysio_2chain_2exceptions_8hpp.html#ab200d016fe1306acaed181b722a3cac6">CATCH_AND_CALL</a>(next);</div>
 <div class="line"><span class="lineno">  422</span> </div>
 <div class="line"><span class="lineno">  423</span>            snapshots_by_height.erase(snapshots_by_height.begin());</div>
@@ -1933,7 +1933,7 @@ Here is the call graph for this function:</div>
 <div class="line"><span class="lineno">  425</span>      }</div>
 <div class="ttc" id="achain_2include_2sysio_2chain_2exceptions_8hpp_html_ab200d016fe1306acaed181b722a3cac6"><div class="ttname"><a href="chain_2include_2sysio_2chain_2exceptions_8hpp.html#ab200d016fe1306acaed181b722a3cac6">CATCH_AND_CALL</a></div><div class="ttdeci">#define CATCH_AND_CALL(NEXT)</div><div class="ttdef"><b>Definition</b> <a href="chain_2include_2sysio_2chain_2exceptions_8hpp_source.html#l00073">exceptions.hpp:73</a></div></div>
 <div class="ttc" id="aclasssysio_1_1producer__plugin__impl_html_ac8be366b39b451f59a5b2f2e4162f6cd"><div class="ttname"><a href="#ac8be366b39b451f59a5b2f2e4162f6cd">sysio::producer_plugin_impl::_pending_snapshot_index</a></div><div class="ttdeci">pending_snapshot_index _pending_snapshot_index</div><div class="ttdef"><b>Definition</b> <a href="producer__plugin_8cpp_source.html#l00351">producer_plugin.cpp:351</a></div></div>
-<div class="ttc" id="anamespacecpp_1_1ast_html_a25b104cfd21fb8487a07063b6ce62062"><div class="ttname"><a href="namespacecpp_1_1ast.html#a25b104cfd21fb8487a07063b6ce62062">cpp.ast.next</a></div><div class="ttdeci">next(obj)</div><div class="ttdef"><b>Definition</b> <a href="ast_8py_source.html#l00058">ast.py:58</a></div></div>
+<div class="ttc" id="anamespaceutf8_html_afc093dfde66a6f52cb4a5caefe0e580d"><div class="ttname"><a href="namespaceutf8.html#afc093dfde66a6f52cb4a5caefe0e580d">utf8::next</a></div><div class="ttdeci">uint32_t next(octet_iterator &amp;it, octet_iterator end)</div><div class="ttdef"><b>Definition</b> <a href="checked_8h_source.html#l00137">checked.h:137</a></div></div>
 </div><!-- fragment --><div class="dynheader">
 Here is the call graph for this function:</div>
 <div class="dyncontent">
@@ -1989,8 +1989,8 @@ Here is the call graph for this function:</div>
 <div class="line"><span class="lineno">  576</span>         <span class="keywordtype">bool</span> <a class="code hl_enumvalue" href="#a1cd329e031b1d57746ec38a44a2181bbae349d735a5fa5b10d9770031e669c477">exhausted</a> = <span class="keyword">false</span>;</div>
 <div class="line"><span class="lineno">  577</span>         chain::controller&amp; chain = <a class="code hl_variable" href="#ad6dd1910645f0e41a009f59fdfc09cb4">chain_plug</a>-&gt;<a class="code hl_function" href="classsysio_1_1chain__plugin.html#a14a5e77b31ecf267c8062267d03440ae">chain</a>();</div>
 <div class="line"><span class="lineno">  578</span> </div>
-<div class="line"><span class="lineno">  579</span>         <span class="keyword">auto</span> send_response = [<span class="keyword">this</span>, &amp;trx, &amp;chain, &amp;<a class="code hl_function" href="namespacecpp_1_1ast.html#a25b104cfd21fb8487a07063b6ce62062">next</a>](<span class="keyword">const</span> std::variant&lt;fc::exception_ptr, transaction_trace_ptr&gt;&amp; response) {</div>
-<div class="line"><span class="lineno">  580</span>            <a class="code hl_function" href="namespacecpp_1_1ast.html#a25b104cfd21fb8487a07063b6ce62062">next</a>(response);</div>
+<div class="line"><span class="lineno">  579</span>         <span class="keyword">auto</span> send_response = [<span class="keyword">this</span>, &amp;trx, &amp;chain, &amp;<a class="code hl_function" href="namespaceutf8.html#afc093dfde66a6f52cb4a5caefe0e580d">next</a>](<span class="keyword">const</span> std::variant&lt;fc::exception_ptr, transaction_trace_ptr&gt;&amp; response) {</div>
+<div class="line"><span class="lineno">  580</span>            <a class="code hl_function" href="namespaceutf8.html#afc093dfde66a6f52cb4a5caefe0e580d">next</a>(response);</div>
 <div class="line"><span class="lineno">  581</span> </div>
 <div class="line"><span class="lineno">  582</span>            <span class="keyword">auto</span> get_trace = [&amp;](<span class="keyword">const</span> std::variant&lt;fc::exception_ptr, transaction_trace_ptr&gt;&amp; response) -&gt; <a class="code hl_class" href="classfc_1_1variant.html">fc::variant</a> {</div>
 <div class="line"><span class="lineno">  583</span>               <span class="keywordflow">if</span> (std::holds_alternative&lt;fc::exception_ptr&gt;(response)) {</div>
@@ -2334,7 +2334,7 @@ Here is the caller graph for this function:</div>
 <div class="line"><span class="lineno"> 2220</span>         --pending_incoming_process_limit;</div>
 <div class="line"><span class="lineno"> 2221</span> </div>
 <div class="line"><span class="lineno"> 2222</span>         <span class="keyword">auto</span> trx_meta = itr-&gt;trx_meta;</div>
-<div class="line"><span class="lineno"> 2223</span>         <span class="keyword">auto</span> <a class="code hl_function" href="namespacecpp_1_1ast.html#a25b104cfd21fb8487a07063b6ce62062">next</a> = itr-&gt;next;</div>
+<div class="line"><span class="lineno"> 2223</span>         <span class="keyword">auto</span> <a class="code hl_function" href="namespaceutf8.html#afc093dfde66a6f52cb4a5caefe0e580d">next</a> = itr-&gt;next;</div>
 <div class="line"><span class="lineno"> 2224</span>         <span class="keywordtype">bool</span> persist_until_expired = itr-&gt;trx_type == trx_enum_type::incoming_persisted;</div>
 <div class="line"><span class="lineno"> 2225</span>         <span class="keywordtype">bool</span> return_failure_trace = itr-&gt;return_failure_trace;</div>
 <div class="line"><span class="lineno"> 2226</span>         itr = <a class="code hl_variable" href="#ab9ac82b1ebcd89332e08e4246fd0a973">_unapplied_transactions</a>.<a class="code hl_function" href="classsysio_1_1chain_1_1unapplied__transaction__queue.html#a60c602838e90f62ba458d569cf52dfe5">erase</a>( itr );</div>
@@ -2538,7 +2538,7 @@ Here is the caller graph for this function:</div>
 <div class="line"><span class="lineno"> 2154</span>         incoming_trx_weight -= 1.0;</div>
 <div class="line"><span class="lineno"> 2155</span> </div>
 <div class="line"><span class="lineno"> 2156</span>         <span class="keyword">auto</span> trx_meta = itr-&gt;trx_meta;</div>
-<div class="line"><span class="lineno"> 2157</span>         <span class="keyword">auto</span> <a class="code hl_function" href="namespacecpp_1_1ast.html#a25b104cfd21fb8487a07063b6ce62062">next</a> = itr-&gt;next;</div>
+<div class="line"><span class="lineno"> 2157</span>         <span class="keyword">auto</span> <a class="code hl_function" href="namespaceutf8.html#afc093dfde66a6f52cb4a5caefe0e580d">next</a> = itr-&gt;next;</div>
 <div class="line"><span class="lineno"> 2158</span>         <span class="keywordtype">bool</span> persist_until_expired = itr-&gt;trx_type == trx_enum_type::incoming_persisted;</div>
 <div class="line"><span class="lineno"> 2159</span>         <span class="keywordtype">bool</span> return_failure_trace = itr-&gt;return_failure_trace;</div>
 <div class="line"><span class="lineno"> 2160</span>         itr = <a class="code hl_variable" href="#ab9ac82b1ebcd89332e08e4246fd0a973">_unapplied_transactions</a>.<a class="code hl_function" href="classsysio_1_1chain_1_1unapplied__transaction__queue.html#a60c602838e90f62ba458d569cf52dfe5">erase</a>( itr );</div>

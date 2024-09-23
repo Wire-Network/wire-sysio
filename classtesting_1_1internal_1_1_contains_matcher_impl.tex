@@ -6,7 +6,8 @@
 
 
 
-Inheritance diagram for testing\+::internal\+::Contains\+Matcher\+Impl\texorpdfstring{$<$}{<} Container \texorpdfstring{$>$}{>}\+:\nopagebreak
+Inheritance diagram for testing\+::internal\+::Contains\+Matcher\+Impl\texorpdfstring{$<$}{<} Container \texorpdfstring{$>$}{>}\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -15,7 +16,8 @@ Inheritance diagram for testing\+::internal\+::Contains\+Matcher\+Impl\texorpdfs
 \end{figure}
 
 
-Collaboration diagram for testing\+::internal\+::Contains\+Matcher\+Impl\texorpdfstring{$<$}{<} Container \texorpdfstring{$>$}{>}\+:\nopagebreak
+Collaboration diagram for testing\+::internal\+::Contains\+Matcher\+Impl\texorpdfstring{$<$}{<} Container \texorpdfstring{$>$}{>}\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -27,9 +29,9 @@ Collaboration diagram for testing\+::internal\+::Contains\+Matcher\+Impl\texorpd
 \item 
 {\footnotesize template$<$typename Inner\+Matcher $>$ }\\\mbox{\hyperlink{classtesting_1_1internal_1_1_contains_matcher_impl_a3fd56f21081068101a76ebe05fc1d7f4}{Contains\+Matcher\+Impl}} (Inner\+Matcher inner\+\_\+matcher)
 \item 
-virtual void \mbox{\hyperlink{classtesting_1_1internal_1_1_contains_matcher_impl_af47e4e9f890d64e7f8abcdf3f5fb8b3e}{Describe\+To}} (\+::std\+::ostream \texorpdfstring{$\ast$}{*}os) const
+virtual void \mbox{\hyperlink{classtesting_1_1internal_1_1_contains_matcher_impl_af47e4e9f890d64e7f8abcdf3f5fb8b3e}{Describe\+To}} (\+::std\+::ostream \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}) const
 \item 
-virtual void \mbox{\hyperlink{classtesting_1_1internal_1_1_contains_matcher_impl_a9d7867110ba3f346399f23e41cc75c5b}{Describe\+Negation\+To}} (\+::std\+::ostream \texorpdfstring{$\ast$}{*}os) const
+virtual void \mbox{\hyperlink{classtesting_1_1internal_1_1_contains_matcher_impl_a9d7867110ba3f346399f23e41cc75c5b}{Describe\+Negation\+To}} (\+::std\+::ostream \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}) const
 \item 
 virtual bool \mbox{\hyperlink{classtesting_1_1internal_1_1_contains_matcher_impl_a1cb9f1d2da48bd4a48c281215f8f94e9}{Match\+And\+Explain}} (Container container, \mbox{\hyperlink{classtesting_1_1_match_result_listener}{Match\+Result\+Listener}} \texorpdfstring{$\ast$}{*}listener) const
 \end{DoxyCompactItemize}
@@ -120,12 +122,13 @@ Definition at line \mbox{\hyperlink{gmock-matchers_8h_source_l03165}{3165}} of f
 
 \begin{DoxyCode}{0}
 \DoxyCodeLine{03165\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
-\DoxyCodeLine{03166\ \ \ \ \ *os\ <<\ \textcolor{stringliteral}{"{}doesn't\ contain\ any\ element\ that\ "{}};}
-\DoxyCodeLine{03167\ \ \ \ \ this-\/>\mbox{\hyperlink{classtesting_1_1internal_1_1_quantifier_matcher_impl_af0ee2a4697f5cb8e937fd29dd75e2a30}{inner\_matcher\_}}.\mbox{\hyperlink{classtesting_1_1internal_1_1_matcher_base_a7e0c883c7745e0d646463077ef1c1267}{DescribeTo}}(os);}
+\DoxyCodeLine{03166\ \ \ \ \ *\mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}\ <<\ \textcolor{stringliteral}{"{}doesn't\ contain\ any\ element\ that\ "{}};}
+\DoxyCodeLine{03167\ \ \ \ \ this-\/>\mbox{\hyperlink{classtesting_1_1internal_1_1_quantifier_matcher_impl_af0ee2a4697f5cb8e937fd29dd75e2a30}{inner\_matcher\_}}.\mbox{\hyperlink{classtesting_1_1internal_1_1_matcher_base_a7e0c883c7745e0d646463077ef1c1267}{DescribeTo}}(\mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}});}
 \DoxyCodeLine{03168\ \ \ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -150,12 +153,13 @@ Definition at line \mbox{\hyperlink{gmock-matchers_8h_source_l03160}{3160}} of f
 
 \begin{DoxyCode}{0}
 \DoxyCodeLine{03160\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
-\DoxyCodeLine{03161\ \ \ \ \ *os\ <<\ \textcolor{stringliteral}{"{}contains\ at\ least\ one\ element\ that\ "{}};}
-\DoxyCodeLine{03162\ \ \ \ \ this-\/>\mbox{\hyperlink{classtesting_1_1internal_1_1_quantifier_matcher_impl_af0ee2a4697f5cb8e937fd29dd75e2a30}{inner\_matcher\_}}.\mbox{\hyperlink{classtesting_1_1internal_1_1_matcher_base_a7e0c883c7745e0d646463077ef1c1267}{DescribeTo}}(os);}
+\DoxyCodeLine{03161\ \ \ \ \ *\mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}\ <<\ \textcolor{stringliteral}{"{}contains\ at\ least\ one\ element\ that\ "{}};}
+\DoxyCodeLine{03162\ \ \ \ \ this-\/>\mbox{\hyperlink{classtesting_1_1internal_1_1_quantifier_matcher_impl_af0ee2a4697f5cb8e937fd29dd75e2a30}{inner\_matcher\_}}.\mbox{\hyperlink{classtesting_1_1internal_1_1_matcher_base_a7e0c883c7745e0d646463077ef1c1267}{DescribeTo}}(\mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}});}
 \DoxyCodeLine{03163\ \ \ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -184,7 +188,8 @@ Definition at line \mbox{\hyperlink{gmock-matchers_8h_source_l03170}{3170}} of f
 \DoxyCodeLine{03173\ \ \ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode

@@ -487,7 +487,7 @@ Here is the caller graph for this function:</div>
 <div class="line"><span class="lineno">  161</span>        ssl_bignum z;</div>
 <div class="line"><span class="lineno">  162</span>        BN_bin2bn((<span class="keywordtype">unsigned</span> <span class="keywordtype">char</span>*)&amp;offset, <span class="keyword">sizeof</span>(offset), z);</div>
 <div class="line"><span class="lineno">  163</span> </div>
-<div class="line"><span class="lineno">  164</span>        ec_group <a class="code hl_variable" href="namespaceupload.html#a9d33d66de17175dced88ffe95f079226">group</a>(EC_GROUP_new_by_curve_name(NID_secp256k1));</div>
+<div class="line"><span class="lineno">  164</span>        ec_group group(EC_GROUP_new_by_curve_name(NID_secp256k1));</div>
 <div class="line"><span class="lineno">  165</span>        bn_ctx ctx(BN_CTX_new());</div>
 <div class="line"><span class="lineno">  166</span>        ssl_bignum order;</div>
 <div class="line"><span class="lineno">  167</span>        EC_GROUP_get_order(group, order, ctx);</div>
@@ -507,7 +507,6 @@ Here is the caller graph for this function:</div>
 <div class="ttc" id="aclassfc_1_1ecc_1_1private__key_html_abcc5312450e72cd78f78b7d2feb6c899"><div class="ttname"><a href="#abcc5312450e72cd78f78b7d2feb6c899">fc::ecc::private_key::regenerate</a></div><div class="ttdeci">static private_key regenerate(const fc::sha256 &amp;secret)</div><div class="ttdef"><b>Definition</b> <a href="elliptic__impl__priv_8cpp_source.html#l00053">elliptic_impl_priv.cpp:53</a></div></div>
 <div class="ttc" id="aclassfc_1_1sha256_html"><div class="ttname"><a href="classfc_1_1sha256.html">fc::sha256</a></div><div class="ttdef"><b>Definition</b> <a href="sha256_8hpp_source.html#l00011">sha256.hpp:12</a></div></div>
 <div class="ttc" id="aexception_8hpp_html_abed525eeff3ae581be7e4e2fcd3b7bf4"><div class="ttname"><a href="exception_8hpp.html#abed525eeff3ae581be7e4e2fcd3b7bf4">FC_ASSERT</a></div><div class="ttdeci">#define FC_ASSERT(TEST,...)</div><div class="ttdoc">Checks a condition and throws an assert_exception if the test is FALSE.</div><div class="ttdef"><b>Definition</b> <a href="exception_8hpp_source.html#l00362">exception.hpp:362</a></div></div>
-<div class="ttc" id="anamespaceupload_html_a9d33d66de17175dced88ffe95f079226"><div class="ttname"><a href="namespaceupload.html#a9d33d66de17175dced88ffe95f079226">upload.group</a></div><div class="ttdeci">group</div><div class="ttdef"><b>Definition</b> <a href="googlemock_2scripts_2upload_8py_source.html#l00397">upload.py:397</a></div></div>
 <div class="ttc" id="astdint_8h_html_a414156feea104f8f75b4ed9e3121b2f6"><div class="ttname"><a href="stdint_8h.html#a414156feea104f8f75b4ed9e3121b2f6">int64_t</a></div><div class="ttdeci">signed __int64 int64_t</div><div class="ttdef"><b>Definition</b> <a href="stdint_8h_source.html#l00135">stdint.h:135</a></div></div>
 </div><!-- fragment --><div class="dynheader">
 Here is the call graph for this function:</div>

@@ -9,7 +9,8 @@
 {\ttfamily \#include $<$random$>$}\newline
 {\ttfamily \#include $<$limits$>$}\newline
 {\ttfamily \#include "{}test\+\_\+utils.\+hpp"{}}\newline
-Include dependency graph for test\+\_\+modular\+\_\+arithmetic.\+cpp\+:\nopagebreak
+Include dependency graph for test\+\_\+modular\+\_\+arithmetic.\+cpp\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -158,7 +159,8 @@ Definition at line \mbox{\hyperlink{test__modular__arithmetic_8cpp_source_l00030
 \DoxyCodeLine{00120\ \}\ \mbox{\hyperlink{test__modular__arithmetic_8cpp_ae70bfa24f5a3bc0917382b3c17fc033c}{FC\_LOG\_AND\_RETHROW}}();}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -184,13 +186,13 @@ Definition at line \mbox{\hyperlink{test__modular__arithmetic_8cpp_source_l00122
 \DoxyCodeLine{00126\ \ \ \ \ \textcolor{keyword}{auto}\ generate\_random\_bytes\ =\ [](std::mt19937\&\ rand\_eng,\ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{int}\ num\_bytes)\ \{}
 \DoxyCodeLine{00127\ \ \ \ \ \ \ \ \ std::vector<char>\ result(num\_bytes);}
 \DoxyCodeLine{00128\ }
-\DoxyCodeLine{00129\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_a8f075c759c74e109e8184306c663809d}{uint\_fast32\_t}}\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}\ =\ 0;}
+\DoxyCodeLine{00129\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_a8f075c759c74e109e8184306c663809d}{uint\_fast32\_t}}\ v\ =\ 0;}
 \DoxyCodeLine{00130\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int}\ byte\_pos\ =\ 0,\ end\ =\ result.size();\ byte\_pos\ <\ end;\ ++byte\_pos)\ \{}
 \DoxyCodeLine{00131\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ ((byte\_pos\ \&\ 0x03)\ ==\ 0)\ \{\ \textcolor{comment}{//\ if\ divisible\ by\ 4}}
-\DoxyCodeLine{00132\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}\ =\ rand\_eng();}
+\DoxyCodeLine{00132\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ v\ =\ rand\_eng();}
 \DoxyCodeLine{00133\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
-\DoxyCodeLine{00134\ \ \ \ \ \ \ \ \ \ \ \ \ result[byte\_pos]\ =\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}\ \&\ 0xFF;}
-\DoxyCodeLine{00135\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}\ >>=\ 8;}
+\DoxyCodeLine{00134\ \ \ \ \ \ \ \ \ \ \ \ \ result[byte\_pos]\ =\ v\ \&\ 0xFF;}
+\DoxyCodeLine{00135\ \ \ \ \ \ \ \ \ \ \ \ \ v\ >>=\ 8;}
 \DoxyCodeLine{00136\ \ \ \ \ \ \ \ \ \}}
 \DoxyCodeLine{00137\ }
 \DoxyCodeLine{00138\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ result;}
@@ -358,7 +360,8 @@ Definition at line \mbox{\hyperlink{test__modular__arithmetic_8cpp_source_l00122
 \DoxyCodeLine{00300\ \}\ \mbox{\hyperlink{test__modular__arithmetic_8cpp_ae70bfa24f5a3bc0917382b3c17fc033c}{FC\_LOG\_AND\_RETHROW}}();}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode

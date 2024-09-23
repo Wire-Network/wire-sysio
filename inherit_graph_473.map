@@ -1,15 +1,21 @@
 <map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
-<area shape="rect" id="Node000000" title=" " alt="" coords="5,50,160,76"/>
-<area shape="rect" id="Node000001" href="$structmie_1_1local_1_1shiftable.html" title=" " alt="" coords="208,43,342,84"/>
-<area shape="poly" id="edge305_Node000000_Node000001" title=" " alt="" coords="175,60,207,60,207,66,175,66"/>
-<area shape="rect" id="Node000002" href="$structmie_1_1local_1_1has_negative.html" title=" " alt="" coords="390,35,567,91"/>
-<area shape="poly" id="edge306_Node000001_Node000002" title=" " alt="" coords="358,60,389,60,389,66,358,66"/>
-<area shape="rect" id="Node000003" href="$structmie_1_1local_1_1dividable.html" title=" " alt="" coords="615,20,768,106"/>
-<area shape="poly" id="edge307_Node000002_Node000003" title=" " alt="" coords="583,60,615,60,615,66,583,66"/>
-<area shape="rect" id="Node000004" href="$structmie_1_1local_1_1comparable.html" title=" " alt="" coords="816,13,1012,114"/>
-<area shape="poly" id="edge308_Node000003_Node000004" title=" " alt="" coords="783,60,815,60,815,66,783,66"/>
-<area shape="rect" id="Node000005" href="$structmie_1_1local_1_1addsubmul.html" title=" " alt="" coords="1060,5,1280,121"/>
-<area shape="poly" id="edge309_Node000004_Node000005" title=" " alt="" coords="1028,60,1059,60,1059,66,1028,66"/>
-<area shape="rect" id="Node000006" href="$classmie_1_1_vsint_t.html" title=" " alt="" coords="1328,50,1450,76"/>
-<area shape="poly" id="edge310_Node000005_Node000006" title=" " alt="" coords="1296,60,1328,60,1328,66,1296,66"/>
+<area shape="rect" id="Node000000" title=" " alt="" coords="5,267,172,292"/>
+<area shape="rect" id="Node000001" href="$structtcp__echo__session.html" title=" " alt="" coords="254,5,380,31"/>
+<area shape="poly" id="edge337_Node000000_Node000001" title=" " alt="" coords="95,251,110,205,135,148,171,91,193,64,218,41,252,24,254,29,221,46,197,68,175,94,140,151,115,207,100,253"/>
+<area shape="rect" id="Node000002" href="$classwebsocketpp_1_1message__buffer_1_1alloc_1_1con__msg__manager.html" title=" " alt="" coords="237,56,396,111"/>
+<area shape="poly" id="edge338_Node000000_Node000002" title=" " alt="" coords="104,252,150,188,182,153,218,121,236,110,239,114,221,126,186,156,154,191,108,255"/>
+<area shape="rect" id="Node000003" href="$classwebsocketpp_1_1transport_1_1asio_1_1basic__socket_1_1connection.html" title="Basic Asio connection socket component." alt="" coords="238,136,396,191"/>
+<area shape="poly" id="edge339_Node000000_Node000003" title=" " alt="" coords="122,256,218,201,243,190,245,194,221,206,125,261"/>
+<area shape="rect" id="Node000004" href="$classwebsocketpp_1_1transport_1_1asio_1_1basic__socket_1_1local__connection.html" title=" " alt="" coords="238,216,396,271"/>
+<area shape="poly" id="edge340_Node000000_Node000004" title=" " alt="" coords="186,261,237,253,238,259,187,267"/>
+<area shape="rect" id="Node000005" href="$classwebsocketpp_1_1transport_1_1asio_1_1tls__socket_1_1connection.html" title="TLS enabled Asio connection socket component." alt="" coords="221,295,413,336"/>
+<area shape="poly" id="edge341_Node000000_Node000005" title=" " alt="" coords="187,292,220,298,220,303,186,298"/>
+<area shape="rect" id="Node000006" href="$classwebsocketpp_1_1transport_1_1debug_1_1connection.html" title=" " alt="" coords="220,360,414,401"/>
+<area shape="poly" id="edge342_Node000000_Node000006" title=" " alt="" coords="127,298,221,345,252,357,250,362,219,350,125,303"/>
+<area shape="rect" id="Node000007" href="$classwebsocketpp_1_1transport_1_1iostream_1_1connection.html" title=" " alt="" coords="238,425,396,481"/>
+<area shape="poly" id="edge343_Node000000_Node000007" title=" " alt="" coords="111,303,158,357,188,385,221,411,241,422,238,427,218,415,185,389,155,360,107,307"/>
+<area shape="rect" id="Node000009" href="$classwebsocketpp_1_1transport_1_1stub_1_1connection.html" title=" " alt="" coords="225,504,409,545"/>
+<area shape="poly" id="edge345_Node000000_Node000009" title=" " alt="" coords="102,306,119,347,144,396,179,447,221,491,239,502,236,506,218,495,174,450,140,399,114,349,97,308"/>
+<area shape="rect" id="Node000008" href="$structstub__con.html" title=" " alt="" coords="462,440,536,466"/>
+<area shape="poly" id="edge344_Node000007_Node000008" title=" " alt="" coords="411,450,461,450,461,456,411,456"/>
 </map>

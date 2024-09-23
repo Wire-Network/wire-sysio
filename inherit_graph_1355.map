@@ -1,33 +1,5 @@
 <map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
-<area shape="rect" id="Node000000" title=" " alt="" coords="5,371,137,412"/>
-<area shape="rect" id="Node000001" href="$classfc_1_1api__connection.html" title=" " alt="" coords="212,104,340,130"/>
-<area shape="poly" id="edge554_Node000000_Node000001" title=" " alt="" coords="82,355,120,269,148,220,183,175,214,148,246,128,249,132,217,152,187,179,153,223,125,271,87,358"/>
-<area shape="rect" id="Node000006" href="$classfc_1_1binary__api__connection.html" title=" " alt="" coords="191,189,360,215"/>
-<area shape="poly" id="edge559_Node000000_Node000006" title=" " alt="" coords="85,356,123,289,150,255,183,225,206,213,208,218,186,230,154,258,127,292,89,359"/>
-<area shape="rect" id="Node000008" href="$structfc_1_1vtable.html" title=" " alt="" coords="205,239,347,280"/>
-<area shape="poly" id="edge561_Node000000_Node000008" title=" " alt="" coords="99,358,137,323,183,289,206,278,208,283,186,294,141,327,103,362"/>
-<area shape="rect" id="Node000009" href="$classsysio_1_1connection.html" title=" " alt="" coords="214,304,338,330"/>
-<area shape="poly" id="edge562_Node000000_Node000009" title=" " alt="" coords="127,362,184,338,218,328,219,333,186,343,129,367"/>
-<area shape="rect" id="Node000010" href="$classsysio_1_1http__plugin__impl.html" title=" " alt="" coords="199,353,353,379"/>
-<area shape="poly" id="edge563_Node000000_Node000010" title=" " alt="" coords="152,379,198,373,199,378,152,384"/>
-<area shape="rect" id="Node000011" href="$classsysio_1_1net__plugin__impl.html" title=" " alt="" coords="201,403,351,428"/>
-<area shape="poly" id="edge564_Node000000_Node000011" title=" " alt="" coords="152,398,200,404,200,409,151,404"/>
-<area shape="rect" id="Node000012" href="$classsysio_1_1producer__plugin__impl.html" title=" " alt="" coords="185,452,367,478"/>
-<area shape="poly" id="edge565_Node000000_Node000012" title=" " alt="" coords="130,416,186,438,220,449,218,454,184,443,128,421"/>
-<area shape="rect" id="Node000013" href="$structsysio_1_1state__history__plugin__impl.html" title=" " alt="" coords="208,502,344,542"/>
-<area shape="poly" id="edge566_Node000000_Node000013" title=" " alt="" coords="103,421,141,456,186,488,209,499,207,504,183,492,138,460,100,425"/>
-<area shape="rect" id="Node000014" href="$structsysio_1_1state__history__plugin__impl_1_1session.html" title=" " alt="" coords="203,567,349,608"/>
-<area shape="poly" id="edge567_Node000000_Node000014" title=" " alt="" coords="90,424,129,489,155,523,186,552,206,564,204,569,183,556,151,526,124,492,86,427"/>
-<area shape="rect" id="Node000015" href="$structsysio_1_1trace__api__rpc__plugin__impl.html" title=" " alt="" coords="207,632,345,673"/>
-<area shape="poly" id="edge568_Node000000_Node000015" title=" " alt="" coords="83,426,97,470,118,521,148,573,186,618,208,632,205,636,183,621,144,576,114,523,92,471,78,428"/>
-<area shape="rect" id="Node000002" href="$classfc_1_1local__api__connection.html" title=" " alt="" coords="426,5,587,31"/>
-<area shape="poly" id="edge555_Node000001_Node000002" title=" " alt="" coords="310,93,358,66,414,40,446,29,448,34,416,45,361,71,312,98"/>
-<area shape="rect" id="Node000003" href="$classfc_1_1rpc_1_1cli.html" title=" " alt="" coords="466,55,546,80"/>
-<area shape="poly" id="edge556_Node000001_Node000003" title=" " alt="" coords="353,98,465,73,467,79,355,103"/>
-<area shape="rect" id="Node000004" href="$classfc_1_1rpc_1_1http__api__connection.html" title=" " alt="" coords="415,104,597,130"/>
-<area shape="poly" id="edge557_Node000001_Node000004" title=" " alt="" coords="355,114,415,114,415,120,355,120"/>
-<area shape="rect" id="Node000005" href="$classfc_1_1rpc_1_1websocket__api__connection.html" title=" " alt="" coords="442,154,571,194"/>
-<area shape="poly" id="edge558_Node000001_Node000005" title=" " alt="" coords="346,131,442,155,440,161,345,137"/>
-<area shape="rect" id="Node000007" href="$classfc_1_1local__binary__api__connection.html" title=" " alt="" coords="440,219,573,260"/>
-<area shape="poly" id="edge560_Node000006_Node000007" title=" " alt="" coords="375,215,440,226,439,231,374,221"/>
+<area shape="rect" id="Node000000" title=" " alt="" coords="5,5,110,31"/>
+<area shape="rect" id="Node000001" href="$classfc_1_1comma__numpunct.html" title=" " alt="" coords="158,5,305,31"/>
+<area shape="poly" id="edge538_Node000000_Node000001" title=" " alt="" coords="125,16,157,16,157,21,125,21"/>
 </map>

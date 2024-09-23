@@ -6,7 +6,8 @@
 
 
 
-Inheritance diagram for testing\+::internal\+::Pointwise\+Matcher\texorpdfstring{$<$}{<} Tuple\+Matcher, Rhs\+Container \texorpdfstring{$>$}{>}\+::Impl\texorpdfstring{$<$}{<} Lhs\+Container \texorpdfstring{$>$}{>}\+:\nopagebreak
+Inheritance diagram for testing\+::internal\+::Pointwise\+Matcher\texorpdfstring{$<$}{<} Tuple\+Matcher, Rhs\+Container \texorpdfstring{$>$}{>}\+::Impl\texorpdfstring{$<$}{<} Lhs\+Container \texorpdfstring{$>$}{>}\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -15,7 +16,8 @@ Inheritance diagram for testing\+::internal\+::Pointwise\+Matcher\texorpdfstring
 \end{figure}
 
 
-Collaboration diagram for testing\+::internal\+::Pointwise\+Matcher\texorpdfstring{$<$}{<} Tuple\+Matcher, Rhs\+Container \texorpdfstring{$>$}{>}\+::Impl\texorpdfstring{$<$}{<} Lhs\+Container \texorpdfstring{$>$}{>}\+:\nopagebreak
+Collaboration diagram for testing\+::internal\+::Pointwise\+Matcher\texorpdfstring{$<$}{<} Tuple\+Matcher, Rhs\+Container \texorpdfstring{$>$}{>}\+::Impl\texorpdfstring{$<$}{<} Lhs\+Container \texorpdfstring{$>$}{>}\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -40,9 +42,9 @@ typedef \+::testing\+::tuple$<$ const \mbox{\hyperlink{classtesting_1_1internal_
 \item 
 \mbox{\hyperlink{classtesting_1_1internal_1_1_pointwise_matcher_1_1_impl_aaf6841b254ef78395919dfc5705dd152}{Impl}} (const Tuple\+Matcher \&tuple\+\_\+matcher, const \mbox{\hyperlink{classtesting_1_1internal_1_1_pointwise_matcher_a9ead9a6a8977458951f2cf33a4a30918}{Rhs\+Stl\+Container}} \&rhs)
 \item 
-virtual void \mbox{\hyperlink{classtesting_1_1internal_1_1_pointwise_matcher_1_1_impl_a0c699f62bbd02595471b793baa9cc75e}{Describe\+To}} (\+::std\+::ostream \texorpdfstring{$\ast$}{*}os) const
+virtual void \mbox{\hyperlink{classtesting_1_1internal_1_1_pointwise_matcher_1_1_impl_a0c699f62bbd02595471b793baa9cc75e}{Describe\+To}} (\+::std\+::ostream \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}) const
 \item 
-virtual void \mbox{\hyperlink{classtesting_1_1internal_1_1_pointwise_matcher_1_1_impl_a26d3a829149e4c497aaced42aad7b247}{Describe\+Negation\+To}} (\+::std\+::ostream \texorpdfstring{$\ast$}{*}os) const
+virtual void \mbox{\hyperlink{classtesting_1_1internal_1_1_pointwise_matcher_1_1_impl_a26d3a829149e4c497aaced42aad7b247}{Describe\+Negation\+To}} (\+::std\+::ostream \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}) const
 \item 
 virtual bool \mbox{\hyperlink{classtesting_1_1internal_1_1_pointwise_matcher_1_1_impl_a4253946989f3743c4dd983909f2d062b}{Match\+And\+Explain}} (Lhs\+Container lhs, \mbox{\hyperlink{classtesting_1_1_match_result_listener}{Match\+Result\+Listener}} \texorpdfstring{$\ast$}{*}listener) const
 \end{DoxyCompactItemize}
@@ -168,16 +170,17 @@ Definition at line \mbox{\hyperlink{gmock-matchers_8h_source_l03043}{3043}} of f
 
 \begin{DoxyCode}{0}
 \DoxyCodeLine{03043\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
-\DoxyCodeLine{03044\ \ \ \ \ \ \ *os\ <<\ \textcolor{stringliteral}{"{}doesn't\ contain\ exactly\ "{}}\ <<\ rhs\_.size()}
+\DoxyCodeLine{03044\ \ \ \ \ \ \ *\mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}\ <<\ \textcolor{stringliteral}{"{}doesn't\ contain\ exactly\ "{}}\ <<\ rhs\_.size()}
 \DoxyCodeLine{03045\ \ \ \ \ \ \ \ \ \ \ <<\ \textcolor{stringliteral}{"{}\ values,\ or\ contains\ a\ value\ x\ at\ some\ index\ i"{}}}
 \DoxyCodeLine{03046\ \ \ \ \ \ \ \ \ \ \ <<\ \textcolor{stringliteral}{"{}\ where\ x\ and\ the\ i-\/th\ value\ of\ "{}};}
-\DoxyCodeLine{03047\ \ \ \ \ \ \ \mbox{\hyperlink{namespacetesting_1_1internal_a30708fa2bacf11895b03bdb21eb72309}{UniversalPrint}}(rhs\_,\ os);}
-\DoxyCodeLine{03048\ \ \ \ \ \ \ *os\ <<\ \textcolor{stringliteral}{"{}\ "{}};}
-\DoxyCodeLine{03049\ \ \ \ \ \ \ mono\_tuple\_matcher\_.\mbox{\hyperlink{classtesting_1_1internal_1_1_matcher_base_ac1089d49b6b8a381900618985cd69b7f}{DescribeNegationTo}}(os);}
+\DoxyCodeLine{03047\ \ \ \ \ \ \ \mbox{\hyperlink{namespacetesting_1_1internal_a30708fa2bacf11895b03bdb21eb72309}{UniversalPrint}}(rhs\_,\ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}});}
+\DoxyCodeLine{03048\ \ \ \ \ \ \ *\mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}\ <<\ \textcolor{stringliteral}{"{}\ "{}};}
+\DoxyCodeLine{03049\ \ \ \ \ \ \ mono\_tuple\_matcher\_.\mbox{\hyperlink{classtesting_1_1internal_1_1_matcher_base_ac1089d49b6b8a381900618985cd69b7f}{DescribeNegationTo}}(\mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}});}
 \DoxyCodeLine{03050\ \ \ \ \ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -203,15 +206,16 @@ Definition at line \mbox{\hyperlink{gmock-matchers_8h_source_l03036}{3036}} of f
 
 \begin{DoxyCode}{0}
 \DoxyCodeLine{03036\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
-\DoxyCodeLine{03037\ \ \ \ \ \ \ *os\ <<\ \textcolor{stringliteral}{"{}contains\ "{}}\ <<\ rhs\_.size()}
+\DoxyCodeLine{03037\ \ \ \ \ \ \ *\mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}\ <<\ \textcolor{stringliteral}{"{}contains\ "{}}\ <<\ rhs\_.size()}
 \DoxyCodeLine{03038\ \ \ \ \ \ \ \ \ \ \ <<\ \textcolor{stringliteral}{"{}\ values,\ where\ each\ value\ and\ its\ corresponding\ value\ in\ "{}};}
-\DoxyCodeLine{03039\ \ \ \ \ \ \ \mbox{\hyperlink{classtesting_1_1internal_1_1_universal_printer_aecec021e1abbaa260b701e24e3fe33eb}{UniversalPrinter<RhsStlContainer>::Print}}(rhs\_,\ os);}
-\DoxyCodeLine{03040\ \ \ \ \ \ \ *os\ <<\ \textcolor{stringliteral}{"{}\ "{}};}
-\DoxyCodeLine{03041\ \ \ \ \ \ \ mono\_tuple\_matcher\_.\mbox{\hyperlink{classtesting_1_1internal_1_1_matcher_base_a7e0c883c7745e0d646463077ef1c1267}{DescribeTo}}(os);}
+\DoxyCodeLine{03039\ \ \ \ \ \ \ \mbox{\hyperlink{classtesting_1_1internal_1_1_universal_printer_aecec021e1abbaa260b701e24e3fe33eb}{UniversalPrinter<RhsStlContainer>::Print}}(rhs\_,\ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}});}
+\DoxyCodeLine{03040\ \ \ \ \ \ \ *\mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}\ <<\ \textcolor{stringliteral}{"{}\ "{}};}
+\DoxyCodeLine{03041\ \ \ \ \ \ \ mono\_tuple\_matcher\_.\mbox{\hyperlink{classtesting_1_1internal_1_1_matcher_base_a7e0c883c7745e0d646463077ef1c1267}{DescribeTo}}(\mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}});}
 \DoxyCodeLine{03042\ \ \ \ \ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -276,7 +280,8 @@ Definition at line \mbox{\hyperlink{gmock-matchers_8h_source_l03052}{3052}} of f
 \DoxyCodeLine{03090\ \ \ \ \ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode

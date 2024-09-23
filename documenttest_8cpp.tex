@@ -8,7 +8,8 @@
 {\ttfamily \#include "{}rapidjson/stringbuffer.\+h"{}}\newline
 {\ttfamily \#include $<$sstream$>$}\newline
 {\ttfamily \#include $<$algorithm$>$}\newline
-Include dependency graph for documenttest.\+cpp\+:\nopagebreak
+Include dependency graph for documenttest.\+cpp\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -109,7 +110,8 @@ Definition at line \mbox{\hyperlink{documenttest_8cpp_source_l00033}{33}} of fil
 \DoxyCodeLine{00076\ \}}
 
 \end{DoxyCode}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -171,14 +173,16 @@ Definition at line \mbox{\hyperlink{documenttest_8cpp_source_l00079}{79}} of fil
 \DoxyCodeLine{00118\ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
 \includegraphics[width=246pt]{documenttest_8cpp_a253a10b144fdcdf1fae18dd2112ea93a_cgraph}
 \end{center}
 \end{figure}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -202,14 +206,15 @@ Definition at line \mbox{\hyperlink{documenttest_8cpp_source_l00359}{359}} of fi
 \DoxyCodeLine{00361\ \ \ \ \ doc.\mbox{\hyperlink{class_generic_document_a901db1678f99a1b550003eed75bc380a}{Parse}}(\textcolor{stringliteral}{"{}\ \{\ \(\backslash\)"{}hello\(\backslash\)"{}\ :\ \(\backslash\)"{}world\(\backslash\)"{},\ \(\backslash\)"{}t\(\backslash\)"{}\ :\ true\ ,\ \(\backslash\)"{}f\(\backslash\)"{}\ :\ false,\ \(\backslash\)"{}n\(\backslash\)"{}:\ null,\ \(\backslash\)"{}i\(\backslash\)"{}:123,\ \(\backslash\)"{}pi\(\backslash\)"{}:\ 3.1416,\ \(\backslash\)"{}a\(\backslash\)"{}:[1,\ 2,\ 3,\ 4]\ \}\ "{}});}
 \DoxyCodeLine{00362\ }
 \DoxyCodeLine{00363\ \ \ \ \ \mbox{\hyperlink{struct_output_string_stream}{OutputStringStream}}\ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}};}
-\DoxyCodeLine{00364\ \ \ \ \ \mbox{\hyperlink{class_writer}{Writer<OutputStringStream>}}\ writer(os);}
+\DoxyCodeLine{00364\ \ \ \ \ \mbox{\hyperlink{class_writer}{Writer<OutputStringStream>}}\ writer(\mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}});}
 \DoxyCodeLine{00365\ \ \ \ \ doc.Accept(writer);}
 \DoxyCodeLine{00366\ }
-\DoxyCodeLine{00367\ \ \ \ \ \mbox{\hyperlink{gtest_8h_a4159019abda84f5366acdb7604ff220a}{EXPECT\_EQ}}(\textcolor{stringliteral}{"{}\{\(\backslash\)"{}hello\(\backslash\)"{}:\(\backslash\)"{}world\(\backslash\)"{},\(\backslash\)"{}t\(\backslash\)"{}:true,\(\backslash\)"{}f\(\backslash\)"{}:false,\(\backslash\)"{}n\(\backslash\)"{}:null,\(\backslash\)"{}i\(\backslash\)"{}:123,\(\backslash\)"{}pi\(\backslash\)"{}:3.1416,\(\backslash\)"{}a\(\backslash\)"{}:[1,2,3,4]\}"{}},\ os.str());}
+\DoxyCodeLine{00367\ \ \ \ \ \mbox{\hyperlink{gtest_8h_a4159019abda84f5366acdb7604ff220a}{EXPECT\_EQ}}(\textcolor{stringliteral}{"{}\{\(\backslash\)"{}hello\(\backslash\)"{}:\(\backslash\)"{}world\(\backslash\)"{},\(\backslash\)"{}t\(\backslash\)"{}:true,\(\backslash\)"{}f\(\backslash\)"{}:false,\(\backslash\)"{}n\(\backslash\)"{}:null,\(\backslash\)"{}i\(\backslash\)"{}:123,\(\backslash\)"{}pi\(\backslash\)"{}:3.1416,\(\backslash\)"{}a\(\backslash\)"{}:[1,2,3,4]\}"{}},\ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}.str());}
 \DoxyCodeLine{00368\ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -235,12 +240,13 @@ Definition at line \mbox{\hyperlink{documenttest_8cpp_source_l00388}{388}} of fi
 \DoxyCodeLine{00392\ \ \ \ \ doc.FindMember(\textcolor{stringliteral}{"{}a"{}})-\/>name.SetNull();\ \textcolor{comment}{//\ Change\ name\ to\ non-\/string\ type.}}
 \DoxyCodeLine{00393\ }
 \DoxyCodeLine{00394\ \ \ \ \ \mbox{\hyperlink{struct_output_string_stream}{OutputStringStream}}\ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}};}
-\DoxyCodeLine{00395\ \ \ \ \ \mbox{\hyperlink{class_writer}{Writer<OutputStringStream>}}\ writer(os);}
+\DoxyCodeLine{00395\ \ \ \ \ \mbox{\hyperlink{class_writer}{Writer<OutputStringStream>}}\ writer(\mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}});}
 \DoxyCodeLine{00396\ \ \ \ \ \mbox{\hyperlink{gtest_8h_aedb1eddae6c2a2430b0e7b7e03b4f052}{ASSERT\_THROW}}(doc.Accept(writer),\ \mbox{\hyperlink{class_assert_exception}{AssertException}});}
 \DoxyCodeLine{00397\ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -267,7 +273,8 @@ Definition at line \mbox{\hyperlink{documenttest_8cpp_source_l00120}{120}} of fi
 \DoxyCodeLine{00125\ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -328,7 +335,8 @@ Definition at line \mbox{\hyperlink{documenttest_8cpp_source_l00174}{174}} of fi
 \DoxyCodeLine{00213\ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -361,10 +369,10 @@ Definition at line \mbox{\hyperlink{documenttest_8cpp_source_l00256}{256}} of fi
 \DoxyCodeLine{00267\ \ \ \ \ fclose(fp);}
 \DoxyCodeLine{00268\ }
 \DoxyCodeLine{00269\ \ \ \ \ \textcolor{keywordtype}{char}\ expected[]\ =\ \textcolor{stringliteral}{"{}I\ can\ eat\ glass\ and\ it\ doesn't\ hurt\ me."{}};}
-\DoxyCodeLine{00270\ \ \ \ \ \mbox{\hyperlink{class_generic_value}{Value}}\&\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}\ =\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a107648633008a7f2d872b4b3d98c2f96}{d}}[\textcolor{stringliteral}{"{}en"{}}];}
-\DoxyCodeLine{00271\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(\mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.IsString());}
-\DoxyCodeLine{00272\ \ \ \ \ \mbox{\hyperlink{gtest_8h_a4159019abda84f5366acdb7604ff220a}{EXPECT\_EQ}}(\textcolor{keyword}{sizeof}(expected)\ -\/\ 1,\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.GetStringLength());}
-\DoxyCodeLine{00273\ \ \ \ \ \mbox{\hyperlink{gtest_8h_a4159019abda84f5366acdb7604ff220a}{EXPECT\_EQ}}(0,\ \mbox{\hyperlink{unittest_8h_a8d8e3cf93e9b811c207711d0b353de02}{StrCmp}}(expected,\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.GetString()));}
+\DoxyCodeLine{00270\ \ \ \ \ \mbox{\hyperlink{class_generic_value}{Value}}\&\ v\ =\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a107648633008a7f2d872b4b3d98c2f96}{d}}[\textcolor{stringliteral}{"{}en"{}}];}
+\DoxyCodeLine{00271\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(v.IsString());}
+\DoxyCodeLine{00272\ \ \ \ \ \mbox{\hyperlink{gtest_8h_a4159019abda84f5366acdb7604ff220a}{EXPECT\_EQ}}(\textcolor{keyword}{sizeof}(expected)\ -\/\ 1,\ v.GetStringLength());}
+\DoxyCodeLine{00273\ \ \ \ \ \mbox{\hyperlink{gtest_8h_a4159019abda84f5366acdb7604ff220a}{EXPECT\_EQ}}(0,\ \mbox{\hyperlink{unittest_8h_a8d8e3cf93e9b811c207711d0b353de02}{StrCmp}}(expected,\ v.GetString()));}
 \DoxyCodeLine{00274\ }
 \DoxyCodeLine{00275\ \ \ \ \ \textcolor{comment}{//\ UTF8\ -\/>\ UTF8\ in\ memory}}
 \DoxyCodeLine{00276\ \ \ \ \ \mbox{\hyperlink{class_generic_string_buffer}{StringBuffer}}\ bos;}
@@ -385,7 +393,8 @@ Definition at line \mbox{\hyperlink{documenttest_8cpp_source_l00256}{256}} of fi
 \DoxyCodeLine{00291\ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -418,10 +427,10 @@ Definition at line \mbox{\hyperlink{documenttest_8cpp_source_l00215}{215}} of fi
 \DoxyCodeLine{00226\ \ \ \ \ fclose(fp);}
 \DoxyCodeLine{00227\ }
 \DoxyCodeLine{00228\ \ \ \ \ \textcolor{keywordtype}{wchar\_t}\ expected[]\ =\ L\textcolor{stringliteral}{"{}I\ can\ eat\ glass\ and\ it\ doesn't\ hurt\ me."{}};}
-\DoxyCodeLine{00229\ \ \ \ \ \mbox{\hyperlink{class_generic_value}{GenericValue<UTF16<>}}\ >\&\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}\ =\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a107648633008a7f2d872b4b3d98c2f96}{d}}[L\textcolor{stringliteral}{"{}en"{}}];}
-\DoxyCodeLine{00230\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(\mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.IsString());}
-\DoxyCodeLine{00231\ \ \ \ \ \mbox{\hyperlink{gtest_8h_a4159019abda84f5366acdb7604ff220a}{EXPECT\_EQ}}(\textcolor{keyword}{sizeof}(expected)\ /\ \textcolor{keyword}{sizeof}(\textcolor{keywordtype}{wchar\_t})\ -\/\ 1,\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.GetStringLength());}
-\DoxyCodeLine{00232\ \ \ \ \ \mbox{\hyperlink{gtest_8h_a4159019abda84f5366acdb7604ff220a}{EXPECT\_EQ}}(0,\ \mbox{\hyperlink{unittest_8h_a8d8e3cf93e9b811c207711d0b353de02}{StrCmp}}(expected,\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.GetString()));}
+\DoxyCodeLine{00229\ \ \ \ \ \mbox{\hyperlink{class_generic_value}{GenericValue<UTF16<>}}\ >\&\ v\ =\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a107648633008a7f2d872b4b3d98c2f96}{d}}[L\textcolor{stringliteral}{"{}en"{}}];}
+\DoxyCodeLine{00230\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(v.IsString());}
+\DoxyCodeLine{00231\ \ \ \ \ \mbox{\hyperlink{gtest_8h_a4159019abda84f5366acdb7604ff220a}{EXPECT\_EQ}}(\textcolor{keyword}{sizeof}(expected)\ /\ \textcolor{keyword}{sizeof}(\textcolor{keywordtype}{wchar\_t})\ -\/\ 1,\ v.GetStringLength());}
+\DoxyCodeLine{00232\ \ \ \ \ \mbox{\hyperlink{gtest_8h_a4159019abda84f5366acdb7604ff220a}{EXPECT\_EQ}}(0,\ \mbox{\hyperlink{unittest_8h_a8d8e3cf93e9b811c207711d0b353de02}{StrCmp}}(expected,\ v.GetString()));}
 \DoxyCodeLine{00233\ }
 \DoxyCodeLine{00234\ \ \ \ \ \textcolor{comment}{//\ UTF16\ -\/>\ UTF8\ in\ memory}}
 \DoxyCodeLine{00235\ \ \ \ \ \mbox{\hyperlink{class_generic_string_buffer}{StringBuffer}}\ bos;}
@@ -446,7 +455,8 @@ Definition at line \mbox{\hyperlink{documenttest_8cpp_source_l00215}{215}} of fi
 \DoxyCodeLine{00254\ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -517,7 +527,8 @@ Definition at line \mbox{\hyperlink{documenttest_8cpp_source_l00293}{293}} of fi
 \DoxyCodeLine{00342\ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -566,7 +577,8 @@ Definition at line \mbox{\hyperlink{documenttest_8cpp_source_l00127}{127}} of fi
 \DoxyCodeLine{00154\ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -603,7 +615,8 @@ Definition at line \mbox{\hyperlink{documenttest_8cpp_source_l00370}{370}} of fi
 \DoxyCodeLine{00385\ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -627,17 +640,18 @@ Definition at line \mbox{\hyperlink{documenttest_8cpp_source_l00400}{400}} of fi
 \DoxyCodeLine{00402\ \ \ \ \ json.\mbox{\hyperlink{class_generic_document_a901db1678f99a1b550003eed75bc380a}{Parse}}<\mbox{\hyperlink{reader_8h_ab7be7dabe6ffcba60fad441505583450a9b3baa16346575d2dc072b23a88e1928}{kParseValidateEncodingFlag}}>(L\textcolor{stringliteral}{"{}[\{\(\backslash\)"{}created\_at\(\backslash\)"{}:\(\backslash\)"{}Wed\ Oct\ 30\ 17:13:20\ +0000\ 2012\(\backslash\)"{}\}]"{}});}
 \DoxyCodeLine{00403\ }
 \DoxyCodeLine{00404\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ae9244bfbda562e8b798789b001993fa5}{ASSERT\_TRUE}}(json.IsArray());}
-\DoxyCodeLine{00405\ \ \ \ \ \mbox{\hyperlink{class_generic_value}{GenericValue<\ UTF16<>}}\ >\&\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}\ =\ json[0];}
-\DoxyCodeLine{00406\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ae9244bfbda562e8b798789b001993fa5}{ASSERT\_TRUE}}(\mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.IsObject());}
+\DoxyCodeLine{00405\ \ \ \ \ \mbox{\hyperlink{class_generic_value}{GenericValue<\ UTF16<>}}\ >\&\ v\ =\ json[0];}
+\DoxyCodeLine{00406\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ae9244bfbda562e8b798789b001993fa5}{ASSERT\_TRUE}}(v.IsObject());}
 \DoxyCodeLine{00407\ }
-\DoxyCodeLine{00408\ \ \ \ \ \mbox{\hyperlink{class_generic_value}{GenericValue<\ UTF16<>}}\ >\&\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}\ =\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}[L\textcolor{stringliteral}{"{}created\_at"{}}];}
+\DoxyCodeLine{00408\ \ \ \ \ \mbox{\hyperlink{class_generic_value}{GenericValue<\ UTF16<>}}\ >\&\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}\ =\ v[L\textcolor{stringliteral}{"{}created\_at"{}}];}
 \DoxyCodeLine{00409\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ae9244bfbda562e8b798789b001993fa5}{ASSERT\_TRUE}}(\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}.IsString());}
 \DoxyCodeLine{00410\ }
 \DoxyCodeLine{00411\ \ \ \ \ \mbox{\hyperlink{gtest_8h_a4159019abda84f5366acdb7604ff220a}{EXPECT\_EQ}}(0,\ memcmp(L\textcolor{stringliteral}{"{}Wed\ Oct\ 30\ 17:13:20\ +0000\ 2012"{}},\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}.GetString(),\ (\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}.GetStringLength()\ +\ 1)\ *\ \textcolor{keyword}{sizeof}(\textcolor{keywordtype}{wchar\_t})));}
 \DoxyCodeLine{00412\ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode

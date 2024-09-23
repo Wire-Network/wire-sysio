@@ -11,7 +11,8 @@ UTF-\/16 little endian encoding.
 
 
 
-Inheritance diagram for UTF16\+LE\texorpdfstring{$<$}{<} Char\+Type \texorpdfstring{$>$}{>}\+:\nopagebreak
+Inheritance diagram for UTF16\+LE\texorpdfstring{$<$}{<} Char\+Type \texorpdfstring{$>$}{>}\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -20,7 +21,8 @@ Inheritance diagram for UTF16\+LE\texorpdfstring{$<$}{<} Char\+Type \texorpdfstr
 \end{figure}
 
 
-Collaboration diagram for UTF16\+LE\texorpdfstring{$<$}{<} Char\+Type \texorpdfstring{$>$}{>}\+:\nopagebreak
+Collaboration diagram for UTF16\+LE\texorpdfstring{$<$}{<} Char\+Type \texorpdfstring{$>$}{>}\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -34,20 +36,20 @@ Collaboration diagram for UTF16\+LE\texorpdfstring{$<$}{<} Char\+Type \texorpdfs
 \item 
 {\footnotesize template$<$typename Input\+Byte\+Stream $>$ }\\static Char\+Type \mbox{\hyperlink{struct_u_t_f16_l_e_a5927b3d75ff9ce02056d827c14bd0160}{Take}} (Input\+Byte\+Stream \&is)
 \item 
-{\footnotesize template$<$typename Output\+Byte\+Stream $>$ }\\static void \mbox{\hyperlink{struct_u_t_f16_l_e_a6bfd05f8cac35c1594c7fce47009f198}{Put\+BOM}} (Output\+Byte\+Stream \&os)
+{\footnotesize template$<$typename Output\+Byte\+Stream $>$ }\\static void \mbox{\hyperlink{struct_u_t_f16_l_e_a6bfd05f8cac35c1594c7fce47009f198}{Put\+BOM}} (Output\+Byte\+Stream \&\mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}})
 \item 
-{\footnotesize template$<$typename Output\+Byte\+Stream $>$ }\\static void \mbox{\hyperlink{struct_u_t_f16_l_e_ac018cc43a1dba5a6ca232bd9a257072c}{Put}} (Output\+Byte\+Stream \&os, Char\+Type c)
+{\footnotesize template$<$typename Output\+Byte\+Stream $>$ }\\static void \mbox{\hyperlink{struct_u_t_f16_l_e_ac018cc43a1dba5a6ca232bd9a257072c}{Put}} (Output\+Byte\+Stream \&\mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}, Char\+Type c)
 \end{DoxyCompactItemize}
 \doxysubsection*{Static Public Member Functions inherited from \mbox{\hyperlink{struct_u_t_f16}{UTF16$<$ wchar\+\_\+t $>$}}}
 \begin{DoxyCompactItemize}
 \item 
-static void \mbox{\hyperlink{struct_u_t_f16_a9d8ded01244e30d037c4afa10ee2b30e}{Encode}} (Output\+Stream \&os, unsigned codepoint)
+static void \mbox{\hyperlink{struct_u_t_f16_a9d8ded01244e30d037c4afa10ee2b30e}{Encode}} (Output\+Stream \&\mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}, unsigned codepoint)
 \item 
-static void \mbox{\hyperlink{struct_u_t_f16_aa67661e756c273871b574e7133b7fc63}{Encode\+Unsafe}} (Output\+Stream \&os, unsigned codepoint)
+static void \mbox{\hyperlink{struct_u_t_f16_aa67661e756c273871b574e7133b7fc63}{Encode\+Unsafe}} (Output\+Stream \&\mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}, unsigned codepoint)
 \item 
 static bool \mbox{\hyperlink{struct_u_t_f16_a124c79dfd9f9b4c3fb65bd55ba17b4be}{Decode}} (Input\+Stream \&is, unsigned \texorpdfstring{$\ast$}{*}codepoint)
 \item 
-static bool \mbox{\hyperlink{struct_u_t_f16_a7516184ed5dce10c0e7895bec124d97d}{Validate}} (Input\+Stream \&is, Output\+Stream \&os)
+static bool \mbox{\hyperlink{struct_u_t_f16_a7516184ed5dce10c0e7895bec124d97d}{Validate}} (Input\+Stream \&is, Output\+Stream \&\mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}})
 \end{DoxyCompactItemize}
 \doxysubsubsection*{Additional Inherited Members}
 \doxysubsection*{Public Types inherited from \mbox{\hyperlink{struct_u_t_f16}{UTF16$<$ wchar\+\_\+t $>$}}}
@@ -90,8 +92,8 @@ Definition at line \mbox{\hyperlink{encodings_8h_source_l00366}{366}} of file \m
 \begin{DoxyCode}{0}
 \DoxyCodeLine{00366\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
 \DoxyCodeLine{00367\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{rapidjson_8h_af95188da1d8eb6d4b148fe9ce71cd7c4}{RAPIDJSON\_STATIC\_ASSERT}}(\textcolor{keyword}{sizeof}(\textcolor{keyword}{typename}\ OutputByteStream::Ch)\ ==\ 1);}
-\DoxyCodeLine{00368\ \ \ \ \ \ \ \ \ os.Put(\textcolor{keyword}{static\_cast<}typename\ OutputByteStream::Ch\textcolor{keyword}{>}(\textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{unsigned}\textcolor{keyword}{>}(c)\ \&\ 0xFFu));}
-\DoxyCodeLine{00369\ \ \ \ \ \ \ \ \ os.Put(\textcolor{keyword}{static\_cast<}typename\ OutputByteStream::Ch\textcolor{keyword}{>}((\textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{unsigned}\textcolor{keyword}{>}(c)\ >>\ 8)\ \&\ 0xFFu));}
+\DoxyCodeLine{00368\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}.Put(\textcolor{keyword}{static\_cast<}typename\ OutputByteStream::Ch\textcolor{keyword}{>}(\textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{unsigned}\textcolor{keyword}{>}(c)\ \&\ 0xFFu));}
+\DoxyCodeLine{00369\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}.Put(\textcolor{keyword}{static\_cast<}typename\ OutputByteStream::Ch\textcolor{keyword}{>}((\textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{unsigned}\textcolor{keyword}{>}(c)\ >>\ 8)\ \&\ 0xFFu));}
 \DoxyCodeLine{00370\ \ \ \ \ \}}
 
 \end{DoxyCode}
@@ -111,8 +113,8 @@ Definition at line \mbox{\hyperlink{encodings_8h_source_l00359}{359}} of file \m
 \begin{DoxyCode}{0}
 \DoxyCodeLine{00359\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
 \DoxyCodeLine{00360\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{rapidjson_8h_af95188da1d8eb6d4b148fe9ce71cd7c4}{RAPIDJSON\_STATIC\_ASSERT}}(\textcolor{keyword}{sizeof}(\textcolor{keyword}{typename}\ OutputByteStream::Ch)\ ==\ 1);}
-\DoxyCodeLine{00361\ \ \ \ \ \ \ \ \ os.Put(\textcolor{keyword}{static\_cast<}typename\ OutputByteStream::Ch\textcolor{keyword}{>}(0xFFu));}
-\DoxyCodeLine{00362\ \ \ \ \ \ \ \ \ os.Put(\textcolor{keyword}{static\_cast<}typename\ OutputByteStream::Ch\textcolor{keyword}{>}(0xFEu));}
+\DoxyCodeLine{00361\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}.Put(\textcolor{keyword}{static\_cast<}typename\ OutputByteStream::Ch\textcolor{keyword}{>}(0xFFu));}
+\DoxyCodeLine{00362\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}.Put(\textcolor{keyword}{static\_cast<}typename\ OutputByteStream::Ch\textcolor{keyword}{>}(0xFEu));}
 \DoxyCodeLine{00363\ \ \ \ \ \}}
 
 \end{DoxyCode}
@@ -138,7 +140,8 @@ Definition at line \mbox{\hyperlink{encodings_8h_source_l00351}{351}} of file \m
 \DoxyCodeLine{00356\ \ \ \ \ \}}
 
 \end{DoxyCode}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -166,7 +169,8 @@ Definition at line \mbox{\hyperlink{encodings_8h_source_l00344}{344}} of file \m
 \DoxyCodeLine{00348\ \ \ \ \ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode

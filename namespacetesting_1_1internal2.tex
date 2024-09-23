@@ -20,11 +20,11 @@ enum \mbox{\hyperlink{namespacetesting_1_1internal2_aeb8161b0b3ee503347b0662d702
 \doxysubsubsection*{Functions}
 \begin{DoxyCompactItemize}
 \item 
-\mbox{\hyperlink{gtest-port_8h_aa73be6f0ba4a7456180a94904ce17790}{GTEST\+\_\+\+API\+\_\+}} void \mbox{\hyperlink{namespacetesting_1_1internal2_a9fbf8e07c0f94dc74d6ef5e56cd3c553}{Print\+Bytes\+In\+Object\+To}} (const unsigned char \texorpdfstring{$\ast$}{*}obj\+\_\+bytes, size\+\_\+t \mbox{\hyperlink{gmock__stress__test_8cc_afd9db40e3361ae09188795e8cbe19752}{count}}, \+::std\+::ostream \texorpdfstring{$\ast$}{*}os)
+\mbox{\hyperlink{gtest-port_8h_aa73be6f0ba4a7456180a94904ce17790}{GTEST\+\_\+\+API\+\_\+}} void \mbox{\hyperlink{namespacetesting_1_1internal2_a9fbf8e07c0f94dc74d6ef5e56cd3c553}{Print\+Bytes\+In\+Object\+To}} (const unsigned char \texorpdfstring{$\ast$}{*}obj\+\_\+bytes, size\+\_\+t \mbox{\hyperlink{gmock__stress__test_8cc_afd9db40e3361ae09188795e8cbe19752}{count}}, \+::std\+::ostream \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}})
 \item 
-{\footnotesize template$<$typename Char , typename Char\+Traits , typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ }\\\+::std\+::basic\+\_\+ostream$<$ Char, Char\+Traits $>$ \& \mbox{\hyperlink{namespacetesting_1_1internal2_aabfdaa0c4719ce3bf82964d0fcf8d999}{operator$<$$<$}} (\+::std\+::basic\+\_\+ostream$<$ Char, Char\+Traits $>$ \&os, const \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \&x)
+{\footnotesize template$<$typename Char , typename Char\+Traits , typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ }\\\+::std\+::basic\+\_\+ostream$<$ Char, Char\+Traits $>$ \& \mbox{\hyperlink{namespacetesting_1_1internal2_aabfdaa0c4719ce3bf82964d0fcf8d999}{operator$<$$<$}} (\+::std\+::basic\+\_\+ostream$<$ Char, Char\+Traits $>$ \&\mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}, const \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \&x)
 \item 
-void \mbox{\hyperlink{namespacetesting_1_1internal2_abfb9aa80365f93b952e9a4bea09947a8}{Print\+Bytes\+In\+Object\+To}} (const unsigned char \texorpdfstring{$\ast$}{*}obj\+\_\+bytes, size\+\_\+t \mbox{\hyperlink{gmock__stress__test_8cc_afd9db40e3361ae09188795e8cbe19752}{count}}, ostream \texorpdfstring{$\ast$}{*}os)
+void \mbox{\hyperlink{namespacetesting_1_1internal2_abfb9aa80365f93b952e9a4bea09947a8}{Print\+Bytes\+In\+Object\+To}} (const unsigned char \texorpdfstring{$\ast$}{*}obj\+\_\+bytes, size\+\_\+t \mbox{\hyperlink{gmock__stress__test_8cc_afd9db40e3361ae09188795e8cbe19752}{count}}, ostream \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}})
 \end{DoxyCompactItemize}
 \doxysubsubsection*{Variables}
 \begin{DoxyCompactItemize}
@@ -101,7 +101,7 @@ Definition at line \mbox{\hyperlink{gtest-printers_8h_source_l00162}{162}} of fi
 \DoxyCodeLine{00241\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ?\ kConvertibleToStringView}
 \DoxyCodeLine{00242\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ :}
 \DoxyCodeLine{00243\ \textcolor{preprocessor}{\#endif}}
-\DoxyCodeLine{00244\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacetesting_1_1internal2_aeb8161b0b3ee503347b0662d7028fd57abe8aaea44751d6ebd0cdf5bd94451db1}{kOtherType}})>\mbox{\hyperlink{gtest-param-test__test_8cc_a4f874f103b3979e50bc676c7f6414dfc}{::PrintValue}}(x,\ \&os);}
+\DoxyCodeLine{00244\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacetesting_1_1internal2_aeb8161b0b3ee503347b0662d7028fd57abe8aaea44751d6ebd0cdf5bd94451db1}{kOtherType}})>\mbox{\hyperlink{gtest-param-test__test_8cc_a4f874f103b3979e50bc676c7f6414dfc}{::PrintValue}}(x,\ \&\mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}});}
 \DoxyCodeLine{00245\ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}};}
 \DoxyCodeLine{00246\ \}}
 
@@ -112,7 +112,8 @@ Definition at line \mbox{\hyperlink{gtest-printers_8h_source_l00162}{162}} of fi
 {\footnotesize\ttfamily \label{namespacetesting_1_1internal2_a9fbf8e07c0f94dc74d6ef5e56cd3c553} 
 \mbox{\hyperlink{gtest-port_8h_aa73be6f0ba4a7456180a94904ce17790}{GTEST\+\_\+\+API\+\_\+}} void testing\+::internal2\+::\+Print\+Bytes\+In\+Object\+To (\begin{DoxyParamCaption}\item[{const unsigned char \texorpdfstring{$\ast$}{*}}]{obj\+\_\+bytes}{, }\item[{size\+\_\+t}]{count}{, }\item[{\+::std\+::ostream \texorpdfstring{$\ast$}{*}}]{os}{}\end{DoxyParamCaption})}
 
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -132,7 +133,7 @@ Definition at line \mbox{\hyperlink{gtest-printers_8cc_source_l00115}{115}} of f
 
 \begin{DoxyCode}{0}
 \DoxyCodeLine{00116\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
-\DoxyCodeLine{00117\ \ \ PrintBytesInObjectToImpl(obj\_bytes,\ \mbox{\hyperlink{gmock__stress__test_8cc_afd9db40e3361ae09188795e8cbe19752}{count}},\ os);}
+\DoxyCodeLine{00117\ \ \ PrintBytesInObjectToImpl(obj\_bytes,\ \mbox{\hyperlink{gmock__stress__test_8cc_afd9db40e3361ae09188795e8cbe19752}{count}},\ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}});}
 \DoxyCodeLine{00118\ \}}
 
 \end{DoxyCode}

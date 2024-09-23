@@ -415,8 +415,8 @@
 \DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00438}00438\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\ \_rexorders.begin()\ ==\ \_rexorders.end()\ )\ \{}
 \DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00439}00439\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};\ \textcolor{comment}{//\ no\ outstanding\ sellrex\ orders}}
 \DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00440}00440\ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
-\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00441}00441\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ \mbox{\hyperlink{namespacehost__functions__tests__1_a8496a24b5236a2dc07bb4f2930d88342}{idx}}\ =\ \_rexorders.get\_index<\textcolor{stringliteral}{"{}bytime"{}}\_n>();}
-\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00442}00442\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ !\mbox{\hyperlink{namespacehost__functions__tests__1_a8496a24b5236a2dc07bb4f2930d88342}{idx}}.begin()-\/>is\_open;\ \textcolor{comment}{//\ no\ outstanding\ unfilled\ sellrex\ orders}}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00441}00441\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ idx\ =\ \_rexorders.get\_index<\textcolor{stringliteral}{"{}bytime"{}}\_n>();}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00442}00442\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ !idx.begin()-\/>is\_open;\ \textcolor{comment}{//\ no\ outstanding\ unfilled\ sellrex\ orders}}
 \DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00443}00443\ \ \ \ \ \ \ \ \ \ \}}
 \DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00444}00444\ \ \ \ \ \ \ \}}
 \DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00445}00445\ \ \ \ \}}
@@ -457,7 +457,7 @@
 \DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00495}00495\ \ \ \ \mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\_t}}\ system\_contract::update\_renewed\_loan(\ Index\&\ idx,\ \textcolor{keyword}{const}\ Iterator\&\ itr,\ \mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\_t}}\ rented\_tokens\ )}
 \DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00496}00496\ \ \ \ \{}
 \DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00497}00497\ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\_t}}\ delta\_stake\ =\ rented\_tokens\ -\/\ itr-\/>total\_staked.amount;}
-\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00498}00498\ \ \ \ \ \ \ \mbox{\hyperlink{namespacehost__functions__tests__1_a8496a24b5236a2dc07bb4f2930d88342}{idx}}.modify\ (\ itr,\ same\_payer,\ [\&](\ \textcolor{keyword}{auto}\&\ loan\ )\ \{}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00498}00498\ \ \ \ \ \ \ idx.modify\ (\ itr,\ same\_payer,\ [\&](\ \textcolor{keyword}{auto}\&\ loan\ )\ \{}
 \DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00499}00499\ \ \ \ \ \ \ \ \ \ loan.total\_staked.amount\ =\ rented\_tokens;}
 \DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00500}00500\ \ \ \ \ \ \ \ \ \ loan.expiration\ \ \ \ \ \ \ \ \ +=\ \mbox{\hyperlink{namespacefc_adcb1bf49c2b6b33eacb5a84333b12a5c}{sysio::days}}(30);}
 \DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00501}00501\ \ \ \ \ \ \ \ \ \ loan.balance.amount\ \ \ \ \ -\/=\ loan.payment.amount;}
@@ -473,7 +473,7 @@
 \DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00516}00516\ }
 \DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00517}00517\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ pool\ =\ \_rexpool.begin();}
 \DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00518}00518\ }
-\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00519}00519\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ process\_expired\_loan\ =\ [\&](\ \textcolor{keyword}{auto}\&\ \mbox{\hyperlink{namespacehost__functions__tests__1_a8496a24b5236a2dc07bb4f2930d88342}{idx}},\ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ itr\ )\ -\/>\ std::pair<bool,\ int64\_t>\ \{}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00519}00519\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ process\_expired\_loan\ =\ [\&](\ \textcolor{keyword}{auto}\&\ idx,\ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ itr\ )\ -\/>\ std::pair<bool,\ int64\_t>\ \{}
 \DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00521}00521\ \ \ \ \ \ \ \ \ \ remove\_loan\_from\_rex\_pool(\ *itr\ );}
 \DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00522}00522\ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{bool}\ \ \ \ delete\_loan\ \ \ =\ \textcolor{keyword}{false};}
 \DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00523}00523\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\_t}}\ delta\_stake\ \ \ =\ 0;}
@@ -537,18 +537,18 @@
 \DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00589}00589\ \ \ \ \ \ \ \}}
 \DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00590}00590\ }
 \DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00592}00592\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\ \_rexorders.begin()\ !=\ \_rexorders.end()\ )\ \{}
-\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00593}00593\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ \mbox{\hyperlink{namespacehost__functions__tests__1_a8496a24b5236a2dc07bb4f2930d88342}{idx}}\ \ =\ \_rexorders.get\_index<\textcolor{stringliteral}{"{}bytime"{}}\_n>();}
-\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00594}00594\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ oitr\ =\ \mbox{\hyperlink{namespacehost__functions__tests__1_a8496a24b5236a2dc07bb4f2930d88342}{idx}}.begin();}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00593}00593\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ idx\ \ =\ \_rexorders.get\_index<\textcolor{stringliteral}{"{}bytime"{}}\_n>();}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00594}00594\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ oitr\ =\ idx.begin();}
 \DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00595}00595\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\ \mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\_t}}\ i\ =\ 0;\ i\ <\ max;\ ++i\ )\ \{}
-\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00596}00596\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\ oitr\ ==\ \mbox{\hyperlink{namespacehost__functions__tests__1_a8496a24b5236a2dc07bb4f2930d88342}{idx}}.end()\ ||\ !oitr-\/>is\_open\ )\ \textcolor{keywordflow}{break};}
-\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00597}00597\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ \mbox{\hyperlink{namespacecpp_1_1ast_a25b104cfd21fb8487a07063b6ce62062}{next}}\ =\ oitr;}
-\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00598}00598\ \ \ \ \ \ \ \ \ \ \ \ \ ++\mbox{\hyperlink{namespacecpp_1_1ast_a25b104cfd21fb8487a07063b6ce62062}{next}};}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00596}00596\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\ oitr\ ==\ idx.end()\ ||\ !oitr-\/>is\_open\ )\ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00597}00597\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ \mbox{\hyperlink{namespaceutf8_afc093dfde66a6f52cb4a5caefe0e580d}{next}}\ =\ oitr;}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00598}00598\ \ \ \ \ \ \ \ \ \ \ \ \ ++\mbox{\hyperlink{namespaceutf8_afc093dfde66a6f52cb4a5caefe0e580d}{next}};}
 \DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00599}00599\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ bitr\ =\ \_rexbalance.find(\ oitr-\/>owner.value\ );}
 \DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00600}00600\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\ bitr\ !=\ \_rexbalance.end()\ )\ \{\ \textcolor{comment}{//\ should\ always\ be\ true}}
 \DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00601}00601\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ result\ =\ fill\_rex\_order(\ bitr,\ oitr-\/>rex\_requested\ );}
 \DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00602}00602\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\ result.success\ )\ \{}
 \DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00603}00603\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}}\ order\_owner\ =\ oitr-\/>owner;}
-\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00604}00604\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacehost__functions__tests__1_a8496a24b5236a2dc07bb4f2930d88342}{idx}}.modify(\ oitr,\ same\_payer,\ [\&](\ \textcolor{keyword}{auto}\&\ order\ )\ \{}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00604}00604\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ idx.modify(\ oitr,\ same\_payer,\ [\&](\ \textcolor{keyword}{auto}\&\ order\ )\ \{}
 \DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00605}00605\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ order.proceeds.amount\ \ \ \ \ =\ result.proceeds.amount;}
 \DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00606}00606\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ order.stake\_change.amount\ =\ result.stake\_change.amount;}
 \DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00607}00607\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ order.close();}
@@ -557,7 +557,7 @@
 \DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00611}00611\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ order\_act.send(\ order\_owner,\ result.proceeds\ );}
 \DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00612}00612\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
 \DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00613}00613\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
-\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00614}00614\ \ \ \ \ \ \ \ \ \ \ \ \ oitr\ =\ \mbox{\hyperlink{namespacecpp_1_1ast_a25b104cfd21fb8487a07063b6ce62062}{next}};}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00614}00614\ \ \ \ \ \ \ \ \ \ \ \ \ oitr\ =\ \mbox{\hyperlink{namespaceutf8_afc093dfde66a6f52cb4a5caefe0e580d}{next}};}
 \DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00615}00615\ \ \ \ \ \ \ \ \ \ \}}
 \DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00616}00616\ \ \ \ \ \ \ \}}
 \DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00617}00617\ }

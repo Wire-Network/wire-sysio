@@ -98,7 +98,8 @@ Definition at line \mbox{\hyperlink{unapplied__transaction__queue_8hpp_source_l0
 \DoxyCodeLine{00162\ \ \ \ \}}
 
 \end{DoxyCode}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -131,7 +132,8 @@ Definition at line \mbox{\hyperlink{unapplied__transaction__queue_8hpp_source_l0
 \DoxyCodeLine{00154\ \ \ \ \}}
 
 \end{DoxyCode}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -160,7 +162,7 @@ Definition at line \mbox{\hyperlink{unapplied__transaction__queue_8hpp_source_l0
 \DoxyCodeLine{00186\ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
 \DoxyCodeLine{00187\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ itr-\/>trx\_meta\ ==\ trx\ )\ \textcolor{keywordflow}{return};\ \textcolor{comment}{//\ same\ trx\ meta\ pointer}}
 \DoxyCodeLine{00188\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ next\ )\ \{}
-\DoxyCodeLine{00189\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacecpp_1_1ast_a25b104cfd21fb8487a07063b6ce62062}{next}}(\ std::static\_pointer\_cast<fc::exception>(\ std::make\_shared<tx\_duplicate>(}
+\DoxyCodeLine{00189\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespaceutf8_afc093dfde66a6f52cb4a5caefe0e580d}{next}}(\ std::static\_pointer\_cast<fc::exception>(\ std::make\_shared<tx\_duplicate>(}
 \DoxyCodeLine{00190\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{log__message_8hpp_a4a4df4bb5cffbe07aadf7d29fd44c75e}{FC\_LOG\_MESSAGE}}(\ info,\ \textcolor{stringliteral}{"{}duplicate\ transaction\ \$\{id\}"{}},\ (\textcolor{stringliteral}{"{}id"{}},\ trx-\/>id())\ )\ )\ )\ );}
 \DoxyCodeLine{00191\ \ \ \ \ \ \ \ \ \ \}}
 \DoxyCodeLine{00192\ \ \ \ \ \ \ \}}
@@ -210,14 +212,16 @@ Definition at line \mbox{\hyperlink{unapplied__transaction__queue_8hpp_source_l0
 \DoxyCodeLine{00197\ \{\ \textcolor{keywordflow}{return}\ queue.get<by\_type>().\mbox{\hyperlink{classsysio_1_1chain_1_1unapplied__transaction__queue_a00c597dcd59f3f2008f6950dab21889c}{begin}}();\ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
 \includegraphics[width=210pt]{classsysio_1_1chain_1_1unapplied__transaction__queue_a00c597dcd59f3f2008f6950dab21889c_cgraph}
 \end{center}
 \end{figure}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -255,32 +259,34 @@ Definition at line \mbox{\hyperlink{unapplied__transaction__queue_8hpp_source_l0
 \begin{DoxyCode}{0}
 \DoxyCodeLine{00124\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
 \DoxyCodeLine{00125\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ \mbox{\hyperlink{classsysio_1_1chain_1_1unapplied__transaction__queue_a5a244791044e2d59736ff24339aed822}{empty}}()\ )\ \textcolor{keywordflow}{return};}
-\DoxyCodeLine{00126\ \ \ \ \ \ \ \textcolor{keyword}{auto}\&\ \mbox{\hyperlink{namespacehost__functions__tests__1_a8496a24b5236a2dc07bb4f2930d88342}{idx}}\ =\ queue.get<by\_trx\_id>();}
+\DoxyCodeLine{00126\ \ \ \ \ \ \ \textcolor{keyword}{auto}\&\ idx\ =\ queue.get<by\_trx\_id>();}
 \DoxyCodeLine{00127\ \ \ \ \ \ \ \textcolor{keywordflow}{for}(\ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ receipt\ :\ bs-\/>block-\/>transactions\ )\ \{}
 \DoxyCodeLine{00128\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ std::holds\_alternative<packed\_transaction>(receipt.trx)\ )\ \{}
 \DoxyCodeLine{00129\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ pt\ =\ std::get<packed\_transaction>(receipt.trx);}
-\DoxyCodeLine{00130\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ itr\ =\ \mbox{\hyperlink{namespacehost__functions__tests__1_a8496a24b5236a2dc07bb4f2930d88342}{idx}}.find(\ pt.id()\ );}
-\DoxyCodeLine{00131\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ itr\ !=\ \mbox{\hyperlink{namespacehost__functions__tests__1_a8496a24b5236a2dc07bb4f2930d88342}{idx}}.end()\ )\ \{}
+\DoxyCodeLine{00130\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ itr\ =\ idx.find(\ pt.id()\ );}
+\DoxyCodeLine{00131\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ itr\ !=\ idx.end()\ )\ \{}
 \DoxyCodeLine{00132\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ itr-\/>next\ )\ \{}
 \DoxyCodeLine{00133\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ itr-\/>next(\ std::static\_pointer\_cast<fc::exception>(\ std::make\_shared<tx\_duplicate>(}
 \DoxyCodeLine{00134\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{log__message_8hpp_a4a4df4bb5cffbe07aadf7d29fd44c75e}{FC\_LOG\_MESSAGE}}(\ info,\ \textcolor{stringliteral}{"{}duplicate\ transaction\ \$\{id\}"{}},\ (\textcolor{stringliteral}{"{}id"{}},\ itr-\/>trx\_meta-\/>id())))));}
 \DoxyCodeLine{00135\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
 \DoxyCodeLine{00136\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ removed(\ itr\ );}
-\DoxyCodeLine{00137\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacehost__functions__tests__1_a8496a24b5236a2dc07bb4f2930d88342}{idx}}.erase(\ itr\ );}
+\DoxyCodeLine{00137\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ idx.erase(\ itr\ );}
 \DoxyCodeLine{00138\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
 \DoxyCodeLine{00139\ \ \ \ \ \ \ \ \ \ \}}
 \DoxyCodeLine{00140\ \ \ \ \ \ \ \}}
 \DoxyCodeLine{00141\ \ \ \ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
 \includegraphics[width=350pt]{classsysio_1_1chain_1_1unapplied__transaction__queue_ae094df3999abc100626a5fe9f5937561_cgraph}
 \end{center}
 \end{figure}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -325,7 +331,8 @@ Definition at line \mbox{\hyperlink{unapplied__transaction__queue_8hpp_source_l0
 \DoxyCodeLine{00122\ \ \ \ \}}
 
 \end{DoxyCode}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -349,7 +356,8 @@ Definition at line \mbox{\hyperlink{unapplied__transaction__queue_8hpp_source_l0
 \DoxyCodeLine{00079\ \ \ \ \}}
 
 \end{DoxyCode}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -371,14 +379,16 @@ Definition at line \mbox{\hyperlink{unapplied__transaction__queue_8hpp_source_l0
 \DoxyCodeLine{00198\ \{\ \textcolor{keywordflow}{return}\ queue.get<by\_type>().\mbox{\hyperlink{classsysio_1_1chain_1_1unapplied__transaction__queue_abb075082079145efb8165a652ca5858a}{end}}();\ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
 \includegraphics[width=203pt]{classsysio_1_1chain_1_1unapplied__transaction__queue_abb075082079145efb8165a652ca5858a_cgraph}
 \end{center}
 \end{figure}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -403,14 +413,16 @@ Definition at line \mbox{\hyperlink{unapplied__transaction__queue_8hpp_source_l0
 \DoxyCodeLine{00214\ \ \ \ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
 \includegraphics[width=211pt]{classsysio_1_1chain_1_1unapplied__transaction__queue_a60c602838e90f62ba458d569cf52dfe5_cgraph}
 \end{center}
 \end{figure}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -436,7 +448,8 @@ Definition at line \mbox{\hyperlink{unapplied__transaction__queue_8hpp_source_l0
 \DoxyCodeLine{00097\ \ \ \ \}}
 
 \end{DoxyCode}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -458,7 +471,8 @@ Definition at line \mbox{\hyperlink{unapplied__transaction__queue_8hpp_source_l0
 \DoxyCodeLine{00207\ \{\ \textcolor{keywordflow}{return}\ queue.get<by\_type>().lower\_bound(\ \mbox{\hyperlink{namespacesysio_1_1chain_affd9603ab5a713a9762157b12c8f6b9ba19690ad10dec174fbc20e26d31019121}{trx\_enum\_type::incoming\_persisted}}\ );\ \}}
 
 \end{DoxyCode}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -480,14 +494,16 @@ Definition at line \mbox{\hyperlink{unapplied__transaction__queue_8hpp_source_l0
 \DoxyCodeLine{00208\ \{\ \textcolor{keywordflow}{return}\ queue.get<by\_type>().\mbox{\hyperlink{classsysio_1_1chain_1_1unapplied__transaction__queue_abb075082079145efb8165a652ca5858a}{end}}();\ \}\ \textcolor{comment}{//\ if\ changed\ to\ upper\_bound,\ verify\ usage\ performance}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
 \includegraphics[width=350pt]{classsysio_1_1chain_1_1unapplied__transaction__queue_ac15fce39af8a270bc242c4c09006daec_cgraph}
 \end{center}
 \end{figure}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -511,7 +527,8 @@ Definition at line \mbox{\hyperlink{unapplied__transaction__queue_8hpp_source_l0
 \DoxyCodeLine{00091\ \ \ \ \}}
 
 \end{DoxyCode}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -533,7 +550,8 @@ Definition at line \mbox{\hyperlink{unapplied__transaction__queue_8hpp_source_l0
 \DoxyCodeLine{00204\ \{\ \textcolor{keywordflow}{return}\ queue.get<by\_type>().lower\_bound(\ \mbox{\hyperlink{namespacesysio_1_1chain_affd9603ab5a713a9762157b12c8f6b9ba3af65799b58d5c9938325b3af06a0d91}{trx\_enum\_type::persisted}}\ );\ \}}
 
 \end{DoxyCode}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -555,7 +573,8 @@ Definition at line \mbox{\hyperlink{unapplied__transaction__queue_8hpp_source_l0
 \DoxyCodeLine{00205\ \{\ \textcolor{keywordflow}{return}\ queue.get<by\_type>().upper\_bound(\ \mbox{\hyperlink{namespacesysio_1_1chain_affd9603ab5a713a9762157b12c8f6b9ba3af65799b58d5c9938325b3af06a0d91}{trx\_enum\_type::persisted}}\ );\ \}}
 
 \end{DoxyCode}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -574,7 +593,7 @@ Definition at line \mbox{\hyperlink{unapplied__transaction__queue_8hpp_source_l0
 
 
 \begin{DoxyCode}{0}
-\DoxyCodeLine{00075\ \{\ max\_transaction\_queue\_size\ =\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}};\ \}}
+\DoxyCodeLine{00075\ \{\ max\_transaction\_queue\_size\ =\ v;\ \}}
 
 \end{DoxyCode}
 \Hypertarget{classsysio_1_1chain_1_1unapplied__transaction__queue_a7fb8cf5dfb622f9e619be9a4bb5eeba8}\index{sysio::chain::unapplied\_transaction\_queue@{sysio::chain::unapplied\_transaction\_queue}!size@{size}}
@@ -594,7 +613,8 @@ Definition at line \mbox{\hyperlink{unapplied__transaction__queue_8hpp_source_l0
 \DoxyCodeLine{00083\ \ \ \ \}}
 
 \end{DoxyCode}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -616,14 +636,16 @@ Definition at line \mbox{\hyperlink{unapplied__transaction__queue_8hpp_source_l0
 \DoxyCodeLine{00201\ \{\ \textcolor{keywordflow}{return}\ queue.get<by\_type>().\mbox{\hyperlink{classsysio_1_1chain_1_1unapplied__transaction__queue_a00c597dcd59f3f2008f6950dab21889c}{begin}}();\ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
 \includegraphics[width=350pt]{classsysio_1_1chain_1_1unapplied__transaction__queue_a5906b1ee94fa2e09ae0eaa8d5cbd3711_cgraph}
 \end{center}
 \end{figure}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -645,7 +667,8 @@ Definition at line \mbox{\hyperlink{unapplied__transaction__queue_8hpp_source_l0
 \DoxyCodeLine{00202\ \{\ \textcolor{keywordflow}{return}\ queue.get<by\_type>().upper\_bound(\ \mbox{\hyperlink{namespacesysio_1_1chain_affd9603ab5a713a9762157b12c8f6b9badfb7069bfc6e0064a6c667626eca07b4}{trx\_enum\_type::aborted}}\ );\ \}}
 
 \end{DoxyCode}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode

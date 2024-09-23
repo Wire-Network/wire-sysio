@@ -11,7 +11,8 @@ This converter works with INI/\+TOML files; to write proper TOML files use \doxy
 
 
 
-Inheritance diagram for CLI\+::Config\+Base\+:\nopagebreak
+Inheritance diagram for CLI\+::Config\+Base\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -20,7 +21,8 @@ Inheritance diagram for CLI\+::Config\+Base\+:\nopagebreak
 \end{figure}
 
 
-Collaboration diagram for CLI\+::Config\+Base\+:\nopagebreak
+Collaboration diagram for CLI\+::Config\+Base\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -151,7 +153,7 @@ Definition at line \mbox{\hyperlink{_c_l_i11_8hpp_source_l07772}{7772}} of file 
 
 \begin{DoxyCode}{0}
 \DoxyCodeLine{07772\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
-\DoxyCodeLine{07773\ \ \ \ \ std::string\ \mbox{\hyperlink{namespacevalidate__reflection_a54d4e98ade8417b88a7e3859a693630a}{line}};}
+\DoxyCodeLine{07773\ \ \ \ \ std::string\ line;}
 \DoxyCodeLine{07774\ \ \ \ \ std::string\ section\ =\ \textcolor{stringliteral}{"{}default"{}};}
 \DoxyCodeLine{07775\ }
 \DoxyCodeLine{07776\ \ \ \ \ std::vector<ConfigItem>\ output;}
@@ -165,15 +167,15 @@ Definition at line \mbox{\hyperlink{_c_l_i11_8hpp_source_l07772}{7772}} of file 
 \DoxyCodeLine{07784\ \ \ \ \ \ \ \ \ std::string\ \mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}};}
 \DoxyCodeLine{07785\ }
 \DoxyCodeLine{07786\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_c_l_i_1_1detail_a621323632158048f6168deacc432b838}{detail::trim}}(line);}
-\DoxyCodeLine{07787\ \ \ \ \ \ \ \ \ std::size\_t\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}}\ =\ \mbox{\hyperlink{namespacevalidate__reflection_a54d4e98ade8417b88a7e3859a693630a}{line}}.length();}
-\DoxyCodeLine{07788\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}}\ >\ 1\ \&\&\ \mbox{\hyperlink{namespacevalidate__reflection_a54d4e98ade8417b88a7e3859a693630a}{line}}.front()\ ==\ \textcolor{charliteral}{'['}\ \&\&\ \mbox{\hyperlink{namespacevalidate__reflection_a54d4e98ade8417b88a7e3859a693630a}{line}}.back()\ ==\ \textcolor{charliteral}{']'})\ \{}
+\DoxyCodeLine{07787\ \ \ \ \ \ \ \ \ std::size\_t\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}}\ =\ line.length();}
+\DoxyCodeLine{07788\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}}\ >\ 1\ \&\&\ line.front()\ ==\ \textcolor{charliteral}{'['}\ \&\&\ line.back()\ ==\ \textcolor{charliteral}{']'})\ \{}
 \DoxyCodeLine{07789\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(section\ !=\ \textcolor{stringliteral}{"{}default"{}})\ \{}
 \DoxyCodeLine{07790\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ insert\ a\ section\ end\ which\ is\ just\ an\ empty\ items\_buffer}}
 \DoxyCodeLine{07791\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ output.emplace\_back();}
 \DoxyCodeLine{07792\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ output.back().parents\ =\ \mbox{\hyperlink{namespace_c_l_i_1_1detail_aa6876cdd19b6e5807239b574a9ce0e3c}{detail::generate\_parents}}(section,\ \mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}});}
 \DoxyCodeLine{07793\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ output.back().name\ =\ \textcolor{stringliteral}{"{}-\/-\/"{}};}
 \DoxyCodeLine{07794\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
-\DoxyCodeLine{07795\ \ \ \ \ \ \ \ \ \ \ \ \ section\ =\ \mbox{\hyperlink{namespacevalidate__reflection_a54d4e98ade8417b88a7e3859a693630a}{line}}.substr(1,\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}}\ -\/\ 2);}
+\DoxyCodeLine{07795\ \ \ \ \ \ \ \ \ \ \ \ \ section\ =\ line.substr(1,\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}}\ -\/\ 2);}
 \DoxyCodeLine{07796\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ deal\ with\ double\ brackets\ for\ TOML}}
 \DoxyCodeLine{07797\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(section.size()\ >\ 1\ \&\&\ section.front()\ ==\ \textcolor{charliteral}{'['}\ \&\&\ section.back()\ ==\ \textcolor{charliteral}{']'})\ \{}
 \DoxyCodeLine{07798\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ section\ =\ section.substr(1,\ section.size()\ -\/\ 2);}
@@ -189,15 +191,15 @@ Definition at line \mbox{\hyperlink{_c_l_i11_8hpp_source_l07772}{7772}} of file 
 \DoxyCodeLine{07808\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{continue};}
 \DoxyCodeLine{07809\ \ \ \ \ \ \ \ \ \}}
 \DoxyCodeLine{07810\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ comment\ lines}}
-\DoxyCodeLine{07811\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\mbox{\hyperlink{namespacevalidate__reflection_a54d4e98ade8417b88a7e3859a693630a}{line}}.front()\ ==\ \textcolor{charliteral}{';'}\ ||\ \mbox{\hyperlink{namespacevalidate__reflection_a54d4e98ade8417b88a7e3859a693630a}{line}}.front()\ ==\ \textcolor{charliteral}{'\#'}\ ||\ \mbox{\hyperlink{namespacevalidate__reflection_a54d4e98ade8417b88a7e3859a693630a}{line}}.front()\ ==\ \mbox{\hyperlink{class_c_l_i_1_1_config_base_afd989253b3c1ec6731f0ce21e0343137}{commentChar}})\ \{}
+\DoxyCodeLine{07811\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(line.front()\ ==\ \textcolor{charliteral}{';'}\ ||\ line.front()\ ==\ \textcolor{charliteral}{'\#'}\ ||\ line.front()\ ==\ \mbox{\hyperlink{class_c_l_i_1_1_config_base_afd989253b3c1ec6731f0ce21e0343137}{commentChar}})\ \{}
 \DoxyCodeLine{07812\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{continue};}
 \DoxyCodeLine{07813\ \ \ \ \ \ \ \ \ \}}
 \DoxyCodeLine{07814\ }
 \DoxyCodeLine{07815\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Find\ =\ in\ string,\ split\ and\ recombine}}
-\DoxyCodeLine{07816\ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ pos\ =\ \mbox{\hyperlink{namespacevalidate__reflection_a54d4e98ade8417b88a7e3859a693630a}{line}}.find(\mbox{\hyperlink{class_c_l_i_1_1_config_base_aae7e270d0354d4c6540c26da250dc001}{valueDelimiter}});}
+\DoxyCodeLine{07816\ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ pos\ =\ line.find(\mbox{\hyperlink{class_c_l_i_1_1_config_base_aae7e270d0354d4c6540c26da250dc001}{valueDelimiter}});}
 \DoxyCodeLine{07817\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(pos\ !=\ std::string::npos)\ \{}
-\DoxyCodeLine{07818\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}\ =\ \mbox{\hyperlink{namespace_c_l_i_1_1detail_a5c7b00a328b3b2da564794081646c251}{detail::trim\_copy}}(\mbox{\hyperlink{namespacevalidate__reflection_a54d4e98ade8417b88a7e3859a693630a}{line}}.substr(0,\ pos));}
-\DoxyCodeLine{07819\ \ \ \ \ \ \ \ \ \ \ \ \ std::string\ item\ =\ \mbox{\hyperlink{namespace_c_l_i_1_1detail_a5c7b00a328b3b2da564794081646c251}{detail::trim\_copy}}(\mbox{\hyperlink{namespacevalidate__reflection_a54d4e98ade8417b88a7e3859a693630a}{line}}.substr(pos\ +\ 1));}
+\DoxyCodeLine{07818\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}\ =\ \mbox{\hyperlink{namespace_c_l_i_1_1detail_a5c7b00a328b3b2da564794081646c251}{detail::trim\_copy}}(line.substr(0,\ pos));}
+\DoxyCodeLine{07819\ \ \ \ \ \ \ \ \ \ \ \ \ std::string\ item\ =\ \mbox{\hyperlink{namespace_c_l_i_1_1detail_a5c7b00a328b3b2da564794081646c251}{detail::trim\_copy}}(line.substr(pos\ +\ 1));}
 \DoxyCodeLine{07820\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(item.size()\ >\ 1\ \&\&\ item.front()\ ==\ aStart\ \&\&\ item.back()\ ==\ aEnd)\ \{}
 \DoxyCodeLine{07821\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ items\_buffer\ =\ detail::split\_up(item.substr(1,\ item.length()\ -\/\ 2),\ aSep);}
 \DoxyCodeLine{07822\ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}(defaultArray\ \&\&\ item.find\_first\_of(aSep)\ !=\ std::string::npos)\ \{}
@@ -245,7 +247,8 @@ Definition at line \mbox{\hyperlink{_c_l_i11_8hpp_source_l07772}{7772}} of file 
 \DoxyCodeLine{07864\ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -281,14 +284,14 @@ Definition at line \mbox{\hyperlink{_c_l_i11_8hpp_source_l07867}{7867}} of file 
 \DoxyCodeLine{07877\ \ \ \ \ \ \ \ \ out\ <<\ commentLead\ <<\ \mbox{\hyperlink{namespaceappbase_a99374dc23934f008a09f2f79be9eae40}{app}}-\/>get\_description()\ <<\ \textcolor{charliteral}{'\(\backslash\)n'};}
 \DoxyCodeLine{07878\ \ \ \ \ \}}
 \DoxyCodeLine{07879\ \ \ \ \ \textcolor{keywordflow}{for}(\textcolor{keyword}{auto}\ \&group\ :\ groups)\ \{}
-\DoxyCodeLine{07880\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(group\ ==\ \textcolor{stringliteral}{"{}Options"{}}\ ||\ \mbox{\hyperlink{namespaceupload_a9d33d66de17175dced88ffe95f079226}{group}}.empty())\ \{}
+\DoxyCodeLine{07880\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(group\ ==\ \textcolor{stringliteral}{"{}Options"{}}\ ||\ group.empty())\ \{}
 \DoxyCodeLine{07881\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(defaultUsed)\ \{}
 \DoxyCodeLine{07882\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{continue};}
 \DoxyCodeLine{07883\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
 \DoxyCodeLine{07884\ \ \ \ \ \ \ \ \ \ \ \ \ defaultUsed\ =\ \textcolor{keyword}{true};}
 \DoxyCodeLine{07885\ \ \ \ \ \ \ \ \ \}}
-\DoxyCodeLine{07886\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(write\_description\ \&\&\ group\ !=\ \textcolor{stringliteral}{"{}Options"{}}\ \&\&\ !\mbox{\hyperlink{namespaceupload_a9d33d66de17175dced88ffe95f079226}{group}}.empty())\ \{}
-\DoxyCodeLine{07887\ \ \ \ \ \ \ \ \ \ \ \ \ out\ <<\ \textcolor{charliteral}{'\(\backslash\)n'}\ <<\ commentLead\ <<\ \mbox{\hyperlink{namespaceupload_a9d33d66de17175dced88ffe95f079226}{group}}\ <<\ \textcolor{stringliteral}{"{}\ Options\(\backslash\)n"{}};}
+\DoxyCodeLine{07886\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(write\_description\ \&\&\ group\ !=\ \textcolor{stringliteral}{"{}Options"{}}\ \&\&\ !group.empty())\ \{}
+\DoxyCodeLine{07887\ \ \ \ \ \ \ \ \ \ \ \ \ out\ <<\ \textcolor{charliteral}{'\(\backslash\)n'}\ <<\ commentLead\ <<\ group\ <<\ \textcolor{stringliteral}{"{}\ Options\(\backslash\)n"{}};}
 \DoxyCodeLine{07888\ \ \ \ \ \ \ \ \ \}}
 \DoxyCodeLine{07889\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}(\textcolor{keyword}{const}\ Option\ *opt\ :\ \mbox{\hyperlink{namespaceappbase_a99374dc23934f008a09f2f79be9eae40}{app}}-\/>\mbox{\hyperlink{classappbase_1_1application_a1cd05ae43f6400f07f9c60a09cc610cb}{get\_options}}(\{\}))\ \{}
 \DoxyCodeLine{07890\ }
@@ -355,14 +358,16 @@ Definition at line \mbox{\hyperlink{_c_l_i11_8hpp_source_l07867}{7867}} of file 
 \DoxyCodeLine{07951\ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
 \includegraphics[width=350pt]{class_c_l_i_1_1_config_base_a5832f6f03212648fa08a8ff83bc9bc08_cgraph}
 \end{center}
 \end{figure}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode

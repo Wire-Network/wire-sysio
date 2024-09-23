@@ -126,16 +126,16 @@ Public Member Functions</h2></td></tr>
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-static-methods" name="pub-static-methods"></a>
 Static Public Member Functions</h2></td></tr>
 <tr class="memitem:a9d8ded01244e30d037c4afa10ee2b30e" id="r_a9d8ded01244e30d037c4afa10ee2b30e"><td class="memTemplParams" colspan="2">template&lt;typename OutputStream &gt; </td></tr>
-<tr class="memitem:a9d8ded01244e30d037c4afa10ee2b30e"><td class="memTemplItemLeft" align="right" valign="top">static void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="#a9d8ded01244e30d037c4afa10ee2b30e">Encode</a> (OutputStream &amp;os, unsigned codepoint)</td></tr>
+<tr class="memitem:a9d8ded01244e30d037c4afa10ee2b30e"><td class="memTemplItemLeft" align="right" valign="top">static void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="#a9d8ded01244e30d037c4afa10ee2b30e">Encode</a> (OutputStream &amp;<a class="el" href="environment_8hpp.html#a3951483d0b31c29ca95336206cd35238">os</a>, unsigned codepoint)</td></tr>
 <tr class="separator:a9d8ded01244e30d037c4afa10ee2b30e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa67661e756c273871b574e7133b7fc63" id="r_aa67661e756c273871b574e7133b7fc63"><td class="memTemplParams" colspan="2">template&lt;typename OutputStream &gt; </td></tr>
-<tr class="memitem:aa67661e756c273871b574e7133b7fc63"><td class="memTemplItemLeft" align="right" valign="top">static void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="#aa67661e756c273871b574e7133b7fc63">EncodeUnsafe</a> (OutputStream &amp;os, unsigned codepoint)</td></tr>
+<tr class="memitem:aa67661e756c273871b574e7133b7fc63"><td class="memTemplItemLeft" align="right" valign="top">static void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="#aa67661e756c273871b574e7133b7fc63">EncodeUnsafe</a> (OutputStream &amp;<a class="el" href="environment_8hpp.html#a3951483d0b31c29ca95336206cd35238">os</a>, unsigned codepoint)</td></tr>
 <tr class="separator:aa67661e756c273871b574e7133b7fc63"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a124c79dfd9f9b4c3fb65bd55ba17b4be" id="r_a124c79dfd9f9b4c3fb65bd55ba17b4be"><td class="memTemplParams" colspan="2">template&lt;typename InputStream &gt; </td></tr>
 <tr class="memitem:a124c79dfd9f9b4c3fb65bd55ba17b4be"><td class="memTemplItemLeft" align="right" valign="top">static bool&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="#a124c79dfd9f9b4c3fb65bd55ba17b4be">Decode</a> (InputStream &amp;is, unsigned *codepoint)</td></tr>
 <tr class="separator:a124c79dfd9f9b4c3fb65bd55ba17b4be"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a7516184ed5dce10c0e7895bec124d97d" id="r_a7516184ed5dce10c0e7895bec124d97d"><td class="memTemplParams" colspan="2">template&lt;typename InputStream , typename OutputStream &gt; </td></tr>
-<tr class="memitem:a7516184ed5dce10c0e7895bec124d97d"><td class="memTemplItemLeft" align="right" valign="top">static bool&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="#a7516184ed5dce10c0e7895bec124d97d">Validate</a> (InputStream &amp;is, OutputStream &amp;os)</td></tr>
+<tr class="memitem:a7516184ed5dce10c0e7895bec124d97d"><td class="memTemplItemLeft" align="right" valign="top">static bool&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="#a7516184ed5dce10c0e7895bec124d97d">Validate</a> (InputStream &amp;is, OutputStream &amp;<a class="el" href="environment_8hpp.html#a3951483d0b31c29ca95336206cd35238">os</a>)</td></tr>
 <tr class="separator:a7516184ed5dce10c0e7895bec124d97d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
@@ -293,17 +293,17 @@ template&lt;typename OutputStream &gt; </div>
 <div class="line"><span class="lineno">  277</span>        <a class="code hl_define" href="rapidjson_8h.html#af95188da1d8eb6d4b148fe9ce71cd7c4">RAPIDJSON_STATIC_ASSERT</a>(<span class="keyword">sizeof</span>(<span class="keyword">typename</span> OutputStream::Ch) &gt;= 2);</div>
 <div class="line"><span class="lineno">  278</span>        <span class="keywordflow">if</span> (codepoint &lt;= 0xFFFF) {</div>
 <div class="line"><span class="lineno">  279</span>            <a class="code hl_define" href="group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g.html#gabeba18d612187bad2ac62aed9276d47c">RAPIDJSON_ASSERT</a>(codepoint &lt; 0xD800 || codepoint &gt; 0xDFFF); <span class="comment">// Code point itself cannot be surrogate pair </span></div>
-<div class="line"><span class="lineno">  280</span>            os.Put(<span class="keyword">static_cast&lt;</span>typename OutputStream::Ch<span class="keyword">&gt;</span>(codepoint));</div>
+<div class="line"><span class="lineno">  280</span>            <a class="code hl_variable" href="environment_8hpp.html#a3951483d0b31c29ca95336206cd35238">os</a>.Put(<span class="keyword">static_cast&lt;</span>typename OutputStream::Ch<span class="keyword">&gt;</span>(codepoint));</div>
 <div class="line"><span class="lineno">  281</span>        }</div>
 <div class="line"><span class="lineno">  282</span>        <span class="keywordflow">else</span> {</div>
 <div class="line"><span class="lineno">  283</span>            <a class="code hl_define" href="group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g.html#gabeba18d612187bad2ac62aed9276d47c">RAPIDJSON_ASSERT</a>(codepoint &lt;= 0x10FFFF);</div>
-<div class="line"><span class="lineno">  284</span>            <span class="keywordtype">unsigned</span> <a class="code hl_variable" href="namespacedevelop_build.html#ade64cd34608f9442ef3049116a2da428">v</a> = codepoint - 0x10000;</div>
-<div class="line"><span class="lineno">  285</span>            os.Put(<span class="keyword">static_cast&lt;</span>typename OutputStream::Ch<span class="keyword">&gt;</span>((v &gt;&gt; 10) | 0xD800));</div>
-<div class="line"><span class="lineno">  286</span>            os.Put(<span class="keyword">static_cast&lt;</span>typename OutputStream::Ch<span class="keyword">&gt;</span>((v &amp; 0x3FF) | 0xDC00));</div>
+<div class="line"><span class="lineno">  284</span>            <span class="keywordtype">unsigned</span> v = codepoint - 0x10000;</div>
+<div class="line"><span class="lineno">  285</span>            <a class="code hl_variable" href="environment_8hpp.html#a3951483d0b31c29ca95336206cd35238">os</a>.Put(<span class="keyword">static_cast&lt;</span>typename OutputStream::Ch<span class="keyword">&gt;</span>((v &gt;&gt; 10) | 0xD800));</div>
+<div class="line"><span class="lineno">  286</span>            <a class="code hl_variable" href="environment_8hpp.html#a3951483d0b31c29ca95336206cd35238">os</a>.Put(<span class="keyword">static_cast&lt;</span>typename OutputStream::Ch<span class="keyword">&gt;</span>((v &amp; 0x3FF) | 0xDC00));</div>
 <div class="line"><span class="lineno">  287</span>        }</div>
 <div class="line"><span class="lineno">  288</span>    }</div>
+<div class="ttc" id="aenvironment_8hpp_html_a3951483d0b31c29ca95336206cd35238"><div class="ttname"><a href="environment_8hpp.html#a3951483d0b31c29ca95336206cd35238">os</a></div><div class="ttdeci">os_t os</div><div class="ttdef"><b>Definition</b> <a href="environment_8hpp_source.html#l00023">environment.hpp:23</a></div></div>
 <div class="ttc" id="agroup___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g_html_gabeba18d612187bad2ac62aed9276d47c"><div class="ttname"><a href="group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g.html#gabeba18d612187bad2ac62aed9276d47c">RAPIDJSON_ASSERT</a></div><div class="ttdeci">#define RAPIDJSON_ASSERT(x)</div><div class="ttdoc">Assertion.</div><div class="ttdef"><b>Definition</b> <a href="rapidjson_8h_source.html#l00406">rapidjson.h:406</a></div></div>
-<div class="ttc" id="anamespacedevelop_build_html_ade64cd34608f9442ef3049116a2da428"><div class="ttname"><a href="namespacedevelop_build.html#ade64cd34608f9442ef3049116a2da428">developBuild.v</a></div><div class="ttdeci">v</div><div class="ttdef"><b>Definition</b> <a href="develop_build_8py_source.html#l00006">developBuild.py:6</a></div></div>
 </div><!-- fragment --><div class="dynheader">
 Here is the caller graph for this function:</div>
 <div class="dyncontent">
@@ -353,13 +353,13 @@ template&lt;typename OutputStream &gt; </div>
 <div class="line"><span class="lineno">  293</span>        <a class="code hl_define" href="rapidjson_8h.html#af95188da1d8eb6d4b148fe9ce71cd7c4">RAPIDJSON_STATIC_ASSERT</a>(<span class="keyword">sizeof</span>(<span class="keyword">typename</span> OutputStream::Ch) &gt;= 2);</div>
 <div class="line"><span class="lineno">  294</span>        <span class="keywordflow">if</span> (codepoint &lt;= 0xFFFF) {</div>
 <div class="line"><span class="lineno">  295</span>            <a class="code hl_define" href="group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g.html#gabeba18d612187bad2ac62aed9276d47c">RAPIDJSON_ASSERT</a>(codepoint &lt; 0xD800 || codepoint &gt; 0xDFFF); <span class="comment">// Code point itself cannot be surrogate pair </span></div>
-<div class="line"><span class="lineno">  296</span>            <a class="code hl_function" href="encodings_8h.html#ad57ba7f2912c5509924b69dec7db4396">PutUnsafe</a>(os, <span class="keyword">static_cast&lt;</span>typename OutputStream::Ch<span class="keyword">&gt;</span>(codepoint));</div>
+<div class="line"><span class="lineno">  296</span>            <a class="code hl_function" href="encodings_8h.html#ad57ba7f2912c5509924b69dec7db4396">PutUnsafe</a>(<a class="code hl_variable" href="environment_8hpp.html#a3951483d0b31c29ca95336206cd35238">os</a>, <span class="keyword">static_cast&lt;</span>typename OutputStream::Ch<span class="keyword">&gt;</span>(codepoint));</div>
 <div class="line"><span class="lineno">  297</span>        }</div>
 <div class="line"><span class="lineno">  298</span>        <span class="keywordflow">else</span> {</div>
 <div class="line"><span class="lineno">  299</span>            <a class="code hl_define" href="group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g.html#gabeba18d612187bad2ac62aed9276d47c">RAPIDJSON_ASSERT</a>(codepoint &lt;= 0x10FFFF);</div>
-<div class="line"><span class="lineno">  300</span>            <span class="keywordtype">unsigned</span> <a class="code hl_variable" href="namespacedevelop_build.html#ade64cd34608f9442ef3049116a2da428">v</a> = codepoint - 0x10000;</div>
-<div class="line"><span class="lineno">  301</span>            <a class="code hl_function" href="encodings_8h.html#ad57ba7f2912c5509924b69dec7db4396">PutUnsafe</a>(os, <span class="keyword">static_cast&lt;</span>typename OutputStream::Ch<span class="keyword">&gt;</span>((v &gt;&gt; 10) | 0xD800));</div>
-<div class="line"><span class="lineno">  302</span>            <a class="code hl_function" href="encodings_8h.html#ad57ba7f2912c5509924b69dec7db4396">PutUnsafe</a>(os, <span class="keyword">static_cast&lt;</span>typename OutputStream::Ch<span class="keyword">&gt;</span>((v &amp; 0x3FF) | 0xDC00));</div>
+<div class="line"><span class="lineno">  300</span>            <span class="keywordtype">unsigned</span> v = codepoint - 0x10000;</div>
+<div class="line"><span class="lineno">  301</span>            <a class="code hl_function" href="encodings_8h.html#ad57ba7f2912c5509924b69dec7db4396">PutUnsafe</a>(<a class="code hl_variable" href="environment_8hpp.html#a3951483d0b31c29ca95336206cd35238">os</a>, <span class="keyword">static_cast&lt;</span>typename OutputStream::Ch<span class="keyword">&gt;</span>((v &gt;&gt; 10) | 0xD800));</div>
+<div class="line"><span class="lineno">  302</span>            <a class="code hl_function" href="encodings_8h.html#ad57ba7f2912c5509924b69dec7db4396">PutUnsafe</a>(<a class="code hl_variable" href="environment_8hpp.html#a3951483d0b31c29ca95336206cd35238">os</a>, <span class="keyword">static_cast&lt;</span>typename OutputStream::Ch<span class="keyword">&gt;</span>((v &amp; 0x3FF) | 0xDC00));</div>
 <div class="line"><span class="lineno">  303</span>        }</div>
 <div class="line"><span class="lineno">  304</span>    }</div>
 <div class="ttc" id="aencodings_8h_html_ad57ba7f2912c5509924b69dec7db4396"><div class="ttname"><a href="encodings_8h.html#ad57ba7f2912c5509924b69dec7db4396">PutUnsafe</a></div><div class="ttdeci">void PutUnsafe(Stream &amp;stream, typename Stream::Ch c)</div><div class="ttdoc">Write character to a stream, presuming buffer is reserved.</div><div class="ttdef"><b>Definition</b> <a href="stream_8h_source.html#l00091">stream.h:91</a></div></div>
@@ -431,11 +431,11 @@ template&lt;typename InputStream , typename OutputStream &gt; </div>
 <div class="line"><span class="lineno">  326</span>        <a class="code hl_define" href="rapidjson_8h.html#af95188da1d8eb6d4b148fe9ce71cd7c4">RAPIDJSON_STATIC_ASSERT</a>(<span class="keyword">sizeof</span>(<span class="keyword">typename</span> InputStream::Ch) &gt;= 2);</div>
 <div class="line"><span class="lineno">  327</span>        <a class="code hl_define" href="rapidjson_8h.html#af95188da1d8eb6d4b148fe9ce71cd7c4">RAPIDJSON_STATIC_ASSERT</a>(<span class="keyword">sizeof</span>(<span class="keyword">typename</span> OutputStream::Ch) &gt;= 2);</div>
 <div class="line"><span class="lineno">  328</span>        <span class="keyword">typename</span> InputStream::Ch c;</div>
-<div class="line"><span class="lineno">  329</span>        os.Put(<span class="keyword">static_cast&lt;</span>typename OutputStream::Ch<span class="keyword">&gt;</span>(c = is.Take()));</div>
+<div class="line"><span class="lineno">  329</span>        <a class="code hl_variable" href="environment_8hpp.html#a3951483d0b31c29ca95336206cd35238">os</a>.Put(<span class="keyword">static_cast&lt;</span>typename OutputStream::Ch<span class="keyword">&gt;</span>(c = is.Take()));</div>
 <div class="line"><span class="lineno">  330</span>        <span class="keywordflow">if</span> (c &lt; 0xD800 || c &gt; 0xDFFF)</div>
 <div class="line"><span class="lineno">  331</span>            <span class="keywordflow">return</span> <span class="keyword">true</span>;</div>
 <div class="line"><span class="lineno">  332</span>        <span class="keywordflow">else</span> <span class="keywordflow">if</span> (c &lt;= 0xDBFF) {</div>
-<div class="line"><span class="lineno">  333</span>            os.Put(c = is.Take());</div>
+<div class="line"><span class="lineno">  333</span>            <a class="code hl_variable" href="environment_8hpp.html#a3951483d0b31c29ca95336206cd35238">os</a>.Put(c = is.Take());</div>
 <div class="line"><span class="lineno">  334</span>            <span class="keywordflow">return</span> c &gt;= 0xDC00 &amp;&amp; c &lt;= 0xDFFF;</div>
 <div class="line"><span class="lineno">  335</span>        }</div>
 <div class="line"><span class="lineno">  336</span>        <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>

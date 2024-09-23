@@ -1,0 +1,15 @@
+<map id="websocketpp::extensions::permessage_deflate::enabled::init" name="websocketpp::extensions::permessage_deflate::enabled::init">
+<area shape="rect" id="Node000001" title="Initialize zlib state." alt="" coords="250,114,419,170"/>
+<area shape="rect" id="Node000002" href="$permessage__deflate_8cpp.html#a3fc62183810edc2235d679db7c3f6fe0" title=" " alt="" coords="5,5,202,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="291,106,249,73,201,45,173,34,175,29,203,40,252,69,294,102"/>
+<area shape="rect" id="Node000003" href="$permessage__deflate_8cpp.html#a44163bcad33e4240f4d4e84474acb2b6" title=" " alt="" coords="5,55,202,80"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="249,111,201,94,163,83,165,78,202,89,251,106"/>
+<area shape="rect" id="Node000004" href="$permessage__deflate_8cpp.html#a526a1f8d6b4b1f670b58e25f41c3670d" title=" " alt="" coords="5,104,202,130"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="234,134,202,130,202,125,235,129"/>
+<area shape="rect" id="Node000005" href="$permessage__deflate_8cpp.html#a7073585a8bb58a3e2781b431db43089b" title=" " alt="" coords="5,153,202,179"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="235,155,202,159,202,153,234,150"/>
+<area shape="rect" id="Node000006" href="$permessage__deflate_8cpp.html#a7142cd972fda20e77309a6836c0f95b5" title=" " alt="" coords="5,203,202,228"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="248,178,202,194,164,205,163,200,201,189,247,173"/>
+<area shape="rect" id="Node000007" href="$permessage__deflate_8cpp.html#a640c2ff3b439cceb412d897c8953216b" title=" " alt="" coords="5,252,202,278"/>
+<area shape="poly" id="edge6_Node000001_Node000007" title=" " alt="" coords="293,182,251,215,203,243,175,254,173,249,201,238,248,210,290,178"/>
+</map>

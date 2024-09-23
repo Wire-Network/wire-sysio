@@ -1,3 +1,7 @@
 <map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
-<area shape="rect" id="Node000000" href="$structtesting_1_1gmock__generated__actions__test_1_1_giant_template.html" title=" " alt="" coords="5,5,197,76"/>
+<area shape="rect" id="Node000000" href="$classtesting_1_1gmock__matchers__test_1_1_base.html" title=" " alt="" coords="5,39,174,79"/>
+<area shape="rect" id="Node000001" href="$classtesting_1_1gmock__matchers__test_1_1_derived.html" title=" " alt="" coords="222,5,390,46"/>
+<area shape="poly" id="edge684_Node000000_Node000001" title=" " alt="" coords="189,41,221,36,222,41,189,46"/>
+<area shape="rect" id="Node000002" href="$classtesting_1_1gmock__matchers__test_1_1_other_derived.html" title=" " alt="" coords="222,71,390,111"/>
+<area shape="poly" id="edge685_Node000000_Node000002" title=" " alt="" coords="189,71,222,76,221,81,189,76"/>
 </map>

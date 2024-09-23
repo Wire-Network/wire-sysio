@@ -1139,7 +1139,7 @@ Here is the call graph for this function:</div>
 <div class="line"><span class="lineno"> 5212</span>  <span class="keywordtype">int</span> num_runnable_tests = 0;</div>
 <div class="line"><span class="lineno"> 5213</span>  <span class="keywordtype">int</span> num_selected_tests = 0;</div>
 <div class="line"><span class="lineno"> 5214</span>  <span class="keywordflow">for</span> (<span class="keywordtype">size_t</span> i = 0; i &lt; test_cases_.size(); i++) {</div>
-<div class="line"><span class="lineno"> 5215</span>    <a class="code hl_variable" href="namespacegmock__test__utils.html#a959c5af591e4d49b6d35745205b64509">TestCase</a>* <span class="keyword">const</span> test_case = test_cases_[i];</div>
+<div class="line"><span class="lineno"> 5215</span>    TestCase* <span class="keyword">const</span> test_case = test_cases_[i];</div>
 <div class="line"><span class="lineno"> 5216</span>    <span class="keyword">const</span> std::string &amp;test_case_name = test_case-&gt;name();</div>
 <div class="line"><span class="lineno"> 5217</span>    test_case-&gt;set_should_run(<span class="keyword">false</span>);</div>
 <div class="line"><span class="lineno"> 5218</span> </div>
@@ -1181,7 +1181,6 @@ Here is the call graph for this function:</div>
 <div class="line"><span class="lineno"> 5254</span>}</div>
 <div class="ttc" id="aclasstesting_1_1internal_1_1_unit_test_options_html_a67fc0adaffbb8d320b92e42e05017e4e"><div class="ttname"><a href="classtesting_1_1internal_1_1_unit_test_options.html#a67fc0adaffbb8d320b92e42e05017e4e">testing::internal::UnitTestOptions::MatchesFilter</a></div><div class="ttdeci">static bool MatchesFilter(const std::string &amp;name, const char *filter)</div><div class="ttdef"><b>Definition</b> <a href="gtest_8cc_source.html#l00496">gtest.cc:496</a></div></div>
 <div class="ttc" id="aclasstesting_1_1internal_1_1_unit_test_options_html_a9975b59cece94874b303421697e3bca6"><div class="ttname"><a href="classtesting_1_1internal_1_1_unit_test_options.html#a9975b59cece94874b303421697e3bca6">testing::internal::UnitTestOptions::FilterMatchesTest</a></div><div class="ttdeci">static bool FilterMatchesTest(const std::string &amp;test_case_name, const std::string &amp;test_name)</div><div class="ttdef"><b>Definition</b> <a href="gtest_8cc_source.html#l00519">gtest.cc:519</a></div></div>
-<div class="ttc" id="anamespacegmock__test__utils_html_a959c5af591e4d49b6d35745205b64509"><div class="ttname"><a href="namespacegmock__test__utils.html#a959c5af591e4d49b6d35745205b64509">gmock_test_utils.TestCase</a></div><div class="ttdeci">TestCase</div><div class="ttdef"><b>Definition</b> <a href="gmock__test__utils_8py_source.html#l00099">gmock_test_utils.py:99</a></div></div>
 <div class="ttc" id="anamespacetesting_1_1internal_html_a437bd89f5bc532778d7467600e210395"><div class="ttname"><a href="namespacetesting_1_1internal.html#a437bd89f5bc532778d7467600e210395">testing::internal::ShouldRunTestOnShard</a></div><div class="ttdeci">GTEST_API_ bool ShouldRunTestOnShard(int total_shards, int shard_index, int test_id)</div><div class="ttdef"><b>Definition</b> <a href="gtest_8cc_source.html#l05191">gtest.cc:5191</a></div></div>
 <div class="ttc" id="anamespacetesting_1_1internal_html_a8ee38faaf875f133358abaf9bc056cec"><div class="ttname"><a href="namespacetesting_1_1internal.html#a8ee38faaf875f133358abaf9bc056cec">testing::internal::Int32</a></div><div class="ttdeci">TypeWithSize&lt; 4 &gt;::Int Int32</div><div class="ttdef"><b>Definition</b> <a href="gtest-port_8h_source.html#l02626">gtest-port.h:2626</a></div></div>
 <div class="ttc" id="anamespacetesting_1_1internal_html_aaa576613655c2f380278c255c3ec5fef"><div class="ttname"><a href="namespacetesting_1_1internal.html#aaa576613655c2f380278c255c3ec5fef">testing::internal::Int32FromEnvOrDie</a></div><div class="ttdeci">GTEST_API_ Int32 Int32FromEnvOrDie(const char *env_var, Int32 default_val)</div><div class="ttdef"><b>Definition</b> <a href="gtest_8cc_source.html#l05173">gtest.cc:5173</a></div></div>
@@ -1366,8 +1365,8 @@ Here is the caller graph for this function:</div>
 <div class="line"><span class="lineno"> 4916</span>    <span class="keywordflow">return</span> *test_case;</div>
 <div class="line"><span class="lineno"> 4917</span> </div>
 <div class="line"><span class="lineno"> 4918</span>  <span class="comment">// No.  Let&#39;s create one.</span></div>
-<div class="line"><span class="lineno"> 4919</span>  <a class="code hl_variable" href="namespacegmock__test__utils.html#a959c5af591e4d49b6d35745205b64509">TestCase</a>* <span class="keyword">const</span> new_test_case =</div>
-<div class="line"><span class="lineno"> 4920</span>      <span class="keyword">new</span> <a class="code hl_variable" href="namespacegmock__test__utils.html#a959c5af591e4d49b6d35745205b64509">TestCase</a>(test_case_name, type_param, set_up_tc, tear_down_tc);</div>
+<div class="line"><span class="lineno"> 4919</span>  TestCase* <span class="keyword">const</span> new_test_case =</div>
+<div class="line"><span class="lineno"> 4920</span>      <span class="keyword">new</span> TestCase(test_case_name, type_param, set_up_tc, tear_down_tc);</div>
 <div class="line"><span class="lineno"> 4921</span> </div>
 <div class="line"><span class="lineno"> 4922</span>  <span class="comment">// Is this a death test case?</span></div>
 <div class="line"><span class="lineno"> 4923</span>  <span class="keywordflow">if</span> (<a class="code hl_function" href="classtesting_1_1internal_1_1_unit_test_options.html#a67fc0adaffbb8d320b92e42e05017e4e">internal::UnitTestOptions::MatchesFilter</a>(test_case_name,</div>
@@ -1603,7 +1602,7 @@ Here is the caller graph for this function:</div>
 <div class="line"><span class="lineno"> 5281</span>  <span class="keyword">const</span> <span class="keywordtype">int</span> kMaxParamLength = 250;</div>
 <div class="line"><span class="lineno"> 5282</span> </div>
 <div class="line"><span class="lineno"> 5283</span>  <span class="keywordflow">for</span> (<span class="keywordtype">size_t</span> i = 0; i &lt; test_cases_.size(); i++) {</div>
-<div class="line"><span class="lineno"> 5284</span>    <span class="keyword">const</span> <a class="code hl_variable" href="namespacegmock__test__utils.html#a959c5af591e4d49b6d35745205b64509">TestCase</a>* <span class="keyword">const</span> test_case = test_cases_[i];</div>
+<div class="line"><span class="lineno"> 5284</span>    <span class="keyword">const</span> TestCase* <span class="keyword">const</span> test_case = test_cases_[i];</div>
 <div class="line"><span class="lineno"> 5285</span>    <span class="keywordtype">bool</span> printed_test_case_name = <span class="keyword">false</span>;</div>
 <div class="line"><span class="lineno"> 5286</span> </div>
 <div class="line"><span class="lineno"> 5287</span>    <span class="keywordflow">for</span> (<span class="keywordtype">size_t</span> <a class="code hl_variable" href="yubihsm__pkcs11_8c.html#a538d097420e725c4dad63c3caa9e55bd">j</a> = 0; <a class="code hl_variable" href="yubihsm__pkcs11_8c.html#a538d097420e725c4dad63c3caa9e55bd">j</a> &lt; test_case-&gt;test_info_list().size(); <a class="code hl_variable" href="yubihsm__pkcs11_8c.html#a538d097420e725c4dad63c3caa9e55bd">j</a>++) {</div>

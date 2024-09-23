@@ -28,13 +28,13 @@
 \DoxyCodeLine{\Hypertarget{catch__version_8cpp_source_l00024}00024\ \ \ \ \ \ \ \ \ buildNumber(\ \_buildNumber\ )}
 \DoxyCodeLine{\Hypertarget{catch__version_8cpp_source_l00025}00025\ \ \ \ \ \{\}}
 \DoxyCodeLine{\Hypertarget{catch__version_8cpp_source_l00026}00026\ }
-\DoxyCodeLine{\Hypertarget{catch__version_8cpp_source_l00027}\mbox{\hyperlink{struct_catch_1_1_version_a6730b4be4f5fa640b39de13d8ffe1dce}{00027}}\ \ \ \ \ std::ostream\&\ \mbox{\hyperlink{namespace_catch_abf821d46e662c8d93d80a98d79a10314}{operator\ <<\ }}(\ std::ostream\&\ os,\ \mbox{\hyperlink{struct_catch_1_1_version}{Version}}\ \textcolor{keyword}{const}\&\ version\ )\ \{}
-\DoxyCodeLine{\Hypertarget{catch__version_8cpp_source_l00028}00028\ \ \ \ \ \ \ \ \ os\ \ <<\ version.majorVersion\ <<\ \textcolor{charliteral}{'.'}}
+\DoxyCodeLine{\Hypertarget{catch__version_8cpp_source_l00027}\mbox{\hyperlink{struct_catch_1_1_version_a6730b4be4f5fa640b39de13d8ffe1dce}{00027}}\ \ \ \ \ std::ostream\&\ \mbox{\hyperlink{namespace_catch_abf821d46e662c8d93d80a98d79a10314}{operator\ <<\ }}(\ std::ostream\&\ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}},\ \mbox{\hyperlink{struct_catch_1_1_version}{Version}}\ \textcolor{keyword}{const}\&\ version\ )\ \{}
+\DoxyCodeLine{\Hypertarget{catch__version_8cpp_source_l00028}00028\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}\ \ <<\ version.majorVersion\ <<\ \textcolor{charliteral}{'.'}}
 \DoxyCodeLine{\Hypertarget{catch__version_8cpp_source_l00029}00029\ \ \ \ \ \ \ \ \ \ \ \ \ <<\ version.minorVersion\ <<\ \textcolor{charliteral}{'.'}}
 \DoxyCodeLine{\Hypertarget{catch__version_8cpp_source_l00030}00030\ \ \ \ \ \ \ \ \ \ \ \ \ <<\ version.patchNumber;}
 \DoxyCodeLine{\Hypertarget{catch__version_8cpp_source_l00031}00031\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ branchName\ is\ never\ null\ -\/>\ 0th\ char\ is\ \(\backslash\)0\ if\ it\ is\ empty}}
 \DoxyCodeLine{\Hypertarget{catch__version_8cpp_source_l00032}00032\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (version.branchName[0])\ \{}
-\DoxyCodeLine{\Hypertarget{catch__version_8cpp_source_l00033}00033\ \ \ \ \ \ \ \ \ \ \ \ \ os\ <<\ \textcolor{charliteral}{'-\/'}\ <<\ version.branchName}
+\DoxyCodeLine{\Hypertarget{catch__version_8cpp_source_l00033}00033\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}\ <<\ \textcolor{charliteral}{'-\/'}\ <<\ version.branchName}
 \DoxyCodeLine{\Hypertarget{catch__version_8cpp_source_l00034}00034\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ <<\ \textcolor{charliteral}{'.'}\ <<\ version.buildNumber;}
 \DoxyCodeLine{\Hypertarget{catch__version_8cpp_source_l00035}00035\ \ \ \ \ \ \ \ \ \}}
 \DoxyCodeLine{\Hypertarget{catch__version_8cpp_source_l00036}00036\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}};}

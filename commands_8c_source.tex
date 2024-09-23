@@ -1187,15 +1187,15 @@
 \DoxyCodeLine{\Hypertarget{commands_8c_source_l01183}01183\ }
 \DoxyCodeLine{\Hypertarget{commands_8c_source_l01184}01184\ \ \ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}}\ =\ strlen(line);}
 \DoxyCodeLine{\Hypertarget{commands_8c_source_l01185}01185\ }
-\DoxyCodeLine{\Hypertarget{commands_8c_source_l01186}01186\ \ \ *\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}\ =\ \mbox{\hyperlink{namespacevalidate__reflection_a54d4e98ade8417b88a7e3859a693630a}{line}};}
+\DoxyCodeLine{\Hypertarget{commands_8c_source_l01186}01186\ \ \ *\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}\ =\ line;}
 \DoxyCodeLine{\Hypertarget{commands_8c_source_l01187}01187\ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{int}\ i\ =\ 0;\ i\ <\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}};\ i++)\ \{}
 \DoxyCodeLine{\Hypertarget{commands_8c_source_l01188}01188\ \ \ \ \ \textcolor{keywordflow}{if}\ (line[i]\ ==\ \textcolor{charliteral}{':'})\ \{}
 \DoxyCodeLine{\Hypertarget{commands_8c_source_l01189}01189\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}}\ -\/\ i\ -\/\ 1\ !=\ \mbox{\hyperlink{ykyh_8h_a00e800150afe4404120c2090461fdf1a}{YKYH\_PW\_LEN}})\ \{}
 \DoxyCodeLine{\Hypertarget{commands_8c_source_l01190}01190\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ -\/1;}
 \DoxyCodeLine{\Hypertarget{commands_8c_source_l01191}01191\ \ \ \ \ \ \ \}}
 \DoxyCodeLine{\Hypertarget{commands_8c_source_l01192}01192\ }
-\DoxyCodeLine{\Hypertarget{commands_8c_source_l01193}01193\ \ \ \ \ \ \ \mbox{\hyperlink{namespacevalidate__reflection_a54d4e98ade8417b88a7e3859a693630a}{line}}[i]\ =\ \textcolor{charliteral}{'\(\backslash\)0'};}
-\DoxyCodeLine{\Hypertarget{commands_8c_source_l01194}01194\ \ \ \ \ \ \ *pw\ =\ \mbox{\hyperlink{namespacevalidate__reflection_a54d4e98ade8417b88a7e3859a693630a}{line}}\ +\ i\ +\ 1;}
+\DoxyCodeLine{\Hypertarget{commands_8c_source_l01193}01193\ \ \ \ \ \ \ line[i]\ =\ \textcolor{charliteral}{'\(\backslash\)0'};}
+\DoxyCodeLine{\Hypertarget{commands_8c_source_l01194}01194\ \ \ \ \ \ \ *pw\ =\ line\ +\ i\ +\ 1;}
 \DoxyCodeLine{\Hypertarget{commands_8c_source_l01195}01195\ }
 \DoxyCodeLine{\Hypertarget{commands_8c_source_l01196}01196\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ 0;}
 \DoxyCodeLine{\Hypertarget{commands_8c_source_l01197}01197\ \ \ \ \ \}}

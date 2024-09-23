@@ -13,14 +13,16 @@
 {\ttfamily \#include "{}gmock/internal/gmock-\/internal-\/utils.\+h"{}}\newline
 {\ttfamily \#include "{}gmock/internal/gmock-\/port.\+h"{}}\newline
 {\ttfamily \#include "{}gmock/internal/custom/gmock-\/matchers.\+h"{}}\newline
-Include dependency graph for gmock-\/matchers.h\+:\nopagebreak
+Include dependency graph for gmock-\/matchers.h\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
 \includegraphics[width=350pt]{gmock-matchers_8h__incl}
 \end{center}
 \end{figure}
-This graph shows which files directly or indirectly include this file\+:\nopagebreak
+This graph shows which files directly or indirectly include this file\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -266,7 +268,7 @@ typedef \+::std\+::vector$<$ \mbox{\hyperlink{namespacetesting_1_1internal_a1098
 \doxysubsubsection*{Functions}
 \begin{DoxyCompactItemize}
 \item 
-{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ }\\std\+::ostream \& \mbox{\hyperlink{namespacetesting_a89620d229e8b9bd6185121c6dc593d49}{testing\+::operator$<$$<$}} (std\+::ostream \&os, const \mbox{\hyperlink{classtesting_1_1_matcher}{Matcher}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \&matcher)
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ }\\std\+::ostream \& \mbox{\hyperlink{namespacetesting_a89620d229e8b9bd6185121c6dc593d49}{testing\+::operator$<$$<$}} (std\+::ostream \&\mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}, const \mbox{\hyperlink{classtesting_1_1_matcher}{Matcher}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \&matcher)
 \item 
 {\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ }\\\mbox{\hyperlink{classtesting_1_1_matcher}{Matcher}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \mbox{\hyperlink{namespacetesting_aca6c4c4fdf7fb7257ea4fc76971cb82c}{testing\+::\+Make\+Matcher}} (const \mbox{\hyperlink{classtesting_1_1_matcher_interface}{Matcher\+Interface}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \texorpdfstring{$\ast$}{*}impl)
 \item 
@@ -278,7 +280,7 @@ typedef \+::std\+::vector$<$ \mbox{\hyperlink{namespacetesting_1_1internal_a1098
 \item 
 {\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ }\\\mbox{\hyperlink{classtesting_1_1_matcher}{Matcher}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \mbox{\hyperlink{namespacetesting_a5e9134d655d2fc9323902348083282e7}{testing\+::A}} ()
 \item 
-void \mbox{\hyperlink{namespacetesting_1_1internal_ad609eb8bac84ab487464a3449c57640a}{testing\+::internal\+::\+Print\+If\+Not\+Empty}} (const std\+::string \&explanation, \+::std\+::ostream \texorpdfstring{$\ast$}{*}os)
+void \mbox{\hyperlink{namespacetesting_1_1internal_ad609eb8bac84ab487464a3449c57640a}{testing\+::internal\+::\+Print\+If\+Not\+Empty}} (const std\+::string \&explanation, \+::std\+::ostream \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}})
 \item 
 bool \mbox{\hyperlink{namespacetesting_1_1internal_abeedf209750a21d996983e84224ac816}{testing\+::internal\+::\+Is\+Readable\+Type\+Name}} (const std\+::string \&type\+\_\+name)
 \item 
@@ -286,7 +288,7 @@ bool \mbox{\hyperlink{namespacetesting_1_1internal_abeedf209750a21d996983e84224a
 \item 
 {\footnotesize template$<$typename \mbox{\hyperlink{structtesting_1_1internal_1_1_matcher_tuple}{Matcher\+Tuple}} , typename Value\+Tuple $>$ }\\bool \mbox{\hyperlink{namespacetesting_1_1internal_a10095d1e1c99369200072b39d657ebc4}{testing\+::internal\+::\+Tuple\+Matches}} (const \mbox{\hyperlink{structtesting_1_1internal_1_1_matcher_tuple}{Matcher\+Tuple}} \&matcher\+\_\+tuple, const Value\+Tuple \&value\+\_\+tuple)
 \item 
-{\footnotesize template$<$typename \mbox{\hyperlink{structtesting_1_1internal_1_1_matcher_tuple}{Matcher\+Tuple}} , typename Value\+Tuple $>$ }\\void \mbox{\hyperlink{namespacetesting_1_1internal_afd62fd8914a7fae1bfc8a314fcc81f22}{testing\+::internal\+::\+Explain\+Match\+Failure\+Tuple\+To}} (const \mbox{\hyperlink{structtesting_1_1internal_1_1_matcher_tuple}{Matcher\+Tuple}} \&matchers, const Value\+Tuple \&values, \+::std\+::ostream \texorpdfstring{$\ast$}{*}os)
+{\footnotesize template$<$typename \mbox{\hyperlink{structtesting_1_1internal_1_1_matcher_tuple}{Matcher\+Tuple}} , typename Value\+Tuple $>$ }\\void \mbox{\hyperlink{namespacetesting_1_1internal_afd62fd8914a7fae1bfc8a314fcc81f22}{testing\+::internal\+::\+Explain\+Match\+Failure\+Tuple\+To}} (const \mbox{\hyperlink{structtesting_1_1internal_1_1_matcher_tuple}{Matcher\+Tuple}} \&matchers, const Value\+Tuple \&values, \+::std\+::ostream \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}})
 \item 
 {\footnotesize template$<$typename Tuple , typename Func , typename Out\+Iter $>$ }\\Out\+Iter \mbox{\hyperlink{namespacetesting_1_1internal_a07ba091a64aa2ba95e41accc55dc8855}{testing\+::internal\+::\+Transform\+Tuple\+Values}} (Func \mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}}, const Tuple \&t, Out\+Iter out)
 \item 

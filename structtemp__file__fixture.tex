@@ -121,9 +121,9 @@ Definition at line \mbox{\hyperlink{test__compressed__file_8cpp_source_l00026}{2
 \begin{DoxyCode}{0}
 \DoxyCodeLine{00026\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
 \DoxyCodeLine{00027\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ \mbox{\hyperlink{classfc_1_1path}{path}}\ =\ bfs::temp\_directory\_path()\ /\ bfs::unique\_path();}
-\DoxyCodeLine{00028\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ os\ =\ bfs::ofstream(\mbox{\hyperlink{classfc_1_1path}{path}},\ std::ios\_base::out);}
-\DoxyCodeLine{00029\ \ \ \ \ \ \ os\ <<\ contents;}
-\DoxyCodeLine{00030\ \ \ \ \ \ \ os.close();}
+\DoxyCodeLine{00028\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}\ =\ bfs::ofstream(\mbox{\hyperlink{classfc_1_1path}{path}},\ std::ios\_base::out);}
+\DoxyCodeLine{00029\ \ \ \ \ \ \ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}\ <<\ contents;}
+\DoxyCodeLine{00030\ \ \ \ \ \ \ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}.close();}
 \DoxyCodeLine{00031\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{structtemp__file__fixture_a8641500328301e32a05bce0f9d737560}{paths}}.emplace\_back(std::move(\mbox{\hyperlink{classfc_1_1path}{path}})).generic\_string();}
 \DoxyCodeLine{00032\ \ \ \ \}}
 
@@ -142,9 +142,9 @@ Definition at line \mbox{\hyperlink{test__configuration__utils_8cpp_source_l0002
 \begin{DoxyCode}{0}
 \DoxyCodeLine{00026\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
 \DoxyCodeLine{00027\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ \mbox{\hyperlink{classfc_1_1path}{path}}\ =\ bfs::temp\_directory\_path()\ /\ bfs::unique\_path();}
-\DoxyCodeLine{00028\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ os\ =\ bfs::ofstream(\mbox{\hyperlink{classfc_1_1path}{path}},\ std::ios\_base::out);}
-\DoxyCodeLine{00029\ \ \ \ \ \ \ os\ <<\ contents;}
-\DoxyCodeLine{00030\ \ \ \ \ \ \ os.close();}
+\DoxyCodeLine{00028\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}\ =\ bfs::ofstream(\mbox{\hyperlink{classfc_1_1path}{path}},\ std::ios\_base::out);}
+\DoxyCodeLine{00029\ \ \ \ \ \ \ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}\ <<\ contents;}
+\DoxyCodeLine{00030\ \ \ \ \ \ \ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}.close();}
 \DoxyCodeLine{00031\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{structtemp__file__fixture_a8641500328301e32a05bce0f9d737560}{paths}}.emplace\_back(std::move(\mbox{\hyperlink{classfc_1_1path}{path}})).generic\_string();}
 \DoxyCodeLine{00032\ \ \ \ \}}
 
@@ -163,10 +163,10 @@ Definition at line \mbox{\hyperlink{test__compressed__file_8cpp_source_l00034}{3
 \begin{DoxyCode}{0}
 \DoxyCodeLine{00034\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
 \DoxyCodeLine{00035\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ \mbox{\hyperlink{classfc_1_1path}{path}}\ =\ bfs::temp\_directory\_path()\ /\ bfs::unique\_path();}
-\DoxyCodeLine{00036\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ os\ =\ bfs::ofstream(\mbox{\hyperlink{classfc_1_1path}{path}},\ std::ios\_base::out|std::ios\_base::binary);}
+\DoxyCodeLine{00036\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}\ =\ bfs::ofstream(\mbox{\hyperlink{classfc_1_1path}{path}},\ std::ios\_base::out|std::ios\_base::binary);}
 \DoxyCodeLine{00037\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (data\ \&\&\ size)}
-\DoxyCodeLine{00038\ \ \ \ \ \ \ \ \ \ os.write(\textcolor{keyword}{reinterpret\_cast<}\textcolor{keyword}{const\ }\textcolor{keywordtype}{char}*\textcolor{keyword}{>}(data),\ size);}
-\DoxyCodeLine{00039\ \ \ \ \ \ \ os.close();}
+\DoxyCodeLine{00038\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}.write(\textcolor{keyword}{reinterpret\_cast<}\textcolor{keyword}{const\ }\textcolor{keywordtype}{char}*\textcolor{keyword}{>}(data),\ size);}
+\DoxyCodeLine{00039\ \ \ \ \ \ \ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}.close();}
 \DoxyCodeLine{00040\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{structtemp__file__fixture_a8641500328301e32a05bce0f9d737560}{paths}}.emplace\_back(std::move(\mbox{\hyperlink{classfc_1_1path}{path}})).generic\_string();}
 \DoxyCodeLine{00041\ \ \ \ \}}
 

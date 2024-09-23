@@ -203,7 +203,7 @@ Definition at line \mbox{\hyperlink{elliptic__webauthn_8cpp_source_l00189}{189}}
 \DoxyCodeLine{00235\ }
 \DoxyCodeLine{00236\ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{namespacefc_1_1crypto_1_1r1_a2f84ba4f539e39bff64fd02cc1ca326e}{r1::ECDSA\_SIG\_recover\_key\_GFp}}(key,\ sig,\ (\mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}*)signed\_digest.\mbox{\hyperlink{classfc_1_1sha256_ab897537f6c524085b28049be51ed370d}{data}}(),\ signed\_digest.\mbox{\hyperlink{classfc_1_1sha256_ac7722b7428b1db345f1b7fab7f4d5774}{data\_size}}(),\ nV\ -\/\ 27,\ 0)\ ==\ 1)\ \{}
 \DoxyCodeLine{00237\ \ \ \ \ \ \ \textcolor{keyword}{const}\ EC\_POINT*\ \mbox{\hyperlink{structpoint}{point}}\ =\ EC\_KEY\_get0\_public\_key(key);}
-\DoxyCodeLine{00238\ \ \ \ \ \ \ \textcolor{keyword}{const}\ EC\_GROUP*\ \mbox{\hyperlink{namespaceupload_a9d33d66de17175dced88ffe95f079226}{group}}\ =\ EC\_KEY\_get0\_group(key);}
+\DoxyCodeLine{00238\ \ \ \ \ \ \ \textcolor{keyword}{const}\ EC\_GROUP*\ group\ =\ EC\_KEY\_get0\_group(key);}
 \DoxyCodeLine{00239\ \ \ \ \ \ \ \textcolor{keywordtype}{size\_t}\ sz\ =\ EC\_POINT\_point2oct(group,\ \mbox{\hyperlink{structpoint}{point}},\ POINT\_CONVERSION\_COMPRESSED,\ (\mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}*)public\_key\_data.\mbox{\hyperlink{classfc_1_1array_ad01e4627be17148ee922c37944c48626}{data}},\ public\_key\_data.\mbox{\hyperlink{classfc_1_1array_a0a4696737886d8a01c8eb75e2d234dc0}{size}}(),\ NULL);}
 \DoxyCodeLine{00240\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(sz\ ==\ public\_key\_data.\mbox{\hyperlink{classfc_1_1array_a0a4696737886d8a01c8eb75e2d234dc0}{size}}())}
 \DoxyCodeLine{00241\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return};}
@@ -212,7 +212,8 @@ Definition at line \mbox{\hyperlink{elliptic__webauthn_8cpp_source_l00189}{189}}
 \DoxyCodeLine{00244\ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode

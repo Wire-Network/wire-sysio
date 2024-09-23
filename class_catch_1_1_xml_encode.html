@@ -118,12 +118,12 @@ Public Types</h2></td></tr>
 Public Member Functions</h2></td></tr>
 <tr class="memitem:a4c156028e2f94e7629a69d1cb10a6a44" id="r_a4c156028e2f94e7629a69d1cb10a6a44"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a4c156028e2f94e7629a69d1cb10a6a44">XmlEncode</a> (std::string const &amp;str, <a class="el" href="#a81ed50fe458d1aae3481781b4d599b7a">ForWhat</a> forWhat=<a class="el" href="#a81ed50fe458d1aae3481781b4d599b7aafebf4db23809cd7925a3bdaaa4249de1">ForTextNodes</a>)</td></tr>
 <tr class="separator:a4c156028e2f94e7629a69d1cb10a6a44"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a030fe9de7193fcdbdc06ade38f0113ce" id="r_a030fe9de7193fcdbdc06ade38f0113ce"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a030fe9de7193fcdbdc06ade38f0113ce">encodeTo</a> (std::ostream &amp;os) const</td></tr>
+<tr class="memitem:a030fe9de7193fcdbdc06ade38f0113ce" id="r_a030fe9de7193fcdbdc06ade38f0113ce"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a030fe9de7193fcdbdc06ade38f0113ce">encodeTo</a> (std::ostream &amp;<a class="el" href="environment_8hpp.html#a3951483d0b31c29ca95336206cd35238">os</a>) const</td></tr>
 <tr class="separator:a030fe9de7193fcdbdc06ade38f0113ce"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="friends" name="friends"></a>
 Friends</h2></td></tr>
-<tr class="memitem:a6c7a42b7cf01392f7e3d856cb72d4131" id="r_a6c7a42b7cf01392f7e3d856cb72d4131"><td class="memItemLeft" align="right" valign="top">std::ostream &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a6c7a42b7cf01392f7e3d856cb72d4131">operator&lt;&lt;</a> (std::ostream &amp;os, <a class="el" href="class_catch_1_1_xml_encode.html">XmlEncode</a> const &amp;xmlEncode)</td></tr>
+<tr class="memitem:a6c7a42b7cf01392f7e3d856cb72d4131" id="r_a6c7a42b7cf01392f7e3d856cb72d4131"><td class="memItemLeft" align="right" valign="top">std::ostream &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a6c7a42b7cf01392f7e3d856cb72d4131">operator&lt;&lt;</a> (std::ostream &amp;<a class="el" href="environment_8hpp.html#a3951483d0b31c29ca95336206cd35238">os</a>, <a class="el" href="class_catch_1_1_xml_encode.html">XmlEncode</a> const &amp;xmlEncode)</td></tr>
 <tr class="separator:a6c7a42b7cf01392f7e3d856cb72d4131"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
@@ -201,25 +201,25 @@ Friends</h2></td></tr>
 <div class="line"><span class="lineno">   62</span>        <span class="comment">// Apostrophe escaping not necessary if we always use &quot; to write attributes</span></div>
 <div class="line"><span class="lineno">   63</span>        <span class="comment">// (see: http://www.w3.org/TR/xml/#syntax)</span></div>
 <div class="line"><span class="lineno">   64</span> </div>
-<div class="line"><span class="lineno">   65</span>        <span class="keywordflow">for</span>( std::size_t idx = 0; <a class="code hl_variable" href="namespacehost__functions__tests__1.html#a8496a24b5236a2dc07bb4f2930d88342">idx</a> &lt; m_str.size(); ++ <a class="code hl_variable" href="namespacehost__functions__tests__1.html#a8496a24b5236a2dc07bb4f2930d88342">idx</a> ) {</div>
-<div class="line"><span class="lineno">   66</span>            <a class="code hl_typedef" href="include_2internal_2catch__xmlwriter_8cpp.html#ae48ac2456c5ad6c956fef86e7bef3a21">uchar</a> c = m_str[<a class="code hl_variable" href="namespacehost__functions__tests__1.html#a8496a24b5236a2dc07bb4f2930d88342">idx</a>];</div>
+<div class="line"><span class="lineno">   65</span>        <span class="keywordflow">for</span>( std::size_t idx = 0; idx &lt; m_str.size(); ++ idx ) {</div>
+<div class="line"><span class="lineno">   66</span>            <a class="code hl_typedef" href="include_2internal_2catch__xmlwriter_8cpp.html#ae48ac2456c5ad6c956fef86e7bef3a21">uchar</a> c = m_str[idx];</div>
 <div class="line"><span class="lineno">   67</span>            <span class="keywordflow">switch</span> (c) {</div>
-<div class="line"><span class="lineno">   68</span>            <span class="keywordflow">case</span> <span class="charliteral">&#39;&lt;&#39;</span>:   os &lt;&lt; <span class="stringliteral">&quot;&amp;lt;&quot;</span>; <span class="keywordflow">break</span>;</div>
-<div class="line"><span class="lineno">   69</span>            <span class="keywordflow">case</span> <span class="charliteral">&#39;&amp;&#39;</span>:   os &lt;&lt; <span class="stringliteral">&quot;&amp;amp;&quot;</span>; <span class="keywordflow">break</span>;</div>
+<div class="line"><span class="lineno">   68</span>            <span class="keywordflow">case</span> <span class="charliteral">&#39;&lt;&#39;</span>:   <a class="code hl_variable" href="environment_8hpp.html#a3951483d0b31c29ca95336206cd35238">os</a> &lt;&lt; <span class="stringliteral">&quot;&amp;lt;&quot;</span>; <span class="keywordflow">break</span>;</div>
+<div class="line"><span class="lineno">   69</span>            <span class="keywordflow">case</span> <span class="charliteral">&#39;&amp;&#39;</span>:   <a class="code hl_variable" href="environment_8hpp.html#a3951483d0b31c29ca95336206cd35238">os</a> &lt;&lt; <span class="stringliteral">&quot;&amp;amp;&quot;</span>; <span class="keywordflow">break</span>;</div>
 <div class="line"><span class="lineno">   70</span> </div>
 <div class="line"><span class="lineno">   71</span>            <span class="keywordflow">case</span> <span class="charliteral">&#39;&gt;&#39;</span>:</div>
 <div class="line"><span class="lineno">   72</span>                <span class="comment">// See: http://www.w3.org/TR/xml/#syntax</span></div>
 <div class="line"><span class="lineno">   73</span>                <span class="keywordflow">if</span> (idx &gt; 2 &amp;&amp; m_str[idx - 1] == <span class="charliteral">&#39;]&#39;</span> &amp;&amp; m_str[idx - 2] == <span class="charliteral">&#39;]&#39;</span>)</div>
-<div class="line"><span class="lineno">   74</span>                    os &lt;&lt; <span class="stringliteral">&quot;&amp;gt;&quot;</span>;</div>
+<div class="line"><span class="lineno">   74</span>                    <a class="code hl_variable" href="environment_8hpp.html#a3951483d0b31c29ca95336206cd35238">os</a> &lt;&lt; <span class="stringliteral">&quot;&amp;gt;&quot;</span>;</div>
 <div class="line"><span class="lineno">   75</span>                <span class="keywordflow">else</span></div>
-<div class="line"><span class="lineno">   76</span>                    os &lt;&lt; c;</div>
+<div class="line"><span class="lineno">   76</span>                    <a class="code hl_variable" href="environment_8hpp.html#a3951483d0b31c29ca95336206cd35238">os</a> &lt;&lt; c;</div>
 <div class="line"><span class="lineno">   77</span>                <span class="keywordflow">break</span>;</div>
 <div class="line"><span class="lineno">   78</span> </div>
 <div class="line"><span class="lineno">   79</span>            <span class="keywordflow">case</span> <span class="charliteral">&#39;\&quot;&#39;</span>:</div>
 <div class="line"><span class="lineno">   80</span>                <span class="keywordflow">if</span> (m_forWhat == <a class="code hl_enumvalue" href="#a81ed50fe458d1aae3481781b4d599b7aa3cdd995cc66ae405a4793a98db186005">ForAttributes</a>)</div>
-<div class="line"><span class="lineno">   81</span>                    os &lt;&lt; <span class="stringliteral">&quot;&amp;quot;&quot;</span>;</div>
+<div class="line"><span class="lineno">   81</span>                    <a class="code hl_variable" href="environment_8hpp.html#a3951483d0b31c29ca95336206cd35238">os</a> &lt;&lt; <span class="stringliteral">&quot;&amp;quot;&quot;</span>;</div>
 <div class="line"><span class="lineno">   82</span>                <span class="keywordflow">else</span></div>
-<div class="line"><span class="lineno">   83</span>                    os &lt;&lt; c;</div>
+<div class="line"><span class="lineno">   83</span>                    <a class="code hl_variable" href="environment_8hpp.html#a3951483d0b31c29ca95336206cd35238">os</a> &lt;&lt; c;</div>
 <div class="line"><span class="lineno">   84</span>                <span class="keywordflow">break</span>;</div>
 <div class="line"><span class="lineno">   85</span> </div>
 <div class="line"><span class="lineno">   86</span>            <span class="keywordflow">default</span>:</div>
@@ -228,13 +228,13 @@ Friends</h2></td></tr>
 <div class="line"><span class="lineno">   89</span>                <span class="comment">// Escape control characters in standard ascii</span></div>
 <div class="line"><span class="lineno">   90</span>                <span class="comment">// see http://stackoverflow.com/questions/404107/why-are-control-characters-illegal-in-xml-1-0</span></div>
 <div class="line"><span class="lineno">   91</span>                <span class="keywordflow">if</span> (c &lt; 0x09 || (c &gt; 0x0D &amp;&amp; c &lt; 0x20) || c == 0x7F) {</div>
-<div class="line"><span class="lineno">   92</span>                    hexEscapeChar(os, c);</div>
+<div class="line"><span class="lineno">   92</span>                    hexEscapeChar(<a class="code hl_variable" href="environment_8hpp.html#a3951483d0b31c29ca95336206cd35238">os</a>, c);</div>
 <div class="line"><span class="lineno">   93</span>                    <span class="keywordflow">break</span>;</div>
 <div class="line"><span class="lineno">   94</span>                }</div>
 <div class="line"><span class="lineno">   95</span> </div>
 <div class="line"><span class="lineno">   96</span>                <span class="comment">// Plain ASCII: Write it to stream</span></div>
 <div class="line"><span class="lineno">   97</span>                <span class="keywordflow">if</span> (c &lt; 0x7F) {</div>
-<div class="line"><span class="lineno">   98</span>                    os &lt;&lt; c;</div>
+<div class="line"><span class="lineno">   98</span>                    <a class="code hl_variable" href="environment_8hpp.html#a3951483d0b31c29ca95336206cd35238">os</a> &lt;&lt; c;</div>
 <div class="line"><span class="lineno">   99</span>                    <span class="keywordflow">break</span>;</div>
 <div class="line"><span class="lineno">  100</span>                }</div>
 <div class="line"><span class="lineno">  101</span> </div>
@@ -246,14 +246,14 @@ Friends</h2></td></tr>
 <div class="line"><span class="lineno">  107</span>                <span class="comment">// Or as 10XX XXXX</span></div>
 <div class="line"><span class="lineno">  108</span>                <span class="keywordflow">if</span> (c &lt;  0xC0 ||</div>
 <div class="line"><span class="lineno">  109</span>                    c &gt;= 0xF8) {</div>
-<div class="line"><span class="lineno">  110</span>                    hexEscapeChar(os, c);</div>
+<div class="line"><span class="lineno">  110</span>                    hexEscapeChar(<a class="code hl_variable" href="environment_8hpp.html#a3951483d0b31c29ca95336206cd35238">os</a>, c);</div>
 <div class="line"><span class="lineno">  111</span>                    <span class="keywordflow">break</span>;</div>
 <div class="line"><span class="lineno">  112</span>                }</div>
 <div class="line"><span class="lineno">  113</span> </div>
 <div class="line"><span class="lineno">  114</span>                <span class="keyword">auto</span> encBytes = trailingBytes(c);</div>
 <div class="line"><span class="lineno">  115</span>                <span class="comment">// Are there enough bytes left to avoid accessing out-of-bounds memory?</span></div>
 <div class="line"><span class="lineno">  116</span>                <span class="keywordflow">if</span> (idx + encBytes - 1 &gt;= m_str.size()) {</div>
-<div class="line"><span class="lineno">  117</span>                    hexEscapeChar(os, c);</div>
+<div class="line"><span class="lineno">  117</span>                    hexEscapeChar(<a class="code hl_variable" href="environment_8hpp.html#a3951483d0b31c29ca95336206cd35238">os</a>, c);</div>
 <div class="line"><span class="lineno">  118</span>                    <span class="keywordflow">break</span>;</div>
 <div class="line"><span class="lineno">  119</span>                }</div>
 <div class="line"><span class="lineno">  120</span>                <span class="comment">// The header is valid, check data</span></div>
@@ -262,7 +262,7 @@ Friends</h2></td></tr>
 <div class="line"><span class="lineno">  123</span>                <span class="keywordtype">bool</span> valid = <span class="keyword">true</span>;</div>
 <div class="line"><span class="lineno">  124</span>                <a class="code hl_typedef" href="stdint_8h.html#a435d1572bf3f880d55459d9805097f62">uint32_t</a> <a class="code hl_define" href="pkcs11_8h.html#a32aff7c6c4cd253fdf6563677afab5ce">value</a> = headerValue(c);</div>
 <div class="line"><span class="lineno">  125</span>                <span class="keywordflow">for</span> (std::size_t n = 1; n &lt; encBytes; ++n) {</div>
-<div class="line"><span class="lineno">  126</span>                    <a class="code hl_typedef" href="include_2internal_2catch__xmlwriter_8cpp.html#ae48ac2456c5ad6c956fef86e7bef3a21">uchar</a> nc = m_str[<a class="code hl_variable" href="namespacehost__functions__tests__1.html#a8496a24b5236a2dc07bb4f2930d88342">idx</a> + n];</div>
+<div class="line"><span class="lineno">  126</span>                    <a class="code hl_typedef" href="include_2internal_2catch__xmlwriter_8cpp.html#ae48ac2456c5ad6c956fef86e7bef3a21">uchar</a> nc = m_str[idx + n];</div>
 <div class="line"><span class="lineno">  127</span>                    valid &amp;= ((nc &amp; 0xC0) == 0x80);</div>
 <div class="line"><span class="lineno">  128</span>                    <a class="code hl_define" href="pkcs11_8h.html#a32aff7c6c4cd253fdf6563677afab5ce">value</a> = (<a class="code hl_define" href="pkcs11_8h.html#a32aff7c6c4cd253fdf6563677afab5ce">value</a> &lt;&lt; 6) | (nc &amp; 0x3F);</div>
 <div class="line"><span class="lineno">  129</span>                }</div>
@@ -277,21 +277,21 @@ Friends</h2></td></tr>
 <div class="line"><span class="lineno">  138</span>                    <span class="comment">// Encoded value out of range</span></div>
 <div class="line"><span class="lineno">  139</span>                    (<a class="code hl_define" href="pkcs11_8h.html#a32aff7c6c4cd253fdf6563677afab5ce">value</a> &gt;= 0x110000)</div>
 <div class="line"><span class="lineno">  140</span>                    ) {</div>
-<div class="line"><span class="lineno">  141</span>                    hexEscapeChar(os, c);</div>
+<div class="line"><span class="lineno">  141</span>                    hexEscapeChar(<a class="code hl_variable" href="environment_8hpp.html#a3951483d0b31c29ca95336206cd35238">os</a>, c);</div>
 <div class="line"><span class="lineno">  142</span>                    <span class="keywordflow">break</span>;</div>
 <div class="line"><span class="lineno">  143</span>                }</div>
 <div class="line"><span class="lineno">  144</span> </div>
 <div class="line"><span class="lineno">  145</span>                <span class="comment">// If we got here, this is in fact a valid(ish) utf-8 sequence</span></div>
 <div class="line"><span class="lineno">  146</span>                <span class="keywordflow">for</span> (std::size_t n = 0; n &lt; encBytes; ++n) {</div>
-<div class="line"><span class="lineno">  147</span>                    os &lt;&lt; m_str[<a class="code hl_variable" href="namespacehost__functions__tests__1.html#a8496a24b5236a2dc07bb4f2930d88342">idx</a> + n];</div>
+<div class="line"><span class="lineno">  147</span>                    <a class="code hl_variable" href="environment_8hpp.html#a3951483d0b31c29ca95336206cd35238">os</a> &lt;&lt; m_str[idx + n];</div>
 <div class="line"><span class="lineno">  148</span>                }</div>
-<div class="line"><span class="lineno">  149</span>                <a class="code hl_variable" href="namespacehost__functions__tests__1.html#a8496a24b5236a2dc07bb4f2930d88342">idx</a> += encBytes - 1;</div>
+<div class="line"><span class="lineno">  149</span>                idx += encBytes - 1;</div>
 <div class="line"><span class="lineno">  150</span>                <span class="keywordflow">break</span>;</div>
 <div class="line"><span class="lineno">  151</span>            }</div>
 <div class="line"><span class="lineno">  152</span>        }</div>
 <div class="line"><span class="lineno">  153</span>    }</div>
+<div class="ttc" id="aenvironment_8hpp_html_a3951483d0b31c29ca95336206cd35238"><div class="ttname"><a href="environment_8hpp.html#a3951483d0b31c29ca95336206cd35238">os</a></div><div class="ttdeci">os_t os</div><div class="ttdef"><b>Definition</b> <a href="environment_8hpp_source.html#l00023">environment.hpp:23</a></div></div>
 <div class="ttc" id="ainclude_2internal_2catch__xmlwriter_8cpp_html_ae48ac2456c5ad6c956fef86e7bef3a21"><div class="ttname"><a href="include_2internal_2catch__xmlwriter_8cpp.html#ae48ac2456c5ad6c956fef86e7bef3a21">uchar</a></div><div class="ttdeci">unsigned char uchar</div><div class="ttdef"><b>Definition</b> <a href="include_2internal_2catch__xmlwriter_8cpp_source.html#l00014">catch_xmlwriter.cpp:14</a></div></div>
-<div class="ttc" id="anamespacehost__functions__tests__1_html_a8496a24b5236a2dc07bb4f2930d88342"><div class="ttname"><a href="namespacehost__functions__tests__1.html#a8496a24b5236a2dc07bb4f2930d88342">host_functions_tests_1.idx</a></div><div class="ttdeci">int idx</div><div class="ttdef"><b>Definition</b> <a href="host__functions__tests__1_8py_source.html#l00021">host_functions_tests_1.py:21</a></div></div>
 <div class="ttc" id="apkcs11_8h_html_a32aff7c6c4cd253fdf6563677afab5ce"><div class="ttname"><a href="pkcs11_8h.html#a32aff7c6c4cd253fdf6563677afab5ce">value</a></div><div class="ttdeci">#define value</div><div class="ttdef"><b>Definition</b> <a href="pkcs11_8h_source.html#l00157">pkcs11.h:157</a></div></div>
 <div class="ttc" id="astdint_8h_html_a435d1572bf3f880d55459d9805097f62"><div class="ttname"><a href="stdint_8h.html#a435d1572bf3f880d55459d9805097f62">uint32_t</a></div><div class="ttdeci">unsigned int uint32_t</div><div class="ttdef"><b>Definition</b> <a href="stdint_8h_source.html#l00126">stdint.h:126</a></div></div>
 </div><!-- fragment -->
@@ -327,10 +327,9 @@ Friends</h2></td></tr>
 
 <p class="definition">Definition at line <a class="el" href="include_2internal_2catch__xmlwriter_8cpp_source.html#l00155">155</a> of file <a class="el" href="include_2internal_2catch__xmlwriter_8cpp_source.html">catch_xmlwriter.cpp</a>.</p>
 <div class="fragment"><div class="line"><span class="lineno">  155</span>                                                                           {</div>
-<div class="line"><span class="lineno">  156</span>        xmlEncode.encodeTo( os );</div>
+<div class="line"><span class="lineno">  156</span>        xmlEncode.encodeTo( <a class="code hl_variable" href="environment_8hpp.html#a3951483d0b31c29ca95336206cd35238">os</a> );</div>
 <div class="line"><span class="lineno">  157</span>        <span class="keywordflow">return</span> <a class="code hl_variable" href="environment_8hpp.html#a3951483d0b31c29ca95336206cd35238">os</a>;</div>
 <div class="line"><span class="lineno">  158</span>    }</div>
-<div class="ttc" id="aenvironment_8hpp_html_a3951483d0b31c29ca95336206cd35238"><div class="ttname"><a href="environment_8hpp.html#a3951483d0b31c29ca95336206cd35238">os</a></div><div class="ttdeci">os_t os</div><div class="ttdef"><b>Definition</b> <a href="environment_8hpp_source.html#l00023">environment.hpp:23</a></div></div>
 </div><!-- fragment -->
 </div>
 </div>

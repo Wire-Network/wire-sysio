@@ -90,7 +90,7 @@
 \DoxyCodeLine{\Hypertarget{array_8hpp_source_l00110}00110\ \ \ \textcolor{keyword}{template}<\textcolor{keyword}{typename}\ T,\ \textcolor{keywordtype}{size\_t}\ N>}
 \DoxyCodeLine{\Hypertarget{array_8hpp_source_l00111}\mbox{\hyperlink{namespacefc_a300e3455bf28e8d10fa1fd9b7137279c}{00111}}\ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespacefc_accef08adf4ee05c36ccc550d8101b08f}{from\_variant}}(\ \textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1variant}{variant}}\&\ v,\ \mbox{\hyperlink{classfc_1_1array}{array<T,N>}}\&\ bi\ )}
 \DoxyCodeLine{\Hypertarget{array_8hpp_source_l00112}00112\ \ \ \{}
-\DoxyCodeLine{\Hypertarget{array_8hpp_source_l00113}00113\ \ \ \ \ std::vector<char>\ ve\ =\ v.as<\ std::vector<char>\ >();}
+\DoxyCodeLine{\Hypertarget{array_8hpp_source_l00113}00113\ \ \ \ \ std::vector<char>\ ve\ =\ v.\mbox{\hyperlink{classfc_1_1variant_a82edd1f33199355d3a1f19bbb92909cc}{as}}<\ std::vector<char>\ >();}
 \DoxyCodeLine{\Hypertarget{array_8hpp_source_l00114}00114\ \ \ \ \ \textcolor{keywordflow}{if}(\ ve.size()\ )}
 \DoxyCodeLine{\Hypertarget{array_8hpp_source_l00115}00115\ \ \ \ \ \{}
 \DoxyCodeLine{\Hypertarget{array_8hpp_source_l00116}00116\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_ae785d5badbf1f08b491af31f32a135a1}{memcpy}}(\&bi,\ ve.data(),\ \mbox{\hyperlink{namespacefc_aa3ea11c18de71ec23b19c3cc571fb8ff}{fc::min<size\_t>}}(ve.size(),\textcolor{keyword}{sizeof}(bi))\ );}

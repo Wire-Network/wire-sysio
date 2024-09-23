@@ -120,35 +120,35 @@ Example\+:
 \begin{DoxyCode}{0}
 \DoxyCodeLine{\mbox{\hyperlink{include_2catch_8hpp_a9a88d21bfca0d58782cc5f0811801303}{TEMPLATE\_TEST\_CASE}}(\ \textcolor{stringliteral}{"{}vectors\ can\ be\ sized\ and\ resized"{}},\ \textcolor{stringliteral}{"{}[vector][template]"{}},\ \textcolor{keywordtype}{int},\ std::string,\ (std::tuple<int,float>)\ )\ \{}
 \DoxyCodeLine{}
-\DoxyCodeLine{\ \ \ \ std::vector<TestType>\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}(\ 5\ );}
+\DoxyCodeLine{\ \ \ \ std::vector<TestType>\ v(\ 5\ );}
 \DoxyCodeLine{}
-\DoxyCodeLine{\ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_ad57835ba8f1bb419a865ada6bd011a85}{REQUIRE}}(\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.size()\ ==\ 5\ );}
-\DoxyCodeLine{\ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_ad57835ba8f1bb419a865ada6bd011a85}{REQUIRE}}(\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.capacity()\ >=\ 5\ );}
+\DoxyCodeLine{\ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_ad57835ba8f1bb419a865ada6bd011a85}{REQUIRE}}(\ v.size()\ ==\ 5\ );}
+\DoxyCodeLine{\ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_ad57835ba8f1bb419a865ada6bd011a85}{REQUIRE}}(\ v.capacity()\ >=\ 5\ );}
 \DoxyCodeLine{}
 \DoxyCodeLine{\ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_ad512fd95a78b95770b9759823f8fbc21}{SECTION}}(\ \textcolor{stringliteral}{"{}resizing\ bigger\ changes\ size\ and\ capacity"{}}\ )\ \{}
-\DoxyCodeLine{\ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.resize(\ 10\ );}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ v.resize(\ 10\ );}
 \DoxyCodeLine{}
-\DoxyCodeLine{\ \ \ \ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_ad57835ba8f1bb419a865ada6bd011a85}{REQUIRE}}(\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.size()\ ==\ 10\ );}
-\DoxyCodeLine{\ \ \ \ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_ad57835ba8f1bb419a865ada6bd011a85}{REQUIRE}}(\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.capacity()\ >=\ 10\ );}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_ad57835ba8f1bb419a865ada6bd011a85}{REQUIRE}}(\ v.size()\ ==\ 10\ );}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_ad57835ba8f1bb419a865ada6bd011a85}{REQUIRE}}(\ v.capacity()\ >=\ 10\ );}
 \DoxyCodeLine{\ \ \ \ \}}
 \DoxyCodeLine{\ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_ad512fd95a78b95770b9759823f8fbc21}{SECTION}}(\ \textcolor{stringliteral}{"{}resizing\ smaller\ changes\ size\ but\ not\ capacity"{}}\ )\ \{}
-\DoxyCodeLine{\ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.resize(\ 0\ );}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ v.resize(\ 0\ );}
 \DoxyCodeLine{}
-\DoxyCodeLine{\ \ \ \ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_ad57835ba8f1bb419a865ada6bd011a85}{REQUIRE}}(\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.size()\ ==\ 0\ );}
-\DoxyCodeLine{\ \ \ \ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_ad57835ba8f1bb419a865ada6bd011a85}{REQUIRE}}(\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.capacity()\ >=\ 5\ );}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_ad57835ba8f1bb419a865ada6bd011a85}{REQUIRE}}(\ v.size()\ ==\ 0\ );}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_ad57835ba8f1bb419a865ada6bd011a85}{REQUIRE}}(\ v.capacity()\ >=\ 5\ );}
 \DoxyCodeLine{}
 \DoxyCodeLine{\ \ \ \ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_ad512fd95a78b95770b9759823f8fbc21}{SECTION}}(\ \textcolor{stringliteral}{"{}We\ can\ use\ the\ 'swap\ trick'\ to\ reset\ the\ capacity"{}}\ )\ \{}
 \DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ std::vector<TestType>\ empty;}
 \DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ empty.swap(\ v\ );}
 \DoxyCodeLine{}
-\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_ad57835ba8f1bb419a865ada6bd011a85}{REQUIRE}}(\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.capacity()\ ==\ 0\ );}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_ad57835ba8f1bb419a865ada6bd011a85}{REQUIRE}}(\ v.capacity()\ ==\ 0\ );}
 \DoxyCodeLine{\ \ \ \ \ \ \ \ \}}
 \DoxyCodeLine{\ \ \ \ \}}
 \DoxyCodeLine{\ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_ad512fd95a78b95770b9759823f8fbc21}{SECTION}}(\ \textcolor{stringliteral}{"{}reserving\ smaller\ does\ not\ change\ size\ or\ capacity"{}}\ )\ \{}
-\DoxyCodeLine{\ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.reserve(\ 0\ );}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ v.reserve(\ 0\ );}
 \DoxyCodeLine{}
-\DoxyCodeLine{\ \ \ \ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_ad57835ba8f1bb419a865ada6bd011a85}{REQUIRE}}(\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.size()\ ==\ 5\ );}
-\DoxyCodeLine{\ \ \ \ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_ad57835ba8f1bb419a865ada6bd011a85}{REQUIRE}}(\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.capacity()\ >=\ 5\ );}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_ad57835ba8f1bb419a865ada6bd011a85}{REQUIRE}}(\ v.size()\ ==\ 5\ );}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_ad57835ba8f1bb419a865ada6bd011a85}{REQUIRE}}(\ v.capacity()\ >=\ 5\ );}
 \DoxyCodeLine{\ \ \ \ \}}
 \DoxyCodeLine{\}}
 

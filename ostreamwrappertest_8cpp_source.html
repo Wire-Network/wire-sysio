@@ -132,8 +132,8 @@ $(function(){initNavTree('ostreamwrappertest_8cpp_source.html',''); initResizabl
 <div class="line"><a id="l00031" name="l00031"></a><span class="lineno">   31</span>    StringStreamType oss(<a class="code hl_variable" href="yubihsm__pkcs11_8c.html#a506da415c9307c897ca9be93acfe1d0f">s</a>);</div>
 <div class="line"><a id="l00032" name="l00032"></a><span class="lineno">   32</span>    <a class="code hl_class" href="class_basic_o_stream_wrapper.html">BasicOStreamWrapper&lt;StringStreamType&gt;</a> <a class="code hl_variable" href="environment_8hpp.html#a3951483d0b31c29ca95336206cd35238">os</a>(oss);</div>
 <div class="line"><a id="l00033" name="l00033"></a><span class="lineno">   33</span>    <span class="keywordflow">for</span> (<span class="keywordtype">size_t</span> i = 0; i &lt; 3; i++)</div>
-<div class="line"><a id="l00034" name="l00034"></a><span class="lineno">   34</span>        os.Put(<a class="code hl_variable" href="yubihsm__pkcs11_8c.html#a506da415c9307c897ca9be93acfe1d0f">s</a>[i]);</div>
-<div class="line"><a id="l00035" name="l00035"></a><span class="lineno">   35</span>    os.Flush();</div>
+<div class="line"><a id="l00034" name="l00034"></a><span class="lineno">   34</span>        <a class="code hl_variable" href="environment_8hpp.html#a3951483d0b31c29ca95336206cd35238">os</a>.Put(<a class="code hl_variable" href="yubihsm__pkcs11_8c.html#a506da415c9307c897ca9be93acfe1d0f">s</a>[i]);</div>
+<div class="line"><a id="l00035" name="l00035"></a><span class="lineno">   35</span>    <a class="code hl_variable" href="environment_8hpp.html#a3951483d0b31c29ca95336206cd35238">os</a>.Flush();</div>
 <div class="line"><a id="l00036" name="l00036"></a><span class="lineno">   36</span>    <span class="keywordflow">for</span> (<span class="keywordtype">size_t</span> i = 0; i &lt; 3; i++)</div>
 <div class="line"><a id="l00037" name="l00037"></a><span class="lineno">   37</span>        <a class="code hl_define" href="gtest_8h.html#a4159019abda84f5366acdb7604ff220a">EXPECT_EQ</a>(<a class="code hl_variable" href="yubihsm__pkcs11_8c.html#a506da415c9307c897ca9be93acfe1d0f">s</a>[i], oss.str()[i]);</div>
 <div class="line"><a id="l00038" name="l00038"></a><span class="lineno">   38</span>}</div>
@@ -167,14 +167,14 @@ $(function(){initNavTree('ostreamwrappertest_8cpp_source.html',''); initResizabl
 <div class="line"><a id="l00057" name="l00057"></a><span class="lineno">   57</span>    <a class="code hl_class" href="class_o_stream_wrapper.html">OStreamWrapper</a> <a class="code hl_variable" href="environment_8hpp.html#a3951483d0b31c29ca95336206cd35238">os</a>(cout);</div>
 <div class="line"><a id="l00058" name="l00058"></a><span class="lineno">   58</span>    <span class="keyword">const</span> <span class="keywordtype">char</span>* <a class="code hl_variable" href="yubihsm__pkcs11_8c.html#a506da415c9307c897ca9be93acfe1d0f">s</a> = <span class="stringliteral">&quot;Hello World!\n&quot;</span>;</div>
 <div class="line"><a id="l00059" name="l00059"></a><span class="lineno">   59</span>    <span class="keywordflow">while</span> (*<a class="code hl_variable" href="yubihsm__pkcs11_8c.html#a506da415c9307c897ca9be93acfe1d0f">s</a>)</div>
-<div class="line"><a id="l00060" name="l00060"></a><span class="lineno">   60</span>        os.Put(*<a class="code hl_variable" href="yubihsm__pkcs11_8c.html#a506da415c9307c897ca9be93acfe1d0f">s</a>++);</div>
-<div class="line"><a id="l00061" name="l00061"></a><span class="lineno">   61</span>    os.Flush();</div>
+<div class="line"><a id="l00060" name="l00060"></a><span class="lineno">   60</span>        <a class="code hl_variable" href="environment_8hpp.html#a3951483d0b31c29ca95336206cd35238">os</a>.Put(*<a class="code hl_variable" href="yubihsm__pkcs11_8c.html#a506da415c9307c897ca9be93acfe1d0f">s</a>++);</div>
+<div class="line"><a id="l00061" name="l00061"></a><span class="lineno">   61</span>    <a class="code hl_variable" href="environment_8hpp.html#a3951483d0b31c29ca95336206cd35238">os</a>.Flush();</div>
 <div class="line"><a id="l00062" name="l00062"></a><span class="lineno">   62</span>}</div>
 </div>
 <div class="line"><a id="l00063" name="l00063"></a><span class="lineno">   63</span> </div>
 <div class="line"><a id="l00064" name="l00064"></a><span class="lineno">   64</span><span class="keyword">template</span> &lt;<span class="keyword">typename</span> FileStreamType&gt;</div>
 <div class="line"><a id="l00065" name="l00065"></a><span class="lineno">   65</span><span class="keyword">static</span> <span class="keywordtype">void</span> TestFileStream() {</div>
-<div class="line"><a id="l00066" name="l00066"></a><span class="lineno">   66</span>    <span class="keywordtype">char</span> <a class="code hl_variable" href="namespaceembed_clara.html#a1e1bd594f85f58f5dca6c41c0ac720fb">filename</a>[L_tmpnam];</div>
+<div class="line"><a id="l00066" name="l00066"></a><span class="lineno">   66</span>    <span class="keywordtype">char</span> filename[L_tmpnam];</div>
 <div class="line"><a id="l00067" name="l00067"></a><span class="lineno">   67</span>    FILE* fp = <a class="code hl_function" href="unittest_8h.html#acb6251ae9b44050f1fcabf8d3c2e792b">TempFile</a>(filename);</div>
 <div class="line"><a id="l00068" name="l00068"></a><span class="lineno">   68</span>    fclose(fp);</div>
 <div class="line"><a id="l00069" name="l00069"></a><span class="lineno">   69</span> </div>
@@ -215,7 +215,6 @@ $(function(){initNavTree('ostreamwrappertest_8cpp_source.html',''); initResizabl
 <div class="ttc" id="agtest_8h_html_ad8b332753515c0ab8baada563c2547eb"><div class="ttname"><a href="gtest_8h.html#ad8b332753515c0ab8baada563c2547eb">TEST</a></div><div class="ttdeci">#define TEST(test_case_name, test_name)</div><div class="ttdef"><b>Definition</b> <a href="gtest_8h_source.html#l02275">gtest.h:2275</a></div></div>
 <div class="ttc" id="agtest_8h_html_ae9244bfbda562e8b798789b001993fa5"><div class="ttname"><a href="gtest_8h.html#ae9244bfbda562e8b798789b001993fa5">ASSERT_TRUE</a></div><div class="ttdeci">#define ASSERT_TRUE(condition)</div><div class="ttdef"><b>Definition</b> <a href="gtest_8h_source.html#l01901">gtest.h:1901</a></div></div>
 <div class="ttc" id="ahash__impl_8h_html_ab0a0d1ad13c7e4d3cb38c89f7127c85a"><div class="ttname"><a href="hash__impl_8h.html#ab0a0d1ad13c7e4d3cb38c89f7127c85a">Ch</a></div><div class="ttdeci">#define Ch(x, y, z)</div><div class="ttdef"><b>Definition</b> <a href="hash__impl_8h_source.html#l00017">hash_impl.h:17</a></div></div>
-<div class="ttc" id="anamespaceembed_clara_html_a1e1bd594f85f58f5dca6c41c0ac720fb"><div class="ttname"><a href="namespaceembed_clara.html#a1e1bd594f85f58f5dca6c41c0ac720fb">embedClara.filename</a></div><div class="ttdeci">filename</div><div class="ttdef"><b>Definition</b> <a href="embed_clara_8py_source.html#l00010">embedClara.py:10</a></div></div>
 <div class="ttc" id="anamespacerapidjson_html"><div class="ttname"><a href="namespacerapidjson.html">rapidjson</a></div><div class="ttdoc">main RapidJSON namespace</div></div>
 <div class="ttc" id="anamespacestd_html"><div class="ttname"><a href="namespacestd.html">std</a></div><div class="ttdef"><b>Definition</b> <a href="name_8hpp_source.html#l00106">name.hpp:106</a></div></div>
 <div class="ttc" id="aostreamwrapper_8h_html"><div class="ttname"><a href="ostreamwrapper_8h.html">ostreamwrapper.h</a></div></div>

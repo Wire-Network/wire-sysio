@@ -628,7 +628,7 @@ Functions</h2></td></tr>
 <div class="line">       std::forward&lt;Visitor&gt;(v).reflector_init(); \</div>
 <div class="line">    } \</div>
 <div class="line">    <span class="keyword">template</span>&lt;<span class="keyword">typename</span> Visitor&gt; \</div>
-<div class="line">    <span class="keyword">static</span> <span class="keyword">auto</span> init_imp(Visitor&amp;&amp; v, <span class="keywordtype">long</span>) -&gt; <span class="keyword">decltype</span>(<a class="code hl_variable" href="namespacedevelop_build.html#ade64cd34608f9442ef3049116a2da428">v</a>, void()) {} \</div>
+<div class="line">    <span class="keyword">static</span> <span class="keyword">auto</span> init_imp(Visitor&amp;&amp; v, <span class="keywordtype">long</span>) -&gt; <span class="keyword">decltype</span>(v, void()) {} \</div>
 <div class="line">    <span class="keyword">template</span>&lt;<span class="keyword">typename</span> Visitor&gt; \</div>
 <div class="line">    <span class="keyword">static</span> <span class="keyword">auto</span> <a class="code hl_function" href="lib_8h.html#a02fd73d861ef2e4aabb38c0c9ff82947">init</a>(Visitor&amp;&amp; v) -&gt; <span class="keyword">decltype</span>(init_imp(std::forward&lt;Visitor&gt;(v), 0), void()) { \</div>
 <div class="line">       init_imp(std::forward&lt;Visitor&gt;(v), 0); \</div>
@@ -644,7 +644,6 @@ Functions</h2></td></tr>
 <div class="line">                   <a class="code hl_struct" href="structfc_1_1has__reflector__init.html">fc::has_reflector_init&lt;TYPE&gt;::value</a>, <span class="stringliteral">&quot;must provide reflector_init() method&quot;</span> ); \</div>
 <div class="line">}; }</div>
 <div class="ttc" id="alib_8h_html_a02fd73d861ef2e4aabb38c0c9ff82947"><div class="ttname"><a href="lib_8h.html#a02fd73d861ef2e4aabb38c0c9ff82947">init</a></div><div class="ttdeci">void init()</div><div class="ttdef"><b>Definition</b> <a href="lib__test_8cpp_source.html#l00003">lib_test.cpp:3</a></div></div>
-<div class="ttc" id="anamespacedevelop_build_html_ade64cd34608f9442ef3049116a2da428"><div class="ttname"><a href="namespacedevelop_build.html#ade64cd34608f9442ef3049116a2da428">developBuild.v</a></div><div class="ttdeci">v</div><div class="ttdef"><b>Definition</b> <a href="develop_build_8py_source.html#l00006">developBuild.py:6</a></div></div>
 <div class="ttc" id="anamespacefc_html"><div class="ttname"><a href="namespacefc.html">fc</a></div><div class="ttdoc">namespace sysio::chain</div><div class="ttdef"><b>Definition</b> <a href="authority_8cpp_source.html#l00003">authority.cpp:3</a></div></div>
 <div class="ttc" id="areflect_8hpp_html_a7f5c0805b721d4cd8f1e7f1fe0a2df7d"><div class="ttname"><a href="#a7f5c0805b721d4cd8f1e7f1fe0a2df7d">FC_REFLECT_MEMBER_COUNT</a></div><div class="ttdeci">#define FC_REFLECT_MEMBER_COUNT(r, OP, elem)</div><div class="ttdef"><b>Definition</b> <a href="reflect_8hpp_source.html#l00163">reflect.hpp:163</a></div></div>
 <div class="ttc" id="areflect_8hpp_html_ab1e2d3906d3ec6b50589d7d85295ef6a"><div class="ttname"><a href="#ab1e2d3906d3ec6b50589d7d85295ef6a">FC_REFLECT_BASE_MEMBER_COUNT</a></div><div class="ttdeci">#define FC_REFLECT_BASE_MEMBER_COUNT(r, OP, elem)</div><div class="ttdef"><b>Definition</b> <a href="reflect_8hpp_source.html#l00160">reflect.hpp:160</a></div></div>

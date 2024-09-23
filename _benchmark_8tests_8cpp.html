@@ -148,15 +148,15 @@ Functions</h2></td></tr>
 <div class="line"><span class="lineno">    6</span> </div>
 <div class="line"><span class="lineno">    7</span>    <span class="keyword">static</span> <span class="keyword">const</span> <span class="keywordtype">int</span> size = 100;</div>
 <div class="line"><span class="lineno">    8</span> </div>
-<div class="line"><span class="lineno">    9</span>    std::vector&lt;int&gt; <a class="code hl_variable" href="namespacedevelop_build.html#ade64cd34608f9442ef3049116a2da428">v</a>;</div>
+<div class="line"><span class="lineno">    9</span>    std::vector&lt;int&gt; v;</div>
 <div class="line"><span class="lineno">   10</span>    std::map&lt;int, int&gt; m;</div>
 <div class="line"><span class="lineno">   11</span> </div>
 <div class="line"><span class="lineno">   12</span>    <a class="code hl_define" href="catch__benchmark_8h.html#aaba0eec6ef0736ca2b022a98a7c855e4">BENCHMARK</a>( <span class="stringliteral">&quot;Load up a vector&quot;</span> ) {</div>
-<div class="line"><span class="lineno">   13</span>        <a class="code hl_variable" href="namespacedevelop_build.html#ade64cd34608f9442ef3049116a2da428">v</a> = std::vector&lt;int&gt;();</div>
+<div class="line"><span class="lineno">   13</span>        v = std::vector&lt;int&gt;();</div>
 <div class="line"><span class="lineno">   14</span>        <span class="keywordflow">for</span>(<span class="keywordtype">int</span> i =0; i &lt; size; ++i )</div>
-<div class="line"><span class="lineno">   15</span>            <a class="code hl_variable" href="namespacedevelop_build.html#ade64cd34608f9442ef3049116a2da428">v</a>.push_back( i );</div>
+<div class="line"><span class="lineno">   15</span>            v.push_back( i );</div>
 <div class="line"><span class="lineno">   16</span>    }</div>
-<div class="line"><span class="lineno">   17</span>    <a class="code hl_define" href="include_2catch_8hpp.html#ad57835ba8f1bb419a865ada6bd011a85">REQUIRE</a>( <a class="code hl_variable" href="namespacedevelop_build.html#ade64cd34608f9442ef3049116a2da428">v</a>.size() == size );</div>
+<div class="line"><span class="lineno">   17</span>    <a class="code hl_define" href="include_2catch_8hpp.html#ad57835ba8f1bb419a865ada6bd011a85">REQUIRE</a>( v.size() == size );</div>
 <div class="line"><span class="lineno">   18</span> </div>
 <div class="line"><span class="lineno">   19</span>    <a class="code hl_define" href="catch__benchmark_8h.html#aaba0eec6ef0736ca2b022a98a7c855e4">BENCHMARK</a>( <span class="stringliteral">&quot;Load up a map&quot;</span> ) {</div>
 <div class="line"><span class="lineno">   20</span>        m = std::map&lt;int, int&gt;();</div>
@@ -166,12 +166,12 @@ Functions</h2></td></tr>
 <div class="line"><span class="lineno">   24</span>    <a class="code hl_define" href="include_2catch_8hpp.html#ad57835ba8f1bb419a865ada6bd011a85">REQUIRE</a>( m.size() == size );</div>
 <div class="line"><span class="lineno">   25</span> </div>
 <div class="line"><span class="lineno">   26</span>    <a class="code hl_define" href="catch__benchmark_8h.html#aaba0eec6ef0736ca2b022a98a7c855e4">BENCHMARK</a>( <span class="stringliteral">&quot;Reserved vector&quot;</span> ) {</div>
-<div class="line"><span class="lineno">   27</span>        <a class="code hl_variable" href="namespacedevelop_build.html#ade64cd34608f9442ef3049116a2da428">v</a> = std::vector&lt;int&gt;();</div>
-<div class="line"><span class="lineno">   28</span>        <a class="code hl_variable" href="namespacedevelop_build.html#ade64cd34608f9442ef3049116a2da428">v</a>.reserve(size);</div>
+<div class="line"><span class="lineno">   27</span>        v = std::vector&lt;int&gt;();</div>
+<div class="line"><span class="lineno">   28</span>        v.reserve(size);</div>
 <div class="line"><span class="lineno">   29</span>        <span class="keywordflow">for</span>(<span class="keywordtype">int</span> i =0; i &lt; size; ++i )</div>
-<div class="line"><span class="lineno">   30</span>            <a class="code hl_variable" href="namespacedevelop_build.html#ade64cd34608f9442ef3049116a2da428">v</a>.push_back( i );</div>
+<div class="line"><span class="lineno">   30</span>            v.push_back( i );</div>
 <div class="line"><span class="lineno">   31</span>    }</div>
-<div class="line"><span class="lineno">   32</span>    <a class="code hl_define" href="include_2catch_8hpp.html#ad57835ba8f1bb419a865ada6bd011a85">REQUIRE</a>( <a class="code hl_variable" href="namespacedevelop_build.html#ade64cd34608f9442ef3049116a2da428">v</a>.size() == size );</div>
+<div class="line"><span class="lineno">   32</span>    <a class="code hl_define" href="include_2catch_8hpp.html#ad57835ba8f1bb419a865ada6bd011a85">REQUIRE</a>( v.size() == size );</div>
 <div class="line"><span class="lineno">   33</span> </div>
 <div class="line"><span class="lineno">   34</span>    <span class="keywordtype">int</span> <a class="code hl_typedef" href="namespacepicojson.html#ac1e72166adfe3d96dc58cddc7ebd536a">array</a>[size];</div>
 <div class="line"><span class="lineno">   35</span>    <a class="code hl_define" href="catch__benchmark_8h.html#aaba0eec6ef0736ca2b022a98a7c855e4">BENCHMARK</a>( <span class="stringliteral">&quot;A fixed size array that should require no allocations&quot;</span> ) {</div>
@@ -185,7 +185,6 @@ Functions</h2></td></tr>
 <div class="line"><span class="lineno">   43</span>}</div>
 <div class="ttc" id="acatch__benchmark_8h_html_aaba0eec6ef0736ca2b022a98a7c855e4"><div class="ttname"><a href="catch__benchmark_8h.html#aaba0eec6ef0736ca2b022a98a7c855e4">BENCHMARK</a></div><div class="ttdeci">#define BENCHMARK(name)</div><div class="ttdef"><b>Definition</b> <a href="catch__benchmark_8h_source.html#l00054">catch_benchmark.h:54</a></div></div>
 <div class="ttc" id="ainclude_2catch_8hpp_html_ad57835ba8f1bb419a865ada6bd011a85"><div class="ttname"><a href="include_2catch_8hpp.html#ad57835ba8f1bb419a865ada6bd011a85">REQUIRE</a></div><div class="ttdeci">#define REQUIRE(...)</div><div class="ttdef"><b>Definition</b> <a href="include_2catch_8hpp_source.html#l00185">catch.hpp:185</a></div></div>
-<div class="ttc" id="anamespacedevelop_build_html_ade64cd34608f9442ef3049116a2da428"><div class="ttname"><a href="namespacedevelop_build.html#ade64cd34608f9442ef3049116a2da428">developBuild.v</a></div><div class="ttdeci">v</div><div class="ttdef"><b>Definition</b> <a href="develop_build_8py_source.html#l00006">developBuild.py:6</a></div></div>
 <div class="ttc" id="anamespacepicojson_html_ac1e72166adfe3d96dc58cddc7ebd536a"><div class="ttname"><a href="namespacepicojson.html#ac1e72166adfe3d96dc58cddc7ebd536a">picojson::array</a></div><div class="ttdeci">value::array array</div><div class="ttdef"><b>Definition</b> <a href="spec__test__generator_8cpp_source.html#l00221">spec_test_generator.cpp:221</a></div></div>
 </div><!-- fragment -->
 </div>

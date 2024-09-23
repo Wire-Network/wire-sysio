@@ -2,7 +2,8 @@
 \hypertarget{structsysio_1_1buffer__factory}{}\label{structsysio_1_1buffer__factory}\index{sysio::buffer\_factory@{sysio::buffer\_factory}}
 
 
-Inheritance diagram for sysio\+::buffer\+\_\+factory\+:\nopagebreak
+Inheritance diagram for sysio\+::buffer\+\_\+factory\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -51,10 +52,10 @@ Definition at line \mbox{\hyperlink{net__plugin_8cpp_source_l01336}{1336}} of fi
 \DoxyCodeLine{01336\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
 \DoxyCodeLine{01337\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ payload\_size\ =\ \mbox{\hyperlink{namespacefc_1_1raw_a64937a5adc8041247f7007882224e225}{fc::raw::pack\_size}}(\ m\ );}
 \DoxyCodeLine{01338\ }
-\DoxyCodeLine{01339\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ \textcolor{keyword}{const}\ header\ =\ \textcolor{keyword}{reinterpret\_cast<}\textcolor{keyword}{const\ }\textcolor{keywordtype}{char}*\ \mbox{\hyperlink{namespaceupload_a985aa9a71de3eb507344df65700c696d}{const}}\textcolor{keyword}{>}(\&payload\_size);\ \textcolor{comment}{//\ avoid\ variable\ size\ encoding\ of\ uint32\_t}}
-\DoxyCodeLine{01340\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{size\_t}\ \mbox{\hyperlink{namespaceversiongenerate_a5656c48d43f7e869041b6a30c124702e}{buffer\_size}}\ =\ \mbox{\hyperlink{namespacesysio_a00c50092ca42151d17c3e24f7649e607}{message\_header\_size}}\ +\ payload\_size;}
+\DoxyCodeLine{01339\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ \textcolor{keyword}{const}\ header\ =\ \textcolor{keyword}{reinterpret\_cast<}\textcolor{keyword}{const\ }\textcolor{keywordtype}{char}*\ const\textcolor{keyword}{>}(\&payload\_size);\ \textcolor{comment}{//\ avoid\ variable\ size\ encoding\ of\ uint32\_t}}
+\DoxyCodeLine{01340\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{size\_t}\ buffer\_size\ =\ \mbox{\hyperlink{namespacesysio_a00c50092ca42151d17c3e24f7649e607}{message\_header\_size}}\ +\ payload\_size;}
 \DoxyCodeLine{01341\ }
-\DoxyCodeLine{01342\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ \mbox{\hyperlink{structsysio_1_1buffer__factory_affe3353e4d4a787692a5b45715cd6c17}{send\_buffer}}\ =\ std::make\_shared<vector<char>>(\mbox{\hyperlink{namespaceversiongenerate_a5656c48d43f7e869041b6a30c124702e}{buffer\_size}});}
+\DoxyCodeLine{01342\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ \mbox{\hyperlink{structsysio_1_1buffer__factory_affe3353e4d4a787692a5b45715cd6c17}{send\_buffer}}\ =\ std::make\_shared<vector<char>>(buffer\_size);}
 \DoxyCodeLine{01343\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1datastream}{fc::datastream<char*>}}\ \mbox{\hyperlink{namespace_xbyak_1_1util_a4b2aef26182d21706896022467868f7c}{ds}}(\ \mbox{\hyperlink{structsysio_1_1buffer__factory_affe3353e4d4a787692a5b45715cd6c17}{send\_buffer}}-\/>data(),\ buffer\_size);}
 \DoxyCodeLine{01344\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_xbyak_1_1util_a4b2aef26182d21706896022467868f7c}{ds}}.write(\ header,\ \mbox{\hyperlink{namespacesysio_a00c50092ca42151d17c3e24f7649e607}{message\_header\_size}}\ );}
 \DoxyCodeLine{01345\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacefc_1_1raw_a3a18d8161aa5b4f4f02b6fcfdff5e5d1}{fc::raw::pack}}(\ ds,\ m\ );}
@@ -63,7 +64,8 @@ Definition at line \mbox{\hyperlink{net__plugin_8cpp_source_l01336}{1336}} of fi
 \DoxyCodeLine{01348\ \ \ \ \ \ \ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -88,10 +90,10 @@ Definition at line \mbox{\hyperlink{net__plugin_8cpp_source_l01351}{1351}} of fi
 \DoxyCodeLine{01353\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ which\_size\ =\ \mbox{\hyperlink{namespacefc_1_1raw_a64937a5adc8041247f7007882224e225}{fc::raw::pack\_size}}(\ \mbox{\hyperlink{structfc_1_1unsigned__int}{unsigned\_int}}(\ which\ )\ );}
 \DoxyCodeLine{01354\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ payload\_size\ =\ which\_size\ +\ \mbox{\hyperlink{namespacefc_1_1raw_a64937a5adc8041247f7007882224e225}{fc::raw::pack\_size}}(\ v\ );}
 \DoxyCodeLine{01355\ }
-\DoxyCodeLine{01356\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ \textcolor{keyword}{const}\ header\ =\ \textcolor{keyword}{reinterpret\_cast<}\textcolor{keyword}{const\ }\textcolor{keywordtype}{char}*\ \mbox{\hyperlink{namespaceupload_a985aa9a71de3eb507344df65700c696d}{const}}\textcolor{keyword}{>}(\&payload\_size);\ \textcolor{comment}{//\ avoid\ variable\ size\ encoding\ of\ uint32\_t}}
-\DoxyCodeLine{01357\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{size\_t}\ \mbox{\hyperlink{namespaceversiongenerate_a5656c48d43f7e869041b6a30c124702e}{buffer\_size}}\ =\ \mbox{\hyperlink{namespacesysio_a00c50092ca42151d17c3e24f7649e607}{message\_header\_size}}\ +\ payload\_size;}
+\DoxyCodeLine{01356\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ \textcolor{keyword}{const}\ header\ =\ \textcolor{keyword}{reinterpret\_cast<}\textcolor{keyword}{const\ }\textcolor{keywordtype}{char}*\ const\textcolor{keyword}{>}(\&payload\_size);\ \textcolor{comment}{//\ avoid\ variable\ size\ encoding\ of\ uint32\_t}}
+\DoxyCodeLine{01357\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{size\_t}\ buffer\_size\ =\ \mbox{\hyperlink{namespacesysio_a00c50092ca42151d17c3e24f7649e607}{message\_header\_size}}\ +\ payload\_size;}
 \DoxyCodeLine{01358\ }
-\DoxyCodeLine{01359\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ \mbox{\hyperlink{structsysio_1_1buffer__factory_affe3353e4d4a787692a5b45715cd6c17}{send\_buffer}}\ =\ std::make\_shared<vector<char>>(\ \mbox{\hyperlink{namespaceversiongenerate_a5656c48d43f7e869041b6a30c124702e}{buffer\_size}}\ );}
+\DoxyCodeLine{01359\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ \mbox{\hyperlink{structsysio_1_1buffer__factory_affe3353e4d4a787692a5b45715cd6c17}{send\_buffer}}\ =\ std::make\_shared<vector<char>>(\ buffer\_size\ );}
 \DoxyCodeLine{01360\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1datastream}{fc::datastream<char*>}}\ \mbox{\hyperlink{namespace_xbyak_1_1util_a4b2aef26182d21706896022467868f7c}{ds}}(\ \mbox{\hyperlink{structsysio_1_1buffer__factory_affe3353e4d4a787692a5b45715cd6c17}{send\_buffer}}-\/>data(),\ buffer\_size\ );}
 \DoxyCodeLine{01361\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_xbyak_1_1util_a4b2aef26182d21706896022467868f7c}{ds}}.write(\ header,\ \mbox{\hyperlink{namespacesysio_a00c50092ca42151d17c3e24f7649e607}{message\_header\_size}}\ );}
 \DoxyCodeLine{01362\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacefc_1_1raw_a3a18d8161aa5b4f4f02b6fcfdff5e5d1}{fc::raw::pack}}(\ ds,\ \mbox{\hyperlink{structfc_1_1unsigned__int}{unsigned\_int}}(\ which\ )\ );}
@@ -101,7 +103,8 @@ Definition at line \mbox{\hyperlink{net__plugin_8cpp_source_l01351}{1351}} of fi
 \DoxyCodeLine{01366\ \ \ \ \ \ \ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -128,7 +131,8 @@ Definition at line \mbox{\hyperlink{net__plugin_8cpp_source_l01325}{1325}} of fi
 \DoxyCodeLine{01330\ \ \ \ \ \ \ \}}
 
 \end{DoxyCode}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode

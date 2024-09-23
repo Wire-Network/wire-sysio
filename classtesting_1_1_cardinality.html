@@ -122,12 +122,12 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:a57128ba46931e24a2b39af177e3346f8"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a9b6a55179f6dcc8fadec26e6d93f3e88" id="r_a9b6a55179f6dcc8fadec26e6d93f3e88"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a9b6a55179f6dcc8fadec26e6d93f3e88">IsOverSaturatedByCallCount</a> (int call_count) const</td></tr>
 <tr class="separator:a9b6a55179f6dcc8fadec26e6d93f3e88"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a2955f4b65022c422f56e79b767c4fa71" id="r_a2955f4b65022c422f56e79b767c4fa71"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a2955f4b65022c422f56e79b767c4fa71">DescribeTo</a> (::std::ostream *os) const</td></tr>
+<tr class="memitem:a2955f4b65022c422f56e79b767c4fa71" id="r_a2955f4b65022c422f56e79b767c4fa71"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a2955f4b65022c422f56e79b767c4fa71">DescribeTo</a> (::std::ostream *<a class="el" href="environment_8hpp.html#a3951483d0b31c29ca95336206cd35238">os</a>) const</td></tr>
 <tr class="separator:a2955f4b65022c422f56e79b767c4fa71"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-static-methods" name="pub-static-methods"></a>
 Static Public Member Functions</h2></td></tr>
-<tr class="memitem:a7cbea339e2f3072a98367e087aa296e8" id="r_a7cbea339e2f3072a98367e087aa296e8"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a7cbea339e2f3072a98367e087aa296e8">DescribeActualCallCountTo</a> (int actual_call_count, ::std::ostream *os)</td></tr>
+<tr class="memitem:a7cbea339e2f3072a98367e087aa296e8" id="r_a7cbea339e2f3072a98367e087aa296e8"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a7cbea339e2f3072a98367e087aa296e8">DescribeActualCallCountTo</a> (int actual_call_count, ::std::ostream *<a class="el" href="environment_8hpp.html#a3951483d0b31c29ca95336206cd35238">os</a>)</td></tr>
 <tr class="separator:a7cbea339e2f3072a98367e087aa296e8"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
@@ -297,11 +297,12 @@ Here is the caller graph for this function:</div>
 <p class="definition">Definition at line <a class="el" href="gmock-cardinalities_8cc_source.html#l00130">130</a> of file <a class="el" href="gmock-cardinalities_8cc_source.html">gmock-cardinalities.cc</a>.</p>
 <div class="fragment"><div class="line"><span class="lineno">  131</span>                                                            {</div>
 <div class="line"><span class="lineno">  132</span>  <span class="keywordflow">if</span> (actual_call_count &gt; 0) {</div>
-<div class="line"><span class="lineno">  133</span>    *os &lt;&lt; <span class="stringliteral">&quot;called &quot;</span> &lt;&lt; FormatTimes(actual_call_count);</div>
+<div class="line"><span class="lineno">  133</span>    *<a class="code hl_variable" href="environment_8hpp.html#a3951483d0b31c29ca95336206cd35238">os</a> &lt;&lt; <span class="stringliteral">&quot;called &quot;</span> &lt;&lt; FormatTimes(actual_call_count);</div>
 <div class="line"><span class="lineno">  134</span>  } <span class="keywordflow">else</span> {</div>
-<div class="line"><span class="lineno">  135</span>    *os &lt;&lt; <span class="stringliteral">&quot;never called&quot;</span>;</div>
+<div class="line"><span class="lineno">  135</span>    *<a class="code hl_variable" href="environment_8hpp.html#a3951483d0b31c29ca95336206cd35238">os</a> &lt;&lt; <span class="stringliteral">&quot;never called&quot;</span>;</div>
 <div class="line"><span class="lineno">  136</span>  }</div>
 <div class="line"><span class="lineno">  137</span>}</div>
+<div class="ttc" id="aenvironment_8hpp_html_a3951483d0b31c29ca95336206cd35238"><div class="ttname"><a href="environment_8hpp.html#a3951483d0b31c29ca95336206cd35238">os</a></div><div class="ttdeci">os_t os</div><div class="ttdef"><b>Definition</b> <a href="environment_8hpp_source.html#l00023">environment.hpp:23</a></div></div>
 </div><!-- fragment --><div class="dynheader">
 Here is the caller graph for this function:</div>
 <div class="dyncontent">
@@ -339,7 +340,7 @@ Here is the caller graph for this function:</div>
 </div><div class="memdoc">
 
 <p class="definition">Definition at line <a class="el" href="gmock-cardinalities_8h_source.html#l00115">115</a> of file <a class="el" href="gmock-cardinalities_8h_source.html">gmock-cardinalities.h</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">  115</span>{ impl_-&gt;DescribeTo(os); }</div>
+<div class="fragment"><div class="line"><span class="lineno">  115</span>{ impl_-&gt;DescribeTo(<a class="code hl_variable" href="environment_8hpp.html#a3951483d0b31c29ca95336206cd35238">os</a>); }</div>
 </div><!-- fragment --><div class="dynheader">
 Here is the caller graph for this function:</div>
 <div class="dyncontent">

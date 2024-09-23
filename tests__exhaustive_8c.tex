@@ -10,7 +10,8 @@
 {\ttfamily \#include "{}testrand\+\_\+impl.\+h"{}}\newline
 {\ttfamily \#include "{}ecmult\+\_\+compute\+\_\+table\+\_\+impl.\+h"{}}\newline
 {\ttfamily \#include "{}ecmult\+\_\+gen\+\_\+compute\+\_\+table\+\_\+impl.\+h"{}}\newline
-Include dependency graph for tests\+\_\+exhaustive.\+c\+:\nopagebreak
+Include dependency graph for tests\+\_\+exhaustive.\+c\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -92,7 +93,8 @@ Definition at line \mbox{\hyperlink{tests__exhaustive_8c_source_l00031}{31}} of 
 \DoxyCodeLine{00038\ \}}
 
 \end{DoxyCode}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -129,7 +131,8 @@ Definition at line \mbox{\hyperlink{tests__exhaustive_8c_source_l00040}{40}} of 
 \DoxyCodeLine{00055\ \}}
 
 \end{DoxyCode}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -151,7 +154,7 @@ Definition at line \mbox{\hyperlink{tests__exhaustive_8c_source_l00356}{356}} of
 \DoxyCodeLine{00356\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
 \DoxyCodeLine{00357\ \ \ \ \ \textcolor{keywordtype}{int}\ i;}
 \DoxyCodeLine{00358\ \ \ \ \ \mbox{\hyperlink{structsecp256k1__gej}{secp256k1\_gej}}\ groupj[\mbox{\hyperlink{tests__exhaustive_8c_aef79eeed489f1f87f86dbbef6f0cb41b}{EXHAUSTIVE\_TEST\_ORDER}}];}
-\DoxyCodeLine{00359\ \ \ \ \ \mbox{\hyperlink{structsecp256k1__ge}{secp256k1\_ge}}\ \mbox{\hyperlink{namespaceupload_a9d33d66de17175dced88ffe95f079226}{group}}[\mbox{\hyperlink{tests__exhaustive_8c_aef79eeed489f1f87f86dbbef6f0cb41b}{EXHAUSTIVE\_TEST\_ORDER}}];}
+\DoxyCodeLine{00359\ \ \ \ \ \mbox{\hyperlink{structsecp256k1__ge}{secp256k1\_ge}}\ group[\mbox{\hyperlink{tests__exhaustive_8c_aef79eeed489f1f87f86dbbef6f0cb41b}{EXHAUSTIVE\_TEST\_ORDER}}];}
 \DoxyCodeLine{00360\ \ \ \ \ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}\ rand32[32];}
 \DoxyCodeLine{00361\ \ \ \ \ \mbox{\hyperlink{structsecp256k1__context__struct}{secp256k1\_context}}\ *ctx;}
 \DoxyCodeLine{00362\ }
@@ -254,7 +257,8 @@ Definition at line \mbox{\hyperlink{tests__exhaustive_8c_source_l00356}{356}} of
 \DoxyCodeLine{00459\ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -277,14 +281,15 @@ Definition at line \mbox{\hyperlink{tests__exhaustive_8c_source_l00232}{232}} of
 \DoxyCodeLine{00233\ \ \ \ \ \mbox{\hyperlink{structsecp256k1__fe}{secp256k1\_fe}}\ x;}
 \DoxyCodeLine{00234\ \ \ \ \ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}\ x\_bin[32];}
 \DoxyCodeLine{00235\ \ \ \ \ k\ \%=\ \mbox{\hyperlink{tests__exhaustive_8c_aef79eeed489f1f87f86dbbef6f0cb41b}{EXHAUSTIVE\_TEST\_ORDER}};}
-\DoxyCodeLine{00236\ \ \ \ \ x\ =\ \mbox{\hyperlink{namespaceupload_a9d33d66de17175dced88ffe95f079226}{group}}[k].x;}
+\DoxyCodeLine{00236\ \ \ \ \ x\ =\ group[k].\mbox{\hyperlink{structsecp256k1__ge_a3c04a97b606c82ea87e55d4a06f06b6e}{x}};}
 \DoxyCodeLine{00237\ \ \ \ \ secp256k1\_fe\_normalize(\&x);}
 \DoxyCodeLine{00238\ \ \ \ \ secp256k1\_fe\_get\_b32(x\_bin,\ \&x);}
 \DoxyCodeLine{00239\ \ \ \ \ secp256k1\_scalar\_set\_b32(\mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}},\ x\_bin,\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a49aa97067a36875627e1380c3fb3833d}{overflow}});}
 \DoxyCodeLine{00240\ \}}
 
 \end{DoxyCode}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -314,7 +319,8 @@ Definition at line \mbox{\hyperlink{tests__exhaustive_8c_source_l00057}{57}} of 
 \DoxyCodeLine{00065\ \}}
 
 \end{DoxyCode}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -352,7 +358,8 @@ Definition at line \mbox{\hyperlink{tests__exhaustive_8c_source_l00077}{77}} of 
 \DoxyCodeLine{00095\ \}}
 
 \end{DoxyCode}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -432,14 +439,16 @@ Definition at line \mbox{\hyperlink{tests__exhaustive_8c_source_l00106}{106}} of
 \DoxyCodeLine{00164\ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
 \includegraphics[width=318pt]{tests__exhaustive_8c_a94bafffb4aca33110a4fb70f5e128543_cgraph}
 \end{center}
 \end{figure}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -483,14 +492,16 @@ Definition at line \mbox{\hyperlink{tests__exhaustive_8c_source_l00166}{166}} of
 \DoxyCodeLine{00188\ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
 \includegraphics[width=314pt]{tests__exhaustive_8c_a2976a9b1636261cfc8e19555f71d1b8f_cgraph}
 \end{center}
 \end{figure}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -526,8 +537,8 @@ Definition at line \mbox{\hyperlink{tests__exhaustive_8c_source_l00202}{202}} of
 \DoxyCodeLine{00216\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ secp256k1\_scalar\_set\_int(\&data.sc[0],\ i);}
 \DoxyCodeLine{00217\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ secp256k1\_scalar\_set\_int(\&data.sc[1],\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a538d097420e725c4dad63c3caa9e55bd}{j}});}
 \DoxyCodeLine{00218\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ secp256k1\_scalar\_set\_int(\&g\_sc,\ k);}
-\DoxyCodeLine{00219\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ data.pt[0]\ =\ \mbox{\hyperlink{namespaceupload_a9d33d66de17175dced88ffe95f079226}{group}}[x];}
-\DoxyCodeLine{00220\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ data.pt[1]\ =\ \mbox{\hyperlink{namespaceupload_a9d33d66de17175dced88ffe95f079226}{group}}[\mbox{\hyperlink{namespacefc_ab199a7c94624123911206db59ebe45da}{y}}];}
+\DoxyCodeLine{00219\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ data.pt[0]\ =\ group[x];}
+\DoxyCodeLine{00220\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ data.pt[1]\ =\ group[\mbox{\hyperlink{namespacefc_ab199a7c94624123911206db59ebe45da}{y}}];}
 \DoxyCodeLine{00221\ }
 \DoxyCodeLine{00222\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ secp256k1\_ecmult\_multi\_var(\&ctx-\/>\mbox{\hyperlink{structsecp256k1__context__struct_aa34a996f869676899e8625adfb6c6f1d}{error\_callback}},\ scratch,\ \&tmp,\ \&g\_sc,\ ecmult\_multi\_callback,\ \&data,\ 2);}
 \DoxyCodeLine{00223\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{tests__exhaustive_8c_a7930deeb9d6815fba34afad98b8dfa69}{ge\_equals\_gej}}(\&group[(i\ *\ x\ +\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a538d097420e725c4dad63c3caa9e55bd}{j}}\ *\ y\ +\ k)\ \%\ \mbox{\hyperlink{tests__exhaustive_8c_aef79eeed489f1f87f86dbbef6f0cb41b}{EXHAUSTIVE\_TEST\_ORDER}}],\ \&tmp);}
@@ -540,14 +551,16 @@ Definition at line \mbox{\hyperlink{tests__exhaustive_8c_source_l00202}{202}} of
 \DoxyCodeLine{00230\ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
 \includegraphics[width=314pt]{tests__exhaustive_8c_a12b7541869f7fd3e006476a1b665f032_cgraph}
 \end{center}
 \end{figure}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -576,14 +589,16 @@ Definition at line \mbox{\hyperlink{tests__exhaustive_8c_source_l00097}{97}} of 
 \DoxyCodeLine{00104\ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
 \includegraphics[width=346pt]{tests__exhaustive_8c_abb9cbc816b14ad97c457f68a554f22a2_cgraph}
 \end{center}
 \end{figure}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -652,14 +667,16 @@ Definition at line \mbox{\hyperlink{tests__exhaustive_8c_source_l00295}{295}} of
 \DoxyCodeLine{00342\ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
 \includegraphics[width=350pt]{tests__exhaustive_8c_a298255aa96326836497fd98fbb670e1a_cgraph}
 \end{center}
 \end{figure}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -732,14 +749,16 @@ Definition at line \mbox{\hyperlink{tests__exhaustive_8c_source_l00242}{242}} of
 \DoxyCodeLine{00293\ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
 \includegraphics[width=350pt]{tests__exhaustive_8c_a9fae4b645cff3cbf46b521ca9f1d39dc_cgraph}
 \end{center}
 \end{figure}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode

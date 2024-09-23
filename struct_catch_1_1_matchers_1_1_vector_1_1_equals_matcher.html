@@ -395,14 +395,13 @@ template&lt;typename <a class="el" href="prettywritertest_8cpp.html#a6283df8c4e3
 <div class="line"><span class="lineno">   78</span>                <span class="comment">// - a more general approach would be via a compare template that defaults</span></div>
 <div class="line"><span class="lineno">   79</span>                <span class="comment">// to using !=. but could be specialised for, e.g. std::vector&lt;T&gt; etc</span></div>
 <div class="line"><span class="lineno">   80</span>                <span class="comment">// - then just call that directly</span></div>
-<div class="line"><span class="lineno">   81</span>                <span class="keywordflow">if</span> (<a class="code hl_variable" href="#a76cb15e71f7da72f6745c9c56a3c01f6">m_comparator</a>.size() != <a class="code hl_variable" href="namespacedevelop_build.html#ade64cd34608f9442ef3049116a2da428">v</a>.size())</div>
+<div class="line"><span class="lineno">   81</span>                <span class="keywordflow">if</span> (<a class="code hl_variable" href="#a76cb15e71f7da72f6745c9c56a3c01f6">m_comparator</a>.size() != v.size())</div>
 <div class="line"><span class="lineno">   82</span>                    <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
-<div class="line"><span class="lineno">   83</span>                <span class="keywordflow">for</span> (std::size_t i = 0; i &lt; <a class="code hl_variable" href="namespacedevelop_build.html#ade64cd34608f9442ef3049116a2da428">v</a>.size(); ++i)</div>
+<div class="line"><span class="lineno">   83</span>                <span class="keywordflow">for</span> (std::size_t i = 0; i &lt; v.size(); ++i)</div>
 <div class="line"><span class="lineno">   84</span>                    <span class="keywordflow">if</span> (<a class="code hl_variable" href="#a76cb15e71f7da72f6745c9c56a3c01f6">m_comparator</a>[i] != v[i])</div>
 <div class="line"><span class="lineno">   85</span>                        <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
 <div class="line"><span class="lineno">   86</span>                <span class="keywordflow">return</span> <span class="keyword">true</span>;</div>
 <div class="line"><span class="lineno">   87</span>            }</div>
-<div class="ttc" id="anamespacedevelop_build_html_ade64cd34608f9442ef3049116a2da428"><div class="ttname"><a href="namespacedevelop_build.html#ade64cd34608f9442ef3049116a2da428">developBuild.v</a></div><div class="ttdeci">v</div><div class="ttdef"><b>Definition</b> <a href="develop_build_8py_source.html#l00006">developBuild.py:6</a></div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -437,9 +436,9 @@ template&lt;typename <a class="el" href="prettywritertest_8cpp.html#a6283df8c4e3
 <div class="line"><span class="lineno"> 3262</span>                <span class="comment">// - a more general approach would be via a compare template that defaults</span></div>
 <div class="line"><span class="lineno"> 3263</span>                <span class="comment">// to using !=. but could be specialised for, e.g. std::vector&lt;T&gt; etc</span></div>
 <div class="line"><span class="lineno"> 3264</span>                <span class="comment">// - then just call that directly</span></div>
-<div class="line"><span class="lineno"> 3265</span>                <span class="keywordflow">if</span> (<a class="code hl_variable" href="#a76cb15e71f7da72f6745c9c56a3c01f6">m_comparator</a>.size() != <a class="code hl_variable" href="namespacedevelop_build.html#ade64cd34608f9442ef3049116a2da428">v</a>.size())</div>
+<div class="line"><span class="lineno"> 3265</span>                <span class="keywordflow">if</span> (<a class="code hl_variable" href="#a76cb15e71f7da72f6745c9c56a3c01f6">m_comparator</a>.size() != v.size())</div>
 <div class="line"><span class="lineno"> 3266</span>                    <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
-<div class="line"><span class="lineno"> 3267</span>                <span class="keywordflow">for</span> (std::size_t i = 0; i &lt; <a class="code hl_variable" href="namespacedevelop_build.html#ade64cd34608f9442ef3049116a2da428">v</a>.size(); ++i)</div>
+<div class="line"><span class="lineno"> 3267</span>                <span class="keywordflow">for</span> (std::size_t i = 0; i &lt; v.size(); ++i)</div>
 <div class="line"><span class="lineno"> 3268</span>                    <span class="keywordflow">if</span> (<a class="code hl_variable" href="#a76cb15e71f7da72f6745c9c56a3c01f6">m_comparator</a>[i] != v[i])</div>
 <div class="line"><span class="lineno"> 3269</span>                        <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
 <div class="line"><span class="lineno"> 3270</span>                <span class="keywordflow">return</span> <span class="keyword">true</span>;</div>

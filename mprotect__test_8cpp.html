@@ -201,23 +201,22 @@ Functions</h2></td></tr>
 <div class="line"><span class="lineno">   20</span>    puts(<span class="stringliteral">&quot;use Allocator with posix_memalign&quot;</span>);</div>
 <div class="line"><span class="lineno">   21</span><span class="preprocessor">#endif</span></div>
 <div class="line"><span class="lineno">   22</span>    <span class="keyword">const</span> <span class="keywordtype">int</span> <a class="code hl_variable" href="quantize_8cpp.html#ab2b6b0c222cd1ce70d6a831f57241e59">N</a> = 70000;</div>
-<div class="line"><span class="lineno">   23</span>    std::vector&lt;Code*&gt; <a class="code hl_variable" href="namespacedevelop_build.html#ade64cd34608f9442ef3049116a2da428">v</a>(<a class="code hl_variable" href="quantize_8cpp.html#ab2b6b0c222cd1ce70d6a831f57241e59">N</a>);</div>
+<div class="line"><span class="lineno">   23</span>    std::vector&lt;Code*&gt; v(<a class="code hl_variable" href="quantize_8cpp.html#ab2b6b0c222cd1ce70d6a831f57241e59">N</a>);</div>
 <div class="line"><span class="lineno">   24</span>    <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i = 0; i &lt; <a class="code hl_variable" href="quantize_8cpp.html#ab2b6b0c222cd1ce70d6a831f57241e59">N</a>; i++) {</div>
-<div class="line"><span class="lineno">   25</span>        <a class="code hl_variable" href="namespacedevelop_build.html#ade64cd34608f9442ef3049116a2da428">v</a>[i] = <span class="keyword">new</span> <a class="code hl_struct" href="struct_code.html">Code</a>(i);</div>
+<div class="line"><span class="lineno">   25</span>        v[i] = <span class="keyword">new</span> <a class="code hl_struct" href="struct_code.html">Code</a>(i);</div>
 <div class="line"><span class="lineno">   26</span>    }</div>
 <div class="line"><span class="lineno">   27</span>    <span class="keywordtype">long</span> <span class="keywordtype">long</span> sum = 0;</div>
 <div class="line"><span class="lineno">   28</span>    <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i = 0; i &lt; <a class="code hl_variable" href="quantize_8cpp.html#ab2b6b0c222cd1ce70d6a831f57241e59">N</a>; i++) {</div>
-<div class="line"><span class="lineno">   29</span>        sum += <a class="code hl_variable" href="namespacedevelop_build.html#ade64cd34608f9442ef3049116a2da428">v</a>[i]-&gt;getCode&lt;int (*)()&gt;()();</div>
+<div class="line"><span class="lineno">   29</span>        sum += v[i]-&gt;getCode&lt;int (*)()&gt;()();</div>
 <div class="line"><span class="lineno">   30</span>    }</div>
 <div class="line"><span class="lineno">   31</span>    <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i = 0; i &lt; <a class="code hl_variable" href="quantize_8cpp.html#ab2b6b0c222cd1ce70d6a831f57241e59">N</a>; i++) {</div>
-<div class="line"><span class="lineno">   32</span>        <span class="keyword">delete</span> <a class="code hl_variable" href="namespacedevelop_build.html#ade64cd34608f9442ef3049116a2da428">v</a>[i];</div>
+<div class="line"><span class="lineno">   32</span>        <span class="keyword">delete</span> v[i];</div>
 <div class="line"><span class="lineno">   33</span>    }</div>
 <div class="line"><span class="lineno">   34</span>    <a class="code hl_function" href="namespace_log.html#a83926634a3916d0927abca4aca58a60a">printf</a>(<span class="stringliteral">&quot;sum=%lld\n&quot;</span>, sum);</div>
 <div class="line"><span class="lineno">   35</span>} <span class="keywordflow">catch</span> (std::exception&amp; e) {</div>
 <div class="line"><span class="lineno">   36</span>    <a class="code hl_function" href="namespace_log.html#a83926634a3916d0927abca4aca58a60a">printf</a>(<span class="stringliteral">&quot;ERR %s\n&quot;</span>, e.what());</div>
 <div class="line"><span class="lineno">   37</span>}</div>
 <div class="ttc" id="anamespace_log_html_a83926634a3916d0927abca4aca58a60a"><div class="ttname"><a href="namespace_log.html#a83926634a3916d0927abca4aca58a60a">Log::printf</a></div><div class="ttdeci">LOGGING_API void printf(Category category, const char *format,...)</div><div class="ttdef"><b>Definition</b> <a href="_logging_8cpp_source.html#l00030">Logging.cpp:30</a></div></div>
-<div class="ttc" id="anamespacedevelop_build_html_ade64cd34608f9442ef3049116a2da428"><div class="ttname"><a href="namespacedevelop_build.html#ade64cd34608f9442ef3049116a2da428">developBuild.v</a></div><div class="ttdeci">v</div><div class="ttdef"><b>Definition</b> <a href="develop_build_8py_source.html#l00006">developBuild.py:6</a></div></div>
 <div class="ttc" id="aquantize_8cpp_html_ab2b6b0c222cd1ce70d6a831f57241e59"><div class="ttname"><a href="quantize_8cpp.html#ab2b6b0c222cd1ce70d6a831f57241e59">N</a></div><div class="ttdeci">const int N</div><div class="ttdef"><b>Definition</b> <a href="quantize_8cpp_source.html#l00054">quantize.cpp:54</a></div></div>
 <div class="ttc" id="astruct_code_html"><div class="ttname"><a href="struct_code.html">Code</a></div><div class="ttdef"><b>Definition</b> <a href="bench_8cpp_source.html#l00018">bench.cpp:18</a></div></div>
 </div><!-- fragment -->

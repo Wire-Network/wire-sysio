@@ -1,15 +1,19 @@
 <map id="sysio::chain::impl::abi_from_variant::extract" name="sysio::chain::impl::abi_from_variant::extract">
-<area shape="rect" id="Node000001" title=" " alt="" coords="5,102,139,158"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,148,139,203"/>
 <area shape="rect" id="Node000002" href="$classfc_1_1variant__object.html#ae4ed31b7cb6bc6e1d2873f9121049589" title=" " alt="" coords="201,38,322,78"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="138,102,191,82,193,87,140,107"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="105,145,143,116,185,88,193,83,196,88,188,92,146,120,108,149"/>
 <area shape="rect" id="Node000005" href="$structsysio_1_1chain_1_1impl_1_1abi__traverse__context.html#aa59879bd83e287e7174d4d0ba248d3ea" title=" " alt="" coords="187,102,337,158"/>
-<area shape="poly" id="edge5_Node000001_Node000005" title=" " alt="" coords="139,128,171,128,171,133,139,133"/>
+<area shape="poly" id="edge5_Node000001_Node000005" title=" " alt="" coords="139,157,171,149,172,154,140,162"/>
 <area shape="rect" id="Node000006" href="$namespacefc.html#accef08adf4ee05c36ccc550d8101b08f" title=" " alt="" coords="206,207,318,232"/>
-<area shape="poly" id="edge6_Node000001_Node000006" title=" " alt="" coords="134,156,220,197,218,202,131,161"/>
+<area shape="poly" id="edge6_Node000001_Node000006" title=" " alt="" coords="140,188,191,200,189,206,139,194"/>
+<area shape="rect" id="Node000007" href="$classfc_1_1variant.html#a17a7054a10963360c6a14d60f6e30128" title=" " alt="" coords="188,256,336,282"/>
+<area shape="poly" id="edge8_Node000001_Node000007" title=" " alt="" coords="116,202,188,242,200,248,198,253,185,247,113,206"/>
 <area shape="rect" id="Node000003" href="$classfc_1_1variant__object.html#a804706455398e249f6272b3ff19cef5d" title=" " alt="" coords="385,5,535,31"/>
 <area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="322,43,378,32,379,37,323,49"/>
 <area shape="rect" id="Node000004" href="$classfc_1_1variant__object.html#acfef67913fd3c24ea8017b3a5ad49144" title=" " alt="" coords="400,79,521,120"/>
 <area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="323,68,385,81,384,86,322,73"/>
 <area shape="poly" id="edge4_Node000004_Node000004" title=" " alt="" coords="422,79,421,69,427,60,440,55,460,53,482,55,495,61,492,66,480,60,460,58,441,60,430,64,426,70,428,78"/>
 <area shape="poly" id="edge7_Node000006_Node000006" title=" " alt="" coords="230,208,224,198,227,188,241,182,262,180,285,183,297,189,294,194,283,188,262,185,242,187,231,192,229,197,234,205"/>
+<area shape="rect" id="Node000008" href="$classfc_1_1variant.html#afaae1df286ff97c83301eda21dbd51ea" title=" " alt="" coords="392,256,529,282"/>
+<area shape="poly" id="edge9_Node000007_Node000008" title=" " alt="" coords="336,266,376,266,376,272,336,272"/>
 </map>

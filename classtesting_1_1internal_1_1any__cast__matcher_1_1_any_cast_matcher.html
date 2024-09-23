@@ -112,9 +112,9 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a90b8b68c487a56e5a34e556b68da030b" id="r_a90b8b68c487a56e5a34e556b68da030b"><td class="memTemplParams" colspan="2">template&lt;typename AnyType &gt; </td></tr>
 <tr class="memitem:a90b8b68c487a56e5a34e556b68da030b"><td class="memTemplItemLeft" align="right" valign="top">bool&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="#a90b8b68c487a56e5a34e556b68da030b">MatchAndExplain</a> (const AnyType &amp;<a class="el" href="pkcs11_8h.html#a32aff7c6c4cd253fdf6563677afab5ce">value</a>, <a class="el" href="classtesting_1_1_match_result_listener.html">::testing::MatchResultListener</a> *listener) const</td></tr>
 <tr class="separator:a90b8b68c487a56e5a34e556b68da030b"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a9dfb780606e32274e938ed28cb210ac9" id="r_a9dfb780606e32274e938ed28cb210ac9"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a9dfb780606e32274e938ed28cb210ac9">DescribeTo</a> (std::ostream *os) const</td></tr>
+<tr class="memitem:a9dfb780606e32274e938ed28cb210ac9" id="r_a9dfb780606e32274e938ed28cb210ac9"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a9dfb780606e32274e938ed28cb210ac9">DescribeTo</a> (std::ostream *<a class="el" href="environment_8hpp.html#a3951483d0b31c29ca95336206cd35238">os</a>) const</td></tr>
 <tr class="separator:a9dfb780606e32274e938ed28cb210ac9"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a901b3965740d6bcbb0e4583a607232dd" id="r_a901b3965740d6bcbb0e4583a607232dd"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a901b3965740d6bcbb0e4583a607232dd">DescribeNegationTo</a> (std::ostream *os) const</td></tr>
+<tr class="memitem:a901b3965740d6bcbb0e4583a607232dd" id="r_a901b3965740d6bcbb0e4583a607232dd"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a901b3965740d6bcbb0e4583a607232dd">DescribeNegationTo</a> (std::ostream *<a class="el" href="environment_8hpp.html#a3951483d0b31c29ca95336206cd35238">os</a>) const</td></tr>
 <tr class="separator:a901b3965740d6bcbb0e4583a607232dd"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
@@ -180,11 +180,12 @@ template&lt;typename <a class="el" href="prettywritertest_8cpp.html#a6283df8c4e3
 
 <p class="definition">Definition at line <a class="el" href="gmock-matchers_8h_source.html#l04156">4156</a> of file <a class="el" href="gmock-matchers_8h_source.html">gmock-matchers.h</a>.</p>
 <div class="fragment"><div class="line"><span class="lineno"> 4156</span>                                                {</div>
-<div class="line"><span class="lineno"> 4157</span>    *os &lt;&lt; <span class="stringliteral">&quot;is an &#39;any&#39; type with value of type other than &#39;&quot;</span> &lt;&lt; GetTypeName()</div>
+<div class="line"><span class="lineno"> 4157</span>    *<a class="code hl_variable" href="environment_8hpp.html#a3951483d0b31c29ca95336206cd35238">os</a> &lt;&lt; <span class="stringliteral">&quot;is an &#39;any&#39; type with value of type other than &#39;&quot;</span> &lt;&lt; GetTypeName()</div>
 <div class="line"><span class="lineno"> 4158</span>        &lt;&lt; <span class="stringliteral">&quot;&#39; or the value &quot;</span>;</div>
-<div class="line"><span class="lineno"> 4159</span>    matcher_.<a class="code hl_function" href="classtesting_1_1internal_1_1_matcher_base.html#ac1089d49b6b8a381900618985cd69b7f">DescribeNegationTo</a>(os);</div>
+<div class="line"><span class="lineno"> 4159</span>    matcher_.<a class="code hl_function" href="classtesting_1_1internal_1_1_matcher_base.html#ac1089d49b6b8a381900618985cd69b7f">DescribeNegationTo</a>(<a class="code hl_variable" href="environment_8hpp.html#a3951483d0b31c29ca95336206cd35238">os</a>);</div>
 <div class="line"><span class="lineno"> 4160</span>  }</div>
 <div class="ttc" id="aclasstesting_1_1internal_1_1_matcher_base_html_ac1089d49b6b8a381900618985cd69b7f"><div class="ttname"><a href="classtesting_1_1internal_1_1_matcher_base.html#ac1089d49b6b8a381900618985cd69b7f">testing::internal::MatcherBase::DescribeNegationTo</a></div><div class="ttdeci">void DescribeNegationTo(::std::ostream *os) const</div><div class="ttdef"><b>Definition</b> <a href="gmock-matchers_8h_source.html#l00299">gmock-matchers.h:299</a></div></div>
+<div class="ttc" id="aenvironment_8hpp_html_a3951483d0b31c29ca95336206cd35238"><div class="ttname"><a href="environment_8hpp.html#a3951483d0b31c29ca95336206cd35238">os</a></div><div class="ttdeci">os_t os</div><div class="ttdef"><b>Definition</b> <a href="environment_8hpp_source.html#l00023">environment.hpp:23</a></div></div>
 </div><!-- fragment --><div class="dynheader">
 Here is the call graph for this function:</div>
 <div class="dyncontent">
@@ -225,9 +226,9 @@ template&lt;typename <a class="el" href="prettywritertest_8cpp.html#a6283df8c4e3
 
 <p class="definition">Definition at line <a class="el" href="gmock-matchers_8h_source.html#l04150">4150</a> of file <a class="el" href="gmock-matchers_8h_source.html">gmock-matchers.h</a>.</p>
 <div class="fragment"><div class="line"><span class="lineno"> 4150</span>                                        {</div>
-<div class="line"><span class="lineno"> 4151</span>    *os &lt;&lt; <span class="stringliteral">&quot;is an &#39;any&#39; type with value of type &#39;&quot;</span> &lt;&lt; GetTypeName()</div>
+<div class="line"><span class="lineno"> 4151</span>    *<a class="code hl_variable" href="environment_8hpp.html#a3951483d0b31c29ca95336206cd35238">os</a> &lt;&lt; <span class="stringliteral">&quot;is an &#39;any&#39; type with value of type &#39;&quot;</span> &lt;&lt; GetTypeName()</div>
 <div class="line"><span class="lineno"> 4152</span>        &lt;&lt; <span class="stringliteral">&quot;&#39; and the value &quot;</span>;</div>
-<div class="line"><span class="lineno"> 4153</span>    matcher_.<a class="code hl_function" href="classtesting_1_1internal_1_1_matcher_base.html#a7e0c883c7745e0d646463077ef1c1267">DescribeTo</a>(os);</div>
+<div class="line"><span class="lineno"> 4153</span>    matcher_.<a class="code hl_function" href="classtesting_1_1internal_1_1_matcher_base.html#a7e0c883c7745e0d646463077ef1c1267">DescribeTo</a>(<a class="code hl_variable" href="environment_8hpp.html#a3951483d0b31c29ca95336206cd35238">os</a>);</div>
 <div class="line"><span class="lineno"> 4154</span>  }</div>
 <div class="ttc" id="aclasstesting_1_1internal_1_1_matcher_base_html_a7e0c883c7745e0d646463077ef1c1267"><div class="ttname"><a href="classtesting_1_1internal_1_1_matcher_base.html#a7e0c883c7745e0d646463077ef1c1267">testing::internal::MatcherBase::DescribeTo</a></div><div class="ttdeci">void DescribeTo(::std::ostream *os) const</div><div class="ttdef"><b>Definition</b> <a href="gmock-matchers_8h_source.html#l00296">gmock-matchers.h:296</a></div></div>
 </div><!-- fragment --><div class="dynheader">

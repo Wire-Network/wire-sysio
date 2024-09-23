@@ -1168,13 +1168,13 @@
 \DoxyCodeLine{\Hypertarget{gtest_8cc_source_l01164}01164\ \ \ \ \ \}}
 \DoxyCodeLine{\Hypertarget{gtest_8cc_source_l01165}01165\ \ \ \}}
 \DoxyCodeLine{\Hypertarget{gtest_8cc_source_l01166}01166\ }
-\DoxyCodeLine{\Hypertarget{gtest_8cc_source_l01167}01167\ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespacetesting_1_1internal_a8fd10cc30084c36a89c74868c8bd53f8}{PrintTo}}(std::ostream*\ os)\ \{}
-\DoxyCodeLine{\Hypertarget{gtest_8cc_source_l01168}01168\ \ \ \ \ PrintHeader(os);}
+\DoxyCodeLine{\Hypertarget{gtest_8cc_source_l01167}01167\ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespacetesting_1_1internal_a8fd10cc30084c36a89c74868c8bd53f8}{PrintTo}}(std::ostream*\ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}})\ \{}
+\DoxyCodeLine{\Hypertarget{gtest_8cc_source_l01168}01168\ \ \ \ \ PrintHeader(\mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}});}
 \DoxyCodeLine{\Hypertarget{gtest_8cc_source_l01169}01169\ \ \ \ \ FlushEdits();}
 \DoxyCodeLine{\Hypertarget{gtest_8cc_source_l01170}01170\ \ \ \ \ \textcolor{keywordflow}{for}\ (std::list<std::pair<char,\ const\ char*>\ >::const\_iterator\ it\ =}
 \DoxyCodeLine{\Hypertarget{gtest_8cc_source_l01171}01171\ \ \ \ \ \ \ \ \ \ \ \ \ \ hunk\_.begin();}
 \DoxyCodeLine{\Hypertarget{gtest_8cc_source_l01172}01172\ \ \ \ \ \ \ \ \ \ it\ !=\ hunk\_.end();\ ++it)\ \{}
-\DoxyCodeLine{\Hypertarget{gtest_8cc_source_l01173}01173\ \ \ \ \ \ \ *os\ <<\ it-\/>first\ <<\ it-\/>second\ <<\ \textcolor{stringliteral}{"{}\(\backslash\)n"{}};}
+\DoxyCodeLine{\Hypertarget{gtest_8cc_source_l01173}01173\ \ \ \ \ \ \ *\mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}\ <<\ it-\/>first\ <<\ it-\/>second\ <<\ \textcolor{stringliteral}{"{}\(\backslash\)n"{}};}
 \DoxyCodeLine{\Hypertarget{gtest_8cc_source_l01174}01174\ \ \ \ \ \}}
 \DoxyCodeLine{\Hypertarget{gtest_8cc_source_l01175}01175\ \ \ \}}
 \DoxyCodeLine{\Hypertarget{gtest_8cc_source_l01176}01176\ }
@@ -2404,7 +2404,7 @@
 \DoxyCodeLine{\Hypertarget{gtest_8cc_source_l02400}02400\ \ \ \ \ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}*\ \textcolor{keywordtype}{object},\ Result\ (\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}::*method)(),\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ location)\ \{}
 \DoxyCodeLine{\Hypertarget{gtest_8cc_source_l02401}02401\ \textcolor{preprocessor}{\#if\ GTEST\_HAS\_SEH}}
 \DoxyCodeLine{\Hypertarget{gtest_8cc_source_l02402}02402\ \ \ \_\_try\ \{}
-\DoxyCodeLine{\Hypertarget{gtest_8cc_source_l02403}02403\ \ \ \ \ \textcolor{keywordflow}{return}\ (object-\/>*method)();}
+\DoxyCodeLine{\Hypertarget{gtest_8cc_source_l02403}02403\ \ \ \ \ \textcolor{keywordflow}{return}\ (\mbox{\hyperlink{yubihsm__pkcs11_8c_a85d991d90970121ba1480cd98d93aab9}{object}}-\/>*method)();}
 \DoxyCodeLine{\Hypertarget{gtest_8cc_source_l02404}02404\ \ \ \}\ \_\_except\ (internal::UnitTestOptions::GTestShouldProcessSEH(\ \ \textcolor{comment}{//\ NOLINT}}
 \DoxyCodeLine{\Hypertarget{gtest_8cc_source_l02405}02405\ \ \ \ \ \ \ GetExceptionCode()))\ \{}
 \DoxyCodeLine{\Hypertarget{gtest_8cc_source_l02406}02406\ \ \ \ \ \textcolor{comment}{//\ We\ create\ the\ exception\ message\ on\ the\ heap\ because\ VC++\ prohibits}}
@@ -2419,7 +2419,7 @@
 \DoxyCodeLine{\Hypertarget{gtest_8cc_source_l02415}02415\ \ \ \}}
 \DoxyCodeLine{\Hypertarget{gtest_8cc_source_l02416}02416\ \textcolor{preprocessor}{\#else}}
 \DoxyCodeLine{\Hypertarget{gtest_8cc_source_l02417}02417\ \ \ (void)location;}
-\DoxyCodeLine{\Hypertarget{gtest_8cc_source_l02418}02418\ \ \ \textcolor{keywordflow}{return}\ (object-\/>*method)();}
+\DoxyCodeLine{\Hypertarget{gtest_8cc_source_l02418}02418\ \ \ \textcolor{keywordflow}{return}\ (\mbox{\hyperlink{yubihsm__pkcs11_8c_a85d991d90970121ba1480cd98d93aab9}{object}}-\/>*method)();}
 \DoxyCodeLine{\Hypertarget{gtest_8cc_source_l02419}02419\ \textcolor{preprocessor}{\#endif\ \ }\textcolor{comment}{//\ GTEST\_HAS\_SEH}}
 \DoxyCodeLine{\Hypertarget{gtest_8cc_source_l02420}02420\ \}}
 \DoxyCodeLine{\Hypertarget{gtest_8cc_source_l02421}02421\ }
@@ -2477,7 +2477,7 @@
 \DoxyCodeLine{\Hypertarget{gtest_8cc_source_l02473}02473\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespacetesting_1_1internal_ac5293b438139ef7ed05cb7fcaaf63545}{HandleSehExceptionsInMethodIfSupported}}(\textcolor{keywordtype}{object},\ method,\ location);}
 \DoxyCodeLine{\Hypertarget{gtest_8cc_source_l02474}02474\ \textcolor{preprocessor}{\#endif\ \ }\textcolor{comment}{//\ GTEST\_HAS\_EXCEPTIONS}}
 \DoxyCodeLine{\Hypertarget{gtest_8cc_source_l02475}02475\ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
-\DoxyCodeLine{\Hypertarget{gtest_8cc_source_l02476}02476\ \ \ \ \ \textcolor{keywordflow}{return}\ (object-\/>*method)();}
+\DoxyCodeLine{\Hypertarget{gtest_8cc_source_l02476}02476\ \ \ \ \ \textcolor{keywordflow}{return}\ (\mbox{\hyperlink{yubihsm__pkcs11_8c_a85d991d90970121ba1480cd98d93aab9}{object}}-\/>*method)();}
 \DoxyCodeLine{\Hypertarget{gtest_8cc_source_l02477}02477\ \ \ \}}
 \DoxyCodeLine{\Hypertarget{gtest_8cc_source_l02478}02478\ \}}
 \DoxyCodeLine{\Hypertarget{gtest_8cc_source_l02479}02479\ }
@@ -3485,7 +3485,7 @@
 \DoxyCodeLine{\Hypertarget{gtest_8cc_source_l03481}03481\ \ \ \mbox{\hyperlink{classtesting_1_1internal_1_1_file_path}{FilePath}}\ output\_file(output\_file\_);}
 \DoxyCodeLine{\Hypertarget{gtest_8cc_source_l03482}03482\ \ \ \mbox{\hyperlink{classtesting_1_1internal_1_1_file_path}{FilePath}}\ output\_dir(output\_file.\mbox{\hyperlink{classtesting_1_1internal_1_1_file_path_a49e030b5a62ca7dcc7f920a63a96fa55}{RemoveFileName}}());}
 \DoxyCodeLine{\Hypertarget{gtest_8cc_source_l03483}03483\ }
-\DoxyCodeLine{\Hypertarget{gtest_8cc_source_l03484}03484\ \ \ \textcolor{keywordflow}{if}\ (output\_dir.CreateDirectoriesRecursively())\ \{}
+\DoxyCodeLine{\Hypertarget{gtest_8cc_source_l03484}03484\ \ \ \textcolor{keywordflow}{if}\ (output\_dir.\mbox{\hyperlink{classtesting_1_1internal_1_1_file_path_a26790e530dd738f7fc8202c1ce718406}{CreateDirectoriesRecursively}}())\ \{}
 \DoxyCodeLine{\Hypertarget{gtest_8cc_source_l03485}03485\ \ \ \ \ xmlout\ =\ \mbox{\hyperlink{namespacetesting_1_1internal_1_1posix_affa05d06d3e3b1ce975935cb0eac4fa7}{posix::FOpen}}(output\_file\_.c\_str(),\ \textcolor{stringliteral}{"{}w"{}});}
 \DoxyCodeLine{\Hypertarget{gtest_8cc_source_l03486}03486\ \ \ \}}
 \DoxyCodeLine{\Hypertarget{gtest_8cc_source_l03487}03487\ \ \ \textcolor{keywordflow}{if}\ (xmlout\ ==\ NULL)\ \{}
@@ -3889,7 +3889,7 @@
 \DoxyCodeLine{\Hypertarget{gtest_8cc_source_l03887}03887\ \ \ \mbox{\hyperlink{classtesting_1_1internal_1_1_file_path}{FilePath}}\ output\_file(output\_file\_);}
 \DoxyCodeLine{\Hypertarget{gtest_8cc_source_l03888}03888\ \ \ \mbox{\hyperlink{classtesting_1_1internal_1_1_file_path}{FilePath}}\ output\_dir(output\_file.\mbox{\hyperlink{classtesting_1_1internal_1_1_file_path_a49e030b5a62ca7dcc7f920a63a96fa55}{RemoveFileName}}());}
 \DoxyCodeLine{\Hypertarget{gtest_8cc_source_l03889}03889\ }
-\DoxyCodeLine{\Hypertarget{gtest_8cc_source_l03890}03890\ \ \ \textcolor{keywordflow}{if}\ (output\_dir.CreateDirectoriesRecursively())\ \{}
+\DoxyCodeLine{\Hypertarget{gtest_8cc_source_l03890}03890\ \ \ \textcolor{keywordflow}{if}\ (output\_dir.\mbox{\hyperlink{classtesting_1_1internal_1_1_file_path_a26790e530dd738f7fc8202c1ce718406}{CreateDirectoriesRecursively}}())\ \{}
 \DoxyCodeLine{\Hypertarget{gtest_8cc_source_l03891}03891\ \ \ \ \ jsonout\ =\ \mbox{\hyperlink{namespacetesting_1_1internal_1_1posix_affa05d06d3e3b1ce975935cb0eac4fa7}{posix::FOpen}}(output\_file\_.c\_str(),\ \textcolor{stringliteral}{"{}w"{}});}
 \DoxyCodeLine{\Hypertarget{gtest_8cc_source_l03892}03892\ \ \ \}}
 \DoxyCodeLine{\Hypertarget{gtest_8cc_source_l03893}03893\ \ \ \textcolor{keywordflow}{if}\ (jsonout\ ==\ NULL)\ \{}
@@ -4218,7 +4218,7 @@
 \DoxyCodeLine{\Hypertarget{gtest_8cc_source_l04216}04216\ \ \ \textcolor{comment}{//\ Loop\ through\ all\ the\ results\ and\ connect\ to\ the\ first\ we\ can.}}
 \DoxyCodeLine{\Hypertarget{gtest_8cc_source_l04217}04217\ \ \ \textcolor{keywordflow}{for}\ (addrinfo*\ cur\_addr\ =\ servinfo;\ sockfd\_\ ==\ -\/1\ \&\&\ cur\_addr\ !=\ NULL;}
 \DoxyCodeLine{\Hypertarget{gtest_8cc_source_l04218}04218\ \ \ \ \ \ \ \ cur\_addr\ =\ cur\_addr-\/>ai\_next)\ \{}
-\DoxyCodeLine{\Hypertarget{gtest_8cc_source_l04219}04219\ \ \ \ \ sockfd\_\ =\ socket(}
+\DoxyCodeLine{\Hypertarget{gtest_8cc_source_l04219}04219\ \ \ \ \ sockfd\_\ =\ \mbox{\hyperlink{namespacewebsocketpp_1_1transport_1_1asio_1_1socket_1_1error_a828ddaa5ed63a761e1b557465a35f05aa0c31b356014843e1d09514e794a539a7}{socket}}(}
 \DoxyCodeLine{\Hypertarget{gtest_8cc_source_l04220}04220\ \ \ \ \ \ \ \ \ cur\_addr-\/>ai\_family,\ cur\_addr-\/>ai\_socktype,\ cur\_addr-\/>ai\_protocol);}
 \DoxyCodeLine{\Hypertarget{gtest_8cc_source_l04221}04221\ \ \ \ \ \textcolor{keywordflow}{if}\ (sockfd\_\ !=\ -\/1)\ \{}
 \DoxyCodeLine{\Hypertarget{gtest_8cc_source_l04222}04222\ \ \ \ \ \ \ \textcolor{comment}{//\ Connect\ the\ client\ socket\ to\ the\ server\ socket.}}

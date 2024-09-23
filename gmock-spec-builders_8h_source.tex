@@ -164,7 +164,7 @@
 \DoxyCodeLine{\Hypertarget{gmock-spec-builders_8h_source_l00160}00160\ \ \ \textcolor{comment}{//\ ostream.}}
 \DoxyCodeLine{\Hypertarget{gmock-spec-builders_8h_source_l00161}\mbox{\hyperlink{classtesting_1_1internal_1_1_untyped_function_mocker_base_a48a17fa75b744c2bfb19ee1f54d51759}{00161}}\ \ \ virtual\ \textcolor{keywordtype}{void}\ UntypedDescribeUninterestingCall(}
 \DoxyCodeLine{\Hypertarget{gmock-spec-builders_8h_source_l00162}00162\ \ \ \ \ \ \ const\ \textcolor{keywordtype}{void}*\ untyped\_args,}
-\DoxyCodeLine{\Hypertarget{gmock-spec-builders_8h_source_l00163}00163\ \ \ \ \ \ \ ::\mbox{\hyperlink{namespacestd}{std}}::ostream*\ os)\ const}
+\DoxyCodeLine{\Hypertarget{gmock-spec-builders_8h_source_l00163}00163\ \ \ \ \ \ \ ::\mbox{\hyperlink{namespacestd}{std}}::ostream*\ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}})\ const}
 \DoxyCodeLine{\Hypertarget{gmock-spec-builders_8h_source_l00164}00164\ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{gtest-port_8h_a69abff5a4efdd07bd5faebe3dd318d06}{GTEST\_LOCK\_EXCLUDED\_}}(g\_gmock\_mutex)\ =\ 0;}
 \DoxyCodeLine{\Hypertarget{gmock-spec-builders_8h_source_l00165}00165\ }
 \DoxyCodeLine{\Hypertarget{gmock-spec-builders_8h_source_l00166}00166\ \ \ \textcolor{comment}{//\ Returns\ the\ expectation\ that\ matches\ the\ given\ function\ arguments}}
@@ -181,7 +181,7 @@
 \DoxyCodeLine{\Hypertarget{gmock-spec-builders_8h_source_l00177}00177\ }
 \DoxyCodeLine{\Hypertarget{gmock-spec-builders_8h_source_l00178}00178\ \ \ \textcolor{comment}{//\ Prints\ the\ given\ function\ arguments\ to\ the\ ostream.}}
 \DoxyCodeLine{\Hypertarget{gmock-spec-builders_8h_source_l00179}\mbox{\hyperlink{classtesting_1_1internal_1_1_untyped_function_mocker_base_ae8c91f05fc90e66a84df49aae8de0d41}{00179}}\ \ \ virtual\ \textcolor{keywordtype}{void}\ UntypedPrintArgs(const\ \textcolor{keywordtype}{void}*\ untyped\_args,}
-\DoxyCodeLine{\Hypertarget{gmock-spec-builders_8h_source_l00180}00180\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ::\mbox{\hyperlink{namespacestd}{std}}::ostream*\ os)\ const\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{gmock-spec-builders_8h_source_l00180}00180\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ::\mbox{\hyperlink{namespacestd}{std}}::ostream*\ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}})\ const\ =\ 0;}
 \DoxyCodeLine{\Hypertarget{gmock-spec-builders_8h_source_l00181}00181\ }
 \DoxyCodeLine{\Hypertarget{gmock-spec-builders_8h_source_l00182}00182\ \ \ \textcolor{comment}{//\ Sets\ the\ mock\ object\ this\ mock\ method\ belongs\ to,\ and\ registers}}
 \DoxyCodeLine{\Hypertarget{gmock-spec-builders_8h_source_l00183}00183\ \ \ \textcolor{comment}{//\ this\ information\ in\ the\ global\ mock\ registry.\ \ Will\ be\ called}}
@@ -711,18 +711,18 @@
 \DoxyCodeLine{\Hypertarget{gmock-spec-builders_8h_source_l00707}\mbox{\hyperlink{classtesting_1_1internal_1_1_expectation_base_add89b0324797a421a1df77898528cbb7}{00707}}\ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{classtesting_1_1_cardinality}{Cardinality}}\&\ \mbox{\hyperlink{classtesting_1_1internal_1_1_expectation_base_add89b0324797a421a1df77898528cbb7}{cardinality}}()\textcolor{keyword}{\ const\ }\{\ \textcolor{keywordflow}{return}\ cardinality\_;\ \}}
 \DoxyCodeLine{\Hypertarget{gmock-spec-builders_8h_source_l00708}00708\ }
 \DoxyCodeLine{\Hypertarget{gmock-spec-builders_8h_source_l00709}00709\ \ \ \textcolor{comment}{//\ Describes\ the\ source\ file\ location\ of\ this\ expectation.}}
-\DoxyCodeLine{\Hypertarget{gmock-spec-builders_8h_source_l00710}\mbox{\hyperlink{classtesting_1_1internal_1_1_expectation_base_a666e7f8fb2412e78f090244e6bfd4493}{00710}}\ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classtesting_1_1internal_1_1_expectation_base_a666e7f8fb2412e78f090244e6bfd4493}{DescribeLocationTo}}(::std::ostream*\ os)\textcolor{keyword}{\ const\ }\{}
-\DoxyCodeLine{\Hypertarget{gmock-spec-builders_8h_source_l00711}00711\ \ \ \ \ *os\ <<\ FormatFileLocation(file(),\ line())\ <<\ \textcolor{stringliteral}{"{}\ "{}};}
+\DoxyCodeLine{\Hypertarget{gmock-spec-builders_8h_source_l00710}\mbox{\hyperlink{classtesting_1_1internal_1_1_expectation_base_a666e7f8fb2412e78f090244e6bfd4493}{00710}}\ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classtesting_1_1internal_1_1_expectation_base_a666e7f8fb2412e78f090244e6bfd4493}{DescribeLocationTo}}(::std::ostream*\ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}})\textcolor{keyword}{\ const\ }\{}
+\DoxyCodeLine{\Hypertarget{gmock-spec-builders_8h_source_l00711}00711\ \ \ \ \ *\mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}\ <<\ FormatFileLocation(file(),\ line())\ <<\ \textcolor{stringliteral}{"{}\ "{}};}
 \DoxyCodeLine{\Hypertarget{gmock-spec-builders_8h_source_l00712}00712\ \ \ \}}
 \DoxyCodeLine{\Hypertarget{gmock-spec-builders_8h_source_l00713}00713\ }
 \DoxyCodeLine{\Hypertarget{gmock-spec-builders_8h_source_l00714}00714\ \ \ \textcolor{comment}{//\ Describes\ how\ many\ times\ a\ function\ call\ matching\ this}}
 \DoxyCodeLine{\Hypertarget{gmock-spec-builders_8h_source_l00715}00715\ \ \ \textcolor{comment}{//\ expectation\ has\ occurred.}}
-\DoxyCodeLine{\Hypertarget{gmock-spec-builders_8h_source_l00716}00716\ \ \ \textcolor{keywordtype}{void}\ DescribeCallCountTo(::std::ostream*\ os)\ \textcolor{keyword}{const}}
+\DoxyCodeLine{\Hypertarget{gmock-spec-builders_8h_source_l00716}00716\ \ \ \textcolor{keywordtype}{void}\ DescribeCallCountTo(::std::ostream*\ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}})\ \textcolor{keyword}{const}}
 \DoxyCodeLine{\Hypertarget{gmock-spec-builders_8h_source_l00717}00717\ \ \ \ \ \ \ \mbox{\hyperlink{gtest-port_8h_a149f693bd59fa1bc937af54c0cdcb32f}{GTEST\_EXCLUSIVE\_LOCK\_REQUIRED\_}}(g\_gmock\_mutex);}
 \DoxyCodeLine{\Hypertarget{gmock-spec-builders_8h_source_l00718}00718\ }
 \DoxyCodeLine{\Hypertarget{gmock-spec-builders_8h_source_l00719}00719\ \ \ \textcolor{comment}{//\ If\ this\ mock\ method\ has\ an\ extra\ matcher\ (i.e.\ .With(matcher)),}}
 \DoxyCodeLine{\Hypertarget{gmock-spec-builders_8h_source_l00720}00720\ \ \ \textcolor{comment}{//\ describes\ it\ to\ the\ ostream.}}
-\DoxyCodeLine{\Hypertarget{gmock-spec-builders_8h_source_l00721}\mbox{\hyperlink{classtesting_1_1internal_1_1_expectation_base_a5ce4f648c7b112d27b798711d1e3ff5b}{00721}}\ \ \ \textcolor{keyword}{virtual}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classtesting_1_1internal_1_1_expectation_base_a5ce4f648c7b112d27b798711d1e3ff5b}{MaybeDescribeExtraMatcherTo}}(::std::ostream*\ os)\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{gmock-spec-builders_8h_source_l00721}\mbox{\hyperlink{classtesting_1_1internal_1_1_expectation_base_a5ce4f648c7b112d27b798711d1e3ff5b}{00721}}\ \ \ \textcolor{keyword}{virtual}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classtesting_1_1internal_1_1_expectation_base_a5ce4f648c7b112d27b798711d1e3ff5b}{MaybeDescribeExtraMatcherTo}}(::std::ostream*\ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}})\ =\ 0;}
 \DoxyCodeLine{\Hypertarget{gmock-spec-builders_8h_source_l00722}00722\ }
 \DoxyCodeLine{\Hypertarget{gmock-spec-builders_8h_source_l00723}00723\ \ \textcolor{keyword}{protected}:}
 \DoxyCodeLine{\Hypertarget{gmock-spec-builders_8h_source_l00724}\mbox{\hyperlink{classtesting_1_1internal_1_1_expectation_base_a86fa3dccdc465d897ee321b74e4ce915}{00724}}\ \ \ \textcolor{keyword}{friend}\ class\ ::testing::Expectation;}
@@ -1070,11 +1070,11 @@
 \DoxyCodeLine{\Hypertarget{gmock-spec-builders_8h_source_l01066}01066\ }
 \DoxyCodeLine{\Hypertarget{gmock-spec-builders_8h_source_l01067}01067\ \ \ \textcolor{comment}{//\ If\ this\ mock\ method\ has\ an\ extra\ matcher\ (i.e.\ .With(matcher)),}}
 \DoxyCodeLine{\Hypertarget{gmock-spec-builders_8h_source_l01068}01068\ \ \ \textcolor{comment}{//\ describes\ it\ to\ the\ ostream.}}
-\DoxyCodeLine{\Hypertarget{gmock-spec-builders_8h_source_l01069}\mbox{\hyperlink{classtesting_1_1internal_1_1_typed_expectation_ab019251041a408dc5a5d8ae216be53f4}{01069}}\ \ \ \textcolor{keyword}{virtual}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classtesting_1_1internal_1_1_typed_expectation_ab019251041a408dc5a5d8ae216be53f4}{MaybeDescribeExtraMatcherTo}}(::std::ostream*\ os)\ \{}
+\DoxyCodeLine{\Hypertarget{gmock-spec-builders_8h_source_l01069}\mbox{\hyperlink{classtesting_1_1internal_1_1_typed_expectation_ab019251041a408dc5a5d8ae216be53f4}{01069}}\ \ \ \textcolor{keyword}{virtual}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classtesting_1_1internal_1_1_typed_expectation_ab019251041a408dc5a5d8ae216be53f4}{MaybeDescribeExtraMatcherTo}}(::std::ostream*\ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}})\ \{}
 \DoxyCodeLine{\Hypertarget{gmock-spec-builders_8h_source_l01070}01070\ \ \ \ \ \textcolor{keywordflow}{if}\ (extra\_matcher\_specified\_)\ \{}
-\DoxyCodeLine{\Hypertarget{gmock-spec-builders_8h_source_l01071}01071\ \ \ \ \ \ \ *os\ <<\ \textcolor{stringliteral}{"{}\ \ \ \ Expected\ args:\ "{}};}
-\DoxyCodeLine{\Hypertarget{gmock-spec-builders_8h_source_l01072}01072\ \ \ \ \ \ \ extra\_matcher\_.DescribeTo(os);}
-\DoxyCodeLine{\Hypertarget{gmock-spec-builders_8h_source_l01073}01073\ \ \ \ \ \ \ *os\ <<\ \textcolor{stringliteral}{"{}\(\backslash\)n"{}};}
+\DoxyCodeLine{\Hypertarget{gmock-spec-builders_8h_source_l01071}01071\ \ \ \ \ \ \ *\mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}\ <<\ \textcolor{stringliteral}{"{}\ \ \ \ Expected\ args:\ "{}};}
+\DoxyCodeLine{\Hypertarget{gmock-spec-builders_8h_source_l01072}01072\ \ \ \ \ \ \ extra\_matcher\_.DescribeTo(\mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}});}
+\DoxyCodeLine{\Hypertarget{gmock-spec-builders_8h_source_l01073}01073\ \ \ \ \ \ \ *\mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}\ <<\ \textcolor{stringliteral}{"{}\(\backslash\)n"{}};}
 \DoxyCodeLine{\Hypertarget{gmock-spec-builders_8h_source_l01074}01074\ \ \ \ \ \}}
 \DoxyCodeLine{\Hypertarget{gmock-spec-builders_8h_source_l01075}01075\ \ \ \}}
 \DoxyCodeLine{\Hypertarget{gmock-spec-builders_8h_source_l01076}01076\ }
@@ -1116,28 +1116,28 @@
 \DoxyCodeLine{\Hypertarget{gmock-spec-builders_8h_source_l01112}01112\ \ \ \textcolor{comment}{//\ expectation\ to\ the\ given\ ostream.}}
 \DoxyCodeLine{\Hypertarget{gmock-spec-builders_8h_source_l01113}01113\ \ \ \textcolor{keywordtype}{void}\ ExplainMatchResultTo(}
 \DoxyCodeLine{\Hypertarget{gmock-spec-builders_8h_source_l01114}01114\ \ \ \ \ \ \ \textcolor{keyword}{const}\ ArgumentTuple\&\ args,}
-\DoxyCodeLine{\Hypertarget{gmock-spec-builders_8h_source_l01115}01115\ \ \ \ \ \ \ ::std::ostream*\ os)\ \textcolor{keyword}{const}}
+\DoxyCodeLine{\Hypertarget{gmock-spec-builders_8h_source_l01115}01115\ \ \ \ \ \ \ ::std::ostream*\ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}})\ \textcolor{keyword}{const}}
 \DoxyCodeLine{\Hypertarget{gmock-spec-builders_8h_source_l01116}01116\ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{gtest-port_8h_a149f693bd59fa1bc937af54c0cdcb32f}{GTEST\_EXCLUSIVE\_LOCK\_REQUIRED\_}}(g\_gmock\_mutex)\ \{}
 \DoxyCodeLine{\Hypertarget{gmock-spec-builders_8h_source_l01117}01117\ \ \ \ \ g\_gmock\_mutex.AssertHeld();}
 \DoxyCodeLine{\Hypertarget{gmock-spec-builders_8h_source_l01118}01118\ }
 \DoxyCodeLine{\Hypertarget{gmock-spec-builders_8h_source_l01119}01119\ \ \ \ \ \textcolor{keywordflow}{if}\ (is\_retired())\ \{}
-\DoxyCodeLine{\Hypertarget{gmock-spec-builders_8h_source_l01120}01120\ \ \ \ \ \ \ *os\ <<\ \textcolor{stringliteral}{"{}\ \ \ \ \ \ \ \ \ Expected:\ the\ expectation\ is\ active\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{gmock-spec-builders_8h_source_l01120}01120\ \ \ \ \ \ \ *\mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}\ <<\ \textcolor{stringliteral}{"{}\ \ \ \ \ \ \ \ \ Expected:\ the\ expectation\ is\ active\(\backslash\)n"{}}}
 \DoxyCodeLine{\Hypertarget{gmock-spec-builders_8h_source_l01121}01121\ \ \ \ \ \ \ \ \ \ \ <<\ \textcolor{stringliteral}{"{}\ \ \ \ \ \ \ \ \ \ \ Actual:\ it\ is\ retired\(\backslash\)n"{}};}
 \DoxyCodeLine{\Hypertarget{gmock-spec-builders_8h_source_l01122}01122\ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}\ (!Matches(args))\ \{}
 \DoxyCodeLine{\Hypertarget{gmock-spec-builders_8h_source_l01123}01123\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!\mbox{\hyperlink{namespacetesting_1_1internal_a10095d1e1c99369200072b39d657ebc4}{TupleMatches}}(matchers\_,\ args))\ \{}
-\DoxyCodeLine{\Hypertarget{gmock-spec-builders_8h_source_l01124}01124\ \ \ \ \ \ \ \ \ ExplainMatchFailureTupleTo(matchers\_,\ args,\ os);}
+\DoxyCodeLine{\Hypertarget{gmock-spec-builders_8h_source_l01124}01124\ \ \ \ \ \ \ \ \ ExplainMatchFailureTupleTo(matchers\_,\ args,\ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}});}
 \DoxyCodeLine{\Hypertarget{gmock-spec-builders_8h_source_l01125}01125\ \ \ \ \ \ \ \}}
 \DoxyCodeLine{\Hypertarget{gmock-spec-builders_8h_source_l01126}01126\ \ \ \ \ \ \ StringMatchResultListener\ listener;}
 \DoxyCodeLine{\Hypertarget{gmock-spec-builders_8h_source_l01127}01127\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!extra\_matcher\_.MatchAndExplain(args,\ \&listener))\ \{}
-\DoxyCodeLine{\Hypertarget{gmock-spec-builders_8h_source_l01128}01128\ \ \ \ \ \ \ \ \ *os\ <<\ \textcolor{stringliteral}{"{}\ \ \ \ Expected\ args:\ "{}};}
-\DoxyCodeLine{\Hypertarget{gmock-spec-builders_8h_source_l01129}01129\ \ \ \ \ \ \ \ \ extra\_matcher\_.DescribeTo(os);}
-\DoxyCodeLine{\Hypertarget{gmock-spec-builders_8h_source_l01130}01130\ \ \ \ \ \ \ \ \ *os\ <<\ \textcolor{stringliteral}{"{}\(\backslash\)n\ \ \ \ \ \ \ \ \ \ \ Actual:\ don't\ match"{}};}
+\DoxyCodeLine{\Hypertarget{gmock-spec-builders_8h_source_l01128}01128\ \ \ \ \ \ \ \ \ *\mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}\ <<\ \textcolor{stringliteral}{"{}\ \ \ \ Expected\ args:\ "{}};}
+\DoxyCodeLine{\Hypertarget{gmock-spec-builders_8h_source_l01129}01129\ \ \ \ \ \ \ \ \ extra\_matcher\_.DescribeTo(\mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}});}
+\DoxyCodeLine{\Hypertarget{gmock-spec-builders_8h_source_l01130}01130\ \ \ \ \ \ \ \ \ *\mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}\ <<\ \textcolor{stringliteral}{"{}\(\backslash\)n\ \ \ \ \ \ \ \ \ \ \ Actual:\ don't\ match"{}};}
 \DoxyCodeLine{\Hypertarget{gmock-spec-builders_8h_source_l01131}01131\ }
-\DoxyCodeLine{\Hypertarget{gmock-spec-builders_8h_source_l01132}01132\ \ \ \ \ \ \ \ \ internal::PrintIfNotEmpty(listener.str(),\ os);}
-\DoxyCodeLine{\Hypertarget{gmock-spec-builders_8h_source_l01133}01133\ \ \ \ \ \ \ \ \ *os\ <<\ \textcolor{stringliteral}{"{}\(\backslash\)n"{}};}
+\DoxyCodeLine{\Hypertarget{gmock-spec-builders_8h_source_l01132}01132\ \ \ \ \ \ \ \ \ internal::PrintIfNotEmpty(listener.str(),\ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}});}
+\DoxyCodeLine{\Hypertarget{gmock-spec-builders_8h_source_l01133}01133\ \ \ \ \ \ \ \ \ *\mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}\ <<\ \textcolor{stringliteral}{"{}\(\backslash\)n"{}};}
 \DoxyCodeLine{\Hypertarget{gmock-spec-builders_8h_source_l01134}01134\ \ \ \ \ \ \ \}}
 \DoxyCodeLine{\Hypertarget{gmock-spec-builders_8h_source_l01135}01135\ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}\ (!AllPrerequisitesAreSatisfied())\ \{}
-\DoxyCodeLine{\Hypertarget{gmock-spec-builders_8h_source_l01136}01136\ \ \ \ \ \ \ *os\ <<\ \textcolor{stringliteral}{"{}\ \ \ \ \ \ \ \ \ Expected:\ all\ pre-\/requisites\ are\ satisfied\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{gmock-spec-builders_8h_source_l01136}01136\ \ \ \ \ \ \ *\mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}\ <<\ \textcolor{stringliteral}{"{}\ \ \ \ \ \ \ \ \ Expected:\ all\ pre-\/requisites\ are\ satisfied\(\backslash\)n"{}}}
 \DoxyCodeLine{\Hypertarget{gmock-spec-builders_8h_source_l01137}01137\ \ \ \ \ \ \ \ \ \ \ <<\ \textcolor{stringliteral}{"{}\ \ \ \ \ \ \ \ \ \ \ Actual:\ the\ following\ immediate\ pre-\/requisites\ "{}}}
 \DoxyCodeLine{\Hypertarget{gmock-spec-builders_8h_source_l01138}01138\ \ \ \ \ \ \ \ \ \ \ <<\ \textcolor{stringliteral}{"{}are\ not\ satisfied:\(\backslash\)n"{}};}
 \DoxyCodeLine{\Hypertarget{gmock-spec-builders_8h_source_l01139}01139\ \ \ \ \ \ \ ExpectationSet\ unsatisfied\_prereqs;}
@@ -1145,16 +1145,16 @@
 \DoxyCodeLine{\Hypertarget{gmock-spec-builders_8h_source_l01141}01141\ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ i\ =\ 0;}
 \DoxyCodeLine{\Hypertarget{gmock-spec-builders_8h_source_l01142}01142\ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (ExpectationSet::const\_iterator\ it\ =\ unsatisfied\_prereqs.begin();}
 \DoxyCodeLine{\Hypertarget{gmock-spec-builders_8h_source_l01143}01143\ \ \ \ \ \ \ \ \ \ \ \ it\ !=\ unsatisfied\_prereqs.end();\ ++it)\ \{}
-\DoxyCodeLine{\Hypertarget{gmock-spec-builders_8h_source_l01144}01144\ \ \ \ \ \ \ \ \ it-\/>expectation\_base()-\/>DescribeLocationTo(os);}
-\DoxyCodeLine{\Hypertarget{gmock-spec-builders_8h_source_l01145}01145\ \ \ \ \ \ \ \ \ *os\ <<\ \textcolor{stringliteral}{"{}pre-\/requisite\ \#"{}}\ <<\ i++\ <<\ \textcolor{stringliteral}{"{}\(\backslash\)n"{}};}
+\DoxyCodeLine{\Hypertarget{gmock-spec-builders_8h_source_l01144}01144\ \ \ \ \ \ \ \ \ it-\/>expectation\_base()-\/>DescribeLocationTo(\mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}});}
+\DoxyCodeLine{\Hypertarget{gmock-spec-builders_8h_source_l01145}01145\ \ \ \ \ \ \ \ \ *\mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}\ <<\ \textcolor{stringliteral}{"{}pre-\/requisite\ \#"{}}\ <<\ i++\ <<\ \textcolor{stringliteral}{"{}\(\backslash\)n"{}};}
 \DoxyCodeLine{\Hypertarget{gmock-spec-builders_8h_source_l01146}01146\ \ \ \ \ \ \ \}}
-\DoxyCodeLine{\Hypertarget{gmock-spec-builders_8h_source_l01147}01147\ \ \ \ \ \ \ *os\ <<\ \textcolor{stringliteral}{"{}\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (end\ of\ pre-\/requisites)\(\backslash\)n"{}};}
+\DoxyCodeLine{\Hypertarget{gmock-spec-builders_8h_source_l01147}01147\ \ \ \ \ \ \ *\mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}\ <<\ \textcolor{stringliteral}{"{}\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (end\ of\ pre-\/requisites)\(\backslash\)n"{}};}
 \DoxyCodeLine{\Hypertarget{gmock-spec-builders_8h_source_l01148}01148\ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
 \DoxyCodeLine{\Hypertarget{gmock-spec-builders_8h_source_l01149}01149\ \ \ \ \ \ \ \textcolor{comment}{//\ This\ line\ is\ here\ just\ for\ completeness'\ sake.\ \ It\ will\ never}}
 \DoxyCodeLine{\Hypertarget{gmock-spec-builders_8h_source_l01150}01150\ \ \ \ \ \ \ \textcolor{comment}{//\ be\ executed\ as\ currently\ the\ ExplainMatchResultTo()\ function}}
 \DoxyCodeLine{\Hypertarget{gmock-spec-builders_8h_source_l01151}01151\ \ \ \ \ \ \ \textcolor{comment}{//\ is\ called\ only\ when\ the\ mock\ function\ call\ does\ NOT\ match\ the}}
 \DoxyCodeLine{\Hypertarget{gmock-spec-builders_8h_source_l01152}01152\ \ \ \ \ \ \ \textcolor{comment}{//\ expectation.}}
-\DoxyCodeLine{\Hypertarget{gmock-spec-builders_8h_source_l01153}01153\ \ \ \ \ \ \ *os\ <<\ \textcolor{stringliteral}{"{}The\ call\ matches\ the\ expectation.\(\backslash\)n"{}};}
+\DoxyCodeLine{\Hypertarget{gmock-spec-builders_8h_source_l01153}01153\ \ \ \ \ \ \ *\mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}\ <<\ \textcolor{stringliteral}{"{}The\ call\ matches\ the\ expectation.\(\backslash\)n"{}};}
 \DoxyCodeLine{\Hypertarget{gmock-spec-builders_8h_source_l01154}01154\ \ \ \ \ \}}
 \DoxyCodeLine{\Hypertarget{gmock-spec-builders_8h_source_l01155}01155\ \ \ \}}
 \DoxyCodeLine{\Hypertarget{gmock-spec-builders_8h_source_l01156}01156\ }
@@ -1380,7 +1380,7 @@
 \DoxyCodeLine{\Hypertarget{gmock-spec-builders_8h_source_l01376}\mbox{\hyperlink{classtesting_1_1internal_1_1_untyped_action_result_holder_base_a2e6c331d249aea75ccc1e4fba3897a29}{01376}}\ \ \ \textcolor{keyword}{virtual}\ \mbox{\hyperlink{classtesting_1_1internal_1_1_untyped_action_result_holder_base_a2e6c331d249aea75ccc1e4fba3897a29}{\string~UntypedActionResultHolderBase}}()\ \{\}}
 \DoxyCodeLine{\Hypertarget{gmock-spec-builders_8h_source_l01377}01377\ }
 \DoxyCodeLine{\Hypertarget{gmock-spec-builders_8h_source_l01378}01378\ \ \ \textcolor{comment}{//\ Prints\ the\ held\ value\ as\ an\ action's\ result\ to\ os.}}
-\DoxyCodeLine{\Hypertarget{gmock-spec-builders_8h_source_l01379}\mbox{\hyperlink{classtesting_1_1internal_1_1_untyped_action_result_holder_base_a4b4a558fcb1d3b02c0fec34f186d3b90}{01379}}\ \ \ \textcolor{keyword}{virtual}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classtesting_1_1internal_1_1_untyped_action_result_holder_base_a4b4a558fcb1d3b02c0fec34f186d3b90}{PrintAsActionResult}}(::std::ostream*\ os)\ \textcolor{keyword}{const}\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{gmock-spec-builders_8h_source_l01379}\mbox{\hyperlink{classtesting_1_1internal_1_1_untyped_action_result_holder_base_a4b4a558fcb1d3b02c0fec34f186d3b90}{01379}}\ \ \ \textcolor{keyword}{virtual}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classtesting_1_1internal_1_1_untyped_action_result_holder_base_a4b4a558fcb1d3b02c0fec34f186d3b90}{PrintAsActionResult}}(::std::ostream*\ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}})\ \textcolor{keyword}{const}\ =\ 0;}
 \DoxyCodeLine{\Hypertarget{gmock-spec-builders_8h_source_l01380}01380\ \};}
 \DoxyCodeLine{\Hypertarget{gmock-spec-builders_8h_source_l01381}01381\ }
 \DoxyCodeLine{\Hypertarget{gmock-spec-builders_8h_source_l01382}01382\ \textcolor{comment}{//\ This\ generic\ definition\ is\ used\ when\ T\ is\ not\ void.}}
@@ -1393,10 +1393,10 @@
 \DoxyCodeLine{\Hypertarget{gmock-spec-builders_8h_source_l01389}01389\ \ \ \}}
 \DoxyCodeLine{\Hypertarget{gmock-spec-builders_8h_source_l01390}01390\ }
 \DoxyCodeLine{\Hypertarget{gmock-spec-builders_8h_source_l01391}01391\ \ \ \textcolor{comment}{//\ Prints\ the\ held\ value\ as\ an\ action's\ result\ to\ os.}}
-\DoxyCodeLine{\Hypertarget{gmock-spec-builders_8h_source_l01392}\mbox{\hyperlink{classtesting_1_1internal_1_1_action_result_holder_a06d1fb40fc863328dbcc102bc46dece4}{01392}}\ \ \ \textcolor{keyword}{virtual}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classtesting_1_1internal_1_1_action_result_holder_a06d1fb40fc863328dbcc102bc46dece4}{PrintAsActionResult}}(::std::ostream*\ os)\textcolor{keyword}{\ const\ }\{}
-\DoxyCodeLine{\Hypertarget{gmock-spec-builders_8h_source_l01393}01393\ \ \ \ \ *os\ <<\ \textcolor{stringliteral}{"{}\(\backslash\)n\ \ \ \ \ \ \ \ \ \ Returns:\ "{}};}
+\DoxyCodeLine{\Hypertarget{gmock-spec-builders_8h_source_l01392}\mbox{\hyperlink{classtesting_1_1internal_1_1_action_result_holder_a06d1fb40fc863328dbcc102bc46dece4}{01392}}\ \ \ \textcolor{keyword}{virtual}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classtesting_1_1internal_1_1_action_result_holder_a06d1fb40fc863328dbcc102bc46dece4}{PrintAsActionResult}}(::std::ostream*\ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}})\textcolor{keyword}{\ const\ }\{}
+\DoxyCodeLine{\Hypertarget{gmock-spec-builders_8h_source_l01393}01393\ \ \ \ \ *\mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}\ <<\ \textcolor{stringliteral}{"{}\(\backslash\)n\ \ \ \ \ \ \ \ \ \ Returns:\ "{}};}
 \DoxyCodeLine{\Hypertarget{gmock-spec-builders_8h_source_l01394}01394\ \ \ \ \ \textcolor{comment}{//\ T\ may\ be\ a\ reference\ type,\ so\ we\ don't\ use\ UniversalPrint().}}
-\DoxyCodeLine{\Hypertarget{gmock-spec-builders_8h_source_l01395}01395\ \ \ \ \ \mbox{\hyperlink{classtesting_1_1internal_1_1_universal_printer}{UniversalPrinter<T>::Print}}(result\_.Peek(),\ os);}
+\DoxyCodeLine{\Hypertarget{gmock-spec-builders_8h_source_l01395}01395\ \ \ \ \ \mbox{\hyperlink{classtesting_1_1internal_1_1_universal_printer}{UniversalPrinter<T>::Print}}(result\_.Peek(),\ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}});}
 \DoxyCodeLine{\Hypertarget{gmock-spec-builders_8h_source_l01396}01396\ \ \ \}}
 \DoxyCodeLine{\Hypertarget{gmock-spec-builders_8h_source_l01397}01397\ }
 \DoxyCodeLine{\Hypertarget{gmock-spec-builders_8h_source_l01398}01398\ \ \ \textcolor{comment}{//\ Performs\ the\ given\ mock\ function's\ default\ action\ and\ returns\ the}}
@@ -1650,15 +1650,15 @@
 \DoxyCodeLine{\Hypertarget{gmock-spec-builders_8h_source_l01646}01646\ \ \ \textcolor{comment}{//\ arguments.}}
 \DoxyCodeLine{\Hypertarget{gmock-spec-builders_8h_source_l01647}01647\ \ \ \textcolor{comment}{//\ L\ =\ *}}
 \DoxyCodeLine{\Hypertarget{gmock-spec-builders_8h_source_l01648}01648\ \ \ \textcolor{keywordtype}{void}\ DescribeDefaultActionTo(\textcolor{keyword}{const}\ \mbox{\hyperlink{classtesting_1_1internal_1_1_function_mocker_base_a2bce16e3cb543ae3ca7554e163fb29a8}{ArgumentTuple}}\&\ args,}
-\DoxyCodeLine{\Hypertarget{gmock-spec-builders_8h_source_l01649}01649\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ::std::ostream*\ os)\textcolor{keyword}{\ const\ }\{}
+\DoxyCodeLine{\Hypertarget{gmock-spec-builders_8h_source_l01649}01649\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ::std::ostream*\ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}})\textcolor{keyword}{\ const\ }\{}
 \DoxyCodeLine{\Hypertarget{gmock-spec-builders_8h_source_l01650}01650\ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{classtesting_1_1internal_1_1_on_call_spec}{OnCallSpec<F>}}*\ \textcolor{keyword}{const}\ spec\ =\ FindOnCallSpec(args);}
 \DoxyCodeLine{\Hypertarget{gmock-spec-builders_8h_source_l01651}01651\ }
 \DoxyCodeLine{\Hypertarget{gmock-spec-builders_8h_source_l01652}01652\ \ \ \ \ \textcolor{keywordflow}{if}\ (spec\ ==\ NULL)\ \{}
-\DoxyCodeLine{\Hypertarget{gmock-spec-builders_8h_source_l01653}01653\ \ \ \ \ \ \ *os\ <<\ (\mbox{\hyperlink{structtesting_1_1internal_1_1type__equals}{internal::type\_equals<Result,\ void>::value}}\ ?}
+\DoxyCodeLine{\Hypertarget{gmock-spec-builders_8h_source_l01653}01653\ \ \ \ \ \ \ *\mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}\ <<\ (\mbox{\hyperlink{structtesting_1_1internal_1_1type__equals}{internal::type\_equals<Result,\ void>::value}}\ ?}
 \DoxyCodeLine{\Hypertarget{gmock-spec-builders_8h_source_l01654}01654\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}returning\ directly.\(\backslash\)n"{}}\ :}
 \DoxyCodeLine{\Hypertarget{gmock-spec-builders_8h_source_l01655}01655\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}returning\ default\ value.\(\backslash\)n"{}});}
 \DoxyCodeLine{\Hypertarget{gmock-spec-builders_8h_source_l01656}01656\ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
-\DoxyCodeLine{\Hypertarget{gmock-spec-builders_8h_source_l01657}01657\ \ \ \ \ \ \ *os\ <<\ \textcolor{stringliteral}{"{}taking\ default\ action\ specified\ at:\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{gmock-spec-builders_8h_source_l01657}01657\ \ \ \ \ \ \ *\mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}\ <<\ \textcolor{stringliteral}{"{}taking\ default\ action\ specified\ at:\(\backslash\)n"{}}}
 \DoxyCodeLine{\Hypertarget{gmock-spec-builders_8h_source_l01658}01658\ \ \ \ \ \ \ \ \ \ \ <<\ FormatFileLocation(spec-\/>\mbox{\hyperlink{classtesting_1_1internal_1_1_untyped_on_call_spec_base_a7f38a9661b49f992e744dfa446bf07e7}{file}}(),\ spec-\/>\mbox{\hyperlink{classtesting_1_1internal_1_1_untyped_on_call_spec_base_a18e9eb7155380b3e124bccc0d8115b5e}{line}}())\ <<\ \textcolor{stringliteral}{"{}\(\backslash\)n"{}};}
 \DoxyCodeLine{\Hypertarget{gmock-spec-builders_8h_source_l01659}01659\ \ \ \ \ \}}
 \DoxyCodeLine{\Hypertarget{gmock-spec-builders_8h_source_l01660}01660\ \ \ \}}
@@ -1668,14 +1668,14 @@
 \DoxyCodeLine{\Hypertarget{gmock-spec-builders_8h_source_l01664}01664\ \ \ \textcolor{comment}{//\ ostream.}}
 \DoxyCodeLine{\Hypertarget{gmock-spec-builders_8h_source_l01665}01665\ \ \ \textcolor{keyword}{virtual}\ \textcolor{keywordtype}{void}\ UntypedDescribeUninterestingCall(}
 \DoxyCodeLine{\Hypertarget{gmock-spec-builders_8h_source_l01666}01666\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{void}*\ untyped\_args,}
-\DoxyCodeLine{\Hypertarget{gmock-spec-builders_8h_source_l01667}01667\ \ \ \ \ \ \ ::std::ostream*\ os)\ \textcolor{keyword}{const}}
+\DoxyCodeLine{\Hypertarget{gmock-spec-builders_8h_source_l01667}01667\ \ \ \ \ \ \ ::std::ostream*\ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}})\ \textcolor{keyword}{const}}
 \DoxyCodeLine{\Hypertarget{gmock-spec-builders_8h_source_l01668}01668\ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{gtest-port_8h_a69abff5a4efdd07bd5faebe3dd318d06}{GTEST\_LOCK\_EXCLUDED\_}}(g\_gmock\_mutex)\ \{}
 \DoxyCodeLine{\Hypertarget{gmock-spec-builders_8h_source_l01669}01669\ \ \ \ \ \textcolor{keyword}{const}\ ArgumentTuple\&\ args\ =}
 \DoxyCodeLine{\Hypertarget{gmock-spec-builders_8h_source_l01670}01670\ \ \ \ \ \ \ \ \ *\textcolor{keyword}{static\_cast<}\textcolor{keyword}{const\ }ArgumentTuple*\textcolor{keyword}{>}(untyped\_args);}
-\DoxyCodeLine{\Hypertarget{gmock-spec-builders_8h_source_l01671}01671\ \ \ \ \ *os\ <<\ \textcolor{stringliteral}{"{}Uninteresting\ mock\ function\ call\ -\/\ "{}};}
-\DoxyCodeLine{\Hypertarget{gmock-spec-builders_8h_source_l01672}01672\ \ \ \ \ DescribeDefaultActionTo(args,\ os);}
-\DoxyCodeLine{\Hypertarget{gmock-spec-builders_8h_source_l01673}01673\ \ \ \ \ *os\ <<\ \textcolor{stringliteral}{"{}\ \ \ \ Function\ call:\ "{}}\ <<\ Name();}
-\DoxyCodeLine{\Hypertarget{gmock-spec-builders_8h_source_l01674}01674\ \ \ \ \ UniversalPrint(args,\ os);}
+\DoxyCodeLine{\Hypertarget{gmock-spec-builders_8h_source_l01671}01671\ \ \ \ \ *\mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}\ <<\ \textcolor{stringliteral}{"{}Uninteresting\ mock\ function\ call\ -\/\ "{}};}
+\DoxyCodeLine{\Hypertarget{gmock-spec-builders_8h_source_l01672}01672\ \ \ \ \ DescribeDefaultActionTo(args,\ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}});}
+\DoxyCodeLine{\Hypertarget{gmock-spec-builders_8h_source_l01673}01673\ \ \ \ \ *\mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}\ <<\ \textcolor{stringliteral}{"{}\ \ \ \ Function\ call:\ "{}}\ <<\ Name();}
+\DoxyCodeLine{\Hypertarget{gmock-spec-builders_8h_source_l01674}01674\ \ \ \ \ UniversalPrint(args,\ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}});}
 \DoxyCodeLine{\Hypertarget{gmock-spec-builders_8h_source_l01675}01675\ \ \ \}}
 \DoxyCodeLine{\Hypertarget{gmock-spec-builders_8h_source_l01676}01676\ }
 \DoxyCodeLine{\Hypertarget{gmock-spec-builders_8h_source_l01677}01677\ \ \ \textcolor{comment}{//\ Returns\ the\ expectation\ that\ matches\ the\ given\ function\ arguments}}
@@ -1699,7 +1699,7 @@
 \DoxyCodeLine{\Hypertarget{gmock-spec-builders_8h_source_l01695}01695\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{void}**\ untyped\_action,\ \textcolor{keywordtype}{bool}*\ is\_excessive,}
 \DoxyCodeLine{\Hypertarget{gmock-spec-builders_8h_source_l01696}01696\ \ \ \ \ \ \ ::std::ostream*\ what,\ ::std::ostream*\ why)}
 \DoxyCodeLine{\Hypertarget{gmock-spec-builders_8h_source_l01697}01697\ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{gtest-port_8h_a69abff5a4efdd07bd5faebe3dd318d06}{GTEST\_LOCK\_EXCLUDED\_}}(g\_gmock\_mutex)\ \{}
-\DoxyCodeLine{\Hypertarget{gmock-spec-builders_8h_source_l01698}01698\ \ \ \ \ \textcolor{keyword}{const}\ ArgumentTuple\&\ \mbox{\hyperlink{namespacebenchmark_compile_ad0ed96ae1454e4347ca61ac3887c379e}{args}}\ =}
+\DoxyCodeLine{\Hypertarget{gmock-spec-builders_8h_source_l01698}01698\ \ \ \ \ \textcolor{keyword}{const}\ ArgumentTuple\&\ args\ =}
 \DoxyCodeLine{\Hypertarget{gmock-spec-builders_8h_source_l01699}01699\ \ \ \ \ \ \ \ \ *\textcolor{keyword}{static\_cast<}\textcolor{keyword}{const\ }ArgumentTuple*\textcolor{keyword}{>}(untyped\_args);}
 \DoxyCodeLine{\Hypertarget{gmock-spec-builders_8h_source_l01700}01700\ \ \ \ \ \mbox{\hyperlink{namespacetesting_1_1internal_a08b187c6cc4e28400aadf9a32fccc8de}{MutexLock}}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a89606eca6b563ec68d2da2e84657736f}{l}}(\&g\_gmock\_mutex);}
 \DoxyCodeLine{\Hypertarget{gmock-spec-builders_8h_source_l01701}01701\ \ \ \ \ TypedExpectation<F>*\ exp\ =\ this-\/>FindMatchingExpectationLocked(args);}
@@ -1721,10 +1721,10 @@
 \DoxyCodeLine{\Hypertarget{gmock-spec-builders_8h_source_l01717}01717\ }
 \DoxyCodeLine{\Hypertarget{gmock-spec-builders_8h_source_l01718}01718\ \ \ \textcolor{comment}{//\ Prints\ the\ given\ function\ arguments\ to\ the\ ostream.}}
 \DoxyCodeLine{\Hypertarget{gmock-spec-builders_8h_source_l01719}01719\ \ \ \textcolor{keyword}{virtual}\ \textcolor{keywordtype}{void}\ UntypedPrintArgs(\textcolor{keyword}{const}\ \textcolor{keywordtype}{void}*\ untyped\_args,}
-\DoxyCodeLine{\Hypertarget{gmock-spec-builders_8h_source_l01720}01720\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ::std::ostream*\ os)\textcolor{keyword}{\ const\ }\{}
-\DoxyCodeLine{\Hypertarget{gmock-spec-builders_8h_source_l01721}01721\ \ \ \ \ \textcolor{keyword}{const}\ ArgumentTuple\&\ \mbox{\hyperlink{namespacebenchmark_compile_ad0ed96ae1454e4347ca61ac3887c379e}{args}}\ =}
+\DoxyCodeLine{\Hypertarget{gmock-spec-builders_8h_source_l01720}01720\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ::std::ostream*\ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}})\textcolor{keyword}{\ const\ }\{}
+\DoxyCodeLine{\Hypertarget{gmock-spec-builders_8h_source_l01721}01721\ \ \ \ \ \textcolor{keyword}{const}\ ArgumentTuple\&\ args\ =}
 \DoxyCodeLine{\Hypertarget{gmock-spec-builders_8h_source_l01722}01722\ \ \ \ \ \ \ \ \ *\textcolor{keyword}{static\_cast<}\textcolor{keyword}{const\ }ArgumentTuple*\textcolor{keyword}{>}(untyped\_args);}
-\DoxyCodeLine{\Hypertarget{gmock-spec-builders_8h_source_l01723}01723\ \ \ \ \ \mbox{\hyperlink{namespacetesting_1_1internal_a30708fa2bacf11895b03bdb21eb72309}{UniversalPrint}}(args,\ os);}
+\DoxyCodeLine{\Hypertarget{gmock-spec-builders_8h_source_l01723}01723\ \ \ \ \ \mbox{\hyperlink{namespacetesting_1_1internal_a30708fa2bacf11895b03bdb21eb72309}{UniversalPrint}}(args,\ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}});}
 \DoxyCodeLine{\Hypertarget{gmock-spec-builders_8h_source_l01724}01724\ \ \ \}}
 \DoxyCodeLine{\Hypertarget{gmock-spec-builders_8h_source_l01725}01725\ }
 \DoxyCodeLine{\Hypertarget{gmock-spec-builders_8h_source_l01726}01726\ \ \ \textcolor{comment}{//\ Returns\ the\ expectation\ that\ matches\ the\ arguments,\ or\ NULL\ if\ no}}
@@ -1750,12 +1750,12 @@
 \DoxyCodeLine{\Hypertarget{gmock-spec-builders_8h_source_l01746}01746\ \ \ \textcolor{comment}{//\ Returns\ a\ message\ that\ the\ arguments\ don't\ match\ any\ expectation.}}
 \DoxyCodeLine{\Hypertarget{gmock-spec-builders_8h_source_l01747}01747\ \ \ \textcolor{keywordtype}{void}\ FormatUnexpectedCallMessageLocked(}
 \DoxyCodeLine{\Hypertarget{gmock-spec-builders_8h_source_l01748}01748\ \ \ \ \ \ \ \textcolor{keyword}{const}\ ArgumentTuple\&\ args,}
-\DoxyCodeLine{\Hypertarget{gmock-spec-builders_8h_source_l01749}01749\ \ \ \ \ \ \ ::std::ostream*\ os,}
+\DoxyCodeLine{\Hypertarget{gmock-spec-builders_8h_source_l01749}01749\ \ \ \ \ \ \ ::std::ostream*\ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}},}
 \DoxyCodeLine{\Hypertarget{gmock-spec-builders_8h_source_l01750}01750\ \ \ \ \ \ \ ::std::ostream*\ why)\ \textcolor{keyword}{const}}
 \DoxyCodeLine{\Hypertarget{gmock-spec-builders_8h_source_l01751}01751\ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{gtest-port_8h_a149f693bd59fa1bc937af54c0cdcb32f}{GTEST\_EXCLUSIVE\_LOCK\_REQUIRED\_}}(g\_gmock\_mutex)\ \{}
 \DoxyCodeLine{\Hypertarget{gmock-spec-builders_8h_source_l01752}01752\ \ \ \ \ g\_gmock\_mutex.AssertHeld();}
-\DoxyCodeLine{\Hypertarget{gmock-spec-builders_8h_source_l01753}01753\ \ \ \ \ *os\ <<\ \textcolor{stringliteral}{"{}\(\backslash\)nUnexpected\ mock\ function\ call\ -\/\ "{}};}
-\DoxyCodeLine{\Hypertarget{gmock-spec-builders_8h_source_l01754}01754\ \ \ \ \ DescribeDefaultActionTo(args,\ os);}
+\DoxyCodeLine{\Hypertarget{gmock-spec-builders_8h_source_l01753}01753\ \ \ \ \ *\mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}\ <<\ \textcolor{stringliteral}{"{}\(\backslash\)nUnexpected\ mock\ function\ call\ -\/\ "{}};}
+\DoxyCodeLine{\Hypertarget{gmock-spec-builders_8h_source_l01754}01754\ \ \ \ \ DescribeDefaultActionTo(args,\ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}});}
 \DoxyCodeLine{\Hypertarget{gmock-spec-builders_8h_source_l01755}01755\ \ \ \ \ PrintTriedExpectationsLocked(args,\ why);}
 \DoxyCodeLine{\Hypertarget{gmock-spec-builders_8h_source_l01756}01756\ \ \ \}}
 \DoxyCodeLine{\Hypertarget{gmock-spec-builders_8h_source_l01757}01757\ }

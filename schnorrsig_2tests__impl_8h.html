@@ -262,7 +262,7 @@ Here is the caller graph for this function:</div>
 <div class="line"><span class="lineno">   44</span>    <span class="keywordtype">unsigned</span> <span class="keywordtype">char</span> key[32];</div>
 <div class="line"><span class="lineno">   45</span>    <span class="keywordtype">unsigned</span> <span class="keywordtype">char</span> pk[32];</div>
 <div class="line"><span class="lineno">   46</span>    <span class="keywordtype">unsigned</span> <span class="keywordtype">char</span> aux_rand[32];</div>
-<div class="line"><span class="lineno">   47</span>    <span class="keywordtype">unsigned</span> <span class="keywordtype">char</span> *<a class="code hl_variable" href="namespacebenchmark_compile.html#ad0ed96ae1454e4347ca61ac3887c379e">args</a>[5];</div>
+<div class="line"><span class="lineno">   47</span>    <span class="keywordtype">unsigned</span> <span class="keywordtype">char</span> *args[5];</div>
 <div class="line"><span class="lineno">   48</span>    <span class="keywordtype">int</span> i;</div>
 <div class="line"><span class="lineno">   49</span> </div>
 <div class="line"><span class="lineno">   50</span>    <span class="comment">/* Check that hash initialized by</span></div>
@@ -285,11 +285,11 @@ Here is the caller graph for this function:</div>
 <div class="line"><span class="lineno">   67</span>    secp256k1_testrand256(aux_rand);</div>
 <div class="line"><span class="lineno">   68</span> </div>
 <div class="line"><span class="lineno">   69</span>    <span class="comment">/* Check that a bitflip in an argument results in different nonces. */</span></div>
-<div class="line"><span class="lineno">   70</span>    <a class="code hl_variable" href="namespacebenchmark_compile.html#ad0ed96ae1454e4347ca61ac3887c379e">args</a>[0] = msg;</div>
-<div class="line"><span class="lineno">   71</span>    <a class="code hl_variable" href="namespacebenchmark_compile.html#ad0ed96ae1454e4347ca61ac3887c379e">args</a>[1] = <a class="code hl_variable" href="yubico__otp_8c.html#a9246c20bb98ad2b4c60313c053c70f08">key</a>;</div>
-<div class="line"><span class="lineno">   72</span>    <a class="code hl_variable" href="namespacebenchmark_compile.html#ad0ed96ae1454e4347ca61ac3887c379e">args</a>[2] = pk;</div>
-<div class="line"><span class="lineno">   73</span>    <a class="code hl_variable" href="namespacebenchmark_compile.html#ad0ed96ae1454e4347ca61ac3887c379e">args</a>[3] = algo;</div>
-<div class="line"><span class="lineno">   74</span>    <a class="code hl_variable" href="namespacebenchmark_compile.html#ad0ed96ae1454e4347ca61ac3887c379e">args</a>[4] = aux_rand;</div>
+<div class="line"><span class="lineno">   70</span>    args[0] = msg;</div>
+<div class="line"><span class="lineno">   71</span>    args[1] = <a class="code hl_variable" href="yubico__otp_8c.html#a9246c20bb98ad2b4c60313c053c70f08">key</a>;</div>
+<div class="line"><span class="lineno">   72</span>    args[2] = pk;</div>
+<div class="line"><span class="lineno">   73</span>    args[3] = algo;</div>
+<div class="line"><span class="lineno">   74</span>    args[4] = aux_rand;</div>
 <div class="line"><span class="lineno">   75</span>    <span class="keywordflow">for</span> (i = 0; i &lt; <a class="code hl_variable" href="gmock__stress__test_8cc.html#afd9db40e3361ae09188795e8cbe19752">count</a>; i++) {</div>
 <div class="line"><span class="lineno">   76</span>        <a class="code hl_function" href="#ac5feade0e2d42bfe7b2d1aa2cc55abe9">nonce_function_bip340_bitflip</a>(args, 0, 32, msglen, algolen);</div>
 <div class="line"><span class="lineno">   77</span>        <a class="code hl_function" href="#ac5feade0e2d42bfe7b2d1aa2cc55abe9">nonce_function_bip340_bitflip</a>(args, 1, 32, msglen, algolen);</div>
@@ -332,7 +332,6 @@ Here is the caller graph for this function:</div>
 <div class="line"><span class="lineno">  114</span>    <a class="code hl_define" href="fc_2secp256k1_2secp256k1_2src_2util_8h.html#aba1590ff86288c886c47dc8a27b30467">CHECK</a>(secp256k1_memcmp_var(nonce_z, nonce, 32) == 0);</div>
 <div class="line"><span class="lineno">  115</span>}</div>
 <div class="ttc" id="agmock__stress__test_8cc_html_afd9db40e3361ae09188795e8cbe19752"><div class="ttname"><a href="gmock__stress__test_8cc.html#afd9db40e3361ae09188795e8cbe19752">count</a></div><div class="ttdeci">int * count</div><div class="ttdef"><b>Definition</b> <a href="gmock__stress__test_8cc_source.html#l00177">gmock_stress_test.cc:177</a></div></div>
-<div class="ttc" id="anamespacebenchmark_compile_html_ad0ed96ae1454e4347ca61ac3887c379e"><div class="ttname"><a href="namespacebenchmark_compile.html#ad0ed96ae1454e4347ca61ac3887c379e">benchmarkCompile.args</a></div><div class="ttdeci">args</div><div class="ttdef"><b>Definition</b> <a href="benchmark_compile_8py_source.html#l00122">benchmarkCompile.py:122</a></div></div>
 <div class="ttc" id="aschnorrsig_2tests__impl_8h_html_a8d01c9b0c8d4c6576171ee1246fb2c61"><div class="ttname"><a href="#a8d01c9b0c8d4c6576171ee1246fb2c61">test_sha256_eq</a></div><div class="ttdeci">void test_sha256_eq(const secp256k1_sha256 *sha1, const secp256k1_sha256 *sha2)</div><div class="ttdef"><b>Definition</b> <a href="schnorrsig_2tests__impl_8h_source.html#l00026">tests_impl.h:26</a></div></div>
 <div class="ttc" id="aschnorrsig_2tests__impl_8h_html_ac5feade0e2d42bfe7b2d1aa2cc55abe9"><div class="ttname"><a href="#ac5feade0e2d42bfe7b2d1aa2cc55abe9">nonce_function_bip340_bitflip</a></div><div class="ttdeci">void nonce_function_bip340_bitflip(unsigned char **args, size_t n_flip, size_t n_bytes, size_t msglen, size_t algolen)</div><div class="ttdef"><b>Definition</b> <a href="schnorrsig_2tests__impl_8h_source.html#l00015">tests_impl.h:15</a></div></div>
 <div class="ttc" id="astdint_8h_html_a435d1572bf3f880d55459d9805097f62"><div class="ttname"><a href="stdint_8h.html#a435d1572bf3f880d55459d9805097f62">uint32_t</a></div><div class="ttdeci">unsigned int uint32_t</div><div class="ttdef"><b>Definition</b> <a href="stdint_8h_source.html#l00126">stdint.h:126</a></div></div>

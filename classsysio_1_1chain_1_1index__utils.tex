@@ -65,14 +65,16 @@ Definition at line \mbox{\hyperlink{database__utils_8hpp_source_l00050}{50}} of 
 \DoxyCodeLine{00052\ \ \ \ \ \ \ \ \ \ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
 \includegraphics[width=350pt]{classsysio_1_1chain_1_1index__utils_a4ba170946682ddcea81d558b0ee8899a_cgraph}
 \end{center}
 \end{figure}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -94,9 +96,9 @@ Definition at line \mbox{\hyperlink{database__utils_8hpp_source_l00038}{38}} of 
 
 \begin{DoxyCode}{0}
 \DoxyCodeLine{00038\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
-\DoxyCodeLine{00039\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ \mbox{\hyperlink{namespacehost__functions__tests__1_a8496a24b5236a2dc07bb4f2930d88342}{idx}}\ =\ db.\mbox{\hyperlink{classchainbase_1_1database_a4d5297635dcf70be481d9b600da9bc13}{get\_index}}<Index,\ Secondary>();}
-\DoxyCodeLine{00040\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ begin\_itr\ =\ \mbox{\hyperlink{namespacehost__functions__tests__1_a8496a24b5236a2dc07bb4f2930d88342}{idx}}.lower\_bound(begin\_key);}
-\DoxyCodeLine{00041\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ end\_itr\ =\ \mbox{\hyperlink{namespacehost__functions__tests__1_a8496a24b5236a2dc07bb4f2930d88342}{idx}}.lower\_bound(end\_key);}
+\DoxyCodeLine{00039\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ idx\ =\ db.\mbox{\hyperlink{classchainbase_1_1database_a4d5297635dcf70be481d9b600da9bc13}{get\_index}}<Index,\ Secondary>();}
+\DoxyCodeLine{00040\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ begin\_itr\ =\ idx.lower\_bound(begin\_key);}
+\DoxyCodeLine{00041\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ end\_itr\ =\ idx.lower\_bound(end\_key);}
 \DoxyCodeLine{00042\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{size\_t}\ res\ =\ 0;}
 \DoxyCodeLine{00043\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{while}\ (begin\_itr\ !=\ end\_itr)\ \{}
 \DoxyCodeLine{00044\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ res++;\ ++begin\_itr;}
@@ -105,7 +107,8 @@ Definition at line \mbox{\hyperlink{database__utils_8hpp_source_l00038}{38}} of 
 \DoxyCodeLine{00047\ \ \ \ \ \ \ \ \ \ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -136,14 +139,16 @@ Definition at line \mbox{\hyperlink{database__utils_8hpp_source_l00018}{18}} of 
 \DoxyCodeLine{00025\ \ \ \ \ \ \ \ \ \ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
 \includegraphics[width=350pt]{classsysio_1_1chain_1_1index__utils_a20f6cbb7f55f78ff4d35a4bf7e928a86_cgraph}
 \end{center}
 \end{figure}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -165,16 +170,17 @@ Definition at line \mbox{\hyperlink{database__utils_8hpp_source_l00028}{28}} of 
 
 \begin{DoxyCode}{0}
 \DoxyCodeLine{00028\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
-\DoxyCodeLine{00029\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ \mbox{\hyperlink{namespacehost__functions__tests__1_a8496a24b5236a2dc07bb4f2930d88342}{idx}}\ =\ db.\mbox{\hyperlink{classchainbase_1_1database_a4d5297635dcf70be481d9b600da9bc13}{get\_index}}<Index,\ Secondary>();}
-\DoxyCodeLine{00030\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ begin\_itr\ =\ \mbox{\hyperlink{namespacehost__functions__tests__1_a8496a24b5236a2dc07bb4f2930d88342}{idx}}.lower\_bound(begin\_key);}
-\DoxyCodeLine{00031\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ end\_itr\ =\ \mbox{\hyperlink{namespacehost__functions__tests__1_a8496a24b5236a2dc07bb4f2930d88342}{idx}}.lower\_bound(end\_key);}
+\DoxyCodeLine{00029\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ idx\ =\ db.\mbox{\hyperlink{classchainbase_1_1database_a4d5297635dcf70be481d9b600da9bc13}{get\_index}}<Index,\ Secondary>();}
+\DoxyCodeLine{00030\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ begin\_itr\ =\ idx.lower\_bound(begin\_key);}
+\DoxyCodeLine{00031\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ end\_itr\ =\ idx.lower\_bound(end\_key);}
 \DoxyCodeLine{00032\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keyword}{auto}\ itr\ =\ begin\_itr;\ itr\ !=\ end\_itr;\ ++itr)\ \{}
 \DoxyCodeLine{00033\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ function(*itr);}
 \DoxyCodeLine{00034\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
 \DoxyCodeLine{00035\ \ \ \ \ \ \ \ \ \ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode

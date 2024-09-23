@@ -204,7 +204,7 @@ Public Attributes</h2></td></tr>
 </div><div class="memdoc">
 
 <p class="definition">Definition at line <a class="el" href="sysio_2vm_2execution__interface_8hpp_source.html#l00014">14</a> of file <a class="el" href="sysio_2vm_2execution__interface_8hpp_source.html">execution_interface.hpp</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">   14</span>: <a class="code hl_variable" href="#aee156e49ed42e090ea0950672b22906e">memory</a>(<a class="code hl_variable" href="#aee156e49ed42e090ea0950672b22906e">memory</a>), <a class="code hl_variable" href="#ab9a372ed9206cf89b9b1dc2383a72157">os</a>(os) {}</div>
+<div class="fragment"><div class="line"><span class="lineno">   14</span>: <a class="code hl_variable" href="#aee156e49ed42e090ea0950672b22906e">memory</a>(<a class="code hl_variable" href="#aee156e49ed42e090ea0950672b22906e">memory</a>), <a class="code hl_variable" href="#ab9a372ed9206cf89b9b1dc2383a72157">os</a>(<a class="code hl_variable" href="#ab9a372ed9206cf89b9b1dc2383a72157">os</a>) {}</div>
 <div class="ttc" id="astructsysio_1_1vm_1_1execution__interface_html_ab9a372ed9206cf89b9b1dc2383a72157"><div class="ttname"><a href="#ab9a372ed9206cf89b9b1dc2383a72157">sysio::vm::execution_interface::os</a></div><div class="ttdeci">operand_stack * os</div><div class="ttdef"><b>Definition</b> <a href="sysio_2vm_2execution__interface_8hpp_source.html#l00048">execution_interface.hpp:48</a></div></div>
 <div class="ttc" id="astructsysio_1_1vm_1_1execution__interface_html_aee156e49ed42e090ea0950672b22906e"><div class="ttname"><a href="#aee156e49ed42e090ea0950672b22906e">sysio::vm::execution_interface::memory</a></div><div class="ttdeci">char * memory</div><div class="ttdef"><b>Definition</b> <a href="sysio_2vm_2execution__interface_8hpp_source.html#l00047">execution_interface.hpp:47</a></div></div>
 </div><!-- fragment -->
@@ -238,7 +238,7 @@ Public Attributes</h2></td></tr>
 </div><div class="memdoc">
 
 <p class="definition">Definition at line <a class="el" href="vm_2execution__interface_8hpp_source.html#l00014">14</a> of file <a class="el" href="vm_2execution__interface_8hpp_source.html">execution_interface.hpp</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">   14</span>: <a class="code hl_variable" href="#aee156e49ed42e090ea0950672b22906e">memory</a>(<a class="code hl_variable" href="#aee156e49ed42e090ea0950672b22906e">memory</a>), <a class="code hl_variable" href="#ab9a372ed9206cf89b9b1dc2383a72157">os</a>(os) {}</div>
+<div class="fragment"><div class="line"><span class="lineno">   14</span>: <a class="code hl_variable" href="#aee156e49ed42e090ea0950672b22906e">memory</a>(<a class="code hl_variable" href="#aee156e49ed42e090ea0950672b22906e">memory</a>), <a class="code hl_variable" href="#ab9a372ed9206cf89b9b1dc2383a72157">os</a>(<a class="code hl_variable" href="#ab9a372ed9206cf89b9b1dc2383a72157">os</a>) {}</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -323,8 +323,19 @@ Public Attributes</h2></td></tr>
 </div><div class="memdoc">
 
 <p class="definition">Definition at line <a class="el" href="sysio_2vm_2execution__interface_8hpp_source.html#l00021">21</a> of file <a class="el" href="sysio_2vm_2execution__interface_8hpp_source.html">execution_interface.hpp</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">   21</span>{ <span class="keywordflow">return</span> os-&gt;get_back(index); }</div>
-</div><!-- fragment -->
+<div class="fragment"><div class="line"><span class="lineno">   21</span>{ <span class="keywordflow">return</span> <a class="code hl_variable" href="#ab9a372ed9206cf89b9b1dc2383a72157">os</a>-&gt;<a class="code hl_function" href="classsysio_1_1vm_1_1stack.html#a062d42c4ce4359ef87c6a53267796d4d">get_back</a>(index); }</div>
+<div class="ttc" id="aclasssysio_1_1vm_1_1stack_html_a062d42c4ce4359ef87c6a53267796d4d"><div class="ttname"><a href="classsysio_1_1vm_1_1stack.html#a062d42c4ce4359ef87c6a53267796d4d">sysio::vm::stack::get_back</a></div><div class="ttdeci">ElemT &amp; get_back(size_t i)</div><div class="ttdef"><b>Definition</b> <a href="sysio_2vm_2wasm__stack_8hpp_source.html#l00060">wasm_stack.hpp:60</a></div></div>
+</div><!-- fragment --><div class="dynheader">
+Here is the call graph for this function:</div>
+<div class="dyncontent">
+<div class="center"><img src="structsysio_1_1vm_1_1execution__interface_ac5ab9433c402a92f88dbcb9e1bf02108_cgraph.png" border="0" usemap="#astructsysio_1_1vm_1_1execution__interface_ac5ab9433c402a92f88dbcb9e1bf02108_cgraph" alt=""/></div>
+<map name="astructsysio_1_1vm_1_1execution__interface_ac5ab9433c402a92f88dbcb9e1bf02108_cgraph" id="astructsysio_1_1vm_1_1execution__interface_ac5ab9433c402a92f88dbcb9e1bf02108_cgraph">
+<area shape="rect" title=" " alt="" coords="5,5,206,46"/>
+<area shape="rect" href="classsysio_1_1vm_1_1stack.html#a062d42c4ce4359ef87c6a53267796d4d" title=" " alt="" coords="254,13,433,38"/>
+<area shape="poly" title=" " alt="" coords="206,23,238,23,238,28,206,28"/>
+</map>
+</div>
+
 </div>
 </div>
 <a id="ac5ab9433c402a92f88dbcb9e1bf02108" name="ac5ab9433c402a92f88dbcb9e1bf02108"></a>
@@ -351,8 +362,18 @@ Public Attributes</h2></td></tr>
 </div><div class="memdoc">
 
 <p class="definition">Definition at line <a class="el" href="vm_2execution__interface_8hpp_source.html#l00021">21</a> of file <a class="el" href="vm_2execution__interface_8hpp_source.html">execution_interface.hpp</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">   21</span>{ <span class="keywordflow">return</span> os-&gt;get_back(index); }</div>
-</div><!-- fragment -->
+<div class="fragment"><div class="line"><span class="lineno">   21</span>{ <span class="keywordflow">return</span> <a class="code hl_variable" href="#ab9a372ed9206cf89b9b1dc2383a72157">os</a>-&gt;<a class="code hl_function" href="classsysio_1_1vm_1_1stack.html#a062d42c4ce4359ef87c6a53267796d4d">get_back</a>(index); }</div>
+</div><!-- fragment --><div class="dynheader">
+Here is the call graph for this function:</div>
+<div class="dyncontent">
+<div class="center"><img src="structsysio_1_1vm_1_1execution__interface_ac5ab9433c402a92f88dbcb9e1bf02108_cgraph.png" border="0" usemap="#astructsysio_1_1vm_1_1execution__interface_ac5ab9433c402a92f88dbcb9e1bf02108_cgraph" alt=""/></div>
+<map name="astructsysio_1_1vm_1_1execution__interface_ac5ab9433c402a92f88dbcb9e1bf02108_cgraph" id="astructsysio_1_1vm_1_1execution__interface_ac5ab9433c402a92f88dbcb9e1bf02108_cgraph">
+<area shape="rect" title=" " alt="" coords="5,5,206,46"/>
+<area shape="rect" href="classsysio_1_1vm_1_1stack.html#a062d42c4ce4359ef87c6a53267796d4d" title=" " alt="" coords="254,13,433,38"/>
+<area shape="poly" title=" " alt="" coords="206,23,238,23,238,28,206,28"/>
+</map>
+</div>
+
 </div>
 </div>
 <a id="a25821ae413bb8e693deac653c82ddd95" name="a25821ae413bb8e693deac653c82ddd95"></a>
@@ -379,8 +400,19 @@ Public Attributes</h2></td></tr>
 </div><div class="memdoc">
 
 <p class="definition">Definition at line <a class="el" href="sysio_2vm_2execution__interface_8hpp_source.html#l00020">20</a> of file <a class="el" href="sysio_2vm_2execution__interface_8hpp_source.html">execution_interface.hpp</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">   20</span>{ <span class="keywordflow">return</span> os-&gt;pop(); }</div>
-</div><!-- fragment -->
+<div class="fragment"><div class="line"><span class="lineno">   20</span>{ <span class="keywordflow">return</span> <a class="code hl_variable" href="#ab9a372ed9206cf89b9b1dc2383a72157">os</a>-&gt;<a class="code hl_function" href="classsysio_1_1vm_1_1stack.html#ae9a715af8918e2e59bf5256632c6b7b1">pop</a>(); }</div>
+<div class="ttc" id="aclasssysio_1_1vm_1_1stack_html_ae9a715af8918e2e59bf5256632c6b7b1"><div class="ttname"><a href="classsysio_1_1vm_1_1stack.html#ae9a715af8918e2e59bf5256632c6b7b1">sysio::vm::stack::pop</a></div><div class="ttdeci">ElemT pop()</div><div class="ttdef"><b>Definition</b> <a href="sysio_2vm_2wasm__stack_8hpp_source.html#l00040">wasm_stack.hpp:40</a></div></div>
+</div><!-- fragment --><div class="dynheader">
+Here is the call graph for this function:</div>
+<div class="dyncontent">
+<div class="center"><img src="structsysio_1_1vm_1_1execution__interface_a25821ae413bb8e693deac653c82ddd95_cgraph.png" border="0" usemap="#astructsysio_1_1vm_1_1execution__interface_a25821ae413bb8e693deac653c82ddd95_cgraph" alt=""/></div>
+<map name="astructsysio_1_1vm_1_1execution__interface_a25821ae413bb8e693deac653c82ddd95_cgraph" id="astructsysio_1_1vm_1_1execution__interface_a25821ae413bb8e693deac653c82ddd95_cgraph">
+<area shape="rect" title=" " alt="" coords="5,5,166,46"/>
+<area shape="rect" href="classsysio_1_1vm_1_1stack.html#ae9a715af8918e2e59bf5256632c6b7b1" title=" " alt="" coords="214,13,361,38"/>
+<area shape="poly" title=" " alt="" coords="166,23,198,23,198,28,166,28"/>
+</map>
+</div>
+
 </div>
 </div>
 <a id="a25821ae413bb8e693deac653c82ddd95" name="a25821ae413bb8e693deac653c82ddd95"></a>
@@ -407,8 +439,18 @@ Public Attributes</h2></td></tr>
 </div><div class="memdoc">
 
 <p class="definition">Definition at line <a class="el" href="vm_2execution__interface_8hpp_source.html#l00020">20</a> of file <a class="el" href="vm_2execution__interface_8hpp_source.html">execution_interface.hpp</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">   20</span>{ <span class="keywordflow">return</span> os-&gt;pop(); }</div>
-</div><!-- fragment -->
+<div class="fragment"><div class="line"><span class="lineno">   20</span>{ <span class="keywordflow">return</span> <a class="code hl_variable" href="#ab9a372ed9206cf89b9b1dc2383a72157">os</a>-&gt;<a class="code hl_function" href="classsysio_1_1vm_1_1stack.html#ae9a715af8918e2e59bf5256632c6b7b1">pop</a>(); }</div>
+</div><!-- fragment --><div class="dynheader">
+Here is the call graph for this function:</div>
+<div class="dyncontent">
+<div class="center"><img src="structsysio_1_1vm_1_1execution__interface_a25821ae413bb8e693deac653c82ddd95_cgraph.png" border="0" usemap="#astructsysio_1_1vm_1_1execution__interface_a25821ae413bb8e693deac653c82ddd95_cgraph" alt=""/></div>
+<map name="astructsysio_1_1vm_1_1execution__interface_a25821ae413bb8e693deac653c82ddd95_cgraph" id="astructsysio_1_1vm_1_1execution__interface_a25821ae413bb8e693deac653c82ddd95_cgraph">
+<area shape="rect" title=" " alt="" coords="5,5,166,46"/>
+<area shape="rect" href="classsysio_1_1vm_1_1stack.html#ae9a715af8918e2e59bf5256632c6b7b1" title=" " alt="" coords="214,13,361,38"/>
+<area shape="poly" title=" " alt="" coords="166,23,198,23,198,28,166,28"/>
+</map>
+</div>
+
 </div>
 </div>
 <a id="a2b8ae377145c591c5d199c4d91e71c64" name="a2b8ae377145c591c5d199c4d91e71c64"></a>
@@ -437,9 +479,20 @@ template&lt;typename <a class="el" href="prettywritertest_8cpp.html#a6283df8c4e3
 </div><div class="memdoc">
 
 <p class="definition">Definition at line <a class="el" href="sysio_2vm_2execution__interface_8hpp_source.html#l00019">19</a> of file <a class="el" href="sysio_2vm_2execution__interface_8hpp_source.html">execution_interface.hpp</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">   19</span>{ os-&gt;push(std::forward&lt;T&gt;(<a class="code hl_union" href="unionop.html">op</a>)); }</div>
+<div class="fragment"><div class="line"><span class="lineno">   19</span>{ <a class="code hl_variable" href="#ab9a372ed9206cf89b9b1dc2383a72157">os</a>-&gt;<a class="code hl_function" href="classsysio_1_1vm_1_1stack.html#a6622e50cf34d892c701d2085faa53f8e">push</a>(std::forward&lt;T&gt;(<a class="code hl_union" href="unionop.html">op</a>)); }</div>
+<div class="ttc" id="aclasssysio_1_1vm_1_1stack_html_a6622e50cf34d892c701d2085faa53f8e"><div class="ttname"><a href="classsysio_1_1vm_1_1stack.html#a6622e50cf34d892c701d2085faa53f8e">sysio::vm::stack::push</a></div><div class="ttdeci">void push(ElemT &amp;&amp;e)</div><div class="ttdef"><b>Definition</b> <a href="sysio_2vm_2wasm__stack_8hpp_source.html#l00032">wasm_stack.hpp:32</a></div></div>
 <div class="ttc" id="aunionop_html"><div class="ttname"><a href="unionop.html">op</a></div><div class="ttdef"><b>Definition</b> <a href="yubihsm__pkcs11_8h_source.html#l00098">yubihsm_pkcs11.h:98</a></div></div>
-</div><!-- fragment -->
+</div><!-- fragment --><div class="dynheader">
+Here is the call graph for this function:</div>
+<div class="dyncontent">
+<div class="center"><img src="structsysio_1_1vm_1_1execution__interface_a2b8ae377145c591c5d199c4d91e71c64_cgraph.png" border="0" usemap="#astructsysio_1_1vm_1_1execution__interface_a2b8ae377145c591c5d199c4d91e71c64_cgraph" alt=""/></div>
+<map name="astructsysio_1_1vm_1_1execution__interface_a2b8ae377145c591c5d199c4d91e71c64_cgraph" id="astructsysio_1_1vm_1_1execution__interface_a2b8ae377145c591c5d199c4d91e71c64_cgraph">
+<area shape="rect" title=" " alt="" coords="5,5,173,46"/>
+<area shape="rect" href="classsysio_1_1vm_1_1stack.html#a6622e50cf34d892c701d2085faa53f8e" title=" " alt="" coords="221,13,375,38"/>
+<area shape="poly" title=" " alt="" coords="173,23,205,23,205,28,173,28"/>
+</map>
+</div>
+
 </div>
 </div>
 <a id="a2b8ae377145c591c5d199c4d91e71c64" name="a2b8ae377145c591c5d199c4d91e71c64"></a>
@@ -468,8 +521,18 @@ template&lt;typename <a class="el" href="prettywritertest_8cpp.html#a6283df8c4e3
 </div><div class="memdoc">
 
 <p class="definition">Definition at line <a class="el" href="vm_2execution__interface_8hpp_source.html#l00019">19</a> of file <a class="el" href="vm_2execution__interface_8hpp_source.html">execution_interface.hpp</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">   19</span>{ os-&gt;push(std::forward&lt;T&gt;(<a class="code hl_union" href="unionop.html">op</a>)); }</div>
-</div><!-- fragment -->
+<div class="fragment"><div class="line"><span class="lineno">   19</span>{ <a class="code hl_variable" href="#ab9a372ed9206cf89b9b1dc2383a72157">os</a>-&gt;<a class="code hl_function" href="classsysio_1_1vm_1_1stack.html#a6622e50cf34d892c701d2085faa53f8e">push</a>(std::forward&lt;T&gt;(<a class="code hl_union" href="unionop.html">op</a>)); }</div>
+</div><!-- fragment --><div class="dynheader">
+Here is the call graph for this function:</div>
+<div class="dyncontent">
+<div class="center"><img src="structsysio_1_1vm_1_1execution__interface_a2b8ae377145c591c5d199c4d91e71c64_cgraph.png" border="0" usemap="#astructsysio_1_1vm_1_1execution__interface_a2b8ae377145c591c5d199c4d91e71c64_cgraph" alt=""/></div>
+<map name="astructsysio_1_1vm_1_1execution__interface_a2b8ae377145c591c5d199c4d91e71c64_cgraph" id="astructsysio_1_1vm_1_1execution__interface_a2b8ae377145c591c5d199c4d91e71c64_cgraph">
+<area shape="rect" title=" " alt="" coords="5,5,173,46"/>
+<area shape="rect" href="classsysio_1_1vm_1_1stack.html#a6622e50cf34d892c701d2085faa53f8e" title=" " alt="" coords="221,13,375,38"/>
+<area shape="poly" title=" " alt="" coords="173,23,205,23,205,28,173,28"/>
+</map>
+</div>
+
 </div>
 </div>
 <a id="a209bec8b3138d230fe2aae2385bc567c" name="a209bec8b3138d230fe2aae2385bc567c"></a>
@@ -496,8 +559,19 @@ template&lt;typename <a class="el" href="prettywritertest_8cpp.html#a6283df8c4e3
 </div><div class="memdoc">
 
 <p class="definition">Definition at line <a class="el" href="sysio_2vm_2execution__interface_8hpp_source.html#l00016">16</a> of file <a class="el" href="sysio_2vm_2execution__interface_8hpp_source.html">execution_interface.hpp</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">   16</span>{ os-&gt;trim(amt); }</div>
-</div><!-- fragment -->
+<div class="fragment"><div class="line"><span class="lineno">   16</span>{ <a class="code hl_variable" href="#ab9a372ed9206cf89b9b1dc2383a72157">os</a>-&gt;<a class="code hl_function" href="classsysio_1_1vm_1_1stack.html#adc4a93eafdcbf2f3526d11bdbe0cc126">trim</a>(amt); }</div>
+<div class="ttc" id="aclasssysio_1_1vm_1_1stack_html_adc4a93eafdcbf2f3526d11bdbe0cc126"><div class="ttname"><a href="classsysio_1_1vm_1_1stack.html#adc4a93eafdcbf2f3526d11bdbe0cc126">sysio::vm::stack::trim</a></div><div class="ttdeci">void trim(size_t amt)</div><div class="ttdef"><b>Definition</b> <a href="sysio_2vm_2wasm__stack_8hpp_source.html#l00062">wasm_stack.hpp:62</a></div></div>
+</div><!-- fragment --><div class="dynheader">
+Here is the call graph for this function:</div>
+<div class="dyncontent">
+<div class="center"><img src="structsysio_1_1vm_1_1execution__interface_a209bec8b3138d230fe2aae2385bc567c_cgraph.png" border="0" usemap="#astructsysio_1_1vm_1_1execution__interface_a209bec8b3138d230fe2aae2385bc567c_cgraph" alt=""/></div>
+<map name="astructsysio_1_1vm_1_1execution__interface_a209bec8b3138d230fe2aae2385bc567c_cgraph" id="astructsysio_1_1vm_1_1execution__interface_a209bec8b3138d230fe2aae2385bc567c_cgraph">
+<area shape="rect" title=" " alt="" coords="5,5,174,46"/>
+<area shape="rect" href="classsysio_1_1vm_1_1stack.html#adc4a93eafdcbf2f3526d11bdbe0cc126" title=" " alt="" coords="222,13,370,38"/>
+<area shape="poly" title=" " alt="" coords="174,23,206,23,206,28,174,28"/>
+</map>
+</div>
+
 </div>
 </div>
 <a id="a209bec8b3138d230fe2aae2385bc567c" name="a209bec8b3138d230fe2aae2385bc567c"></a>
@@ -524,8 +598,18 @@ template&lt;typename <a class="el" href="prettywritertest_8cpp.html#a6283df8c4e3
 </div><div class="memdoc">
 
 <p class="definition">Definition at line <a class="el" href="vm_2execution__interface_8hpp_source.html#l00016">16</a> of file <a class="el" href="vm_2execution__interface_8hpp_source.html">execution_interface.hpp</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">   16</span>{ os-&gt;trim(amt); }</div>
-</div><!-- fragment -->
+<div class="fragment"><div class="line"><span class="lineno">   16</span>{ <a class="code hl_variable" href="#ab9a372ed9206cf89b9b1dc2383a72157">os</a>-&gt;<a class="code hl_function" href="classsysio_1_1vm_1_1stack.html#adc4a93eafdcbf2f3526d11bdbe0cc126">trim</a>(amt); }</div>
+</div><!-- fragment --><div class="dynheader">
+Here is the call graph for this function:</div>
+<div class="dyncontent">
+<div class="center"><img src="structsysio_1_1vm_1_1execution__interface_a209bec8b3138d230fe2aae2385bc567c_cgraph.png" border="0" usemap="#astructsysio_1_1vm_1_1execution__interface_a209bec8b3138d230fe2aae2385bc567c_cgraph" alt=""/></div>
+<map name="astructsysio_1_1vm_1_1execution__interface_a209bec8b3138d230fe2aae2385bc567c_cgraph" id="astructsysio_1_1vm_1_1execution__interface_a209bec8b3138d230fe2aae2385bc567c_cgraph">
+<area shape="rect" title=" " alt="" coords="5,5,174,46"/>
+<area shape="rect" href="classsysio_1_1vm_1_1stack.html#adc4a93eafdcbf2f3526d11bdbe0cc126" title=" " alt="" coords="222,13,370,38"/>
+<area shape="poly" title=" " alt="" coords="174,23,206,23,206,28,174,28"/>
+</map>
+</div>
+
 </div>
 </div>
 <a id="ae232261f5e82de248bfd4b92523c1948" name="ae232261f5e82de248bfd4b92523c1948"></a>

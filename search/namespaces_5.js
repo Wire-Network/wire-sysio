@@ -21,9 +21,6 @@ var searchData=
   ['fc_3a_3arpc_18',['rpc',['../namespacefc_1_1rpc.html',1,'fc']]],
   ['fc_3a_3arpc_3a_3adetail_19',['detail',['../namespacefc_1_1rpc_1_1detail.html',1,'fc::rpc']]],
   ['fc_3a_3atracked_20',['tracked',['../namespacefc_1_1tracked.html',1,'fc']]],
-  ['fixwhitespace_21',['fixWhitespace',['../namespacefix_whitespace.html',1,'']]],
-  ['floats_22',['Floats',['../namespace_floats.html',1,'']]],
-  ['foo_23',['foo',['../namespacefoo.html',1,'']]],
-  ['fuse_5fgmock_5ffiles_24',['fuse_gmock_files',['../namespacefuse__gmock__files.html',1,'']]],
-  ['fuse_5fgtest_5ffiles_25',['fuse_gtest_files',['../namespacefuse__gtest__files.html',1,'']]]
+  ['floats_21',['Floats',['../namespace_floats.html',1,'']]],
+  ['foo_22',['foo',['../namespacefoo.html',1,'']]]
 ];

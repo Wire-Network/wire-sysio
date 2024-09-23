@@ -133,9 +133,9 @@ Collaboration diagram for testing::internal::AllOfMatcherImpl&lt; T &gt;:</div>
 Public Member Functions</h2></td></tr>
 <tr class="memitem:af8807a21f6a28db7035447d6651740e9" id="r_af8807a21f6a28db7035447d6651740e9"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#af8807a21f6a28db7035447d6651740e9">AllOfMatcherImpl</a> (std::vector&lt; <a class="el" href="classtesting_1_1_matcher.html">Matcher</a>&lt; <a class="el" href="prettywritertest_8cpp.html#a6283df8c4e365cc8a01727e2d7ad44bf">T</a> &gt; &gt; matchers)</td></tr>
 <tr class="separator:af8807a21f6a28db7035447d6651740e9"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a0d43334f7430a82d9650d127cc32a8d3" id="r_a0d43334f7430a82d9650d127cc32a8d3"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a0d43334f7430a82d9650d127cc32a8d3">DescribeTo</a> (::std::ostream *os) const</td></tr>
+<tr class="memitem:a0d43334f7430a82d9650d127cc32a8d3" id="r_a0d43334f7430a82d9650d127cc32a8d3"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a0d43334f7430a82d9650d127cc32a8d3">DescribeTo</a> (::std::ostream *<a class="el" href="environment_8hpp.html#a3951483d0b31c29ca95336206cd35238">os</a>) const</td></tr>
 <tr class="separator:a0d43334f7430a82d9650d127cc32a8d3"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a64e2fd7e33cade4f9357b1af2e7927ac" id="r_a64e2fd7e33cade4f9357b1af2e7927ac"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a64e2fd7e33cade4f9357b1af2e7927ac">DescribeNegationTo</a> (::std::ostream *os) const</td></tr>
+<tr class="memitem:a64e2fd7e33cade4f9357b1af2e7927ac" id="r_a64e2fd7e33cade4f9357b1af2e7927ac"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a64e2fd7e33cade4f9357b1af2e7927ac">DescribeNegationTo</a> (::std::ostream *<a class="el" href="environment_8hpp.html#a3951483d0b31c29ca95336206cd35238">os</a>) const</td></tr>
 <tr class="separator:a64e2fd7e33cade4f9357b1af2e7927ac"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a55b5d84052ccd196972b393bfdd6cd50" id="r_a55b5d84052ccd196972b393bfdd6cd50"><td class="memItemLeft" align="right" valign="top">virtual bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a55b5d84052ccd196972b393bfdd6cd50">MatchAndExplain</a> (<a class="el" href="gtest-port_8h.html#a9f91fcd24cae0b48fdaeb19102dac525">GTEST_REFERENCE_TO_CONST_</a>(<a class="el" href="prettywritertest_8cpp.html#a6283df8c4e365cc8a01727e2d7ad44bf">T</a>) x, <a class="el" href="classtesting_1_1_match_result_listener.html">MatchResultListener</a> *listener) const</td></tr>
 <tr class="separator:a55b5d84052ccd196972b393bfdd6cd50"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -212,13 +212,14 @@ template&lt;typename <a class="el" href="prettywritertest_8cpp.html#a6283df8c4e3
 
 <p class="definition">Definition at line <a class="el" href="gmock-matchers_8h_source.html#l01736">1736</a> of file <a class="el" href="gmock-matchers_8h_source.html">gmock-matchers.h</a>.</p>
 <div class="fragment"><div class="line"><span class="lineno"> 1736</span>                                                        {</div>
-<div class="line"><span class="lineno"> 1737</span>    *os &lt;&lt; <span class="stringliteral">&quot;(&quot;</span>;</div>
+<div class="line"><span class="lineno"> 1737</span>    *<a class="code hl_variable" href="environment_8hpp.html#a3951483d0b31c29ca95336206cd35238">os</a> &lt;&lt; <span class="stringliteral">&quot;(&quot;</span>;</div>
 <div class="line"><span class="lineno"> 1738</span>    <span class="keywordflow">for</span> (<span class="keywordtype">size_t</span> i = 0; i &lt; matchers_.size(); ++i) {</div>
-<div class="line"><span class="lineno"> 1739</span>      <span class="keywordflow">if</span> (i != 0) *os &lt;&lt; <span class="stringliteral">&quot;) or (&quot;</span>;</div>
-<div class="line"><span class="lineno"> 1740</span>      matchers_[i].DescribeNegationTo(os);</div>
+<div class="line"><span class="lineno"> 1739</span>      <span class="keywordflow">if</span> (i != 0) *<a class="code hl_variable" href="environment_8hpp.html#a3951483d0b31c29ca95336206cd35238">os</a> &lt;&lt; <span class="stringliteral">&quot;) or (&quot;</span>;</div>
+<div class="line"><span class="lineno"> 1740</span>      matchers_[i].DescribeNegationTo(<a class="code hl_variable" href="environment_8hpp.html#a3951483d0b31c29ca95336206cd35238">os</a>);</div>
 <div class="line"><span class="lineno"> 1741</span>    }</div>
-<div class="line"><span class="lineno"> 1742</span>    *os &lt;&lt; <span class="stringliteral">&quot;)&quot;</span>;</div>
+<div class="line"><span class="lineno"> 1742</span>    *<a class="code hl_variable" href="environment_8hpp.html#a3951483d0b31c29ca95336206cd35238">os</a> &lt;&lt; <span class="stringliteral">&quot;)&quot;</span>;</div>
 <div class="line"><span class="lineno"> 1743</span>  }</div>
+<div class="ttc" id="aenvironment_8hpp_html_a3951483d0b31c29ca95336206cd35238"><div class="ttname"><a href="environment_8hpp.html#a3951483d0b31c29ca95336206cd35238">os</a></div><div class="ttdeci">os_t os</div><div class="ttdef"><b>Definition</b> <a href="environment_8hpp_source.html#l00023">environment.hpp:23</a></div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -251,12 +252,12 @@ template&lt;typename <a class="el" href="prettywritertest_8cpp.html#a6283df8c4e3
 
 <p class="definition">Definition at line <a class="el" href="gmock-matchers_8h_source.html#l01727">1727</a> of file <a class="el" href="gmock-matchers_8h_source.html">gmock-matchers.h</a>.</p>
 <div class="fragment"><div class="line"><span class="lineno"> 1727</span>                                                {</div>
-<div class="line"><span class="lineno"> 1728</span>    *os &lt;&lt; <span class="stringliteral">&quot;(&quot;</span>;</div>
+<div class="line"><span class="lineno"> 1728</span>    *<a class="code hl_variable" href="environment_8hpp.html#a3951483d0b31c29ca95336206cd35238">os</a> &lt;&lt; <span class="stringliteral">&quot;(&quot;</span>;</div>
 <div class="line"><span class="lineno"> 1729</span>    <span class="keywordflow">for</span> (<span class="keywordtype">size_t</span> i = 0; i &lt; matchers_.size(); ++i) {</div>
-<div class="line"><span class="lineno"> 1730</span>      <span class="keywordflow">if</span> (i != 0) *os &lt;&lt; <span class="stringliteral">&quot;) and (&quot;</span>;</div>
-<div class="line"><span class="lineno"> 1731</span>      matchers_[i].DescribeTo(os);</div>
+<div class="line"><span class="lineno"> 1730</span>      <span class="keywordflow">if</span> (i != 0) *<a class="code hl_variable" href="environment_8hpp.html#a3951483d0b31c29ca95336206cd35238">os</a> &lt;&lt; <span class="stringliteral">&quot;) and (&quot;</span>;</div>
+<div class="line"><span class="lineno"> 1731</span>      matchers_[i].DescribeTo(<a class="code hl_variable" href="environment_8hpp.html#a3951483d0b31c29ca95336206cd35238">os</a>);</div>
 <div class="line"><span class="lineno"> 1732</span>    }</div>
-<div class="line"><span class="lineno"> 1733</span>    *os &lt;&lt; <span class="stringliteral">&quot;)&quot;</span>;</div>
+<div class="line"><span class="lineno"> 1733</span>    *<a class="code hl_variable" href="environment_8hpp.html#a3951483d0b31c29ca95336206cd35238">os</a> &lt;&lt; <span class="stringliteral">&quot;)&quot;</span>;</div>
 <div class="line"><span class="lineno"> 1734</span>  }</div>
 </div><!-- fragment -->
 </div>

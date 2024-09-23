@@ -24,13 +24,13 @@ class \mbox{\hyperlink{classfoo_1_1_unprintable_in_foo}{Unprintable\+In\+Foo}}
 \doxysubsubsection*{Functions}
 \begin{DoxyCompactItemize}
 \item 
-void \mbox{\hyperlink{namespacefoo_ac435de653934c97045bbdba8c8afbe3f}{Print\+To}} (const \mbox{\hyperlink{structfoo_1_1_printable_via_print_to}{Printable\+Via\+Print\+To}} \&x, \+::std\+::ostream \texorpdfstring{$\ast$}{*}os)
+void \mbox{\hyperlink{namespacefoo_ac435de653934c97045bbdba8c8afbe3f}{Print\+To}} (const \mbox{\hyperlink{structfoo_1_1_printable_via_print_to}{Printable\+Via\+Print\+To}} \&x, \+::std\+::ostream \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}})
 \item 
-\+::std\+::ostream \& \mbox{\hyperlink{namespacefoo_aaa854bf85744e6ec2ffa474ce15e36fe}{operator$<$$<$}} (\+::std\+::ostream \&os, const \mbox{\hyperlink{structfoo_1_1_pointer_printable}{Pointer\+Printable}} \texorpdfstring{$\ast$}{*})
+\+::std\+::ostream \& \mbox{\hyperlink{namespacefoo_aaa854bf85744e6ec2ffa474ce15e36fe}{operator$<$$<$}} (\+::std\+::ostream \&\mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}, const \mbox{\hyperlink{structfoo_1_1_pointer_printable}{Pointer\+Printable}} \texorpdfstring{$\ast$}{*})
 \item 
-{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ }\\void \mbox{\hyperlink{namespacefoo_a7b78eba501ea7ff1226a8cb40b6e3d92}{Print\+To}} (const \mbox{\hyperlink{classfoo_1_1_printable_via_print_to_template}{Printable\+Via\+Print\+To\+Template}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \&x, \+::std\+::ostream \texorpdfstring{$\ast$}{*}os)
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ }\\void \mbox{\hyperlink{namespacefoo_a7b78eba501ea7ff1226a8cb40b6e3d92}{Print\+To}} (const \mbox{\hyperlink{classfoo_1_1_printable_via_print_to_template}{Printable\+Via\+Print\+To\+Template}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \&x, \+::std\+::ostream \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}})
 \item 
-{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ }\\inline \+::std\+::ostream \& \mbox{\hyperlink{namespacefoo_a4a4d839c73d5476881324336467fdfd3}{operator$<$$<$}} (\+::std\+::ostream \&os, const \mbox{\hyperlink{classfoo_1_1_streamable_template_in_foo}{Streamable\+Template\+In\+Foo}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \&x)
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ }\\inline \+::std\+::ostream \& \mbox{\hyperlink{namespacefoo_a4a4d839c73d5476881324336467fdfd3}{operator$<$$<$}} (\+::std\+::ostream \&\mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}, const \mbox{\hyperlink{classfoo_1_1_streamable_template_in_foo}{Streamable\+Template\+In\+Foo}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \&x)
 \item 
 \mbox{\hyperlink{namespacefoo_a0d50eecc97df56ae625078848ba9c98a}{TEST\+\_\+F}} (\mbox{\hyperlink{classfoo_1_1_mixed_up_test_case_test}{Mixed\+Up\+Test\+Case\+Test}}, First\+Test\+From\+Namespace\+Foo)
 \item 
@@ -54,7 +54,7 @@ Definition at line \mbox{\hyperlink{gtest-printers__test_8cc_source_l00150}{150}
 
 \begin{DoxyCode}{0}
 \DoxyCodeLine{00153\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
-\DoxyCodeLine{00154\ \ \ \textcolor{keywordflow}{return}\ os\ <<\ \textcolor{stringliteral}{"{}PointerPrintable*"{}};}
+\DoxyCodeLine{00154\ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}\ <<\ \textcolor{stringliteral}{"{}PointerPrintable*"{}};}
 \DoxyCodeLine{00155\ \}}
 
 \end{DoxyCode}
@@ -72,11 +72,12 @@ Definition at line \mbox{\hyperlink{gtest-printers__test_8cc_source_l00185}{185}
 
 \begin{DoxyCode}{0}
 \DoxyCodeLine{00186\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
-\DoxyCodeLine{00187\ \ \ \textcolor{keywordflow}{return}\ os\ <<\ \textcolor{stringliteral}{"{}StreamableTemplateInFoo:\ "{}}\ <<\ x.\mbox{\hyperlink{classfoo_1_1_streamable_template_in_foo_acb166eea328a1354a6b10ac519b2a77d}{value}}();}
+\DoxyCodeLine{00187\ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}\ <<\ \textcolor{stringliteral}{"{}StreamableTemplateInFoo:\ "{}}\ <<\ x.\mbox{\hyperlink{classfoo_1_1_streamable_template_in_foo_acb166eea328a1354a6b10ac519b2a77d}{value}}();}
 \DoxyCodeLine{00188\ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -96,7 +97,7 @@ Definition at line \mbox{\hyperlink{gtest-printers__test_8cc_source_l00144}{144}
 
 \begin{DoxyCode}{0}
 \DoxyCodeLine{00144\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
-\DoxyCodeLine{00145\ \ \ *os\ <<\ \textcolor{stringliteral}{"{}PrintableViaPrintTo:\ "{}}\ <<\ x.\mbox{\hyperlink{structfoo_1_1_printable_via_print_to_a16f8c6420275d86f0d0112ca5a41bca2}{value}};}
+\DoxyCodeLine{00145\ \ \ *\mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}\ <<\ \textcolor{stringliteral}{"{}PrintableViaPrintTo:\ "{}}\ <<\ x.\mbox{\hyperlink{structfoo_1_1_printable_via_print_to_a16f8c6420275d86f0d0112ca5a41bca2}{value}};}
 \DoxyCodeLine{00146\ \}}
 
 \end{DoxyCode}
@@ -114,11 +115,12 @@ Definition at line \mbox{\hyperlink{gtest-printers__test_8cc_source_l00169}{169}
 
 \begin{DoxyCode}{0}
 \DoxyCodeLine{00169\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
-\DoxyCodeLine{00170\ \ \ *os\ <<\ \textcolor{stringliteral}{"{}PrintableViaPrintToTemplate:\ "{}}\ <<\ x.\mbox{\hyperlink{classfoo_1_1_printable_via_print_to_template_abf729e1562cdea4257fbb35b1eab486c}{value}}();}
+\DoxyCodeLine{00170\ \ \ *\mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}\ <<\ \textcolor{stringliteral}{"{}PrintableViaPrintToTemplate:\ "{}}\ <<\ x.\mbox{\hyperlink{classfoo_1_1_printable_via_print_to_template_abf729e1562cdea4257fbb35b1eab486c}{value}}();}
 \DoxyCodeLine{00171\ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode

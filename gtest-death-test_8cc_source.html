@@ -739,7 +739,7 @@ $(function(){initNavTree('gtest-death-test_8cc_source.html',''); initResizable(t
 <div class="line"><a id="l00638" name="l00638"></a><span class="lineno">  638</span>                   <span class="keyword">const</span> RE* a_regex,</div>
 <div class="line"><a id="l00639" name="l00639"></a><span class="lineno">  639</span>                   <span class="keyword">const</span> <span class="keywordtype">char</span>* file,</div>
 <div class="line"><a id="l00640" name="l00640"></a><span class="lineno">  640</span>                   <span class="keywordtype">int</span> line)</div>
-<div class="line"><a id="l00641" name="l00641"></a><span class="lineno">  641</span>      : DeathTestImpl(a_statement, a_regex), file_(file), line_(<a class="code hl_variable" href="namespacevalidate__reflection.html#a54d4e98ade8417b88a7e3859a693630a">line</a>) {}</div>
+<div class="line"><a id="l00641" name="l00641"></a><span class="lineno">  641</span>      : DeathTestImpl(a_statement, a_regex), file_(file), line_(line) {}</div>
 <div class="line"><a id="l00642" name="l00642"></a><span class="lineno">  642</span> </div>
 <div class="line"><a id="l00643" name="l00643"></a><span class="lineno">  643</span>  <span class="comment">// All of these virtual functions are inherited from DeathTest.</span></div>
 <div class="line"><a id="l00644" name="l00644"></a><span class="lineno">  644</span>  <span class="keyword">virtual</span> <span class="keywordtype">int</span> Wait();</div>
@@ -905,7 +905,7 @@ $(function(){initNavTree('gtest-death-test_8cc_source.html',''); initResizable(t
 <div class="line"><a id="l00804" name="l00804"></a><span class="lineno">  804</span>                   <span class="keyword">const</span> RE* a_regex,</div>
 <div class="line"><a id="l00805" name="l00805"></a><span class="lineno">  805</span>                   <span class="keyword">const</span> <span class="keywordtype">char</span>* file,</div>
 <div class="line"><a id="l00806" name="l00806"></a><span class="lineno">  806</span>                   <span class="keywordtype">int</span> line)</div>
-<div class="line"><a id="l00807" name="l00807"></a><span class="lineno">  807</span>      : DeathTestImpl(a_statement, a_regex), file_(file), line_(<a class="code hl_variable" href="namespacevalidate__reflection.html#a54d4e98ade8417b88a7e3859a693630a">line</a>) {}</div>
+<div class="line"><a id="l00807" name="l00807"></a><span class="lineno">  807</span>      : DeathTestImpl(a_statement, a_regex), file_(file), line_(line) {}</div>
 <div class="line"><a id="l00808" name="l00808"></a><span class="lineno">  808</span> </div>
 <div class="line"><a id="l00809" name="l00809"></a><span class="lineno">  809</span>  <span class="comment">// All of these virtual functions are inherited from DeathTest.</span></div>
 <div class="line"><a id="l00810" name="l00810"></a><span class="lineno">  810</span>  <span class="keyword">virtual</span> <span class="keywordtype">int</span> Wait();</div>
@@ -1023,10 +1023,10 @@ $(function(){initNavTree('gtest-death-test_8cc_source.html',''); initResizable(t
 <div class="line"><a id="l00922" name="l00922"></a><span class="lineno">  922</span>      + file_ + <span class="stringliteral">&quot;|&quot;</span></div>
 <div class="line"><a id="l00923" name="l00923"></a><span class="lineno">  923</span>      + <a class="code hl_function" href="namespacetesting_1_1internal.html#aad4beed95d0846e6ffc5da0978ef3bb9">StreamableToString</a>(line_) + <span class="stringliteral">&quot;|&quot;</span></div>
 <div class="line"><a id="l00924" name="l00924"></a><span class="lineno">  924</span>      + <a class="code hl_function" href="namespacetesting_1_1internal.html#aad4beed95d0846e6ffc5da0978ef3bb9">StreamableToString</a>(death_test_index);</div>
-<div class="line"><a id="l00925" name="l00925"></a><span class="lineno">  925</span>  Arguments <a class="code hl_variable" href="namespacebenchmark_compile.html#ad0ed96ae1454e4347ca61ac3887c379e">args</a>;</div>
-<div class="line"><a id="l00926" name="l00926"></a><span class="lineno">  926</span>  <a class="code hl_variable" href="namespacebenchmark_compile.html#ad0ed96ae1454e4347ca61ac3887c379e">args</a>.AddArguments(GetInjectableArgvs());</div>
-<div class="line"><a id="l00927" name="l00927"></a><span class="lineno">  927</span>  <a class="code hl_variable" href="namespacebenchmark_compile.html#ad0ed96ae1454e4347ca61ac3887c379e">args</a>.AddArgument(filter_flag.c_str());</div>
-<div class="line"><a id="l00928" name="l00928"></a><span class="lineno">  928</span>  <a class="code hl_variable" href="namespacebenchmark_compile.html#ad0ed96ae1454e4347ca61ac3887c379e">args</a>.AddArgument(internal_flag.c_str());</div>
+<div class="line"><a id="l00925" name="l00925"></a><span class="lineno">  925</span>  Arguments args;</div>
+<div class="line"><a id="l00926" name="l00926"></a><span class="lineno">  926</span>  args.AddArguments(GetInjectableArgvs());</div>
+<div class="line"><a id="l00927" name="l00927"></a><span class="lineno">  927</span>  args.AddArgument(filter_flag.c_str());</div>
+<div class="line"><a id="l00928" name="l00928"></a><span class="lineno">  928</span>  args.AddArgument(internal_flag.c_str());</div>
 <div class="line"><a id="l00929" name="l00929"></a><span class="lineno">  929</span> </div>
 <div class="line"><a id="l00930" name="l00930"></a><span class="lineno">  930</span>  <span class="comment">// Build the pipe for communication with the child.</span></div>
 <div class="line"><a id="l00931" name="l00931"></a><span class="lineno">  931</span>  zx_status_t status;</div>
@@ -1047,7 +1047,7 @@ $(function(){initNavTree('gtest-death-test_8cc_source.html',''); initResizable(t
 <div class="line"><a id="l00946" name="l00946"></a><span class="lineno">  946</span> </div>
 <div class="line"><a id="l00947" name="l00947"></a><span class="lineno">  947</span>  <span class="comment">// Spawn the child process.</span></div>
 <div class="line"><a id="l00948" name="l00948"></a><span class="lineno">  948</span>  status = fdio_spawn_etc(ZX_HANDLE_INVALID, FDIO_SPAWN_CLONE_ALL,</div>
-<div class="line"><a id="l00949" name="l00949"></a><span class="lineno">  949</span>                          <a class="code hl_variable" href="namespacebenchmark_compile.html#ad0ed96ae1454e4347ca61ac3887c379e">args</a>.Argv()[0], <a class="code hl_variable" href="namespacebenchmark_compile.html#ad0ed96ae1454e4347ca61ac3887c379e">args</a>.Argv(), <span class="keyword">nullptr</span>, 1,</div>
+<div class="line"><a id="l00949" name="l00949"></a><span class="lineno">  949</span>                          args.Argv()[0], args.Argv(), <span class="keyword">nullptr</span>, 1,</div>
 <div class="line"><a id="l00950" name="l00950"></a><span class="lineno">  950</span>                          &amp;add_handle_action, &amp;child_process_, <span class="keyword">nullptr</span>);</div>
 <div class="line"><a id="l00951" name="l00951"></a><span class="lineno">  951</span>  GTEST_DEATH_TEST_CHECK_(status == ZX_OK);</div>
 <div class="line"><a id="l00952" name="l00952"></a><span class="lineno">  952</span> </div>
@@ -1156,17 +1156,17 @@ $(function(){initNavTree('gtest-death-test_8cc_source.html',''); initResizable(t
 <div class="line"><a id="l01055" name="l01055"></a><span class="lineno"> 1055</span> <span class="keyword">public</span>:</div>
 <div class="line"><a id="l01056" name="l01056"></a><span class="lineno"> 1056</span>  ExecDeathTest(<span class="keyword">const</span> <span class="keywordtype">char</span>* a_statement, <span class="keyword">const</span> RE* a_regex,</div>
 <div class="line"><a id="l01057" name="l01057"></a><span class="lineno"> 1057</span>                <span class="keyword">const</span> <span class="keywordtype">char</span>* file, <span class="keywordtype">int</span> line) :</div>
-<div class="line"><a id="l01058" name="l01058"></a><span class="lineno"> 1058</span>      ForkingDeathTest(a_statement, a_regex), file_(file), line_(<a class="code hl_variable" href="namespacevalidate__reflection.html#a54d4e98ade8417b88a7e3859a693630a">line</a>) { }</div>
+<div class="line"><a id="l01058" name="l01058"></a><span class="lineno"> 1058</span>      ForkingDeathTest(a_statement, a_regex), file_(file), line_(line) { }</div>
 <div class="line"><a id="l01059" name="l01059"></a><span class="lineno"> 1059</span>  <span class="keyword">virtual</span> TestRole AssumeRole();</div>
 <div class="line"><a id="l01060" name="l01060"></a><span class="lineno"> 1060</span> <span class="keyword">private</span>:</div>
 <div class="line"><a id="l01061" name="l01061"></a><span class="lineno"> 1061</span>  static ::std::vector&lt;std::string&gt; GetArgvsForDeathTestChildProcess() {</div>
-<div class="line"><a id="l01062" name="l01062"></a><span class="lineno"> 1062</span>    ::std::vector&lt;std::string&gt; <a class="code hl_variable" href="namespacebenchmark_compile.html#ad0ed96ae1454e4347ca61ac3887c379e">args</a> = GetInjectableArgvs();</div>
+<div class="line"><a id="l01062" name="l01062"></a><span class="lineno"> 1062</span>    ::std::vector&lt;std::string&gt; args = GetInjectableArgvs();</div>
 <div class="line"><a id="l01063" name="l01063"></a><span class="lineno"> 1063</span><span class="preprocessor">#  if defined(GTEST_EXTRA_DEATH_TEST_COMMAND_LINE_ARGS_)</span></div>
 <div class="line"><a id="l01064" name="l01064"></a><span class="lineno"> 1064</span>    ::std::vector&lt;std::string&gt; extra_args =</div>
 <div class="line"><a id="l01065" name="l01065"></a><span class="lineno"> 1065</span>        GTEST_EXTRA_DEATH_TEST_COMMAND_LINE_ARGS_();</div>
-<div class="line"><a id="l01066" name="l01066"></a><span class="lineno"> 1066</span>    <a class="code hl_variable" href="namespacebenchmark_compile.html#ad0ed96ae1454e4347ca61ac3887c379e">args</a>.insert(<a class="code hl_variable" href="namespacebenchmark_compile.html#ad0ed96ae1454e4347ca61ac3887c379e">args</a>.end(), extra_args.begin(), extra_args.end());</div>
+<div class="line"><a id="l01066" name="l01066"></a><span class="lineno"> 1066</span>    args.insert(args.end(), extra_args.begin(), extra_args.end());</div>
 <div class="line"><a id="l01067" name="l01067"></a><span class="lineno"> 1067</span><span class="preprocessor">#  endif  </span><span class="comment">// defined(GTEST_EXTRA_DEATH_TEST_COMMAND_LINE_ARGS_)</span></div>
-<div class="line"><a id="l01068" name="l01068"></a><span class="lineno"> 1068</span>    <span class="keywordflow">return</span> <a class="code hl_variable" href="namespacebenchmark_compile.html#ad0ed96ae1454e4347ca61ac3887c379e">args</a>;</div>
+<div class="line"><a id="l01068" name="l01068"></a><span class="lineno"> 1068</span>    <span class="keywordflow">return</span> args;</div>
 <div class="line"><a id="l01069" name="l01069"></a><span class="lineno"> 1069</span>  }</div>
 <div class="line"><a id="l01070" name="l01070"></a><span class="lineno"> 1070</span>  <span class="comment">// The name of the file in which the death test is located.</span></div>
 <div class="line"><a id="l01071" name="l01071"></a><span class="lineno"> 1071</span>  <span class="keyword">const</span> <span class="keywordtype">char</span>* <span class="keyword">const</span> file_;</div>
@@ -1224,8 +1224,8 @@ $(function(){initNavTree('gtest-death-test_8cc_source.html',''); initResizable(t
 <div class="line"><a id="l01123" name="l01123"></a><span class="lineno"> 1123</span><span class="preprocessor">#  else</span></div>
 <div class="line"><a id="l01124" name="l01124"></a><span class="lineno"> 1124</span><span class="comment">// Some POSIX platforms expect you to declare environ. extern &quot;C&quot; makes</span></div>
 <div class="line"><a id="l01125" name="l01125"></a><span class="lineno"> 1125</span><span class="comment">// it reside in the global namespace.</span></div>
-<div class="line"><a id="l01126" name="l01126"></a><span class="lineno"> 1126</span><span class="keyword">extern</span> <span class="stringliteral">&quot;C&quot;</span> <span class="keywordtype">char</span>** <a class="code hl_variable" href="namespacegmock__leak__test.html#a9437a2d2e3bde77354e5c6443ef129f8">environ</a>;</div>
-<div class="line"><a id="l01127" name="l01127"></a><span class="lineno"> 1127</span><span class="keyword">inline</span> <span class="keywordtype">char</span>** GetEnviron() { <span class="keywordflow">return</span> <a class="code hl_variable" href="namespacegmock__leak__test.html#a9437a2d2e3bde77354e5c6443ef129f8">environ</a>; }</div>
+<div class="line"><a id="l01126" name="l01126"></a><span class="lineno"> 1126</span><span class="keyword">extern</span> <span class="stringliteral">&quot;C&quot;</span> <span class="keywordtype">char</span>** environ;</div>
+<div class="line"><a id="l01127" name="l01127"></a><span class="lineno"> 1127</span><span class="keyword">inline</span> <span class="keywordtype">char</span>** GetEnviron() { <span class="keywordflow">return</span> environ; }</div>
 <div class="line"><a id="l01128" name="l01128"></a><span class="lineno"> 1128</span><span class="preprocessor">#  endif  </span><span class="comment">// GTEST_OS_MAC</span></div>
 <div class="line"><a id="l01129" name="l01129"></a><span class="lineno"> 1129</span> </div>
 <div class="line"><a id="l01130" name="l01130"></a><span class="lineno"> 1130</span><span class="preprocessor">#  if !GTEST_OS_QNX</span></div>
@@ -1233,8 +1233,8 @@ $(function(){initNavTree('gtest-death-test_8cc_source.html',''); initResizable(t
 <div class="line"><a id="l01132" name="l01132"></a><span class="lineno"> 1132</span><span class="comment">// This function is called in a clone()-ed process and thus must avoid</span></div>
 <div class="line"><a id="l01133" name="l01133"></a><span class="lineno"> 1133</span><span class="comment">// any potentially unsafe operations like malloc or libc functions.</span></div>
 <div class="line"><a id="l01134" name="l01134"></a><span class="lineno"> 1134</span><span class="keyword">static</span> <span class="keywordtype">int</span> ExecDeathTestChildMain(<span class="keywordtype">void</span>* child_arg) {</div>
-<div class="line"><a id="l01135" name="l01135"></a><span class="lineno"> 1135</span>  ExecDeathTestArgs* <span class="keyword">const</span> <a class="code hl_variable" href="namespacebenchmark_compile.html#ad0ed96ae1454e4347ca61ac3887c379e">args</a> = <span class="keyword">static_cast&lt;</span>ExecDeathTestArgs*<span class="keyword">&gt;</span>(child_arg);</div>
-<div class="line"><a id="l01136" name="l01136"></a><span class="lineno"> 1136</span>  GTEST_DEATH_TEST_CHECK_SYSCALL_(<a class="code hl_function" href="integration_8cpp.html#af5b66d867a040d002fb57d645cae3fb4">close</a>(<a class="code hl_variable" href="namespacebenchmark_compile.html#ad0ed96ae1454e4347ca61ac3887c379e">args</a>-&gt;close_fd));</div>
+<div class="line"><a id="l01135" name="l01135"></a><span class="lineno"> 1135</span>  ExecDeathTestArgs* <span class="keyword">const</span> args = <span class="keyword">static_cast&lt;</span>ExecDeathTestArgs*<span class="keyword">&gt;</span>(child_arg);</div>
+<div class="line"><a id="l01136" name="l01136"></a><span class="lineno"> 1136</span>  GTEST_DEATH_TEST_CHECK_SYSCALL_(<a class="code hl_function" href="integration_8cpp.html#af5b66d867a040d002fb57d645cae3fb4">close</a>(args-&gt;close_fd));</div>
 <div class="line"><a id="l01137" name="l01137"></a><span class="lineno"> 1137</span> </div>
 <div class="line"><a id="l01138" name="l01138"></a><span class="lineno"> 1138</span>  <span class="comment">// We need to execute the test program in the same environment where</span></div>
 <div class="line"><a id="l01139" name="l01139"></a><span class="lineno"> 1139</span>  <span class="comment">// it was originally invoked.  Therefore we change to the original</span></div>
@@ -1253,8 +1253,8 @@ $(function(){initNavTree('gtest-death-test_8cc_source.html',''); initResizable(t
 <div class="line"><a id="l01152" name="l01152"></a><span class="lineno"> 1152</span>  <span class="comment">// unsafe.  Since execve() doesn&#39;t search the PATH, the user must</span></div>
 <div class="line"><a id="l01153" name="l01153"></a><span class="lineno"> 1153</span>  <span class="comment">// invoke the test program via a valid path that contains at least</span></div>
 <div class="line"><a id="l01154" name="l01154"></a><span class="lineno"> 1154</span>  <span class="comment">// one path separator.</span></div>
-<div class="line"><a id="l01155" name="l01155"></a><span class="lineno"> 1155</span>  execve(<a class="code hl_variable" href="namespacebenchmark_compile.html#ad0ed96ae1454e4347ca61ac3887c379e">args</a>-&gt;argv[0], <a class="code hl_variable" href="namespacebenchmark_compile.html#ad0ed96ae1454e4347ca61ac3887c379e">args</a>-&gt;argv, GetEnviron());</div>
-<div class="line"><a id="l01156" name="l01156"></a><span class="lineno"> 1156</span>  DeathTestAbort(std::string(<span class="stringliteral">&quot;execve(&quot;</span>) + <a class="code hl_variable" href="namespacebenchmark_compile.html#ad0ed96ae1454e4347ca61ac3887c379e">args</a>-&gt;argv[0] + <span class="stringliteral">&quot;, ...) in &quot;</span> +</div>
+<div class="line"><a id="l01155" name="l01155"></a><span class="lineno"> 1155</span>  execve(args-&gt;argv[0], args-&gt;argv, GetEnviron());</div>
+<div class="line"><a id="l01156" name="l01156"></a><span class="lineno"> 1156</span>  DeathTestAbort(std::string(<span class="stringliteral">&quot;execve(&quot;</span>) + args-&gt;argv[0] + <span class="stringliteral">&quot;, ...) in &quot;</span> +</div>
 <div class="line"><a id="l01157" name="l01157"></a><span class="lineno"> 1157</span>                 original_dir + <span class="stringliteral">&quot; failed: &quot;</span> +</div>
 <div class="line"><a id="l01158" name="l01158"></a><span class="lineno"> 1158</span>                 GetLastErrnoDescription());</div>
 <div class="line"><a id="l01159" name="l01159"></a><span class="lineno"> 1159</span>  <span class="keywordflow">return</span> EXIT_FAILURE;</div>
@@ -1296,7 +1296,7 @@ $(function(){initNavTree('gtest-death-test_8cc_source.html',''); initResizable(t
 <div class="line"><a id="l01195" name="l01195"></a><span class="lineno"> 1195</span><span class="comment">// spawn(2) there instead.  The function dies with an error message if</span></div>
 <div class="line"><a id="l01196" name="l01196"></a><span class="lineno"> 1196</span><span class="comment">// anything goes wrong.</span></div>
 <div class="line"><a id="l01197" name="l01197"></a><span class="lineno"> 1197</span><span class="keyword">static</span> pid_t ExecDeathTestSpawnChild(<span class="keywordtype">char</span>* <span class="keyword">const</span>* <a class="code hl_variable" href="hello__driver_8cpp.html#af2efa898e9eed6fe6715279cb1ec35b0">argv</a>, <span class="keywordtype">int</span> close_fd) {</div>
-<div class="line"><a id="l01198" name="l01198"></a><span class="lineno"> 1198</span>  ExecDeathTestArgs <a class="code hl_variable" href="namespacebenchmark_compile.html#ad0ed96ae1454e4347ca61ac3887c379e">args</a> = { <a class="code hl_variable" href="hello__driver_8cpp.html#af2efa898e9eed6fe6715279cb1ec35b0">argv</a>, close_fd };</div>
+<div class="line"><a id="l01198" name="l01198"></a><span class="lineno"> 1198</span>  ExecDeathTestArgs args = { <a class="code hl_variable" href="hello__driver_8cpp.html#af2efa898e9eed6fe6715279cb1ec35b0">argv</a>, close_fd };</div>
 <div class="line"><a id="l01199" name="l01199"></a><span class="lineno"> 1199</span>  pid_t child_pid = -1;</div>
 <div class="line"><a id="l01200" name="l01200"></a><span class="lineno"> 1200</span> </div>
 <div class="line"><a id="l01201" name="l01201"></a><span class="lineno"> 1201</span><span class="preprocessor">#  if GTEST_OS_QNX</span></div>
@@ -1324,7 +1324,7 @@ $(function(){initNavTree('gtest-death-test_8cc_source.html',''); initResizable(t
 <div class="line"><a id="l01223" name="l01223"></a><span class="lineno"> 1223</span>                                        fd_flags | FD_CLOEXEC));</div>
 <div class="line"><a id="l01224" name="l01224"></a><span class="lineno"> 1224</span>  <span class="keyword">struct </span>inheritance inherit = {0};</div>
 <div class="line"><a id="l01225" name="l01225"></a><span class="lineno"> 1225</span>  <span class="comment">// spawn is a system call.</span></div>
-<div class="line"><a id="l01226" name="l01226"></a><span class="lineno"> 1226</span>  child_pid = spawn(<a class="code hl_variable" href="namespacebenchmark_compile.html#ad0ed96ae1454e4347ca61ac3887c379e">args</a>.argv[0], 0, NULL, &amp;inherit, <a class="code hl_variable" href="namespacebenchmark_compile.html#ad0ed96ae1454e4347ca61ac3887c379e">args</a>.argv, GetEnviron());</div>
+<div class="line"><a id="l01226" name="l01226"></a><span class="lineno"> 1226</span>  child_pid = spawn(args.argv[0], 0, NULL, &amp;inherit, args.argv, GetEnviron());</div>
 <div class="line"><a id="l01227" name="l01227"></a><span class="lineno"> 1227</span>  <span class="comment">// Restores the current working directory.</span></div>
 <div class="line"><a id="l01228" name="l01228"></a><span class="lineno"> 1228</span>  GTEST_DEATH_TEST_CHECK_(fchdir(cwd_fd) != -1);</div>
 <div class="line"><a id="l01229" name="l01229"></a><span class="lineno"> 1229</span>  GTEST_DEATH_TEST_CHECK_SYSCALL_(<a class="code hl_function" href="integration_8cpp.html#af5b66d867a040d002fb57d645cae3fb4">close</a>(cwd_fd));</div>
@@ -1419,10 +1419,10 @@ $(function(){initNavTree('gtest-death-test_8cc_source.html',''); initResizable(t
 <div class="line"><a id="l01318" name="l01318"></a><span class="lineno"> 1318</span>      + file_ + <span class="stringliteral">&quot;|&quot;</span> + StreamableToString(line_) + <span class="stringliteral">&quot;|&quot;</span></div>
 <div class="line"><a id="l01319" name="l01319"></a><span class="lineno"> 1319</span>      + StreamableToString(death_test_index) + <span class="stringliteral">&quot;|&quot;</span></div>
 <div class="line"><a id="l01320" name="l01320"></a><span class="lineno"> 1320</span>      + StreamableToString(pipe_fd[1]);</div>
-<div class="line"><a id="l01321" name="l01321"></a><span class="lineno"> 1321</span>  Arguments <a class="code hl_variable" href="namespacebenchmark_compile.html#ad0ed96ae1454e4347ca61ac3887c379e">args</a>;</div>
-<div class="line"><a id="l01322" name="l01322"></a><span class="lineno"> 1322</span>  <a class="code hl_variable" href="namespacebenchmark_compile.html#ad0ed96ae1454e4347ca61ac3887c379e">args</a>.AddArguments(GetArgvsForDeathTestChildProcess());</div>
-<div class="line"><a id="l01323" name="l01323"></a><span class="lineno"> 1323</span>  <a class="code hl_variable" href="namespacebenchmark_compile.html#ad0ed96ae1454e4347ca61ac3887c379e">args</a>.AddArgument(filter_flag.c_str());</div>
-<div class="line"><a id="l01324" name="l01324"></a><span class="lineno"> 1324</span>  <a class="code hl_variable" href="namespacebenchmark_compile.html#ad0ed96ae1454e4347ca61ac3887c379e">args</a>.AddArgument(internal_flag.c_str());</div>
+<div class="line"><a id="l01321" name="l01321"></a><span class="lineno"> 1321</span>  Arguments args;</div>
+<div class="line"><a id="l01322" name="l01322"></a><span class="lineno"> 1322</span>  args.AddArguments(GetArgvsForDeathTestChildProcess());</div>
+<div class="line"><a id="l01323" name="l01323"></a><span class="lineno"> 1323</span>  args.AddArgument(filter_flag.c_str());</div>
+<div class="line"><a id="l01324" name="l01324"></a><span class="lineno"> 1324</span>  args.AddArgument(internal_flag.c_str());</div>
 <div class="line"><a id="l01325" name="l01325"></a><span class="lineno"> 1325</span> </div>
 <div class="line"><a id="l01326" name="l01326"></a><span class="lineno"> 1326</span>  DeathTest::set_last_death_test_message(<span class="stringliteral">&quot;&quot;</span>);</div>
 <div class="line"><a id="l01327" name="l01327"></a><span class="lineno"> 1327</span> </div>
@@ -1431,7 +1431,7 @@ $(function(){initNavTree('gtest-death-test_8cc_source.html',''); initResizable(t
 <div class="line"><a id="l01330" name="l01330"></a><span class="lineno"> 1330</span>  <span class="comment">// is necessary.</span></div>
 <div class="line"><a id="l01331" name="l01331"></a><span class="lineno"> 1331</span>  <a class="code hl_function" href="namespacetesting_1_1internal.html#a2135f223bf6b527729aeaa651115183b">FlushInfoLog</a>();</div>
 <div class="line"><a id="l01332" name="l01332"></a><span class="lineno"> 1332</span> </div>
-<div class="line"><a id="l01333" name="l01333"></a><span class="lineno"> 1333</span>  <span class="keyword">const</span> pid_t child_pid = ExecDeathTestSpawnChild(<a class="code hl_variable" href="namespacebenchmark_compile.html#ad0ed96ae1454e4347ca61ac3887c379e">args</a>.Argv(), pipe_fd[0]);</div>
+<div class="line"><a id="l01333" name="l01333"></a><span class="lineno"> 1333</span>  <span class="keyword">const</span> pid_t child_pid = ExecDeathTestSpawnChild(args.Argv(), pipe_fd[0]);</div>
 <div class="line"><a id="l01334" name="l01334"></a><span class="lineno"> 1334</span>  GTEST_DEATH_TEST_CHECK_SYSCALL_(<a class="code hl_function" href="integration_8cpp.html#af5b66d867a040d002fb57d645cae3fb4">close</a>(pipe_fd[1]));</div>
 <div class="line"><a id="l01335" name="l01335"></a><span class="lineno"> 1335</span>  set_child_pid(child_pid);</div>
 <div class="line"><a id="l01336" name="l01336"></a><span class="lineno"> 1336</span>  set_read_fd(pipe_fd[0]);</div>
@@ -1581,7 +1581,7 @@ $(function(){initNavTree('gtest-death-test_8cc_source.html',''); initResizable(t
 <div class="line"><a id="l01480" name="l01480"></a><span class="lineno"> 1480</span> </div>
 <div class="line"><a id="l01481" name="l01481"></a><span class="lineno"> 1481</span>  <span class="comment">// GTEST_HAS_DEATH_TEST implies that we have ::std::string, so we</span></div>
 <div class="line"><a id="l01482" name="l01482"></a><span class="lineno"> 1482</span>  <span class="comment">// can use it here.</span></div>
-<div class="line"><a id="l01483" name="l01483"></a><span class="lineno"> 1483</span>  <span class="keywordtype">int</span> <a class="code hl_variable" href="namespacevalidate__reflection.html#a54d4e98ade8417b88a7e3859a693630a">line</a> = -1;</div>
+<div class="line"><a id="l01483" name="l01483"></a><span class="lineno"> 1483</span>  <span class="keywordtype">int</span> line = -1;</div>
 <div class="line"><a id="l01484" name="l01484"></a><span class="lineno"> 1484</span>  <span class="keywordtype">int</span> index = -1;</div>
 <div class="line"><a id="l01485" name="l01485"></a><span class="lineno"> 1485</span>  ::std::vector&lt; ::std::string&gt; fields;</div>
 <div class="line"><a id="l01486" name="l01486"></a><span class="lineno"> 1486</span>  <a class="code hl_function" href="namespacetesting_1_1internal.html#a8eb8eddf760375a490e007b20777ec56">SplitString</a>(<a class="code hl_define" href="gtest-port_8h.html#a828f4e34a1c4b510da50ec1563e3562a">GTEST_FLAG</a>(internal_run_death_test).c_str(), <span class="charliteral">&#39;|&#39;</span>, &amp;fields);</div>
@@ -1658,8 +1658,6 @@ $(function(){initNavTree('gtest-death-test_8cc_source.html',''); initResizable(t
 <div class="ttc" id="aintegration_8cpp_html_af5b66d867a040d002fb57d645cae3fb4"><div class="ttname"><a href="integration_8cpp.html#af5b66d867a040d002fb57d645cae3fb4">close</a></div><div class="ttdeci">void close(T *e, websocketpp::connection_hdl hdl)</div><div class="ttdef"><b>Definition</b> <a href="integration_8cpp_source.html#l00353">integration.cpp:353</a></div></div>
 <div class="ttc" id="ainternal_2custom_2gtest_8h_html"><div class="ttname"><a href="internal_2custom_2gtest_8h.html">gtest.h</a></div></div>
 <div class="ttc" id="anamespace_c_l_i_1_1detail_html_a01c35a876e2917ffdc1ee618e0c06619"><div class="ttname"><a href="namespace_c_l_i_1_1detail.html#a01c35a876e2917ffdc1ee618e0c06619">CLI::detail::dummy</a></div><div class="ttdeci">constexpr enabler dummy</div><div class="ttdoc">An instance to use in EnableIf.</div><div class="ttdef"><b>Definition</b> <a href="_c_l_i11_8hpp_source.html#l00856">CLI11.hpp:856</a></div></div>
-<div class="ttc" id="anamespacebenchmark_compile_html_ad0ed96ae1454e4347ca61ac3887c379e"><div class="ttname"><a href="namespacebenchmark_compile.html#ad0ed96ae1454e4347ca61ac3887c379e">benchmarkCompile.args</a></div><div class="ttdeci">args</div><div class="ttdef"><b>Definition</b> <a href="benchmark_compile_8py_source.html#l00122">benchmarkCompile.py:122</a></div></div>
-<div class="ttc" id="anamespacegmock__leak__test_html_a9437a2d2e3bde77354e5c6443ef129f8"><div class="ttname"><a href="namespacegmock__leak__test.html#a9437a2d2e3bde77354e5c6443ef129f8">gmock_leak_test.environ</a></div><div class="ttdeci">environ</div><div class="ttdef"><b>Definition</b> <a href="gmock__leak__test_8py_source.html#l00045">gmock_leak_test.py:45</a></div></div>
 <div class="ttc" id="anamespaceinternal_html"><div class="ttname"><a href="namespaceinternal.html">internal</a></div><div class="ttdef"><b>Definition</b> <a href="document_8h_source.html#l00409">document.h:409</a></div></div>
 <div class="ttc" id="anamespacesysio_1_1chain_1_1webassembly_html_a72ffd6653260a2dedcc4b55e39e10973a4e09c20e9a85794807a130e8283e8769"><div class="ttname"><a href="namespacesysio_1_1chain_1_1webassembly.html#a72ffd6653260a2dedcc4b55e39e10973a4e09c20e9a85794807a130e8283e8769">sysio::chain::webassembly::success</a></div><div class="ttdeci">@ success</div><div class="ttdef"><b>Definition</b> <a href="return__codes_8hpp_source.html#l00008">return_codes.hpp:8</a></div></div>
 <div class="ttc" id="anamespacesysio_1_1vm_html_abc94c8e9af7289dc068a502c63ad98d4afac2a47adace059aff113283a03f6760"><div class="ttname"><a href="namespacesysio_1_1vm.html#abc94c8e9af7289dc068a502c63ad98d4afac2a47adace059aff113283a03f6760">sysio::vm::max_func_local_bytes_flags_t::stack</a></div><div class="ttdeci">@ stack</div></div>
@@ -1683,7 +1681,6 @@ $(function(){initNavTree('gtest-death-test_8cc_source.html',''); initResizable(t
 <div class="ttc" id="anamespacetesting_1_1internal_html_a9bd0caf5d16512de38b39599c13ee634"><div class="ttname"><a href="namespacetesting_1_1internal.html#a9bd0caf5d16512de38b39599c13ee634">testing::internal::GetUnitTestImpl</a></div><div class="ttdeci">class UnitTestImpl * GetUnitTestImpl()</div><div class="ttdef"><b>Definition</b> <a href="gtest-internal-inl_8h_source.html#l00919">gtest-internal-inl.h:919</a></div></div>
 <div class="ttc" id="anamespacetesting_1_1internal_html_aad4beed95d0846e6ffc5da0978ef3bb9"><div class="ttname"><a href="namespacetesting_1_1internal.html#aad4beed95d0846e6ffc5da0978ef3bb9">testing::internal::StreamableToString</a></div><div class="ttdeci">std::string StreamableToString(const T &amp;streamable)</div><div class="ttdef"><b>Definition</b> <a href="gtest-message_8h_source.html#l00242">gtest-message.h:242</a></div></div>
 <div class="ttc" id="anamespacetesting_html"><div class="ttname"><a href="namespacetesting.html">testing</a></div><div class="ttdef"><b>Definition</b> <a href="gmock-actions_8h_source.html#l00054">gmock-actions.h:54</a></div></div>
-<div class="ttc" id="anamespacevalidate__reflection_html_a54d4e98ade8417b88a7e3859a693630a"><div class="ttname"><a href="namespacevalidate__reflection.html#a54d4e98ade8417b88a7e3859a693630a">validate_reflection.line</a></div><div class="ttdeci">line</div><div class="ttdef"><b>Definition</b> <a href="validate__reflection_8py_source.html#l00735">validate_reflection.py:735</a></div></div>
 <div class="ttc" id="anamespacewebsocketpp_1_1error_html_a0558d884e44e79146ad4947aea63f68daee5b74d2be31ca48e104578d6c2b7425"><div class="ttname"><a href="namespacewebsocketpp_1_1error.html#a0558d884e44e79146ad4947aea63f68daee5b74d2be31ca48e104578d6c2b7425">websocketpp::error::test</a></div><div class="ttdeci">@ test</div><div class="ttdoc">Unit testing utility error code.</div><div class="ttdef"><b>Definition</b> <a href="error_8hpp_source.html#l00096">error.hpp:96</a></div></div>
 <div class="ttc" id="anamespacewebsocketpp_1_1session_1_1state_html_a12acca56cdb6c10f467dfb10fc763ca5a90d929cb6e119645ec2800451bfdc0a0"><div class="ttname"><a href="namespacewebsocketpp_1_1session_1_1state.html#a12acca56cdb6c10f467dfb10fc763ca5a90d929cb6e119645ec2800451bfdc0a0">websocketpp::session::state::open</a></div><div class="ttdeci">@ open</div><div class="ttdef"><b>Definition</b> <a href="connection_8hpp_source.html#l00181">connection.hpp:181</a></div></div>
 <div class="ttc" id="apkcs11_8h_html_aa8cecfc5c5c054d2875c03e77b7be15d"><div class="ttname"><a href="pkcs11_8h.html#aa8cecfc5c5c054d2875c03e77b7be15d">TRUE</a></div><div class="ttdeci">#define TRUE</div><div class="ttdef"><b>Definition</b> <a href="pkcs11_8h_source.html#l01209">pkcs11.h:1209</a></div></div>

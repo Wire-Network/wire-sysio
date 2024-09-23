@@ -243,7 +243,7 @@ Static Public Member Functions</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="friends" name="friends"></a>
 Friends</h2></td></tr>
-<tr class="memitem:ac851aca03c9cb8cb1dd32f94b750b35f" id="r_ac851aca03c9cb8cb1dd32f94b750b35f"><td class="memItemLeft" align="right" valign="top">std::ostream &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ac851aca03c9cb8cb1dd32f94b750b35f">operator&lt;&lt;</a> (std::ostream &amp;os, const <a class="el" href="classmie_1_1_vsint_t.html">VsintT</a> &amp;x)</td></tr>
+<tr class="memitem:ac851aca03c9cb8cb1dd32f94b750b35f" id="r_ac851aca03c9cb8cb1dd32f94b750b35f"><td class="memItemLeft" align="right" valign="top">std::ostream &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ac851aca03c9cb8cb1dd32f94b750b35f">operator&lt;&lt;</a> (std::ostream &amp;<a class="el" href="environment_8hpp.html#a3951483d0b31c29ca95336206cd35238">os</a>, const <a class="el" href="classmie_1_1_vsint_t.html">VsintT</a> &amp;x)</td></tr>
 <tr class="separator:ac851aca03c9cb8cb1dd32f94b750b35f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a036e3f25e554609c33cc631b2508a60a" id="r_a036e3f25e554609c33cc631b2508a60a"><td class="memItemLeft" align="right" valign="top">std::istream &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a036e3f25e554609c33cc631b2508a60a">operator&gt;&gt;</a> (std::istream &amp;is, <a class="el" href="classmie_1_1_vsint_t.html">VsintT</a> &amp;x)</td></tr>
 <tr class="separator:a036e3f25e554609c33cc631b2508a60a"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -561,17 +561,7 @@ template&lt;<a class="el" href="yubihsm__pkcs11_8c.html#a5c230edcb923568000cb798
 <div class="line"><span class="lineno"> 1049</span>    }</div>
 <div class="ttc" id="abn_8cpp_html_af0a5201ca8846f05f25435b41d7f39f7"><div class="ttname"><a href="bn_8cpp.html#af0a5201ca8846f05f25435b41d7f39f7">r</a></div><div class="ttdeci">const mie::Vuint &amp; r</div><div class="ttdef"><b>Definition</b> <a href="bn_8cpp_source.html#l00028">bn.cpp:28</a></div></div>
 <div class="ttc" id="anamespacefc_html_ab199a7c94624123911206db59ebe45da"><div class="ttname"><a href="namespacefc.html#ab199a7c94624123911206db59ebe45da">fc::y</a></div><div class="ttdeci">uint64_t y</div><div class="ttdef"><b>Definition</b> <a href="sha3_8cpp_source.html#l00034">sha3.cpp:34</a></div></div>
-</div><!-- fragment --><div class="dynheader">
-Here is the caller graph for this function:</div>
-<div class="dyncontent">
-<div class="center"><img src="classmie_1_1_vsint_t_aecaec03bafecb4f4ade403e7d6d2b78a_icgraph.png" border="0" usemap="#aclassmie_1_1_vsint_t_aecaec03bafecb4f4ade403e7d6d2b78a_icgraph" alt=""/></div>
-<map name="aclassmie_1_1_vsint_t_aecaec03bafecb4f4ade403e7d6d2b78a_icgraph" id="aclassmie_1_1_vsint_t_aecaec03bafecb4f4ade403e7d6d2b78a_icgraph">
-<area shape="rect" title=" " alt="" coords="222,13,337,38"/>
-<area shape="rect" href="classvalidate__reflection_1_1_empty_scope.html#a1fb4f76506790294268dc078986d7430" title=" " alt="" coords="5,5,174,46"/>
-<area shape="poly" title=" " alt="" coords="206,28,174,28,174,23,206,23"/>
-</map>
-</div>
-
+</div><!-- fragment -->
 </div>
 </div>
 <a id="a4a80b9825752d904d56933a757f81fc5" name="a4a80b9825752d904d56933a757f81fc5"></a>
@@ -1652,9 +1642,10 @@ template&lt;<a class="el" href="yubihsm__pkcs11_8c.html#a5c230edcb923568000cb798
 
 <p class="definition">Definition at line <a class="el" href="zm_8h_source.html#l01113">1113</a> of file <a class="el" href="zm_8h_source.html">zm.h</a>.</p>
 <div class="fragment"><div class="line"><span class="lineno"> 1114</span>    {</div>
-<div class="line"><span class="lineno"> 1115</span>        <span class="keywordflow">if</span> (x.isNeg_) os &lt;&lt; <span class="stringliteral">&quot;-&quot;</span>;</div>
-<div class="line"><span class="lineno"> 1116</span>        <span class="keywordflow">return</span> os &lt;&lt; x.v_;</div>
+<div class="line"><span class="lineno"> 1115</span>        <span class="keywordflow">if</span> (x.isNeg_) <a class="code hl_variable" href="environment_8hpp.html#a3951483d0b31c29ca95336206cd35238">os</a> &lt;&lt; <span class="stringliteral">&quot;-&quot;</span>;</div>
+<div class="line"><span class="lineno"> 1116</span>        <span class="keywordflow">return</span> <a class="code hl_variable" href="environment_8hpp.html#a3951483d0b31c29ca95336206cd35238">os</a> &lt;&lt; x.v_;</div>
 <div class="line"><span class="lineno"> 1117</span>    }</div>
+<div class="ttc" id="aenvironment_8hpp_html_a3951483d0b31c29ca95336206cd35238"><div class="ttname"><a href="environment_8hpp.html#a3951483d0b31c29ca95336206cd35238">os</a></div><div class="ttdeci">os_t os</div><div class="ttdef"><b>Definition</b> <a href="environment_8hpp_source.html#l00023">environment.hpp:23</a></div></div>
 </div><!-- fragment -->
 </div>
 </div>

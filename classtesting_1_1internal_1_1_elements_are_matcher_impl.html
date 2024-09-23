@@ -148,9 +148,9 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:abfe21bd90e0c085d4a171e22f1e2cc09" id="r_abfe21bd90e0c085d4a171e22f1e2cc09"><td class="memTemplParams" colspan="2">template&lt;typename InputIter &gt; </td></tr>
 <tr class="memitem:abfe21bd90e0c085d4a171e22f1e2cc09"><td class="memTemplItemLeft" align="right" valign="top">&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="#abfe21bd90e0c085d4a171e22f1e2cc09">ElementsAreMatcherImpl</a> (InputIter first, InputIter last)</td></tr>
 <tr class="separator:abfe21bd90e0c085d4a171e22f1e2cc09"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a685f19f64b22a37317332d512c1bce52" id="r_a685f19f64b22a37317332d512c1bce52"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a685f19f64b22a37317332d512c1bce52">DescribeTo</a> (::std::ostream *os) const</td></tr>
+<tr class="memitem:a685f19f64b22a37317332d512c1bce52" id="r_a685f19f64b22a37317332d512c1bce52"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a685f19f64b22a37317332d512c1bce52">DescribeTo</a> (::std::ostream *<a class="el" href="environment_8hpp.html#a3951483d0b31c29ca95336206cd35238">os</a>) const</td></tr>
 <tr class="separator:a685f19f64b22a37317332d512c1bce52"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ab8485a836eb7ffabc43b05187e58616d" id="r_ab8485a836eb7ffabc43b05187e58616d"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ab8485a836eb7ffabc43b05187e58616d">DescribeNegationTo</a> (::std::ostream *os) const</td></tr>
+<tr class="memitem:ab8485a836eb7ffabc43b05187e58616d" id="r_ab8485a836eb7ffabc43b05187e58616d"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ab8485a836eb7ffabc43b05187e58616d">DescribeNegationTo</a> (::std::ostream *<a class="el" href="environment_8hpp.html#a3951483d0b31c29ca95336206cd35238">os</a>) const</td></tr>
 <tr class="separator:ab8485a836eb7ffabc43b05187e58616d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a6562159fa83e09417c3552fd881f878e" id="r_a6562159fa83e09417c3552fd881f878e"><td class="memItemLeft" align="right" valign="top">virtual bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a6562159fa83e09417c3552fd881f878e">MatchAndExplain</a> (Container container, <a class="el" href="classtesting_1_1_match_result_listener.html">MatchResultListener</a> *listener) const</td></tr>
 <tr class="separator:a6562159fa83e09417c3552fd881f878e"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -308,19 +308,20 @@ template&lt;typename Container &gt; </div>
 <p class="definition">Definition at line <a class="el" href="gmock-matchers_8h_source.html#l03497">3497</a> of file <a class="el" href="gmock-matchers_8h_source.html">gmock-matchers.h</a>.</p>
 <div class="fragment"><div class="line"><span class="lineno"> 3497</span>                                                        {</div>
 <div class="line"><span class="lineno"> 3498</span>    <span class="keywordflow">if</span> (count() == 0) {</div>
-<div class="line"><span class="lineno"> 3499</span>      *os &lt;&lt; <span class="stringliteral">&quot;isn&#39;t empty&quot;</span>;</div>
+<div class="line"><span class="lineno"> 3499</span>      *<a class="code hl_variable" href="environment_8hpp.html#a3951483d0b31c29ca95336206cd35238">os</a> &lt;&lt; <span class="stringliteral">&quot;isn&#39;t empty&quot;</span>;</div>
 <div class="line"><span class="lineno"> 3500</span>      <span class="keywordflow">return</span>;</div>
 <div class="line"><span class="lineno"> 3501</span>    }</div>
 <div class="line"><span class="lineno"> 3502</span> </div>
-<div class="line"><span class="lineno"> 3503</span>    *os &lt;&lt; <span class="stringliteral">&quot;doesn&#39;t have &quot;</span> &lt;&lt; Elements(count()) &lt;&lt; <span class="stringliteral">&quot;, or\n&quot;</span>;</div>
+<div class="line"><span class="lineno"> 3503</span>    *<a class="code hl_variable" href="environment_8hpp.html#a3951483d0b31c29ca95336206cd35238">os</a> &lt;&lt; <span class="stringliteral">&quot;doesn&#39;t have &quot;</span> &lt;&lt; Elements(count()) &lt;&lt; <span class="stringliteral">&quot;, or\n&quot;</span>;</div>
 <div class="line"><span class="lineno"> 3504</span>    <span class="keywordflow">for</span> (<span class="keywordtype">size_t</span> i = 0; i != count(); ++i) {</div>
-<div class="line"><span class="lineno"> 3505</span>      *os &lt;&lt; <span class="stringliteral">&quot;element #&quot;</span> &lt;&lt; i &lt;&lt; <span class="stringliteral">&quot; &quot;</span>;</div>
-<div class="line"><span class="lineno"> 3506</span>      matchers_[i].DescribeNegationTo(os);</div>
+<div class="line"><span class="lineno"> 3505</span>      *<a class="code hl_variable" href="environment_8hpp.html#a3951483d0b31c29ca95336206cd35238">os</a> &lt;&lt; <span class="stringliteral">&quot;element #&quot;</span> &lt;&lt; i &lt;&lt; <span class="stringliteral">&quot; &quot;</span>;</div>
+<div class="line"><span class="lineno"> 3506</span>      matchers_[i].DescribeNegationTo(<a class="code hl_variable" href="environment_8hpp.html#a3951483d0b31c29ca95336206cd35238">os</a>);</div>
 <div class="line"><span class="lineno"> 3507</span>      <span class="keywordflow">if</span> (i + 1 &lt; count()) {</div>
-<div class="line"><span class="lineno"> 3508</span>        *os &lt;&lt; <span class="stringliteral">&quot;, or\n&quot;</span>;</div>
+<div class="line"><span class="lineno"> 3508</span>        *<a class="code hl_variable" href="environment_8hpp.html#a3951483d0b31c29ca95336206cd35238">os</a> &lt;&lt; <span class="stringliteral">&quot;, or\n&quot;</span>;</div>
 <div class="line"><span class="lineno"> 3509</span>      }</div>
 <div class="line"><span class="lineno"> 3510</span>    }</div>
 <div class="line"><span class="lineno"> 3511</span>  }</div>
+<div class="ttc" id="aenvironment_8hpp_html_a3951483d0b31c29ca95336206cd35238"><div class="ttname"><a href="environment_8hpp.html#a3951483d0b31c29ca95336206cd35238">os</a></div><div class="ttdeci">os_t os</div><div class="ttdef"><b>Definition</b> <a href="environment_8hpp_source.html#l00023">environment.hpp:23</a></div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -354,17 +355,17 @@ template&lt;typename Container &gt; </div>
 <p class="definition">Definition at line <a class="el" href="gmock-matchers_8h_source.html#l03478">3478</a> of file <a class="el" href="gmock-matchers_8h_source.html">gmock-matchers.h</a>.</p>
 <div class="fragment"><div class="line"><span class="lineno"> 3478</span>                                                {</div>
 <div class="line"><span class="lineno"> 3479</span>    <span class="keywordflow">if</span> (count() == 0) {</div>
-<div class="line"><span class="lineno"> 3480</span>      *os &lt;&lt; <span class="stringliteral">&quot;is empty&quot;</span>;</div>
+<div class="line"><span class="lineno"> 3480</span>      *<a class="code hl_variable" href="environment_8hpp.html#a3951483d0b31c29ca95336206cd35238">os</a> &lt;&lt; <span class="stringliteral">&quot;is empty&quot;</span>;</div>
 <div class="line"><span class="lineno"> 3481</span>    } <span class="keywordflow">else</span> <span class="keywordflow">if</span> (count() == 1) {</div>
-<div class="line"><span class="lineno"> 3482</span>      *os &lt;&lt; <span class="stringliteral">&quot;has 1 element that &quot;</span>;</div>
-<div class="line"><span class="lineno"> 3483</span>      matchers_[0].DescribeTo(os);</div>
+<div class="line"><span class="lineno"> 3482</span>      *<a class="code hl_variable" href="environment_8hpp.html#a3951483d0b31c29ca95336206cd35238">os</a> &lt;&lt; <span class="stringliteral">&quot;has 1 element that &quot;</span>;</div>
+<div class="line"><span class="lineno"> 3483</span>      matchers_[0].DescribeTo(<a class="code hl_variable" href="environment_8hpp.html#a3951483d0b31c29ca95336206cd35238">os</a>);</div>
 <div class="line"><span class="lineno"> 3484</span>    } <span class="keywordflow">else</span> {</div>
-<div class="line"><span class="lineno"> 3485</span>      *os &lt;&lt; <span class="stringliteral">&quot;has &quot;</span> &lt;&lt; Elements(count()) &lt;&lt; <span class="stringliteral">&quot; where\n&quot;</span>;</div>
+<div class="line"><span class="lineno"> 3485</span>      *<a class="code hl_variable" href="environment_8hpp.html#a3951483d0b31c29ca95336206cd35238">os</a> &lt;&lt; <span class="stringliteral">&quot;has &quot;</span> &lt;&lt; Elements(count()) &lt;&lt; <span class="stringliteral">&quot; where\n&quot;</span>;</div>
 <div class="line"><span class="lineno"> 3486</span>      <span class="keywordflow">for</span> (<span class="keywordtype">size_t</span> i = 0; i != count(); ++i) {</div>
-<div class="line"><span class="lineno"> 3487</span>        *os &lt;&lt; <span class="stringliteral">&quot;element #&quot;</span> &lt;&lt; i &lt;&lt; <span class="stringliteral">&quot; &quot;</span>;</div>
-<div class="line"><span class="lineno"> 3488</span>        matchers_[i].DescribeTo(os);</div>
+<div class="line"><span class="lineno"> 3487</span>        *<a class="code hl_variable" href="environment_8hpp.html#a3951483d0b31c29ca95336206cd35238">os</a> &lt;&lt; <span class="stringliteral">&quot;element #&quot;</span> &lt;&lt; i &lt;&lt; <span class="stringliteral">&quot; &quot;</span>;</div>
+<div class="line"><span class="lineno"> 3488</span>        matchers_[i].DescribeTo(<a class="code hl_variable" href="environment_8hpp.html#a3951483d0b31c29ca95336206cd35238">os</a>);</div>
 <div class="line"><span class="lineno"> 3489</span>        <span class="keywordflow">if</span> (i + 1 &lt; count()) {</div>
-<div class="line"><span class="lineno"> 3490</span>          *os &lt;&lt; <span class="stringliteral">&quot;,\n&quot;</span>;</div>
+<div class="line"><span class="lineno"> 3490</span>          *<a class="code hl_variable" href="environment_8hpp.html#a3951483d0b31c29ca95336206cd35238">os</a> &lt;&lt; <span class="stringliteral">&quot;,\n&quot;</span>;</div>
 <div class="line"><span class="lineno"> 3491</span>        }</div>
 <div class="line"><span class="lineno"> 3492</span>      }</div>
 <div class="line"><span class="lineno"> 3493</span>    }</div>

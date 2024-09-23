@@ -2,7 +2,8 @@
 \hypertarget{classtesting_1_1internal_1_1_xml_unit_test_result_printer}{}\label{classtesting_1_1internal_1_1_xml_unit_test_result_printer}\index{testing::internal::XmlUnitTestResultPrinter@{testing::internal::XmlUnitTestResultPrinter}}
 
 
-Inheritance diagram for testing\+::internal\+::Xml\+Unit\+Test\+Result\+Printer\+:\nopagebreak
+Inheritance diagram for testing\+::internal\+::Xml\+Unit\+Test\+Result\+Printer\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -11,7 +12,8 @@ Inheritance diagram for testing\+::internal\+::Xml\+Unit\+Test\+Result\+Printer\
 \end{figure}
 
 
-Collaboration diagram for testing\+::internal\+::Xml\+Unit\+Test\+Result\+Printer\+:\nopagebreak
+Collaboration diagram for testing\+::internal\+::Xml\+Unit\+Test\+Result\+Printer\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -108,9 +110,9 @@ Definition at line \mbox{\hyperlink{gtest_8cc_source_l03478}{3478}} of file \mbo
 \DoxyCodeLine{03479\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
 \DoxyCodeLine{03480\ \ \ FILE*\ xmlout\ =\ NULL;}
 \DoxyCodeLine{03481\ \ \ FilePath\ output\_file(output\_file\_);}
-\DoxyCodeLine{03482\ \ \ FilePath\ \mbox{\hyperlink{namespaceversiongenerate_aab714e0aa9036025ba7c83eb7422c567}{output\_dir}}(output\_file.RemoveFileName());}
+\DoxyCodeLine{03482\ \ \ FilePath\ output\_dir(output\_file.RemoveFileName());}
 \DoxyCodeLine{03483\ }
-\DoxyCodeLine{03484\ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{namespaceversiongenerate_aab714e0aa9036025ba7c83eb7422c567}{output\_dir}}.CreateDirectoriesRecursively())\ \{}
+\DoxyCodeLine{03484\ \ \ \textcolor{keywordflow}{if}\ (output\_dir.CreateDirectoriesRecursively())\ \{}
 \DoxyCodeLine{03485\ \ \ \ \ xmlout\ =\ \mbox{\hyperlink{namespacetesting_1_1internal_1_1posix_affa05d06d3e3b1ce975935cb0eac4fa7}{posix::FOpen}}(output\_file\_.c\_str(),\ \textcolor{stringliteral}{"{}w"{}});}
 \DoxyCodeLine{03486\ \ \ \}}
 \DoxyCodeLine{03487\ \ \ \textcolor{keywordflow}{if}\ (xmlout\ ==\ NULL)\ \{}
@@ -134,7 +136,8 @@ Definition at line \mbox{\hyperlink{gtest_8cc_source_l03478}{3478}} of file \mbo
 \DoxyCodeLine{03505\ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode

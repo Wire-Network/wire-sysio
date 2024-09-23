@@ -2781,10 +2781,10 @@ Here is the caller graph for this function:</div>
 <div class="line"><span class="lineno">  856</span>  <span class="keywordtype">int</span> length = strlen(line);</div>
 <div class="line"><span class="lineno">  857</span>  <span class="keywordtype">int</span> start_of_word = 0;</div>
 <div class="line"><span class="lineno">  858</span>  <span class="keyword">enum</span> states { SPACE, WORD, QUOTE } <a class="code hl_struct" href="structstate.html">state</a> = SPACE;</div>
-<div class="line"><span class="lineno">  859</span>  toks[0] = <a class="code hl_variable" href="namespacevalidate__reflection.html#a54d4e98ade8417b88a7e3859a693630a">line</a>; <span class="comment">// set up as fall-through</span></div>
+<div class="line"><span class="lineno">  859</span>  toks[0] = line; <span class="comment">// set up as fall-through</span></div>
 <div class="line"><span class="lineno">  860</span> </div>
 <div class="line"><span class="lineno">  861</span>  <span class="keywordflow">for</span> (i = 0; i &lt;= length; i++) {</div>
-<div class="line"><span class="lineno">  862</span>    <span class="keywordtype">char</span> c = <a class="code hl_variable" href="namespacevalidate__reflection.html#a54d4e98ade8417b88a7e3859a693630a">line</a>[i];</div>
+<div class="line"><span class="lineno">  862</span>    <span class="keywordtype">char</span> c = line[i];</div>
 <div class="line"><span class="lineno">  863</span>    <span class="keywordflow">if</span> (cursorc &amp;&amp; i == *cursorc &amp;&amp; tok &gt; 0) {</div>
 <div class="line"><span class="lineno">  864</span>      <span class="keywordflow">if</span> (<a class="code hl_struct" href="structstate.html">state</a> == SPACE) {</div>
 <div class="line"><span class="lineno">  865</span>        *cursoro = 0;</div>
@@ -2821,18 +2821,18 @@ Here is the caller graph for this function:</div>
 <div class="line"><span class="lineno">  896</span>          <a class="code hl_struct" href="structstate.html">state</a> = WORD;</div>
 <div class="line"><span class="lineno">  897</span>          start_of_word = i;</div>
 <div class="line"><span class="lineno">  898</span>        }</div>
-<div class="line"><span class="lineno">  899</span>        toks[tok++] = <a class="code hl_variable" href="namespacevalidate__reflection.html#a54d4e98ade8417b88a7e3859a693630a">line</a> + start_of_word;</div>
+<div class="line"><span class="lineno">  899</span>        toks[tok++] = line + start_of_word;</div>
 <div class="line"><span class="lineno">  900</span>      } <span class="keywordflow">break</span>;</div>
 <div class="line"><span class="lineno">  901</span>      <span class="keywordflow">case</span> QUOTE:</div>
 <div class="line"><span class="lineno">  902</span>        <span class="keywordflow">if</span> (c == <span class="charliteral">&#39;&quot;&#39;</span>) {</div>
-<div class="line"><span class="lineno">  903</span>          <a class="code hl_variable" href="namespacevalidate__reflection.html#a54d4e98ade8417b88a7e3859a693630a">line</a>[i] = <span class="charliteral">&#39;\0&#39;</span>;</div>
+<div class="line"><span class="lineno">  903</span>          line[i] = <span class="charliteral">&#39;\0&#39;</span>;</div>
 <div class="line"><span class="lineno">  904</span>          <a class="code hl_struct" href="structstate.html">state</a> = SPACE;</div>
 <div class="line"><span class="lineno">  905</span>        }</div>
 <div class="line"><span class="lineno">  906</span>        <span class="keywordflow">break</span>;</div>
 <div class="line"><span class="lineno">  907</span>      <span class="keywordflow">case</span> WORD:</div>
 <div class="line"><span class="lineno">  908</span>        <span class="keywordflow">for</span> (<span class="keywordtype">size_t</span> <a class="code hl_variable" href="yubihsm__pkcs11_8c.html#a538d097420e725c4dad63c3caa9e55bd">j</a> = 0; <a class="code hl_variable" href="yubihsm__pkcs11_8c.html#a538d097420e725c4dad63c3caa9e55bd">j</a> &lt; strlen(space); <a class="code hl_variable" href="yubihsm__pkcs11_8c.html#a538d097420e725c4dad63c3caa9e55bd">j</a>++) {</div>
 <div class="line"><span class="lineno">  909</span>          <span class="keywordflow">if</span> (c == space[<a class="code hl_variable" href="yubihsm__pkcs11_8c.html#a538d097420e725c4dad63c3caa9e55bd">j</a>]) {</div>
-<div class="line"><span class="lineno">  910</span>            <a class="code hl_variable" href="namespacevalidate__reflection.html#a54d4e98ade8417b88a7e3859a693630a">line</a>[i] = <span class="charliteral">&#39;\0&#39;</span>;</div>
+<div class="line"><span class="lineno">  910</span>            line[i] = <span class="charliteral">&#39;\0&#39;</span>;</div>
 <div class="line"><span class="lineno">  911</span>            <a class="code hl_struct" href="structstate.html">state</a> = SPACE;</div>
 <div class="line"><span class="lineno">  912</span>          }</div>
 <div class="line"><span class="lineno">  913</span>        }</div>
@@ -2841,7 +2841,6 @@ Here is the caller graph for this function:</div>
 <div class="line"><span class="lineno">  916</span>  }</div>
 <div class="line"><span class="lineno">  917</span>  <span class="keywordflow">return</span> tok;</div>
 <div class="line"><span class="lineno">  918</span>}</div>
-<div class="ttc" id="anamespacevalidate__reflection_html_a54d4e98ade8417b88a7e3859a693630a"><div class="ttname"><a href="namespacevalidate__reflection.html#a54d4e98ade8417b88a7e3859a693630a">validate_reflection.line</a></div><div class="ttdeci">line</div><div class="ttdef"><b>Definition</b> <a href="validate__reflection_8py_source.html#l00735">validate_reflection.py:735</a></div></div>
 <div class="ttc" id="astructstate_html"><div class="ttname"><a href="structstate.html">state</a></div><div class="ttdef"><b>Definition</b> <a href="yubihsm__curl_8c_source.html#l00028">yubihsm_curl.c:28</a></div></div>
 <div class="ttc" id="ayubihsm__pkcs11_8c_html_a538d097420e725c4dad63c3caa9e55bd"><div class="ttname"><a href="yubihsm__pkcs11_8c.html#a538d097420e725c4dad63c3caa9e55bd">j</a></div><div class="ttdeci">uint16_t j</div><div class="ttdef"><b>Definition</b> <a href="yubihsm__pkcs11_8c_source.html#l00465">yubihsm_pkcs11.c:465</a></div></div>
 </div><!-- fragment --><div class="dynheader">
@@ -2904,7 +2903,7 @@ Here is the caller graph for this function:</div>
 <div class="line"><span class="lineno"> 1518</span> </div>
 <div class="line"><span class="lineno"> 1519</span>  <span class="keywordtype">bool</span> completing_args = <span class="keyword">false</span>;</div>
 <div class="line"><span class="lineno"> 1520</span> </div>
-<div class="line"><span class="lineno"> 1521</span>  <span class="keyword">const</span> <span class="keywordtype">char</span> *<a class="code hl_variable" href="namespacebenchmark_compile.html#ad0ed96ae1454e4347ca61ac3887c379e">args</a> = <span class="stringliteral">&quot;&quot;</span>;</div>
+<div class="line"><span class="lineno"> 1521</span>  <span class="keyword">const</span> <span class="keywordtype">char</span> *args = <span class="stringliteral">&quot;&quot;</span>;</div>
 <div class="line"><span class="lineno"> 1522</span> </div>
 <div class="line"><span class="lineno"> 1523</span>  <a class="code hl_struct" href="struct_argument.html">Argument</a> arguments[<a class="code hl_define" href="#a0edb60dab8dbc580a40d8d987492631f">MAX_ARGUMENTS</a>] = {{{0}, 0, 0}};</div>
 <div class="line"><span class="lineno"> 1524</span>  <span class="keywordtype">int</span> n_arguments = 0;</div>
@@ -2948,7 +2947,7 @@ Here is the caller graph for this function:</div>
 <div class="line"><span class="lineno"> 1562</span>          <span class="keywordflow">if</span> (command-&gt;<a class="code hl_variable" href="struct_command.html#a07afbf564c2e3b7b8d310e22a301dfba">args</a> != NULL) {</div>
 <div class="line"><span class="lineno"> 1563</span>            <span class="keywordtype">char</span> *arg_toks[64];</div>
 <div class="line"><span class="lineno"> 1564</span> </div>
-<div class="line"><span class="lineno"> 1565</span>            <a class="code hl_variable" href="namespacebenchmark_compile.html#ad0ed96ae1454e4347ca61ac3887c379e">args</a> = command-&gt;<a class="code hl_variable" href="struct_command.html#a07afbf564c2e3b7b8d310e22a301dfba">args</a>;</div>
+<div class="line"><span class="lineno"> 1565</span>            args = command-&gt;<a class="code hl_variable" href="struct_command.html#a07afbf564c2e3b7b8d310e22a301dfba">args</a>;</div>
 <div class="line"><span class="lineno"> 1566</span>            strncpy(arg_data, args,</div>
 <div class="line"><span class="lineno"> 1567</span>                    <a class="code hl_define" href="#ad9514bbc324b3ddd5f2ad47dcf4aa5e3">ARGS_BUFFER_SIZE</a>); <span class="comment">// since tokenize() modifies the buffer..</span></div>
 <div class="line"><span class="lineno"> 1568</span>            <span class="keywordtype">int</span> num_args = <a class="code hl_function" href="#a2324bfd26dadd085f211c969ccfcabf2">tokenize</a>(arg_data, arg_toks, 64, NULL, NULL, <span class="stringliteral">&quot;,&quot;</span>);</div>
@@ -2991,10 +2990,10 @@ Here is the caller graph for this function:</div>
 <div class="line"><span class="lineno"> 1605</span>        <span class="keywordflow">break</span>;</div>
 <div class="line"><span class="lineno"> 1606</span>      }</div>
 <div class="line"><span class="lineno"> 1607</span>      <span class="keywordflow">while</span> (*args != <span class="charliteral">&#39;\0&#39;</span> &amp;&amp; *args != <span class="charliteral">&#39;,&#39;</span>) {</div>
-<div class="line"><span class="lineno"> 1608</span>        <a class="code hl_variable" href="namespacebenchmark_compile.html#ad0ed96ae1454e4347ca61ac3887c379e">args</a>++;</div>
+<div class="line"><span class="lineno"> 1608</span>        args++;</div>
 <div class="line"><span class="lineno"> 1609</span>      }</div>
 <div class="line"><span class="lineno"> 1610</span>      <span class="keywordflow">if</span> (*args == <span class="charliteral">&#39;,&#39;</span>) {</div>
-<div class="line"><span class="lineno"> 1611</span>        <a class="code hl_variable" href="namespacebenchmark_compile.html#ad0ed96ae1454e4347ca61ac3887c379e">args</a>++;</div>
+<div class="line"><span class="lineno"> 1611</span>        args++;</div>
 <div class="line"><span class="lineno"> 1612</span>        i++; <span class="comment">// NOTE(adma): next word</span></div>
 <div class="line"><span class="lineno"> 1613</span>      } <span class="keywordflow">else</span> {</div>
 <div class="line"><span class="lineno"> 1614</span>        found = <span class="keyword">true</span>;</div>
@@ -3026,7 +3025,7 @@ Here is the caller graph for this function:</div>
 <div class="line"><span class="lineno"> 1640</span>      strncpy(arg, args, <a class="code hl_define" href="#ad9514bbc324b3ddd5f2ad47dcf4aa5e3">ARGS_BUFFER_SIZE</a>);</div>
 <div class="line"><span class="lineno"> 1641</span>      <span class="keywordtype">char</span> *end = strchr(args, <span class="charliteral">&#39;,&#39;</span>);</div>
 <div class="line"><span class="lineno"> 1642</span>      <span class="keywordflow">if</span> (end) {</div>
-<div class="line"><span class="lineno"> 1643</span>        arg[end - <a class="code hl_variable" href="namespacebenchmark_compile.html#ad0ed96ae1454e4347ca61ac3887c379e">args</a>] = <span class="charliteral">&#39;\0&#39;</span>;</div>
+<div class="line"><span class="lineno"> 1643</span>        arg[end - args] = <span class="charliteral">&#39;\0&#39;</span>;</div>
 <div class="line"><span class="lineno"> 1644</span>      }</div>
 <div class="line"><span class="lineno"> 1645</span>      <a class="code hl_function" href="namespace_log.html#a83926634a3916d0927abca4aca58a60a">printf</a>(<span class="stringliteral">&quot;Invalid argument %d: %s (%s)\n&quot;</span>, i, <a class="code hl_variable" href="hello__driver_8cpp.html#af2efa898e9eed6fe6715279cb1ec35b0">argv</a>[i], arg);</div>
 <div class="line"><span class="lineno"> 1646</span>    } <span class="keywordflow">else</span> <span class="keywordflow">if</span> (command == NULL) {</div>
@@ -3045,7 +3044,6 @@ Here is the caller graph for this function:</div>
 <div class="line"><span class="lineno"> 1659</span>}</div>
 <div class="ttc" id="acommands_8h_html_ade4d2f5e7e712bfda5f5d7a664b13460"><div class="ttname"><a href="commands_8h.html#ade4d2f5e7e712bfda5f5d7a664b13460">CommandFunction</a></div><div class="ttdeci">int CommandFunction(yubihsm_context *ctx, Argument *argv, cmd_format fmt)</div><div class="ttdef"><b>Definition</b> <a href="commands_8h_source.html#l00041">commands.h:41</a></div></div>
 <div class="ttc" id="anamespace_c_l_i_1_1detail_html_ab4542375c903302c3876ce0403d55596"><div class="ttname"><a href="namespace_c_l_i_1_1detail.html#ab4542375c903302c3876ce0403d55596">CLI::detail::str</a></div><div class="ttdeci">return str</div><div class="ttdef"><b>Definition</b> <a href="_c_l_i11_8hpp_source.html#l01359">CLI11.hpp:1359</a></div></div>
-<div class="ttc" id="anamespacebenchmark_compile_html_ad0ed96ae1454e4347ca61ac3887c379e"><div class="ttname"><a href="namespacebenchmark_compile.html#ad0ed96ae1454e4347ca61ac3887c379e">benchmarkCompile.args</a></div><div class="ttdeci">args</div><div class="ttdef"><b>Definition</b> <a href="benchmark_compile_8py_source.html#l00122">benchmarkCompile.py:122</a></div></div>
 <div class="ttc" id="anamespacesysio_1_1vm_html_aea2b0c85e98f4073b07115a97b46ae55a6b56c53a1b24e55124ff7f71bb9817d2"><div class="ttname"><a href="namespacesysio_1_1vm.html#aea2b0c85e98f4073b07115a97b46ae55a6b56c53a1b24e55124ff7f71bb9817d2">sysio::vm::func</a></div><div class="ttdeci">@ func</div><div class="ttdef"><b>Definition</b> <a href="sys-vm_2include_2sysio_2sysio_2vm_2types_8hpp_source.html#l00020">types.hpp:20</a></div></div>
 <div class="ttc" id="asrc_2main_8c_html_a0edb60dab8dbc580a40d8d987492631f"><div class="ttname"><a href="#a0edb60dab8dbc580a40d8d987492631f">MAX_ARGUMENTS</a></div><div class="ttdeci">#define MAX_ARGUMENTS</div><div class="ttdef"><b>Definition</b> <a href="src_2main_8c_source.html#l00045">main.c:45</a></div></div>
 <div class="ttc" id="asrc_2main_8c_html_a1a9b6f40de4cd7ffb57dd5abf8ec1f03"><div class="ttname"><a href="#a1a9b6f40de4cd7ffb57dd5abf8ec1f03">SPACES</a></div><div class="ttdeci">#define SPACES</div><div class="ttdef"><b>Definition</b> <a href="src_2main_8c_source.html#l00051">main.c:51</a></div></div>
@@ -3781,7 +3779,7 @@ Here is the caller graph for this function:</div>
 <div class="line"><span class="lineno"> 1194</span>    <span class="keywordtype">int</span> i = 0;</div>
 <div class="line"><span class="lineno"> 1195</span>    <a class="code hl_struct" href="struct_command.html">Command</a> *command = <a class="code hl_variable" href="#a872d1e0eb3ee3fb13c651a1a0a8fbeb3">g_commands</a>;</div>
 <div class="line"><span class="lineno"> 1196</span>    <a class="code hl_struct" href="struct_command.html">Command</a> *to_complete = NULL;</div>
-<div class="line"><span class="lineno"> 1197</span>    <span class="keywordtype">char</span> *<a class="code hl_variable" href="namespacebenchmark_compile.html#ad0ed96ae1454e4347ca61ac3887c379e">args</a> = <span class="stringliteral">&quot;&quot;</span>;</div>
+<div class="line"><span class="lineno"> 1197</span>    <span class="keywordtype">char</span> *args = <span class="stringliteral">&quot;&quot;</span>;</div>
 <div class="line"><span class="lineno"> 1198</span> </div>
 <div class="line"><span class="lineno"> 1199</span>    <span class="keywordtype">bool</span> completing_args = <span class="keyword">false</span>;</div>
 <div class="line"><span class="lineno"> 1200</span> </div>
@@ -3801,7 +3799,7 @@ Here is the caller graph for this function:</div>
 <div class="line"><span class="lineno"> 1214</span>            <span class="comment">// NOTE(adma): start matching arguments otherwise</span></div>
 <div class="line"><span class="lineno"> 1215</span>            completing_args = <span class="keyword">true</span>;</div>
 <div class="line"><span class="lineno"> 1216</span>            <span class="keywordflow">if</span> (command-&gt;<a class="code hl_variable" href="struct_command.html#a07afbf564c2e3b7b8d310e22a301dfba">args</a> != NULL) {</div>
-<div class="line"><span class="lineno"> 1217</span>              <a class="code hl_variable" href="namespacebenchmark_compile.html#ad0ed96ae1454e4347ca61ac3887c379e">args</a> = command-&gt;<a class="code hl_variable" href="struct_command.html#a07afbf564c2e3b7b8d310e22a301dfba">args</a>;</div>
+<div class="line"><span class="lineno"> 1217</span>              args = command-&gt;<a class="code hl_variable" href="struct_command.html#a07afbf564c2e3b7b8d310e22a301dfba">args</a>;</div>
 <div class="line"><span class="lineno"> 1218</span>            } <span class="keywordflow">else</span> {</div>
 <div class="line"><span class="lineno"> 1219</span>              <span class="comment">// NOTE(adma): there are no args for this command</span></div>
 <div class="line"><span class="lineno"> 1220</span>              <span class="keywordflow">break</span>;</div>
@@ -3818,10 +3816,10 @@ Here is the caller graph for this function:</div>
 <div class="line"><span class="lineno"> 1231</span>      } <span class="keywordflow">else</span> {</div>
 <div class="line"><span class="lineno"> 1232</span>        <span class="comment">// NOTE(adma): match arguments</span></div>
 <div class="line"><span class="lineno"> 1233</span>        <span class="keywordflow">while</span> (*args != <span class="charliteral">&#39;\0&#39;</span> &amp;&amp; *args != <span class="charliteral">&#39;,&#39;</span>) {</div>
-<div class="line"><span class="lineno"> 1234</span>          <a class="code hl_variable" href="namespacebenchmark_compile.html#ad0ed96ae1454e4347ca61ac3887c379e">args</a>++;</div>
+<div class="line"><span class="lineno"> 1234</span>          args++;</div>
 <div class="line"><span class="lineno"> 1235</span>        }</div>
 <div class="line"><span class="lineno"> 1236</span>        <span class="keywordflow">if</span> (*args == <span class="charliteral">&#39;,&#39;</span>) {</div>
-<div class="line"><span class="lineno"> 1237</span>          <a class="code hl_variable" href="namespacebenchmark_compile.html#ad0ed96ae1454e4347ca61ac3887c379e">args</a>++;</div>
+<div class="line"><span class="lineno"> 1237</span>          args++;</div>
 <div class="line"><span class="lineno"> 1238</span>          i++; <span class="comment">// NOTE(adma): next word</span></div>
 <div class="line"><span class="lineno"> 1239</span>        } <span class="keywordflow">else</span> {</div>
 <div class="line"><span class="lineno"> 1240</span>          <span class="keywordflow">break</span>;</div>

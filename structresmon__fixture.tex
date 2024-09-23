@@ -2,7 +2,8 @@
 \hypertarget{structresmon__fixture}{}\label{structresmon__fixture}\index{resmon\_fixture@{resmon\_fixture}}
 
 
-Collaboration diagram for resmon\+\_\+fixture\+:\nopagebreak
+Collaboration diagram for resmon\+\_\+fixture\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -53,29 +54,31 @@ Definition at line \mbox{\hyperlink{test__resmon__plugin_8cpp_source_l00026}{26}
 \DoxyCodeLine{00027\ \ \ \ \ \ \ \textcolor{comment}{//\ We\ only\ have\ at\ most\ 3\ arguments.\ OK\ to\ hardcodied\ in\ test}}
 \DoxyCodeLine{00028\ \ \ \ \ \ \ \textcolor{comment}{//\ programs.}}
 \DoxyCodeLine{00029\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ \mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}}[10];}
-\DoxyCodeLine{00030\ \ \ \ \ \ \ \mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp_a40c2826a6fba35c1ffbf912bdf559792}{SYS\_ASSERT}}(\mbox{\hyperlink{namespacebenchmark_compile_ad0ed96ae1454e4347ca61ac3887c379e}{args}}.size()\ <\ 10,\ chain::plugin\_exception,\ \textcolor{stringliteral}{"{}number\ of\ arguments\ \ (\$\{size\})\ must\ be\ less\ than\ 10"{}},\ (\textcolor{stringliteral}{"{}size"{}},\ \mbox{\hyperlink{namespacebenchmark_compile_ad0ed96ae1454e4347ca61ac3887c379e}{args}}.size()));}
+\DoxyCodeLine{00030\ \ \ \ \ \ \ \mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp_a40c2826a6fba35c1ffbf912bdf559792}{SYS\_ASSERT}}(args.size()\ <\ 10,\ chain::plugin\_exception,\ \textcolor{stringliteral}{"{}number\ of\ arguments\ \ (\$\{size\})\ must\ be\ less\ than\ 10"{}},\ (\textcolor{stringliteral}{"{}size"{}},\ args.size()));}
 \DoxyCodeLine{00031\ }
 \DoxyCodeLine{00032\ \ \ \ \ \ \ \textcolor{comment}{//\ argv[0]\ is\ program\ name,\ no\ need\ to\ fill\ in}}
-\DoxyCodeLine{00033\ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{size\_t}\ i=0;\ i<\mbox{\hyperlink{namespacebenchmark_compile_ad0ed96ae1454e4347ca61ac3887c379e}{args}}.size();\ ++i)\ \{}
-\DoxyCodeLine{00034\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}}[i+1]\ =\ \mbox{\hyperlink{namespacebenchmark_compile_ad0ed96ae1454e4347ca61ac3887c379e}{args}}[i].c\_str();}
+\DoxyCodeLine{00033\ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{size\_t}\ i=0;\ i<args.size();\ ++i)\ \{}
+\DoxyCodeLine{00034\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}}[i+1]\ =\ args[i].c\_str();}
 \DoxyCodeLine{00035\ \ \ \ \ \ \ \}}
 \DoxyCodeLine{00036\ }
-\DoxyCodeLine{00037\ \ \ \ \ \ \ bpo::variables\_map\ \mbox{\hyperlink{namespacebenchmark_compile_acf738bbf3b8391aa78929ceeceb8a03b}{options}};}
-\DoxyCodeLine{00038\ \ \ \ \ \ \ bpo::store(bpo::parse\_command\_line(\mbox{\hyperlink{namespacebenchmark_compile_ad0ed96ae1454e4347ca61ac3887c379e}{args}}.size()+1,\ \mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}},\ \mbox{\hyperlink{structresmon__fixture_a4c75064976b2e8857322afb6000f32f7}{\_cfg}}),\ options);}
+\DoxyCodeLine{00037\ \ \ \ \ \ \ bpo::variables\_map\ options;}
+\DoxyCodeLine{00038\ \ \ \ \ \ \ bpo::store(bpo::parse\_command\_line(args.size()+1,\ \mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}},\ \mbox{\hyperlink{structresmon__fixture_a4c75064976b2e8857322afb6000f32f7}{\_cfg}}),\ options);}
 \DoxyCodeLine{00039\ \ \ \ \ \ \ bpo::notify(options);}
 \DoxyCodeLine{00040\ }
 \DoxyCodeLine{00041\ \ \ \ \ \ \ \mbox{\hyperlink{structresmon__fixture_a4136c5f10d574c6cbd1d15ef1af31837}{\_my}}.\mbox{\hyperlink{classsysio_1_1resource__monitor__plugin_a8aa338848d9b4ea7f0af24674fb9afe3}{plugin\_initialize}}(options);}
 \DoxyCodeLine{00042\ \ \ \ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
 \includegraphics[width=350pt]{structresmon__fixture_a68bd6bd03fb7e49249e6d7fcfc3dd16d_cgraph}
 \end{center}
 \end{figure}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -107,7 +110,8 @@ Definition at line \mbox{\hyperlink{test__resmon__plugin_8cpp_source_l00049}{49}
 \DoxyCodeLine{00059\ \ \ \ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -132,14 +136,16 @@ Definition at line \mbox{\hyperlink{test__resmon__plugin_8cpp_source_l00044}{44}
 \DoxyCodeLine{00047\ \ \ \ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
 \includegraphics[width=350pt]{structresmon__fixture_a7138a1a6fe46f645488210b544163f05_cgraph}
 \end{center}
 \end{figure}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -164,14 +170,16 @@ Definition at line \mbox{\hyperlink{test__resmon__plugin_8cpp_source_l00021}{21}
 \DoxyCodeLine{00024\ \ \ \ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
 \includegraphics[width=350pt]{structresmon__fixture_af5d15c1bb948ca8150b97a3e46247686_cgraph}
 \end{center}
 \end{figure}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode

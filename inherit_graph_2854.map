@@ -1,11 +1,5 @@
 <map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
-<area shape="rect" id="Node000000" href="$classwebsocketpp_1_1processor_1_1processor.html" title="WebSocket protocol processor abstract base class." alt="" coords="5,39,169,79"/>
-<area shape="rect" id="Node000001" href="$classwebsocketpp_1_1processor_1_1hybi00.html" title="Processor for Hybi Draft version 00." alt="" coords="217,5,380,46"/>
-<area shape="poly" id="edge1051_Node000000_Node000001" title=" " alt="" coords="184,41,216,36,217,41,184,46"/>
-<area shape="rect" id="Node000002" href="$classwebsocketpp_1_1processor_1_1hybi13.html" title="Processor for Hybi version 13 (RFC6455)" alt="" coords="217,71,380,111"/>
-<area shape="poly" id="edge1052_Node000000_Node000002" title=" " alt="" coords="184,71,217,76,216,81,184,76"/>
-<area shape="rect" id="Node000003" href="$classwebsocketpp_1_1processor_1_1hybi08.html" title="Processor for Hybi Draft version 08." alt="" coords="428,71,591,111"/>
-<area shape="poly" id="edge1053_Node000002_Node000003" title=" " alt="" coords="395,88,428,88,428,94,395,94"/>
-<area shape="rect" id="Node000004" href="$classwebsocketpp_1_1processor_1_1hybi07.html" title="Processor for Hybi Draft version 07." alt="" coords="639,71,803,111"/>
-<area shape="poly" id="edge1054_Node000003_Node000004" title=" " alt="" coords="607,88,639,88,639,94,607,94"/>
+<area shape="rect" id="Node000000" href="$class_writer.html" title=" " alt="" coords="5,5,217,61"/>
+<area shape="rect" id="Node000001" href="$class_pretty_writer.html" title="Writer with indentation and spacing." alt="" coords="265,5,487,61"/>
+<area shape="poly" id="edge1000_Node000000_Node000001" title=" " alt="" coords="232,30,264,30,264,36,232,36"/>
 </map>

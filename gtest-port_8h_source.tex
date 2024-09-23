@@ -1688,7 +1688,7 @@
 \DoxyCodeLine{\Hypertarget{gtest-port_8h_source_l01684}01684\ \textcolor{keyword}{class\ }ThreadWithParamBase\ \{}
 \DoxyCodeLine{\Hypertarget{gtest-port_8h_source_l01685}01685\ \ \textcolor{keyword}{public}:}
 \DoxyCodeLine{\Hypertarget{gtest-port_8h_source_l01686}01686\ \ \ \textcolor{keyword}{virtual}\ \string~ThreadWithParamBase()\ \{\}}
-\DoxyCodeLine{\Hypertarget{gtest-port_8h_source_l01687}01687\ \ \ \textcolor{keyword}{virtual}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespacegtest__break__on__failure__unittest_a79d81fcd2832c8f582e494ed9b27396c}{Run}}()\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{gtest-port_8h_source_l01687}01687\ \ \ \textcolor{keyword}{virtual}\ \textcolor{keywordtype}{void}\ Run()\ =\ 0;}
 \DoxyCodeLine{\Hypertarget{gtest-port_8h_source_l01688}01688\ \};}
 \DoxyCodeLine{\Hypertarget{gtest-port_8h_source_l01689}01689\ }
 \DoxyCodeLine{\Hypertarget{gtest-port_8h_source_l01690}01690\ \textcolor{comment}{//\ pthread\_create()\ accepts\ a\ pointer\ to\ a\ function\ type\ with\ the\ C\ linkage.}}
@@ -1698,7 +1698,7 @@
 \DoxyCodeLine{\Hypertarget{gtest-port_8h_source_l01694}01694\ \textcolor{comment}{//\ cannot\ be\ defined\ with\ C-\/linkage\ we\ need\ to\ define\ a\ free\ C-\/function\ to}}
 \DoxyCodeLine{\Hypertarget{gtest-port_8h_source_l01695}01695\ \textcolor{comment}{//\ pass\ into\ pthread\_create().}}
 \DoxyCodeLine{\Hypertarget{gtest-port_8h_source_l01696}01696\ \textcolor{keyword}{extern}\ \textcolor{stringliteral}{"{}C"{}}\ \textcolor{keyword}{inline}\ \textcolor{keywordtype}{void}*\ ThreadFuncWithCLinkage(\textcolor{keywordtype}{void}*\ thread)\ \{}
-\DoxyCodeLine{\Hypertarget{gtest-port_8h_source_l01697}01697\ \ \ \textcolor{keyword}{static\_cast<}ThreadWithParamBase*\textcolor{keyword}{>}(thread)-\/>\mbox{\hyperlink{namespacegtest__break__on__failure__unittest_a79d81fcd2832c8f582e494ed9b27396c}{Run}}();}
+\DoxyCodeLine{\Hypertarget{gtest-port_8h_source_l01697}01697\ \ \ \textcolor{keyword}{static\_cast<}ThreadWithParamBase*\textcolor{keyword}{>}(thread)-\/>Run();}
 \DoxyCodeLine{\Hypertarget{gtest-port_8h_source_l01698}01698\ \ \ \textcolor{keywordflow}{return}\ NULL;}
 \DoxyCodeLine{\Hypertarget{gtest-port_8h_source_l01699}01699\ \}}
 \DoxyCodeLine{\Hypertarget{gtest-port_8h_source_l01700}01700\ }
@@ -1739,7 +1739,7 @@
 \DoxyCodeLine{\Hypertarget{gtest-port_8h_source_l01735}01735\ \ \ \ \ \}}
 \DoxyCodeLine{\Hypertarget{gtest-port_8h_source_l01736}01736\ \ \ \}}
 \DoxyCodeLine{\Hypertarget{gtest-port_8h_source_l01737}01737\ }
-\DoxyCodeLine{\Hypertarget{gtest-port_8h_source_l01738}01738\ \ \ \textcolor{keyword}{virtual}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespacegtest__break__on__failure__unittest_a79d81fcd2832c8f582e494ed9b27396c}{Run}}()\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-port_8h_source_l01738}01738\ \ \ \textcolor{keyword}{virtual}\ \textcolor{keywordtype}{void}\ Run()\ \{}
 \DoxyCodeLine{\Hypertarget{gtest-port_8h_source_l01739}01739\ \ \ \ \ \textcolor{keywordflow}{if}\ (thread\_can\_start\_\ !=\ NULL)}
 \DoxyCodeLine{\Hypertarget{gtest-port_8h_source_l01740}01740\ \ \ \ \ \ \ thread\_can\_start\_-\/>WaitForNotification();}
 \DoxyCodeLine{\Hypertarget{gtest-port_8h_source_l01741}01741\ \ \ \ \ func\_(param\_);}
@@ -1894,7 +1894,7 @@
 \DoxyCodeLine{\Hypertarget{gtest-port_8h_source_l01890}01890\ \ \ \textcolor{keyword}{class\ }Runnable\ \{}
 \DoxyCodeLine{\Hypertarget{gtest-port_8h_source_l01891}01891\ \ \ \ \textcolor{keyword}{public}:}
 \DoxyCodeLine{\Hypertarget{gtest-port_8h_source_l01892}01892\ \ \ \ \ \textcolor{keyword}{virtual}\ \string~Runnable()\ \{\}}
-\DoxyCodeLine{\Hypertarget{gtest-port_8h_source_l01893}01893\ \ \ \ \ \textcolor{keyword}{virtual}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespacegtest__break__on__failure__unittest_a79d81fcd2832c8f582e494ed9b27396c}{Run}}()\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{gtest-port_8h_source_l01893}01893\ \ \ \ \ \textcolor{keyword}{virtual}\ \textcolor{keywordtype}{void}\ Run()\ =\ 0;}
 \DoxyCodeLine{\Hypertarget{gtest-port_8h_source_l01894}01894\ \ \ \};}
 \DoxyCodeLine{\Hypertarget{gtest-port_8h_source_l01895}01895\ }
 \DoxyCodeLine{\Hypertarget{gtest-port_8h_source_l01896}01896\ \ \ ThreadWithParamBase(Runnable\ *runnable,\ Notification*\ thread\_can\_start);}
@@ -1923,7 +1923,7 @@
 \DoxyCodeLine{\Hypertarget{gtest-port_8h_source_l01919}01919\ \ \ \ \ \ \ \ \ \ \ param\_(param)\ \{}
 \DoxyCodeLine{\Hypertarget{gtest-port_8h_source_l01920}01920\ \ \ \ \ \}}
 \DoxyCodeLine{\Hypertarget{gtest-port_8h_source_l01921}01921\ \ \ \ \ \textcolor{keyword}{virtual}\ \string~RunnableImpl()\ \{\}}
-\DoxyCodeLine{\Hypertarget{gtest-port_8h_source_l01922}01922\ \ \ \ \ \textcolor{keyword}{virtual}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespacegtest__break__on__failure__unittest_a79d81fcd2832c8f582e494ed9b27396c}{Run}}()\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-port_8h_source_l01922}01922\ \ \ \ \ \textcolor{keyword}{virtual}\ \textcolor{keywordtype}{void}\ Run()\ \{}
 \DoxyCodeLine{\Hypertarget{gtest-port_8h_source_l01923}01923\ \ \ \ \ \ \ func\_(param\_);}
 \DoxyCodeLine{\Hypertarget{gtest-port_8h_source_l01924}01924\ \ \ \ \ \}}
 \DoxyCodeLine{\Hypertarget{gtest-port_8h_source_l01925}01925\ }

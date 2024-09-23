@@ -1766,7 +1766,7 @@ $(function(){initNavTree('pointertest_8cpp_source.html',''); initResizable(true)
 <div class="line"><a id="l01592" name="l01592"></a><span class="lineno"> 1592</span>        <span class="keywordflow">if</span> (it-&gt;first.IsValid()) {</div>
 <div class="line"><a id="l01593" name="l01593"></a><span class="lineno"> 1593</span>            std::stringstream ss;</div>
 <div class="line"><a id="l01594" name="l01594"></a><span class="lineno"> 1594</span>            <a class="code hl_class" href="class_o_stream_wrapper.html">OStreamWrapper</a> <a class="code hl_variable" href="environment_8hpp.html#a3951483d0b31c29ca95336206cd35238">os</a>(ss);</div>
-<div class="line"><a id="l01595" name="l01595"></a><span class="lineno"> 1595</span>            <a class="code hl_define" href="gtest_8h.html#ac33e7cdfb5d44a7a0f0ab552eb5c3c6a">EXPECT_TRUE</a>(it-&gt;first.Stringify(os));</div>
+<div class="line"><a id="l01595" name="l01595"></a><span class="lineno"> 1595</span>            <a class="code hl_define" href="gtest_8h.html#ac33e7cdfb5d44a7a0f0ab552eb5c3c6a">EXPECT_TRUE</a>(it-&gt;first.Stringify(<a class="code hl_variable" href="environment_8hpp.html#a3951483d0b31c29ca95336206cd35238">os</a>));</div>
 <div class="line"><a id="l01596" name="l01596"></a><span class="lineno"> 1596</span>            <a class="code hl_define" href="gtest_8h.html#a4159019abda84f5366acdb7604ff220a">EXPECT_EQ</a>(ss.str(), pointers[it-&gt;second].str);</div>
 <div class="line"><a id="l01597" name="l01597"></a><span class="lineno"> 1597</span>            <a class="code hl_define" href="gtest_8h.html#a4159019abda84f5366acdb7604ff220a">EXPECT_EQ</a>(ss.str(), ordered_pointers[i]);</div>
 <div class="line"><a id="l01598" name="l01598"></a><span class="lineno"> 1598</span>        }</div>

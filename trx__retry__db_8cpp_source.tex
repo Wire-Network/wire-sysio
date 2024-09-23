@@ -35,7 +35,7 @@
 \DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00031}00031\ \ \ \ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ block\_num\ =\ 0;}
 \DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00032}00032\ \ \ \ \mbox{\hyperlink{classfc_1_1variant}{fc::variant}}\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ trx\_trace\_v;}
 \DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00033}00033\ \ \ \ \mbox{\hyperlink{classfc_1_1time__point}{fc::time\_point}}\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ last\_try;}
-\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00034}00034\ \ \ \ \mbox{\hyperlink{namespacesysio_1_1chain__apis_a7c0a9b3be43e3ab139d31d0d3bb98f5b}{chain\_apis::next\_function<std::unique\_ptr<fc::variant>}}>\ \ \ \mbox{\hyperlink{namespacecpp_1_1ast_a25b104cfd21fb8487a07063b6ce62062}{next}};}
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00034}00034\ \ \ \ \mbox{\hyperlink{namespacesysio_1_1chain__apis_a7c0a9b3be43e3ab139d31d0d3bb98f5b}{chain\_apis::next\_function<std::unique\_ptr<fc::variant>}}>\ \ \ \mbox{\hyperlink{namespaceutf8_afc093dfde66a6f52cb4a5caefe0e580d}{next}};}
 \DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00035}00035\ }
 \DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00036}00036\ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1sha256}{transaction\_id\_type}}\&\ \mbox{\hyperlink{code__cache_8cpp_aa0efefe21f4700d78692edc823e763be}{id}}()\textcolor{keyword}{const\ }\{\ \textcolor{keywordflow}{return}\ ptrx-\/>id();\ \}}
 \DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00037}00037\ \ \ \ \mbox{\hyperlink{classfc_1_1time__point__sec}{fc::time\_point\_sec}}\ expiry()\textcolor{keyword}{const\ }\{\ \textcolor{keywordflow}{return}\ ptrx-\/>expiration();\ \}}
@@ -208,11 +208,11 @@
 \DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00204}00204\ \ \ \ \}}
 \DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00205}00205\ }
 \DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00206}00206\ \ \ \ \textcolor{keywordtype}{void}\ retry\_trxs()\ \{}
-\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00207}00207\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ \mbox{\hyperlink{namespacehost__functions__tests__1_a8496a24b5236a2dc07bb4f2930d88342}{idx}}\ =\ \_tracked\_trxs.\mbox{\hyperlink{classfc_1_1tracked__storage_ab578f3765c80c8cee1d758d440c99e90}{index}}().get<by\_last\_try>();}
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00207}00207\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ idx\ =\ \_tracked\_trxs.\mbox{\hyperlink{classfc_1_1tracked__storage_ab578f3765c80c8cee1d758d440c99e90}{index}}().get<by\_last\_try>();}
 \DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00208}00208\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ now\ =\ \mbox{\hyperlink{classfc_1_1time__point_aa164ff1268a16d4b32afcff181f6100e}{fc::time\_point::now}}();}
 \DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00209}00209\ \ \ \ \ \ \ \textcolor{comment}{//\ determine\ what\ to\ retry}}
-\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00210}00210\ \ \ \ \ \ \ deque<\textcolor{keyword}{decltype}(\_tracked\_trxs.\mbox{\hyperlink{classfc_1_1tracked__storage_ab578f3765c80c8cee1d758d440c99e90}{index}}().project<0>(\mbox{\hyperlink{namespacehost__functions__tests__1_a8496a24b5236a2dc07bb4f2930d88342}{idx}}.begin()))>\ to\_process;}
-\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00211}00211\ \ \ \ \ \ \ \textcolor{keywordflow}{for}(\ \textcolor{keyword}{auto}\ i\ =\ \mbox{\hyperlink{namespacehost__functions__tests__1_a8496a24b5236a2dc07bb4f2930d88342}{idx}}.begin();\ i\ !=\ \mbox{\hyperlink{namespacehost__functions__tests__1_a8496a24b5236a2dc07bb4f2930d88342}{idx}}.end();\ ++i\ )\ \{}
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00210}00210\ \ \ \ \ \ \ deque<\textcolor{keyword}{decltype}(\_tracked\_trxs.\mbox{\hyperlink{classfc_1_1tracked__storage_ab578f3765c80c8cee1d758d440c99e90}{index}}().project<0>(idx.begin()))>\ to\_process;}
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00211}00211\ \ \ \ \ \ \ \textcolor{keywordflow}{for}(\ \textcolor{keyword}{auto}\ i\ =\ idx.begin();\ i\ !=\ idx.end();\ ++i\ )\ \{}
 \DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00212}00212\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ i-\/>is\_ready()\ )\ \textcolor{keywordflow}{break};}
 \DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00213}00213\ }
 \DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00214}00214\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ i-\/>last\_try\ +\ \_retry\_interval\ <=\ now\ )\ \{}
@@ -231,11 +231,11 @@
 \DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00227}00227\ \ \ \ \}}
 \DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00228}00228\ }
 \DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00229}00229\ \ \ \ \textcolor{keywordtype}{void}\ ack\_ready\_trxs\_by\_block\_num(\ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ block\_num\ )\ \{}
-\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00230}00230\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ \mbox{\hyperlink{namespacehost__functions__tests__1_a8496a24b5236a2dc07bb4f2930d88342}{idx}}\ =\ \_tracked\_trxs.\mbox{\hyperlink{classfc_1_1tracked__storage_ab578f3765c80c8cee1d758d440c99e90}{index}}().get<by\_ready\_block\_num>();}
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00230}00230\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ idx\ =\ \_tracked\_trxs.\mbox{\hyperlink{classfc_1_1tracked__storage_ab578f3765c80c8cee1d758d440c99e90}{index}}().get<by\_ready\_block\_num>();}
 \DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00231}00231\ \ \ \ \ \ \ \textcolor{comment}{//\ if\ we\ have\ reached\ requested\ block\ height\ then\ ack\ to\ user}}
-\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00232}00232\ \ \ \ \ \ \ deque<\textcolor{keyword}{decltype}(\_tracked\_trxs.\mbox{\hyperlink{classfc_1_1tracked__storage_ab578f3765c80c8cee1d758d440c99e90}{index}}().project<0>(\mbox{\hyperlink{namespacehost__functions__tests__1_a8496a24b5236a2dc07bb4f2930d88342}{idx}}.begin()))>\ to\_process;}
-\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00233}00233\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ end\ =\ \mbox{\hyperlink{namespacehost__functions__tests__1_a8496a24b5236a2dc07bb4f2930d88342}{idx}}.upper\_bound(block\_num);}
-\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00234}00234\ \ \ \ \ \ \ \textcolor{keywordflow}{for}(\ \textcolor{keyword}{auto}\ i\ =\ \mbox{\hyperlink{namespacehost__functions__tests__1_a8496a24b5236a2dc07bb4f2930d88342}{idx}}.begin();\ i\ !=\ end;\ ++i\ )\ \{}
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00232}00232\ \ \ \ \ \ \ deque<\textcolor{keyword}{decltype}(\_tracked\_trxs.\mbox{\hyperlink{classfc_1_1tracked__storage_ab578f3765c80c8cee1d758d440c99e90}{index}}().project<0>(idx.begin()))>\ to\_process;}
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00233}00233\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ end\ =\ idx.upper\_bound(block\_num);}
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00234}00234\ \ \ \ \ \ \ \textcolor{keywordflow}{for}(\ \textcolor{keyword}{auto}\ i\ =\ idx.begin();\ i\ !=\ end;\ ++i\ )\ \{}
 \DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00235}00235\ \ \ \ \ \ \ \ \ \ to\_process.emplace\_back(\ \_tracked\_trxs.\mbox{\hyperlink{classfc_1_1tracked__storage_ab578f3765c80c8cee1d758d440c99e90}{index}}().project<0>(\ i\ )\ );}
 \DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00236}00236\ \ \ \ \ \ \ \}}
 \DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00237}00237\ \ \ \ \ \ \ \textcolor{comment}{//\ ack}}
@@ -249,11 +249,11 @@
 \DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00245}00245\ \ \ \ \}}
 \DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00246}00246\ }
 \DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00247}00247\ \ \ \ \textcolor{keywordtype}{void}\ ack\_ready\_trxs\_by\_lib(\ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ lib\_block\_num\ )\ \{}
-\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00248}00248\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ \mbox{\hyperlink{namespacehost__functions__tests__1_a8496a24b5236a2dc07bb4f2930d88342}{idx}}\ =\ \_tracked\_trxs.\mbox{\hyperlink{classfc_1_1tracked__storage_ab578f3765c80c8cee1d758d440c99e90}{index}}().get<by\_block\_num>();}
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00248}00248\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ idx\ =\ \_tracked\_trxs.\mbox{\hyperlink{classfc_1_1tracked__storage_ab578f3765c80c8cee1d758d440c99e90}{index}}().get<by\_block\_num>();}
 \DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00249}00249\ \ \ \ \ \ \ \textcolor{comment}{//\ determine\ what\ to\ ack}}
-\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00250}00250\ \ \ \ \ \ \ deque<\textcolor{keyword}{decltype}(\_tracked\_trxs.\mbox{\hyperlink{classfc_1_1tracked__storage_ab578f3765c80c8cee1d758d440c99e90}{index}}().project<0>(\mbox{\hyperlink{namespacehost__functions__tests__1_a8496a24b5236a2dc07bb4f2930d88342}{idx}}.begin()))>\ to\_process;}
-\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00251}00251\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ end\ =\ \mbox{\hyperlink{namespacehost__functions__tests__1_a8496a24b5236a2dc07bb4f2930d88342}{idx}}.upper\_bound(lib\_block\_num);\ \textcolor{comment}{//\ process\ until\ lib\_block\_num}}
-\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00252}00252\ \ \ \ \ \ \ \textcolor{keywordflow}{for}(\ \textcolor{keyword}{auto}\ i\ =\ \mbox{\hyperlink{namespacehost__functions__tests__1_a8496a24b5236a2dc07bb4f2930d88342}{idx}}.lower\_bound(1);\ i\ !=\ end;\ ++i\ )\ \{\ \textcolor{comment}{//\ skip\ over\ not\ ready,\ block\_num\ ==\ 0}}
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00250}00250\ \ \ \ \ \ \ deque<\textcolor{keyword}{decltype}(\_tracked\_trxs.\mbox{\hyperlink{classfc_1_1tracked__storage_ab578f3765c80c8cee1d758d440c99e90}{index}}().project<0>(idx.begin()))>\ to\_process;}
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00251}00251\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ end\ =\ idx.upper\_bound(lib\_block\_num);\ \textcolor{comment}{//\ process\ until\ lib\_block\_num}}
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00252}00252\ \ \ \ \ \ \ \textcolor{keywordflow}{for}(\ \textcolor{keyword}{auto}\ i\ =\ idx.lower\_bound(1);\ i\ !=\ end;\ ++i\ )\ \{\ \textcolor{comment}{//\ skip\ over\ not\ ready,\ block\_num\ ==\ 0}}
 \DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00253}00253\ \ \ \ \ \ \ \ \ \ to\_process.emplace\_back(\ \_tracked\_trxs.\mbox{\hyperlink{classfc_1_1tracked__storage_ab578f3765c80c8cee1d758d440c99e90}{index}}().project<0>(\ i\ )\ );}
 \DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00254}00254\ \ \ \ \ \ \ \}}
 \DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00255}00255\ \ \ \ \ \ \ \textcolor{comment}{//\ ack}}
@@ -268,9 +268,9 @@
 \DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00264}00264\ }
 \DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00265}00265\ \ \ \ \textcolor{keywordtype}{void}\ clear\_expired(\textcolor{keyword}{const}\ \mbox{\hyperlink{classsysio_1_1chain_1_1block__timestamp}{block\_timestamp\_type}}\&\ \mbox{\hyperlink{classsysio_1_1chain_1_1block__timestamp}{block\_timestamp}})\ \{}
 \DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00266}00266\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1time__point}{fc::time\_point}}\ block\_time\ =\ \mbox{\hyperlink{classsysio_1_1chain_1_1block__timestamp}{block\_timestamp}};}
-\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00267}00267\ \ \ \ \ \ \ \textcolor{keyword}{auto}\&\ \mbox{\hyperlink{namespacehost__functions__tests__1_a8496a24b5236a2dc07bb4f2930d88342}{idx}}\ =\ \_tracked\_trxs.\mbox{\hyperlink{classfc_1_1tracked__storage_ab578f3765c80c8cee1d758d440c99e90}{index}}().get<by\_expiry>();}
-\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00268}00268\ \ \ \ \ \ \ \textcolor{keywordflow}{while}(\ !\mbox{\hyperlink{namespacehost__functions__tests__1_a8496a24b5236a2dc07bb4f2930d88342}{idx}}.empty()\ )\ \{}
-\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00269}00269\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ itr\ =\ \mbox{\hyperlink{namespacehost__functions__tests__1_a8496a24b5236a2dc07bb4f2930d88342}{idx}}.begin();}
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00267}00267\ \ \ \ \ \ \ \textcolor{keyword}{auto}\&\ idx\ =\ \_tracked\_trxs.\mbox{\hyperlink{classfc_1_1tracked__storage_ab578f3765c80c8cee1d758d440c99e90}{index}}().get<by\_expiry>();}
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00268}00268\ \ \ \ \ \ \ \textcolor{keywordflow}{while}(\ !idx.empty()\ )\ \{}
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00269}00269\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ itr\ =\ idx.begin();}
 \DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00270}00270\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ itr-\/>expiry()\ >\ block\_time\ )\ \{}
 \DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00271}00271\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
 \DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00272}00272\ \ \ \ \ \ \ \ \ \ \}}

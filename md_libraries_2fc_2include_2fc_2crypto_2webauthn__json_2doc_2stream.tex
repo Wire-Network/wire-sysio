@@ -109,7 +109,7 @@ Apart from reading file, user can also use {\ttfamily \doxylink{class_file_read_
 \DoxyCodeLine{\textcolor{keywordtype}{char}\ writeBuffer[65536];}
 \DoxyCodeLine{\mbox{\hyperlink{class_file_write_stream}{FileWriteStream}}\ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}(fp,\ writeBuffer,\ \textcolor{keyword}{sizeof}(writeBuffer));}
 \DoxyCodeLine{}
-\DoxyCodeLine{\mbox{\hyperlink{class_writer}{Writer<FileWriteStream>}}\ writer(os);}
+\DoxyCodeLine{\mbox{\hyperlink{class_writer}{Writer<FileWriteStream>}}\ writer(\mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}});}
 \DoxyCodeLine{\mbox{\hyperlink{yubihsm__pkcs11_8c_a107648633008a7f2d872b4b3d98c2f96}{d}}.Accept(writer);}
 \DoxyCodeLine{}
 \DoxyCodeLine{fclose(fp);}
@@ -289,7 +289,7 @@ Rapid\+JSON combines different types using templates. \doxylink{struct_a}{A} cla
 \DoxyCodeLine{\textcolor{keyword}{concept\ }\mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}}\ \{}
 \DoxyCodeLine{\ \ \ \ typename\ \mbox{\hyperlink{hash__impl_8h_ab0a0d1ad13c7e4d3cb38c89f7127c85a}{Ch}};\ \ \ \ }
 \DoxyCodeLine{}
-\DoxyCodeLine{\ \ \ \ \mbox{\hyperlink{hash__impl_8h_ab0a0d1ad13c7e4d3cb38c89f7127c85a}{Ch}}\ Peek()\ \mbox{\hyperlink{namespaceupload_a985aa9a71de3eb507344df65700c696d}{const}};}
+\DoxyCodeLine{\ \ \ \ \mbox{\hyperlink{hash__impl_8h_ab0a0d1ad13c7e4d3cb38c89f7127c85a}{Ch}}\ Peek()\ const;}
 \DoxyCodeLine{}
 \DoxyCodeLine{\ \ \ \ \mbox{\hyperlink{hash__impl_8h_ab0a0d1ad13c7e4d3cb38c89f7127c85a}{Ch}}\ Take();}
 \DoxyCodeLine{}
@@ -369,7 +369,7 @@ The following example is a simple wrapper of {\ttfamily std\+::istream}, which o
 \DoxyCodeLine{\textcolor{keyword}{public}:}
 \DoxyCodeLine{\ \ \ \ \textcolor{keyword}{typedef}\ \textcolor{keywordtype}{char}\ \mbox{\hyperlink{hash__impl_8h_ab0a0d1ad13c7e4d3cb38c89f7127c85a}{Ch}};}
 \DoxyCodeLine{}
-\DoxyCodeLine{\ \ \ \ MyOStreamWrapper(std::ostream\&\ os)\ :\ os\_(os)\ \{}
+\DoxyCodeLine{\ \ \ \ MyOStreamWrapper(std::ostream\&\ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}})\ :\ os\_(\mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}})\ \{}
 \DoxyCodeLine{\ \ \ \ \}}
 \DoxyCodeLine{}
 \DoxyCodeLine{\ \ \ \ \mbox{\hyperlink{hash__impl_8h_ab0a0d1ad13c7e4d3cb38c89f7127c85a}{Ch}}\ Peek()\textcolor{keyword}{\ const\ }\{\ assert(\textcolor{keyword}{false});\ \textcolor{keywordflow}{return}\ \textcolor{charliteral}{'\(\backslash\)0'};\ \}}
@@ -401,7 +401,7 @@ User can use it to wrap instances of {\ttfamily std\+::stringstream}, {\ttfamily
 \DoxyCodeLine{std::stringstream\ \mbox{\hyperlink{namespace_xbyak_1_1util_a67cd5471fb751b186b53fdab6da7d3f7}{ss}};}
 \DoxyCodeLine{MyOStreamWrapper\ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}(ss);}
 \DoxyCodeLine{}
-\DoxyCodeLine{\mbox{\hyperlink{class_writer}{Writer<MyOStreamWrapper>}}\ writer(os);}
+\DoxyCodeLine{\mbox{\hyperlink{class_writer}{Writer<MyOStreamWrapper>}}\ writer(\mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}});}
 \DoxyCodeLine{\mbox{\hyperlink{yubihsm__pkcs11_8c_a107648633008a7f2d872b4b3d98c2f96}{d}}.Accept(writer);}
 
 \end{DoxyCode}

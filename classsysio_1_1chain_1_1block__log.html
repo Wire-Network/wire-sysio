@@ -1734,7 +1734,7 @@ Here is the caller graph for this function:</div>
 <div class="line"><span class="lineno"> 1204</span> </div>
 <div class="line"><span class="lineno"> 1205</span>      <span class="comment">// ****** create the new block log file and write out the header for the file</span></div>
 <div class="line"><span class="lineno"> 1206</span>      <a class="code hl_function" href="namespacefc.html#a76b0787468a9f403087b71a894c07ce2">fc::create_directories</a>(temp_dir);</div>
-<div class="line"><span class="lineno"> 1207</span>      <a class="code hl_class" href="classfc_1_1path.html">fc::path</a> new_block_filename = <a class="code hl_variable" href="namespacevalidate__reflection.html#a4d36594f2363ca67854bebf3a1447a6a">temp_dir</a> / <span class="stringliteral">&quot;blocks.log&quot;</span>;</div>
+<div class="line"><span class="lineno"> 1207</span>      <a class="code hl_class" href="classfc_1_1path.html">fc::path</a> new_block_filename = temp_dir / <span class="stringliteral">&quot;blocks.log&quot;</span>;</div>
 <div class="line"><span class="lineno"> 1208</span>      <span class="keywordflow">if</span> (<a class="code hl_function" href="namespacefc.html#a0db76f35dc060918029b16de918b1e84">fc::remove</a>(new_block_filename)) {</div>
 <div class="line"><span class="lineno"> 1209</span>         <a class="code hl_define" href="logger_8hpp.html#a831cf08dc63704c11fd154132c6e8bdb">ilog</a>(<span class="stringliteral">&quot;Removing old blocks.out file&quot;</span>);</div>
 <div class="line"><span class="lineno"> 1210</span>      }</div>
@@ -1781,7 +1781,7 @@ Here is the caller graph for this function:</div>
 <div class="line"><span class="lineno"> 1251</span> </div>
 <div class="line"><span class="lineno"> 1252</span>      <span class="keyword">const</span> <span class="keyword">auto</span> num_blocks = original_block_log.last_block - truncate_at_block + 1;</div>
 <div class="line"><span class="lineno"> 1253</span> </div>
-<div class="line"><span class="lineno"> 1254</span>      <a class="code hl_class" href="classfc_1_1path.html">fc::path</a> new_index_filename = <a class="code hl_variable" href="namespacevalidate__reflection.html#a4d36594f2363ca67854bebf3a1447a6a">temp_dir</a> / <span class="stringliteral">&quot;blocks.index&quot;</span>;</div>
+<div class="line"><span class="lineno"> 1254</span>      <a class="code hl_class" href="classfc_1_1path.html">fc::path</a> new_index_filename = temp_dir / <span class="stringliteral">&quot;blocks.index&quot;</span>;</div>
 <div class="line"><span class="lineno"> 1255</span>      detail::index_writer index(new_index_filename, num_blocks);</div>
 <div class="line"><span class="lineno"> 1256</span> </div>
 <div class="line"><span class="lineno"> 1257</span>      <a class="code hl_typedef" href="stdint_8h.html#aec6fcb673ff035718c238c8c9d544c47">uint64_t</a> read_size = 0;</div>
@@ -1825,10 +1825,10 @@ Here is the caller graph for this function:</div>
 <div class="line"><span class="lineno"> 1295</span>      new_block_file.<a class="code hl_function" href="classfc_1_1cfile.html#a2e03001fc7d98a010f98c56fb7c62a69">flush</a>();</div>
 <div class="line"><span class="lineno"> 1296</span>      new_block_file.<a class="code hl_function" href="classfc_1_1cfile.html#a25b3bbb8ed2f690b750a197380153985">close</a>();</div>
 <div class="line"><span class="lineno"> 1297</span> </div>
-<div class="line"><span class="lineno"> 1298</span>      <a class="code hl_class" href="classfc_1_1path.html">fc::path</a> old_log = <a class="code hl_variable" href="namespacevalidate__reflection.html#a4d36594f2363ca67854bebf3a1447a6a">temp_dir</a> / <span class="stringliteral">&quot;old.log&quot;</span>;</div>
+<div class="line"><span class="lineno"> 1298</span>      <a class="code hl_class" href="classfc_1_1path.html">fc::path</a> old_log = temp_dir / <span class="stringliteral">&quot;old.log&quot;</span>;</div>
 <div class="line"><span class="lineno"> 1299</span>      <a class="code hl_function" href="namespacefc.html#a067b275100894b82b6cf3aa85e804ea5">rename</a>(original_block_log.block_file_name, old_log);</div>
 <div class="line"><span class="lineno"> 1300</span>      <a class="code hl_function" href="namespacefc.html#a067b275100894b82b6cf3aa85e804ea5">rename</a>(new_block_filename, original_block_log.block_file_name);</div>
-<div class="line"><span class="lineno"> 1301</span>      <a class="code hl_class" href="classfc_1_1path.html">fc::path</a> old_ind = <a class="code hl_variable" href="namespacevalidate__reflection.html#a4d36594f2363ca67854bebf3a1447a6a">temp_dir</a> / <span class="stringliteral">&quot;old.index&quot;</span>;</div>
+<div class="line"><span class="lineno"> 1301</span>      <a class="code hl_class" href="classfc_1_1path.html">fc::path</a> old_ind = temp_dir / <span class="stringliteral">&quot;old.index&quot;</span>;</div>
 <div class="line"><span class="lineno"> 1302</span>      <a class="code hl_function" href="namespacefc.html#a067b275100894b82b6cf3aa85e804ea5">rename</a>(original_block_log.index_file_name, old_ind);</div>
 <div class="line"><span class="lineno"> 1303</span>      <a class="code hl_function" href="namespacefc.html#a067b275100894b82b6cf3aa85e804ea5">rename</a>(new_index_filename, original_block_log.index_file_name);</div>
 <div class="line"><span class="lineno"> 1304</span> </div>
@@ -1845,7 +1845,6 @@ Here is the caller graph for this function:</div>
 <div class="ttc" id="aclasssysio_1_1chain_1_1detail_1_1reverse__iterator_html_a52163ca3aca71df680e1b934d8bfb187"><div class="ttname"><a href="classsysio_1_1chain_1_1detail_1_1reverse__iterator.html#a52163ca3aca71df680e1b934d8bfb187">sysio::chain::detail::reverse_iterator::_buf_len</a></div><div class="ttdeci">static uint32_t _buf_len</div><div class="ttdef"><b>Definition</b> <a href="block__log_8cpp_source.html#l00154">block_log.cpp:154</a></div></div>
 <div class="ttc" id="anamespacefc_html_a0db76f35dc060918029b16de918b1e84"><div class="ttname"><a href="namespacefc.html#a0db76f35dc060918029b16de918b1e84">fc::remove</a></div><div class="ttdeci">bool remove(const path &amp;p)</div><div class="ttdef"><b>Definition</b> <a href="filesystem_8cpp_source.html#l00350">filesystem.cpp:350</a></div></div>
 <div class="ttc" id="anamespacestd_html"><div class="ttname"><a href="namespacestd.html">std</a></div><div class="ttdef"><b>Definition</b> <a href="name_8hpp_source.html#l00106">name.hpp:106</a></div></div>
-<div class="ttc" id="anamespacevalidate__reflection_html_a4d36594f2363ca67854bebf3a1447a6a"><div class="ttname"><a href="namespacevalidate__reflection.html#a4d36594f2363ca67854bebf3a1447a6a">validate_reflection.temp_dir</a></div><div class="ttdeci">temp_dir</div><div class="ttdef"><b>Definition</b> <a href="validate__reflection_8py_source.html#l00051">validate_reflection.py:51</a></div></div>
 <div class="ttc" id="aprograms_2sysio-launcher_2main_8cpp_html_a3426d59b828f63d073d546fed967330e"><div class="ttname"><a href="programs_2sysio-launcher_2main_8cpp.html#a3426d59b828f63d073d546fed967330e">block_dir</a></div><div class="ttdeci">const string block_dir</div><div class="ttdef"><b>Definition</b> <a href="programs_2sysio-launcher_2main_8cpp_source.html#l00048">main.cpp:48</a></div></div>
 <div class="ttc" id="ayubihsm__pkcs11_8c_html_a855e99b645b13e7905d074d02fe0bff5"><div class="ttname"><a href="yubihsm__pkcs11_8c.html#a855e99b645b13e7905d074d02fe0bff5">buf</a></div><div class="ttdeci">uint8_t buf[2048]</div><div class="ttdef"><b>Definition</b> <a href="yubihsm__pkcs11_8c_source.html#l04770">yubihsm_pkcs11.c:4770</a></div></div>
 </div><!-- fragment --><div class="dynheader">

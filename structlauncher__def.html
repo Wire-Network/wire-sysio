@@ -625,9 +625,9 @@ Here is the caller graph for this function:</div>
 <p class="definition">Definition at line <a class="el" href="programs_2sysio-launcher_2main_8cpp_source.html#l01045">1045</a> of file <a class="el" href="programs_2sysio-launcher_2main_8cpp_source.html">main.cpp</a>.</p>
 <div class="fragment"><div class="line"><span class="lineno"> 1045</span>                                                                                                          {</div>
 <div class="line"><span class="lineno"> 1046</span>  <span class="keywordtype">string</span> scp_cmd_line = network.ssh_helper.scp_cmd + <span class="stringliteral">&quot; &quot;</span>;</div>
-<div class="line"><span class="lineno"> 1047</span>  <span class="keyword">const</span> <span class="keywordtype">string</span> &amp;<a class="code hl_variable" href="namespacebenchmark_compile.html#ad0ed96ae1454e4347ca61ac3887c379e">args</a> = host.ssh_args.length() ? host.ssh_args : network.ssh_helper.ssh_args;</div>
-<div class="line"><span class="lineno"> 1048</span>  <span class="keywordflow">if</span> (<a class="code hl_variable" href="namespacebenchmark_compile.html#ad0ed96ae1454e4347ca61ac3887c379e">args</a>.length()) {</div>
-<div class="line"><span class="lineno"> 1049</span>    scp_cmd_line += <a class="code hl_variable" href="namespacebenchmark_compile.html#ad0ed96ae1454e4347ca61ac3887c379e">args</a> + <span class="stringliteral">&quot; &quot;</span>;</div>
+<div class="line"><span class="lineno"> 1047</span>  <span class="keyword">const</span> <span class="keywordtype">string</span> &amp;args = host.ssh_args.length() ? host.ssh_args : network.ssh_helper.ssh_args;</div>
+<div class="line"><span class="lineno"> 1048</span>  <span class="keywordflow">if</span> (args.length()) {</div>
+<div class="line"><span class="lineno"> 1049</span>    scp_cmd_line += args + <span class="stringliteral">&quot; &quot;</span>;</div>
 <div class="line"><span class="lineno"> 1050</span>  }</div>
 <div class="line"><span class="lineno"> 1051</span>  scp_cmd_line += <a class="code hl_variable" href="pointer_8h.html#adb82dfe18535e9a30aa97d275f82bd55">source</a>.string() + <span class="stringliteral">&quot; &quot;</span>;</div>
 <div class="line"><span class="lineno"> 1052</span> </div>
@@ -640,7 +640,6 @@ Here is the caller graph for this function:</div>
 <div class="line"><span class="lineno"> 1059</span> </div>
 <div class="line"><span class="lineno"> 1060</span>  <span class="keywordflow">return</span> scp_cmd_line;</div>
 <div class="line"><span class="lineno"> 1061</span>}</div>
-<div class="ttc" id="anamespacebenchmark_compile_html_ad0ed96ae1454e4347ca61ac3887c379e"><div class="ttname"><a href="namespacebenchmark_compile.html#ad0ed96ae1454e4347ca61ac3887c379e">benchmarkCompile.args</a></div><div class="ttdeci">args</div><div class="ttdef"><b>Definition</b> <a href="benchmark_compile_8py_source.html#l00122">benchmarkCompile.py:122</a></div></div>
 <div class="ttc" id="apointer_8h_html_adb82dfe18535e9a30aa97d275f82bd55"><div class="ttname"><a href="pointer_8h.html#adb82dfe18535e9a30aa97d275f82bd55">source</a></div><div class="ttdeci">const CharType(&amp; source)[N]</div><div class="ttdef"><b>Definition</b> <a href="pointer_8h_source.html#l01204">pointer.h:1204</a></div></div>
 </div><!-- fragment --><div class="dynheader">
 Here is the caller graph for this function:</div>
@@ -1199,21 +1198,21 @@ Here is the caller graph for this function:</div>
 
 <p class="definition">Definition at line <a class="el" href="programs_2sysio-launcher_2main_8cpp_source.html#l01546">1546</a> of file <a class="el" href="programs_2sysio-launcher_2main_8cpp_source.html">main.cpp</a>.</p>
 <div class="fragment"><div class="line"><span class="lineno"> 1546</span>                                                         {</div>
-<div class="line"><span class="lineno"> 1547</span>   <span class="keywordflow">if</span> (<a class="code hl_variable" href="namespacebenchmark_compile.html#ad0ed96ae1454e4347ca61ac3887c379e">args</a>.empty() || arg.empty())</div>
-<div class="line"><span class="lineno"> 1548</span>      <span class="keywordflow">return</span> <a class="code hl_variable" href="namespacebenchmark_compile.html#ad0ed96ae1454e4347ca61ac3887c379e">args</a>;</div>
+<div class="line"><span class="lineno"> 1547</span>   <span class="keywordflow">if</span> (args.empty() || arg.empty())</div>
+<div class="line"><span class="lineno"> 1548</span>      <span class="keywordflow">return</span> args;</div>
 <div class="line"><span class="lineno"> 1549</span> </div>
 <div class="line"><span class="lineno"> 1550</span>   <span class="keywordtype">string</span> left, middle, right;</div>
-<div class="line"><span class="lineno"> 1551</span>   <span class="keywordtype">size_t</span> found = <a class="code hl_variable" href="namespacebenchmark_compile.html#ad0ed96ae1454e4347ca61ac3887c379e">args</a>.find(arg);</div>
+<div class="line"><span class="lineno"> 1551</span>   <span class="keywordtype">size_t</span> found = args.find(arg);</div>
 <div class="line"><span class="lineno"> 1552</span>   <span class="keywordflow">if</span> (found != std::string::npos){</div>
-<div class="line"><span class="lineno"> 1553</span>      left = <a class="code hl_variable" href="namespacebenchmark_compile.html#ad0ed96ae1454e4347ca61ac3887c379e">args</a>.substr(0, found);</div>
-<div class="line"><span class="lineno"> 1554</span>      middle = <a class="code hl_variable" href="namespacebenchmark_compile.html#ad0ed96ae1454e4347ca61ac3887c379e">args</a>.substr(found + 2); <span class="comment">//skip --</span></div>
+<div class="line"><span class="lineno"> 1553</span>      left = args.substr(0, found);</div>
+<div class="line"><span class="lineno"> 1554</span>      middle = args.substr(found + 2); <span class="comment">//skip --</span></div>
 <div class="line"><span class="lineno"> 1555</span>      found = middle.find(<span class="stringliteral">&quot;--&quot;</span>);</div>
 <div class="line"><span class="lineno"> 1556</span>      <span class="keywordflow">if</span> (found != std::string::npos){</div>
 <div class="line"><span class="lineno"> 1557</span>         right = middle.substr(found);</div>
 <div class="line"><span class="lineno"> 1558</span>      }</div>
 <div class="line"><span class="lineno"> 1559</span>      <span class="keywordflow">return</span> left + right;</div>
 <div class="line"><span class="lineno"> 1560</span>   } <span class="keywordflow">else</span> {</div>
-<div class="line"><span class="lineno"> 1561</span>      <span class="keywordflow">return</span> <a class="code hl_variable" href="namespacebenchmark_compile.html#ad0ed96ae1454e4347ca61ac3887c379e">args</a>;</div>
+<div class="line"><span class="lineno"> 1561</span>      <span class="keywordflow">return</span> args;</div>
 <div class="line"><span class="lineno"> 1562</span>   }</div>
 <div class="line"><span class="lineno"> 1563</span>}</div>
 </div><!-- fragment --><div class="dynheader">
@@ -3977,12 +3976,12 @@ Here is the caller graph for this function:</div>
 <div class="line"><span class="lineno"> 1285</span>   <span class="keyword">auto</span> &amp;bios_node = network.nodes[<span class="stringliteral">&quot;bios&quot;</span>];</div>
 <div class="line"><span class="lineno"> 1286</span>   <a class="code hl_typedef" href="stdint_8h.html#a273cf69d639a59973b6019625df33e30">uint16_t</a> biosport = bios_node.instance-&gt;http_port;</div>
 <div class="line"><span class="lineno"> 1287</span>   <span class="keywordtype">string</span> bhost = bios_node.instance-&gt;host;</div>
-<div class="line"><span class="lineno"> 1288</span>   <span class="keywordtype">string</span> <a class="code hl_variable" href="namespacevalidate__reflection.html#a54d4e98ade8417b88a7e3859a693630a">line</a>;</div>
+<div class="line"><span class="lineno"> 1288</span>   <span class="keywordtype">string</span> line;</div>
 <div class="line"><span class="lineno"> 1289</span>   <span class="keywordtype">string</span> prefix = <span class="stringliteral">&quot;###INSERT &quot;</span>;</div>
 <div class="line"><span class="lineno"> 1290</span>   <span class="keywordtype">size_t</span> <a class="code hl_variable" href="yubihsm__pkcs11_8c.html#a7360b55975153b822efc5217b7734e6a">len</a> = prefix.length();</div>
 <div class="line"><span class="lineno"> 1291</span>   <span class="keywordflow">while</span> (getline(src,line)) {</div>
-<div class="line"><span class="lineno"> 1292</span>      <span class="keywordflow">if</span> (<a class="code hl_variable" href="namespacevalidate__reflection.html#a54d4e98ade8417b88a7e3859a693630a">line</a>.substr(0,<a class="code hl_variable" href="yubihsm__pkcs11_8c.html#a7360b55975153b822efc5217b7734e6a">len</a>) == prefix) {</div>
-<div class="line"><span class="lineno"> 1293</span>         <span class="keywordtype">string</span> key = <a class="code hl_variable" href="namespacevalidate__reflection.html#a54d4e98ade8417b88a7e3859a693630a">line</a>.substr(<a class="code hl_variable" href="yubihsm__pkcs11_8c.html#a7360b55975153b822efc5217b7734e6a">len</a>);</div>
+<div class="line"><span class="lineno"> 1292</span>      <span class="keywordflow">if</span> (line.substr(0,<a class="code hl_variable" href="yubihsm__pkcs11_8c.html#a7360b55975153b822efc5217b7734e6a">len</a>) == prefix) {</div>
+<div class="line"><span class="lineno"> 1293</span>         <span class="keywordtype">string</span> key = line.substr(<a class="code hl_variable" href="yubihsm__pkcs11_8c.html#a7360b55975153b822efc5217b7734e6a">len</a>);</div>
 <div class="line"><span class="lineno"> 1294</span>         <span class="keywordflow">if</span> (key == <span class="stringliteral">&quot;envars&quot;</span>) {</div>
 <div class="line"><span class="lineno"> 1295</span>            brb &lt;&lt; <span class="stringliteral">&quot;bioshost=&quot;</span> &lt;&lt; bhost &lt;&lt; <span class="stringliteral">&quot;\nbiosport=&quot;</span> &lt;&lt; biosport &lt;&lt; <span class="stringliteral">&quot;\n&quot;</span>;</div>
 <div class="line"><span class="lineno"> 1296</span>         }</div>
@@ -4001,12 +4000,11 @@ Here is the caller graph for this function:</div>
 <div class="line"><span class="lineno"> 1309</span>            }</div>
 <div class="line"><span class="lineno"> 1310</span>         }</div>
 <div class="line"><span class="lineno"> 1311</span>      }</div>
-<div class="line"><span class="lineno"> 1312</span>      brb &lt;&lt; <a class="code hl_variable" href="namespacevalidate__reflection.html#a54d4e98ade8417b88a7e3859a693630a">line</a> &lt;&lt; <span class="stringliteral">&quot;\n&quot;</span>;</div>
+<div class="line"><span class="lineno"> 1312</span>      brb &lt;&lt; line &lt;&lt; <span class="stringliteral">&quot;\n&quot;</span>;</div>
 <div class="line"><span class="lineno"> 1313</span>   }</div>
 <div class="line"><span class="lineno"> 1314</span>   src.close();</div>
 <div class="line"><span class="lineno"> 1315</span>   brb.close();</div>
 <div class="line"><span class="lineno"> 1316</span>}</div>
-<div class="ttc" id="anamespacevalidate__reflection_html_a54d4e98ade8417b88a7e3859a693630a"><div class="ttname"><a href="namespacevalidate__reflection.html#a54d4e98ade8417b88a7e3859a693630a">validate_reflection.line</a></div><div class="ttdeci">line</div><div class="ttdef"><b>Definition</b> <a href="validate__reflection_8py_source.html#l00735">validate_reflection.py:735</a></div></div>
 <div class="ttc" id="ayubihsm__pkcs11_8c_html_a7360b55975153b822efc5217b7734e6a"><div class="ttname"><a href="yubihsm__pkcs11_8c.html#a7360b55975153b822efc5217b7734e6a">len</a></div><div class="ttdeci">size_t len</div><div class="ttdef"><b>Definition</b> <a href="yubihsm__pkcs11_8c_source.html#l04771">yubihsm_pkcs11.c:4771</a></div></div>
 </div><!-- fragment --><div class="dynheader">
 Here is the caller graph for this function:</div>
@@ -4041,7 +4039,7 @@ Here is the caller graph for this function:</div>
 <p class="definition">Definition at line <a class="el" href="programs_2sysio-launcher_2main_8cpp_source.html#l01064">1064</a> of file <a class="el" href="programs_2sysio-launcher_2main_8cpp_source.html">main.cpp</a>.</p>
 <div class="fragment"><div class="line"><span class="lineno"> 1064</span>                                                  {</div>
 <div class="line"><span class="lineno"> 1065</span>   <span class="keywordtype">bool</span> is_bios = (node.<a class="code hl_variable" href="classtn__node__def.html#a0aa81fe136c8ff5db0040e94d959885e">name</a> == <span class="stringliteral">&quot;bios&quot;</span>);</div>
-<div class="line"><span class="lineno"> 1066</span>   bfs::path <a class="code hl_variable" href="namespaceembed_clara.html#a1e1bd594f85f58f5dca6c41c0ac720fb">filename</a>;</div>
+<div class="line"><span class="lineno"> 1066</span>   bfs::path filename;</div>
 <div class="line"><span class="lineno"> 1067</span>   <a class="code hl_class" href="classeosd__def.html">eosd_def</a> &amp;instance = *node.<a class="code hl_variable" href="classtn__node__def.html#acf8b6f71a8edc88e475d266392e2f9b3">instance</a>;</div>
 <div class="line"><span class="lineno"> 1068</span>   <a class="code hl_class" href="classhost__def.html">host_def</a> *host = <a class="code hl_function" href="#ad4f922524a20063f61dfe6e9b3ebb0f5">find_host</a> (instance.<a class="code hl_variable" href="classeosd__def.html#ac1f0929b1ddfb5484250aa39c0cec105">host</a>);</div>
 <div class="line"><span class="lineno"> 1069</span> </div>
@@ -4055,11 +4053,11 @@ Here is the caller graph for this function:</div>
 <div class="line"><span class="lineno"> 1077</span>      }</div>
 <div class="line"><span class="lineno"> 1078</span>   }</div>
 <div class="line"><span class="lineno"> 1079</span> </div>
-<div class="line"><span class="lineno"> 1080</span>   <a class="code hl_variable" href="namespaceembed_clara.html#a1e1bd594f85f58f5dca6c41c0ac720fb">filename</a> = dd / <span class="stringliteral">&quot;config.ini&quot;</span>;</div>
+<div class="line"><span class="lineno"> 1080</span>   filename = dd / <span class="stringliteral">&quot;config.ini&quot;</span>;</div>
 <div class="line"><span class="lineno"> 1081</span> </div>
 <div class="line"><span class="lineno"> 1082</span>   bfs::ofstream cfg(filename);</div>
 <div class="line"><span class="lineno"> 1083</span>   <span class="keywordflow">if</span> (!cfg.good()) {</div>
-<div class="line"><span class="lineno"> 1084</span>      <a class="code hl_function" href="namespace_catch.html#a54c1ce08041448d684ae8edc14162cd2">cerr</a> &lt;&lt; <span class="stringliteral">&quot;unable to open &quot;</span> &lt;&lt; <a class="code hl_variable" href="namespaceembed_clara.html#a1e1bd594f85f58f5dca6c41c0ac720fb">filename</a> &lt;&lt; <span class="stringliteral">&quot; &quot;</span> &lt;&lt; strerror(errno) &lt;&lt; <span class="stringliteral">&quot;\n&quot;</span>;</div>
+<div class="line"><span class="lineno"> 1084</span>      <a class="code hl_function" href="namespace_catch.html#a54c1ce08041448d684ae8edc14162cd2">cerr</a> &lt;&lt; <span class="stringliteral">&quot;unable to open &quot;</span> &lt;&lt; filename &lt;&lt; <span class="stringliteral">&quot; &quot;</span> &lt;&lt; strerror(errno) &lt;&lt; <span class="stringliteral">&quot;\n&quot;</span>;</div>
 <div class="line"><span class="lineno"> 1085</span>      exit (-1);</div>
 <div class="line"><span class="lineno"> 1086</span>   }</div>
 <div class="line"><span class="lineno"> 1087</span> </div>
@@ -4116,7 +4114,6 @@ Here is the caller graph for this function:</div>
 <div class="ttc" id="aclasseosd__def_html_af00099700968db5cc2ba0460039ca013"><div class="ttname"><a href="classeosd__def.html#af00099700968db5cc2ba0460039ca013">eosd_def::http_port</a></div><div class="ttdeci">uint16_t http_port</div><div class="ttdef"><b>Definition</b> <a href="programs_2sysio-launcher_2main_8cpp_source.html#l00213">main.cpp:213</a></div></div>
 <div class="ttc" id="aclasseosd__def_html_af7e087103ea972bc98bc135bcc24970d"><div class="ttname"><a href="classeosd__def.html#af7e087103ea972bc98bc135bcc24970d">eosd_def::p2p_port</a></div><div class="ttdeci">uint16_t p2p_port</div><div class="ttdef"><b>Definition</b> <a href="programs_2sysio-launcher_2main_8cpp_source.html#l00212">main.cpp:212</a></div></div>
 <div class="ttc" id="aclasstn__node__def_html_ad02268d098aa5072ed3f6ce6edcda5b1"><div class="ttname"><a href="classtn__node__def.html#ad02268d098aa5072ed3f6ce6edcda5b1">tn_node_def::peers</a></div><div class="ttdeci">vector&lt; string &gt; peers</div><div class="ttdef"><b>Definition</b> <a href="programs_2sysio-launcher_2main_8cpp_source.html#l00240">main.cpp:240</a></div></div>
-<div class="ttc" id="anamespaceembed_clara_html_a1e1bd594f85f58f5dca6c41c0ac720fb"><div class="ttname"><a href="namespaceembed_clara.html#a1e1bd594f85f58f5dca6c41c0ac720fb">embedClara.filename</a></div><div class="ttdeci">filename</div><div class="ttdef"><b>Definition</b> <a href="embed_clara_8py_source.html#l00010">embedClara.py:10</a></div></div>
 </div><!-- fragment --><div class="dynheader">
 Here is the call graph for this function:</div>
 <div class="dyncontent">
@@ -4205,7 +4202,7 @@ Here is the caller graph for this function:</div>
 
 <p class="definition">Definition at line <a class="el" href="programs_2sysio-launcher_2main_8cpp_source.html#l01240">1240</a> of file <a class="el" href="programs_2sysio-launcher_2main_8cpp_source.html">main.cpp</a>.</p>
 <div class="fragment"><div class="line"><span class="lineno"> 1240</span>                                                  {</div>
-<div class="line"><span class="lineno"> 1241</span>  bfs::path <a class="code hl_variable" href="namespaceembed_clara.html#a1e1bd594f85f58f5dca6c41c0ac720fb">filename</a>;</div>
+<div class="line"><span class="lineno"> 1241</span>  bfs::path filename;</div>
 <div class="line"><span class="lineno"> 1242</span>  <a class="code hl_class" href="classeosd__def.html">eosd_def</a> &amp;instance = *node.<a class="code hl_variable" href="classtn__node__def.html#acf8b6f71a8edc88e475d266392e2f9b3">instance</a>;</div>
 <div class="line"><span class="lineno"> 1243</span> </div>
 <div class="line"><span class="lineno"> 1244</span>  bfs::path dd = <a class="code hl_enumeration" href="yubihsm__winhttp_8c.html#ad7668fe49909e0598d75380816eba577">stage</a> / instance.<a class="code hl_variable" href="classeosd__def.html#a2b0e5560d8740df24078c2bd69eeeb5e">config_dir_name</a>;</div>
@@ -4213,7 +4210,7 @@ Here is the caller graph for this function:</div>
 <div class="line"><span class="lineno"> 1246</span>    bfs::create_directories(dd);</div>
 <div class="line"><span class="lineno"> 1247</span>  }</div>
 <div class="line"><span class="lineno"> 1248</span> </div>
-<div class="line"><span class="lineno"> 1249</span>  <a class="code hl_variable" href="namespaceembed_clara.html#a1e1bd594f85f58f5dca6c41c0ac720fb">filename</a> = dd / <span class="stringliteral">&quot;genesis.json&quot;</span>;</div>
+<div class="line"><span class="lineno"> 1249</span>  filename = dd / <span class="stringliteral">&quot;genesis.json&quot;</span>;</div>
 <div class="line"><span class="lineno"> 1250</span>  <a class="code hl_function" href="classfc_1_1json.html#a7d6bb8dc49fecafcf96688c5202b22e5">fc::json::save_to_file</a>( <a class="code hl_variable" href="#a4354ffc4dfd7c8196bf95fd4bac3e23e">genesis_from_file</a>, dd / <span class="stringliteral">&quot;genesis.json&quot;</span>, <span class="keyword">true</span> );</div>
 <div class="line"><span class="lineno"> 1251</span>}</div>
 </div><!-- fragment --><div class="dynheader">
@@ -4259,7 +4256,7 @@ Here is the caller graph for this function:</div>
 
 <p class="definition">Definition at line <a class="el" href="programs_2sysio-launcher_2main_8cpp_source.html#l01140">1140</a> of file <a class="el" href="programs_2sysio-launcher_2main_8cpp_source.html">main.cpp</a>.</p>
 <div class="fragment"><div class="line"><span class="lineno"> 1140</span>                                                         {</div>
-<div class="line"><span class="lineno"> 1141</span>  bfs::path <a class="code hl_variable" href="namespaceembed_clara.html#a1e1bd594f85f58f5dca6c41c0ac720fb">filename</a>;</div>
+<div class="line"><span class="lineno"> 1141</span>  bfs::path filename;</div>
 <div class="line"><span class="lineno"> 1142</span>  <a class="code hl_class" href="classeosd__def.html">eosd_def</a> &amp;instance = *node.<a class="code hl_variable" href="classtn__node__def.html#acf8b6f71a8edc88e475d266392e2f9b3">instance</a>;</div>
 <div class="line"><span class="lineno"> 1143</span> </div>
 <div class="line"><span class="lineno"> 1144</span>  bfs::path dd = <a class="code hl_enumeration" href="yubihsm__winhttp_8c.html#ad7668fe49909e0598d75380816eba577">stage</a> / instance.<a class="code hl_variable" href="classeosd__def.html#a2b0e5560d8740df24078c2bd69eeeb5e">config_dir_name</a>;</div>
@@ -4267,11 +4264,11 @@ Here is the caller graph for this function:</div>
 <div class="line"><span class="lineno"> 1146</span>    bfs::create_directories(dd);</div>
 <div class="line"><span class="lineno"> 1147</span>  }</div>
 <div class="line"><span class="lineno"> 1148</span> </div>
-<div class="line"><span class="lineno"> 1149</span>  <a class="code hl_variable" href="namespaceembed_clara.html#a1e1bd594f85f58f5dca6c41c0ac720fb">filename</a> = dd / <span class="stringliteral">&quot;logging.json&quot;</span>;</div>
+<div class="line"><span class="lineno"> 1149</span>  filename = dd / <span class="stringliteral">&quot;logging.json&quot;</span>;</div>
 <div class="line"><span class="lineno"> 1150</span> </div>
 <div class="line"><span class="lineno"> 1151</span>  bfs::ofstream cfg(filename);</div>
 <div class="line"><span class="lineno"> 1152</span>  <span class="keywordflow">if</span> (!cfg.good()) {</div>
-<div class="line"><span class="lineno"> 1153</span>    <a class="code hl_function" href="namespace_catch.html#a54c1ce08041448d684ae8edc14162cd2">cerr</a> &lt;&lt; <span class="stringliteral">&quot;unable to open &quot;</span> &lt;&lt; <a class="code hl_variable" href="namespaceembed_clara.html#a1e1bd594f85f58f5dca6c41c0ac720fb">filename</a> &lt;&lt; <span class="stringliteral">&quot; &quot;</span> &lt;&lt; strerror(errno) &lt;&lt; <span class="stringliteral">&quot;\n&quot;</span>;</div>
+<div class="line"><span class="lineno"> 1153</span>    <a class="code hl_function" href="namespace_catch.html#a54c1ce08041448d684ae8edc14162cd2">cerr</a> &lt;&lt; <span class="stringliteral">&quot;unable to open &quot;</span> &lt;&lt; filename &lt;&lt; <span class="stringliteral">&quot; &quot;</span> &lt;&lt; strerror(errno) &lt;&lt; <span class="stringliteral">&quot;\n&quot;</span>;</div>
 <div class="line"><span class="lineno"> 1154</span>    exit (9);</div>
 <div class="line"><span class="lineno"> 1155</span>  }</div>
 <div class="line"><span class="lineno"> 1156</span> </div>
@@ -4405,10 +4402,10 @@ Here is the caller graph for this function:</div>
 
 <p class="definition">Definition at line <a class="el" href="programs_2sysio-launcher_2main_8cpp_source.html#l01254">1254</a> of file <a class="el" href="programs_2sysio-launcher_2main_8cpp_source.html">main.cpp</a>.</p>
 <div class="fragment"><div class="line"><span class="lineno"> 1254</span>                                  {</div>
-<div class="line"><span class="lineno"> 1255</span>   bfs::path <a class="code hl_variable" href="namespaceembed_clara.html#a1e1bd594f85f58f5dca6c41c0ac720fb">filename</a> = bfs::current_path() / <span class="stringliteral">&quot;setprods.json&quot;</span>;</div>
+<div class="line"><span class="lineno"> 1255</span>   bfs::path filename = bfs::current_path() / <span class="stringliteral">&quot;setprods.json&quot;</span>;</div>
 <div class="line"><span class="lineno"> 1256</span>   bfs::ofstream psfile (filename);</div>
 <div class="line"><span class="lineno"> 1257</span>   <span class="keywordflow">if</span>(!psfile.good()) {</div>
-<div class="line"><span class="lineno"> 1258</span>      <a class="code hl_function" href="namespace_catch.html#a54c1ce08041448d684ae8edc14162cd2">cerr</a> &lt;&lt; <span class="stringliteral">&quot;unable to open &quot;</span> &lt;&lt; <a class="code hl_variable" href="namespaceembed_clara.html#a1e1bd594f85f58f5dca6c41c0ac720fb">filename</a> &lt;&lt; <span class="stringliteral">&quot; &quot;</span> &lt;&lt; strerror(errno) &lt;&lt; <span class="stringliteral">&quot;\n&quot;</span>;</div>
+<div class="line"><span class="lineno"> 1258</span>      <a class="code hl_function" href="namespace_catch.html#a54c1ce08041448d684ae8edc14162cd2">cerr</a> &lt;&lt; <span class="stringliteral">&quot;unable to open &quot;</span> &lt;&lt; filename &lt;&lt; <span class="stringliteral">&quot; &quot;</span> &lt;&lt; strerror(errno) &lt;&lt; <span class="stringliteral">&quot;\n&quot;</span>;</div>
 <div class="line"><span class="lineno"> 1259</span>    exit (9);</div>
 <div class="line"><span class="lineno"> 1260</span>  }</div>
 <div class="line"><span class="lineno"> 1261</span>   <a class="code hl_struct" href="structproducer__set__def.html">producer_set_def</a> no_bios;</div>

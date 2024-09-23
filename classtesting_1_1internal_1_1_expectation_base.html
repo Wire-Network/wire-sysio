@@ -149,11 +149,11 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:a30c6f21bc67833c1f313b2148603b22b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:add89b0324797a421a1df77898528cbb7" id="r_add89b0324797a421a1df77898528cbb7"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="classtesting_1_1_cardinality.html">Cardinality</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#add89b0324797a421a1df77898528cbb7">cardinality</a> () const</td></tr>
 <tr class="separator:add89b0324797a421a1df77898528cbb7"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a666e7f8fb2412e78f090244e6bfd4493" id="r_a666e7f8fb2412e78f090244e6bfd4493"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a666e7f8fb2412e78f090244e6bfd4493">DescribeLocationTo</a> (::std::ostream *os) const</td></tr>
+<tr class="memitem:a666e7f8fb2412e78f090244e6bfd4493" id="r_a666e7f8fb2412e78f090244e6bfd4493"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a666e7f8fb2412e78f090244e6bfd4493">DescribeLocationTo</a> (::std::ostream *<a class="el" href="environment_8hpp.html#a3951483d0b31c29ca95336206cd35238">os</a>) const</td></tr>
 <tr class="separator:a666e7f8fb2412e78f090244e6bfd4493"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a2beebed3ade29077bcf294b449bb8b9d" id="r_a2beebed3ade29077bcf294b449bb8b9d"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a2beebed3ade29077bcf294b449bb8b9d">DescribeCallCountTo</a> (::std::ostream *os) const <a class="el" href="gtest-port_8h.html#a149f693bd59fa1bc937af54c0cdcb32f">GTEST_EXCLUSIVE_LOCK_REQUIRED_</a>(g_gmock_mutex)</td></tr>
+<tr class="memitem:a2beebed3ade29077bcf294b449bb8b9d" id="r_a2beebed3ade29077bcf294b449bb8b9d"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a2beebed3ade29077bcf294b449bb8b9d">DescribeCallCountTo</a> (::std::ostream *<a class="el" href="environment_8hpp.html#a3951483d0b31c29ca95336206cd35238">os</a>) const <a class="el" href="gtest-port_8h.html#a149f693bd59fa1bc937af54c0cdcb32f">GTEST_EXCLUSIVE_LOCK_REQUIRED_</a>(g_gmock_mutex)</td></tr>
 <tr class="separator:a2beebed3ade29077bcf294b449bb8b9d"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a5ce4f648c7b112d27b798711d1e3ff5b" id="r_a5ce4f648c7b112d27b798711d1e3ff5b"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a5ce4f648c7b112d27b798711d1e3ff5b">MaybeDescribeExtraMatcherTo</a> (::std::ostream *os)=0</td></tr>
+<tr class="memitem:a5ce4f648c7b112d27b798711d1e3ff5b" id="r_a5ce4f648c7b112d27b798711d1e3ff5b"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a5ce4f648c7b112d27b798711d1e3ff5b">MaybeDescribeExtraMatcherTo</a> (::std::ostream *<a class="el" href="environment_8hpp.html#a3951483d0b31c29ca95336206cd35238">os</a>)=0</td></tr>
 <tr class="separator:a5ce4f648c7b112d27b798711d1e3ff5b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pro-types" name="pro-types"></a>
@@ -461,8 +461,8 @@ Friends</h2></td></tr>
 <div class="line"><span class="lineno">  139</span>    <span class="keywordflow">for</span> (<a class="code hl_typedef" href="classtesting_1_1_expectation_set.html#a133d96bcaa13be84583cf2718a1e6c69">ExpectationSet::const_iterator</a> it =</div>
 <div class="line"><span class="lineno">  140</span>             exp-&gt;immediate_prerequisites_.begin();</div>
 <div class="line"><span class="lineno">  141</span>         it != exp-&gt;immediate_prerequisites_.end(); ++it) {</div>
-<div class="line"><span class="lineno">  142</span>      <span class="keyword">const</span> <a class="code hl_function" href="#a7ba2da3ba34dfca22d2202934405e676">ExpectationBase</a>* <a class="code hl_function" href="namespacecpp_1_1ast.html#a25b104cfd21fb8487a07063b6ce62062">next</a> = it-&gt;expectation_base().get();</div>
-<div class="line"><span class="lineno">  143</span>      <span class="keywordflow">if</span> (!<a class="code hl_function" href="namespacecpp_1_1ast.html#a25b104cfd21fb8487a07063b6ce62062">next</a>-&gt;IsSatisfied()) <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
+<div class="line"><span class="lineno">  142</span>      <span class="keyword">const</span> <a class="code hl_function" href="#a7ba2da3ba34dfca22d2202934405e676">ExpectationBase</a>* <a class="code hl_function" href="namespaceutf8.html#afc093dfde66a6f52cb4a5caefe0e580d">next</a> = it-&gt;expectation_base().get();</div>
+<div class="line"><span class="lineno">  143</span>      <span class="keywordflow">if</span> (!<a class="code hl_function" href="namespaceutf8.html#afc093dfde66a6f52cb4a5caefe0e580d">next</a>-&gt;IsSatisfied()) <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
 <div class="line"><span class="lineno">  144</span>      expectations.push_back(next);</div>
 <div class="line"><span class="lineno">  145</span>    }</div>
 <div class="line"><span class="lineno">  146</span>  }</div>
@@ -470,7 +470,7 @@ Friends</h2></td></tr>
 <div class="line"><span class="lineno">  148</span>}</div>
 <div class="ttc" id="aclasstesting_1_1_expectation_set_html_a133d96bcaa13be84583cf2718a1e6c69"><div class="ttname"><a href="classtesting_1_1_expectation_set.html#a133d96bcaa13be84583cf2718a1e6c69">testing::ExpectationSet::const_iterator</a></div><div class="ttdeci">Expectation::Set::const_iterator const_iterator</div><div class="ttdef"><b>Definition</b> <a href="gmock-spec-builders_8h_source.html#l00571">gmock-spec-builders.h:571</a></div></div>
 <div class="ttc" id="aclasstesting_1_1internal_1_1_expectation_base_html_a7ba2da3ba34dfca22d2202934405e676"><div class="ttname"><a href="#a7ba2da3ba34dfca22d2202934405e676">testing::internal::ExpectationBase::ExpectationBase</a></div><div class="ttdeci">ExpectationBase(const char *file, int line, const std::string &amp;source_text)</div><div class="ttdef"><b>Definition</b> <a href="gmock-spec-builders_8cc_source.html#l00078">gmock-spec-builders.cc:78</a></div></div>
-<div class="ttc" id="anamespacecpp_1_1ast_html_a25b104cfd21fb8487a07063b6ce62062"><div class="ttname"><a href="namespacecpp_1_1ast.html#a25b104cfd21fb8487a07063b6ce62062">cpp.ast.next</a></div><div class="ttdeci">next(obj)</div><div class="ttdef"><b>Definition</b> <a href="ast_8py_source.html#l00058">ast.py:58</a></div></div>
+<div class="ttc" id="anamespaceutf8_html_afc093dfde66a6f52cb4a5caefe0e580d"><div class="ttname"><a href="namespaceutf8.html#afc093dfde66a6f52cb4a5caefe0e580d">utf8::next</a></div><div class="ttdeci">uint32_t next(octet_iterator &amp;it, octet_iterator end)</div><div class="ttdef"><b>Definition</b> <a href="checked_8h_source.html#l00137">checked.h:137</a></div></div>
 </div><!-- fragment --><div class="dynheader">
 Here is the call graph for this function:</div>
 <div class="dyncontent">
@@ -757,14 +757,14 @@ Here is the call graph for this function:</div>
 <div class="line"><span class="lineno">  184</span>  g_gmock_mutex.AssertHeld();</div>
 <div class="line"><span class="lineno">  185</span> </div>
 <div class="line"><span class="lineno">  186</span>  <span class="comment">// Describes how many times the function is expected to be called.</span></div>
-<div class="line"><span class="lineno">  187</span>  *os &lt;&lt; <span class="stringliteral">&quot;         Expected: to be &quot;</span>;</div>
-<div class="line"><span class="lineno">  188</span>  <a class="code hl_function" href="#add89b0324797a421a1df77898528cbb7">cardinality</a>().<a class="code hl_function" href="classtesting_1_1_cardinality.html#a2955f4b65022c422f56e79b767c4fa71">DescribeTo</a>(os);</div>
-<div class="line"><span class="lineno">  189</span>  *os &lt;&lt; <span class="stringliteral">&quot;\n           Actual: &quot;</span>;</div>
-<div class="line"><span class="lineno">  190</span>  <a class="code hl_function" href="classtesting_1_1_cardinality.html#a7cbea339e2f3072a98367e087aa296e8">Cardinality::DescribeActualCallCountTo</a>(<a class="code hl_function" href="#aacc0399271907194ac1627439f65047a">call_count</a>(), os);</div>
+<div class="line"><span class="lineno">  187</span>  *<a class="code hl_variable" href="environment_8hpp.html#a3951483d0b31c29ca95336206cd35238">os</a> &lt;&lt; <span class="stringliteral">&quot;         Expected: to be &quot;</span>;</div>
+<div class="line"><span class="lineno">  188</span>  <a class="code hl_function" href="#add89b0324797a421a1df77898528cbb7">cardinality</a>().<a class="code hl_function" href="classtesting_1_1_cardinality.html#a2955f4b65022c422f56e79b767c4fa71">DescribeTo</a>(<a class="code hl_variable" href="environment_8hpp.html#a3951483d0b31c29ca95336206cd35238">os</a>);</div>
+<div class="line"><span class="lineno">  189</span>  *<a class="code hl_variable" href="environment_8hpp.html#a3951483d0b31c29ca95336206cd35238">os</a> &lt;&lt; <span class="stringliteral">&quot;\n           Actual: &quot;</span>;</div>
+<div class="line"><span class="lineno">  190</span>  <a class="code hl_function" href="classtesting_1_1_cardinality.html#a7cbea339e2f3072a98367e087aa296e8">Cardinality::DescribeActualCallCountTo</a>(<a class="code hl_function" href="#aacc0399271907194ac1627439f65047a">call_count</a>(), <a class="code hl_variable" href="environment_8hpp.html#a3951483d0b31c29ca95336206cd35238">os</a>);</div>
 <div class="line"><span class="lineno">  191</span> </div>
 <div class="line"><span class="lineno">  192</span>  <span class="comment">// Describes the state of the expectation (e.g. is it satisfied?</span></div>
 <div class="line"><span class="lineno">  193</span>  <span class="comment">// is it active?).</span></div>
-<div class="line"><span class="lineno">  194</span>  *os &lt;&lt; <span class="stringliteral">&quot; - &quot;</span> &lt;&lt; (<a class="code hl_function" href="#a080dab35ecc6c57096f50758a0e8123d">IsOverSaturated</a>() ? <span class="stringliteral">&quot;over-saturated&quot;</span> :</div>
+<div class="line"><span class="lineno">  194</span>  *<a class="code hl_variable" href="environment_8hpp.html#a3951483d0b31c29ca95336206cd35238">os</a> &lt;&lt; <span class="stringliteral">&quot; - &quot;</span> &lt;&lt; (<a class="code hl_function" href="#a080dab35ecc6c57096f50758a0e8123d">IsOverSaturated</a>() ? <span class="stringliteral">&quot;over-saturated&quot;</span> :</div>
 <div class="line"><span class="lineno">  195</span>                   <a class="code hl_function" href="#ad3e4340cedefdc24fce1478a8d6cab93">IsSaturated</a>() ? <span class="stringliteral">&quot;saturated&quot;</span> :</div>
 <div class="line"><span class="lineno">  196</span>                   <a class="code hl_function" href="#ae629adc2dd9aee0ac62e50314f1a6449">IsSatisfied</a>() ? <span class="stringliteral">&quot;satisfied&quot;</span> : <span class="stringliteral">&quot;unsatisfied&quot;</span>)</div>
 <div class="line"><span class="lineno">  197</span>      &lt;&lt; <span class="stringliteral">&quot; and &quot;</span></div>
@@ -776,6 +776,7 @@ Here is the call graph for this function:</div>
 <div class="ttc" id="aclasstesting_1_1internal_1_1_expectation_base_html_ad3e4340cedefdc24fce1478a8d6cab93"><div class="ttname"><a href="#ad3e4340cedefdc24fce1478a8d6cab93">testing::internal::ExpectationBase::IsSaturated</a></div><div class="ttdeci">bool IsSaturated() const GTEST_EXCLUSIVE_LOCK_REQUIRED_(g_gmock_mutex)</div><div class="ttdef"><b>Definition</b> <a href="gmock-spec-builders_8h_source.html#l00800">gmock-spec-builders.h:800</a></div></div>
 <div class="ttc" id="aclasstesting_1_1internal_1_1_expectation_base_html_ae629adc2dd9aee0ac62e50314f1a6449"><div class="ttname"><a href="#ae629adc2dd9aee0ac62e50314f1a6449">testing::internal::ExpectationBase::IsSatisfied</a></div><div class="ttdeci">bool IsSatisfied() const GTEST_EXCLUSIVE_LOCK_REQUIRED_(g_gmock_mutex)</div><div class="ttdef"><b>Definition</b> <a href="gmock-spec-builders_8h_source.html#l00793">gmock-spec-builders.h:793</a></div></div>
 <div class="ttc" id="aclasstesting_1_1internal_1_1_expectation_base_html_afe539dbc5b29d9635403767a4708c476"><div class="ttname"><a href="#afe539dbc5b29d9635403767a4708c476">testing::internal::ExpectationBase::is_retired</a></div><div class="ttdeci">bool is_retired() const GTEST_EXCLUSIVE_LOCK_REQUIRED_(g_gmock_mutex)</div><div class="ttdef"><b>Definition</b> <a href="gmock-spec-builders_8h_source.html#l00779">gmock-spec-builders.h:779</a></div></div>
+<div class="ttc" id="aenvironment_8hpp_html_a3951483d0b31c29ca95336206cd35238"><div class="ttname"><a href="environment_8hpp.html#a3951483d0b31c29ca95336206cd35238">os</a></div><div class="ttdeci">os_t os</div><div class="ttdef"><b>Definition</b> <a href="environment_8hpp_source.html#l00023">environment.hpp:23</a></div></div>
 </div><!-- fragment --><div class="dynheader">
 Here is the call graph for this function:</div>
 <div class="dyncontent">
@@ -814,7 +815,7 @@ Here is the call graph for this function:</div>
 
 <p class="definition">Definition at line <a class="el" href="gmock-spec-builders_8h_source.html#l00710">710</a> of file <a class="el" href="gmock-spec-builders_8h_source.html">gmock-spec-builders.h</a>.</p>
 <div class="fragment"><div class="line"><span class="lineno">  710</span>                                                {</div>
-<div class="line"><span class="lineno">  711</span>    *os &lt;&lt; <a class="code hl_function" href="namespacetesting_1_1internal.html#a31b7c3abed4a7c395f42c61e993989f4">FormatFileLocation</a>(<a class="code hl_function" href="#a4e6c2bf337d2213652dbe630be7fdcc7">file</a>(), <a class="code hl_function" href="#a6a44d831449d31e0e46d0070625b452c">line</a>()) &lt;&lt; <span class="stringliteral">&quot; &quot;</span>;</div>
+<div class="line"><span class="lineno">  711</span>    *<a class="code hl_variable" href="environment_8hpp.html#a3951483d0b31c29ca95336206cd35238">os</a> &lt;&lt; <a class="code hl_function" href="namespacetesting_1_1internal.html#a31b7c3abed4a7c395f42c61e993989f4">FormatFileLocation</a>(<a class="code hl_function" href="#a4e6c2bf337d2213652dbe630be7fdcc7">file</a>(), <a class="code hl_function" href="#a6a44d831449d31e0e46d0070625b452c">line</a>()) &lt;&lt; <span class="stringliteral">&quot; &quot;</span>;</div>
 <div class="line"><span class="lineno">  712</span>  }</div>
 <div class="ttc" id="aclasstesting_1_1internal_1_1_expectation_base_html_a4e6c2bf337d2213652dbe630be7fdcc7"><div class="ttname"><a href="#a4e6c2bf337d2213652dbe630be7fdcc7">testing::internal::ExpectationBase::file</a></div><div class="ttdeci">const char * file() const</div><div class="ttdef"><b>Definition</b> <a href="gmock-spec-builders_8h_source.html#l00703">gmock-spec-builders.h:703</a></div></div>
 <div class="ttc" id="aclasstesting_1_1internal_1_1_expectation_base_html_a6a44d831449d31e0e46d0070625b452c"><div class="ttname"><a href="#a6a44d831449d31e0e46d0070625b452c">testing::internal::ExpectationBase::line</a></div><div class="ttdeci">int line() const</div><div class="ttdef"><b>Definition</b> <a href="gmock-spec-builders_8h_source.html#l00704">gmock-spec-builders.h:704</a></div></div>
@@ -961,12 +962,12 @@ Here is the caller graph for this function:</div>
 <div class="line"><span class="lineno">  159</span>    <span class="keywordflow">for</span> (<a class="code hl_typedef" href="classtesting_1_1_expectation_set.html#a133d96bcaa13be84583cf2718a1e6c69">ExpectationSet::const_iterator</a> it =</div>
 <div class="line"><span class="lineno">  160</span>             exp-&gt;immediate_prerequisites_.begin();</div>
 <div class="line"><span class="lineno">  161</span>         it != exp-&gt;immediate_prerequisites_.end(); ++it) {</div>
-<div class="line"><span class="lineno">  162</span>      <span class="keyword">const</span> <a class="code hl_function" href="#a7ba2da3ba34dfca22d2202934405e676">ExpectationBase</a>* <a class="code hl_function" href="namespacecpp_1_1ast.html#a25b104cfd21fb8487a07063b6ce62062">next</a> = it-&gt;expectation_base().get();</div>
+<div class="line"><span class="lineno">  162</span>      <span class="keyword">const</span> <a class="code hl_function" href="#a7ba2da3ba34dfca22d2202934405e676">ExpectationBase</a>* <a class="code hl_function" href="namespaceutf8.html#afc093dfde66a6f52cb4a5caefe0e580d">next</a> = it-&gt;expectation_base().get();</div>
 <div class="line"><span class="lineno">  163</span> </div>
-<div class="line"><span class="lineno">  164</span>      <span class="keywordflow">if</span> (<a class="code hl_function" href="namespacecpp_1_1ast.html#a25b104cfd21fb8487a07063b6ce62062">next</a>-&gt;IsSatisfied()) {</div>
+<div class="line"><span class="lineno">  164</span>      <span class="keywordflow">if</span> (<a class="code hl_function" href="namespaceutf8.html#afc093dfde66a6f52cb4a5caefe0e580d">next</a>-&gt;IsSatisfied()) {</div>
 <div class="line"><span class="lineno">  165</span>        <span class="comment">// If *it is satisfied and has a call count of 0, some of its</span></div>
 <div class="line"><span class="lineno">  166</span>        <span class="comment">// pre-requisites may not be satisfied yet.</span></div>
-<div class="line"><span class="lineno">  167</span>        <span class="keywordflow">if</span> (<a class="code hl_function" href="namespacecpp_1_1ast.html#a25b104cfd21fb8487a07063b6ce62062">next</a>-&gt;call_count_ == 0) {</div>
+<div class="line"><span class="lineno">  167</span>        <span class="keywordflow">if</span> (<a class="code hl_function" href="namespaceutf8.html#afc093dfde66a6f52cb4a5caefe0e580d">next</a>-&gt;call_count_ == 0) {</div>
 <div class="line"><span class="lineno">  168</span>          expectations.push_back(next);</div>
 <div class="line"><span class="lineno">  169</span>        }</div>
 <div class="line"><span class="lineno">  170</span>      } <span class="keywordflow">else</span> {</div>
@@ -1241,21 +1242,9 @@ Here is the caller graph for this function:</div>
 <div class="dyncontent">
 <div class="center"><img src="classtesting_1_1internal_1_1_expectation_base_a6a44d831449d31e0e46d0070625b452c_icgraph.png" border="0" usemap="#aclasstesting_1_1internal_1_1_expectation_base_a6a44d831449d31e0e46d0070625b452c_icgraph" alt=""/></div>
 <map name="aclasstesting_1_1internal_1_1_expectation_base_a6a44d831449d31e0e46d0070625b452c_icgraph" id="aclasstesting_1_1internal_1_1_expectation_base_a6a44d831449d31e0e46d0070625b452c_icgraph">
-<area shape="rect" title=" " alt="" coords="247,146,395,186"/>
-<area shape="rect" href="classpump_1_1_cursor.html#a7a565e3c30559d7b02ece7817ab1cf72" title=" " alt="" coords="28,5,176,31"/>
-<area shape="poly" title=" " alt="" coords="294,135,252,88,226,64,197,44,174,34,176,29,200,40,229,60,256,84,298,132"/>
-<area shape="rect" href="classpump_1_1_cursor.html#a012a67506d0a3e81daec0394d18359b8" title=" " alt="" coords="31,55,173,80"/>
-<area shape="poly" title=" " alt="" coords="278,139,240,115,198,94,167,83,169,78,200,89,242,111,280,135"/>
-<area shape="rect" href="classpump_1_1_cursor.html#a7ec8a30a836133d7654fcaf81250fc77" title=" " alt="" coords="35,104,169,130"/>
-<area shape="poly" title=" " alt="" coords="231,149,162,133,163,128,233,144"/>
-<area shape="rect" href="classpump_1_1_cursor.html#afca901b5f22d9b2bfe207beccdec7dfa" title=" " alt="" coords="31,153,173,179"/>
-<area shape="poly" title=" " alt="" coords="231,169,174,169,174,164,231,164"/>
-<area shape="rect" href="classpump_1_1_cursor.html#a8a9a818d6c242243bc08641deb3b007d" title=" " alt="" coords="28,203,176,228"/>
-<area shape="poly" title=" " alt="" coords="233,189,163,205,162,199,231,184"/>
-<area shape="rect" href="classpump_1_1_cursor.html#ae5be3cd7be0409815feaa37cca01f0bf" title=" " alt="" coords="35,252,169,278"/>
-<area shape="poly" title=" " alt="" coords="280,198,242,222,200,243,169,254,167,249,198,238,240,217,278,193"/>
-<area shape="rect" href="classtesting_1_1internal_1_1_untyped_function_mocker_base.html#a819f2e6575f1245e65fc2040150b5bac" title=" " alt="" coords="5,302,199,358"/>
-<area shape="poly" title=" " alt="" coords="296,201,254,247,200,292,181,304,178,299,197,288,250,243,292,197"/>
+<area shape="rect" title=" " alt="" coords="247,13,395,54"/>
+<area shape="rect" href="classtesting_1_1internal_1_1_untyped_function_mocker_base.html#a819f2e6575f1245e65fc2040150b5bac" title=" " alt="" coords="5,5,199,61"/>
+<area shape="poly" title=" " alt="" coords="231,36,199,36,199,30,231,30"/>
 </map>
 </div>
 
@@ -1358,9 +1347,9 @@ Here is the caller graph for this function:</div>
 <div class="line"><span class="lineno">  117</span>    <span class="keywordflow">for</span> (<a class="code hl_typedef" href="classtesting_1_1_expectation_set.html#a133d96bcaa13be84583cf2718a1e6c69">ExpectationSet::const_iterator</a> it =</div>
 <div class="line"><span class="lineno">  118</span>             exp-&gt;immediate_prerequisites_.begin();</div>
 <div class="line"><span class="lineno">  119</span>         it != exp-&gt;immediate_prerequisites_.end(); ++it) {</div>
-<div class="line"><span class="lineno">  120</span>      <a class="code hl_function" href="#a7ba2da3ba34dfca22d2202934405e676">ExpectationBase</a>* <a class="code hl_function" href="namespacecpp_1_1ast.html#a25b104cfd21fb8487a07063b6ce62062">next</a> = it-&gt;expectation_base().get();</div>
-<div class="line"><span class="lineno">  121</span>      <span class="keywordflow">if</span> (!<a class="code hl_function" href="namespacecpp_1_1ast.html#a25b104cfd21fb8487a07063b6ce62062">next</a>-&gt;is_retired()) {</div>
-<div class="line"><span class="lineno">  122</span>        <a class="code hl_function" href="namespacecpp_1_1ast.html#a25b104cfd21fb8487a07063b6ce62062">next</a>-&gt;Retire();</div>
+<div class="line"><span class="lineno">  120</span>      <a class="code hl_function" href="#a7ba2da3ba34dfca22d2202934405e676">ExpectationBase</a>* <a class="code hl_function" href="namespaceutf8.html#afc093dfde66a6f52cb4a5caefe0e580d">next</a> = it-&gt;expectation_base().get();</div>
+<div class="line"><span class="lineno">  121</span>      <span class="keywordflow">if</span> (!<a class="code hl_function" href="namespaceutf8.html#afc093dfde66a6f52cb4a5caefe0e580d">next</a>-&gt;is_retired()) {</div>
+<div class="line"><span class="lineno">  122</span>        <a class="code hl_function" href="namespaceutf8.html#afc093dfde66a6f52cb4a5caefe0e580d">next</a>-&gt;Retire();</div>
 <div class="line"><span class="lineno">  123</span>        expectations.push_back(next);</div>
 <div class="line"><span class="lineno">  124</span>      }</div>
 <div class="line"><span class="lineno">  125</span>    }</div>

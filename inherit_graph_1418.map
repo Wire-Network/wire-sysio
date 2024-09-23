@@ -1,3 +1,7 @@
 <map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
-<area shape="rect" id="Node000000" href="$structstd_1_1tr1_1_1tuple__size_3_01_g_t_e_s_t__4___t_u_p_l_e___07_t_08_01_4.html" title=" " alt="" coords="5,5,182,46"/>
+<area shape="rect" id="Node000000" href="$structsysio_1_1buffer__factory.html" title=" " alt="" coords="5,42,146,68"/>
+<area shape="rect" id="Node000001" href="$structsysio_1_1block__buffer__factory.html" title=" " alt="" coords="209,5,340,46"/>
+<area shape="poly" id="edge581_Node000000_Node000001" title=" " alt="" coords="161,40,208,33,209,38,162,45"/>
+<area shape="rect" id="Node000002" href="$structsysio_1_1trx__buffer__factory.html" title=" " alt="" coords="194,70,356,96"/>
+<area shape="poly" id="edge582_Node000000_Node000002" title=" " alt="" coords="162,64,193,69,193,74,161,70"/>
 </map>

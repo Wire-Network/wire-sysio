@@ -1,7 +1,5 @@
 <map id="Catch::TagAliasRegistry::add" name="Catch::TagAliasRegistry::add">
-<area shape="rect" id="Node000001" title=" " alt="" coords="222,42,414,68"/>
-<area shape="rect" id="Node000002" href="$classvalidate__reflection_1_1_empty_scope.html#a1fb4f76506790294268dc078986d7430" title=" " alt="" coords="5,5,174,46"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="206,43,174,39,175,34,207,38"/>
-<area shape="rect" id="Node000003" href="$_tag_8tests_8cpp.html#a43ab70fddf12722cf416418b1b17c08d" title=" " alt="" coords="40,70,139,96"/>
-<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="207,71,140,80,139,74,206,66"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="153,5,345,31"/>
+<area shape="rect" id="Node000002" href="$_tag_8tests_8cpp.html#a43ab70fddf12722cf416418b1b17c08d" title=" " alt="" coords="5,5,105,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="137,21,105,21,105,16,137,16"/>
 </map>

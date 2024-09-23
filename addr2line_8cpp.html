@@ -221,7 +221,7 @@ Here is the caller graph for this function:</div>
 <div class="line"><span class="lineno">   55</span>   <span class="keywordtype">bool</span> print_functions = <span class="keyword">false</span>;</div>
 <div class="line"><span class="lineno">   56</span>   <span class="keywordtype">bool</span> pretty = <span class="keyword">false</span>;</div>
 <div class="line"><span class="lineno">   57</span>   std::vector&lt;std::string&gt; addresses;</div>
-<div class="line"><span class="lineno">   58</span>   std::string <a class="code hl_variable" href="namespaceembed_clara.html#a1e1bd594f85f58f5dca6c41c0ac720fb">filename</a> = <span class="stringliteral">&quot;a.out&quot;</span>;</div>
+<div class="line"><span class="lineno">   58</span>   std::string filename = <span class="stringliteral">&quot;a.out&quot;</span>;</div>
 <div class="line"><span class="lineno">   59</span>   <span class="keywordflow">for</span>(<span class="keywordtype">int</span> i = 1; i &lt; argc; ++i) {</div>
 <div class="line"><span class="lineno">   60</span>      std::string arg = <a class="code hl_variable" href="hello__driver_8cpp.html#af2efa898e9eed6fe6715279cb1ec35b0">argv</a>[i];</div>
 <div class="line"><span class="lineno">   61</span>      <span class="keywordflow">if</span>(arg == <span class="stringliteral">&quot;-h&quot;</span> || arg == <span class="stringliteral">&quot;--help&quot;</span>) {</div>
@@ -233,13 +233,13 @@ Here is the caller graph for this function:</div>
 <div class="line"><span class="lineno">   67</span>         <span class="comment">// Ignore requests to demangle</span></div>
 <div class="line"><span class="lineno">   68</span>      } <span class="keywordflow">else</span> <span class="keywordflow">if</span>(arg == <span class="stringliteral">&quot;-e&quot;</span>) {</div>
 <div class="line"><span class="lineno">   69</span>         <span class="keywordflow">if</span>(++i &lt; argc) {</div>
-<div class="line"><span class="lineno">   70</span>            <a class="code hl_variable" href="namespaceembed_clara.html#a1e1bd594f85f58f5dca6c41c0ac720fb">filename</a> = <a class="code hl_variable" href="hello__driver_8cpp.html#af2efa898e9eed6fe6715279cb1ec35b0">argv</a>[i];</div>
+<div class="line"><span class="lineno">   70</span>            filename = <a class="code hl_variable" href="hello__driver_8cpp.html#af2efa898e9eed6fe6715279cb1ec35b0">argv</a>[i];</div>
 <div class="line"><span class="lineno">   71</span>         } <span class="keywordflow">else</span> {</div>
 <div class="line"><span class="lineno">   72</span>            std::cerr &lt;&lt; <span class="stringliteral">&quot;Missing argument to -e&quot;</span> &lt;&lt; std::endl;</div>
 <div class="line"><span class="lineno">   73</span>            <span class="keywordflow">return</span> 2;</div>
 <div class="line"><span class="lineno">   74</span>         }</div>
 <div class="line"><span class="lineno">   75</span>      } <span class="keywordflow">else</span> <span class="keywordflow">if</span>(<a class="code hl_function" href="#af098af211275a41a03419345d18a8a59">starts_with</a>(arg, <span class="stringliteral">&quot;--exe=&quot;</span>)) {</div>
-<div class="line"><span class="lineno">   76</span>         <a class="code hl_variable" href="namespaceembed_clara.html#a1e1bd594f85f58f5dca6c41c0ac720fb">filename</a> = arg.substr(6);</div>
+<div class="line"><span class="lineno">   76</span>         filename = arg.substr(6);</div>
 <div class="line"><span class="lineno">   77</span>      } <span class="keywordflow">else</span> <span class="keywordflow">if</span>(arg == <span class="stringliteral">&quot;-f&quot;</span> || arg == <span class="stringliteral">&quot;--functions&quot;</span>) {</div>
 <div class="line"><span class="lineno">   78</span>         print_functions = <span class="keyword">true</span>;</div>
 <div class="line"><span class="lineno">   79</span>      } <span class="keywordflow">else</span> <span class="keywordflow">if</span>(arg == <span class="stringliteral">&quot;-s&quot;</span> || arg == <span class="stringliteral">&quot;--basenames&quot;</span>) {</div>
@@ -262,8 +262,8 @@ Here is the caller graph for this function:</div>
 <div class="line"><span class="lineno">   96</span>   <span class="keyword">auto</span> code = <a class="code hl_function" href="fuzz__parser_8cpp.html#ab6d9537f94c320b20d681495d7f93099">read_wasm</a>(filename);</div>
 <div class="line"><span class="lineno">   97</span>   <a class="code hl_struct" href="structnm__debug__info.html">nm_debug_info</a> info;</div>
 <div class="line"><span class="lineno">   98</span>   <span class="keyword">module</span> mod;</div>
-<div class="line"><span class="lineno">   99</span>   <a class="code hl_class" href="classsysio_1_1vm_1_1binary__parser.html">binary_parser&lt;null_writer, nm_options, nm_debug_info&gt;</a> <a class="code hl_variable" href="namespaceupload.html#af9e508d19dc2dd9cdb7c642dde0bdd21">parser</a>(mod.allocator);</div>
-<div class="line"><span class="lineno">  100</span>   <a class="code hl_variable" href="namespaceupload.html#af9e508d19dc2dd9cdb7c642dde0bdd21">parser</a>.parse_module(code, mod, info);</div>
+<div class="line"><span class="lineno">   99</span>   <a class="code hl_class" href="classsysio_1_1vm_1_1binary__parser.html">binary_parser&lt;null_writer, nm_options, nm_debug_info&gt;</a> parser(mod.allocator);</div>
+<div class="line"><span class="lineno">  100</span>   parser.parse_module(code, mod, info);</div>
 <div class="line"><span class="lineno">  101</span>   {</div>
 <div class="line"><span class="lineno">  102</span>      <span class="keywordflow">for</span>(std::size_t i = 0; i &lt; info.function_offsets.size(); ++i) {</div>
 <div class="line"><span class="lineno">  103</span>         <span class="keywordflow">if</span>(<a class="code hl_class" href="classsysio_1_1vm_1_1managed__vector.html">guarded_vector&lt;uint8_t&gt;</a>* <a class="code hl_struct" href="structsysio_1_1chain_1_1name.html">name</a> = <a class="code hl_function" href="#a0c79579de6b0e6b2ab9145d9ae03da59">find_export_name</a>(mod, i + mod.get_imported_functions_size())) {</div>
@@ -304,9 +304,7 @@ Here is the caller graph for this function:</div>
 <div class="ttc" id="aclasssysio_1_1vm_1_1managed__vector_html"><div class="ttname"><a href="classsysio_1_1vm_1_1managed__vector.html">sysio::vm::managed_vector</a></div><div class="ttdef"><b>Definition</b> <a href="sys-vm_2include_2sysio_2vm_2vector_8hpp_source.html#l00101">vector.hpp:101</a></div></div>
 <div class="ttc" id="afuzz__parser_8cpp_html_ab6d9537f94c320b20d681495d7f93099"><div class="ttname"><a href="fuzz__parser_8cpp.html#ab6d9537f94c320b20d681495d7f93099">read_wasm</a></div><div class="ttdeci">std::vector&lt; uint8_t &gt; read_wasm(const std::string &amp;fname)</div><div class="ttdef"><b>Definition</b> <a href="fuzz__parser_8cpp_source.html#l00011">fuzz_parser.cpp:11</a></div></div>
 <div class="ttc" id="ahello__driver_8cpp_html_af2efa898e9eed6fe6715279cb1ec35b0"><div class="ttname"><a href="hello__driver_8cpp.html#af2efa898e9eed6fe6715279cb1ec35b0">argv</a></div><div class="ttdeci">char ** argv</div><div class="ttdef"><b>Definition</b> <a href="hello__driver_8cpp_source.html#l00052">hello_driver.cpp:52</a></div></div>
-<div class="ttc" id="anamespaceembed_clara_html_a1e1bd594f85f58f5dca6c41c0ac720fb"><div class="ttname"><a href="namespaceembed_clara.html#a1e1bd594f85f58f5dca6c41c0ac720fb">embedClara.filename</a></div><div class="ttdeci">filename</div><div class="ttdef"><b>Definition</b> <a href="embed_clara_8py_source.html#l00010">embedClara.py:10</a></div></div>
 <div class="ttc" id="anamespacesysio_1_1vm_html"><div class="ttname"><a href="namespacesysio_1_1vm.html">sysio::vm</a></div><div class="ttdef"><b>Definition</b> <a href="controller_8hpp_source.html#l00023">controller.hpp:23</a></div></div>
-<div class="ttc" id="anamespaceupload_html_af9e508d19dc2dd9cdb7c642dde0bdd21"><div class="ttname"><a href="namespaceupload.html#af9e508d19dc2dd9cdb7c642dde0bdd21">upload.parser</a></div><div class="ttdeci">parser</div><div class="ttdef"><b>Definition</b> <a href="googlemock_2scripts_2upload_8py_source.html#l00392">upload.py:392</a></div></div>
 <div class="ttc" id="astructnm__debug__info_html"><div class="ttname"><a href="structnm__debug__info.html">nm_debug_info</a></div><div class="ttdef"><b>Definition</b> <a href="addr2line_8cpp_source.html#l00006">addr2line.cpp:6</a></div></div>
 <div class="ttc" id="astructsysio_1_1chain_1_1name_html"><div class="ttname"><a href="structsysio_1_1chain_1_1name.html">sysio::chain::name</a></div><div class="ttdoc">Immutable except for fc::from_variant.</div><div class="ttdef"><b>Definition</b> <a href="name_8hpp_source.html#l00043">name.hpp:43</a></div></div>
 </div><!-- fragment --><div class="dynheader">
@@ -314,13 +312,15 @@ Here is the call graph for this function:</div>
 <div class="dyncontent">
 <div class="center"><img src="addr2line_8cpp_a217dbf8b442f20279ea00b898af96f52_cgraph.png" border="0" usemap="#aaddr2line_8cpp_a217dbf8b442f20279ea00b898af96f52_cgraph" alt=""/></div>
 <map name="aaddr2line_8cpp_a217dbf8b442f20279ea00b898af96f52_cgraph" id="aaddr2line_8cpp_a217dbf8b442f20279ea00b898af96f52_cgraph">
-<area shape="rect" title=" " alt="" coords="5,55,55,80"/>
-<area shape="rect" href="addr2line_8cpp.html#a0c79579de6b0e6b2ab9145d9ae03da59" title=" " alt="" coords="103,5,227,31"/>
-<area shape="poly" title=" " alt="" coords="54,56,113,34,114,39,56,61"/>
-<area shape="rect" href="fuzz__parser_8cpp.html#ab6d9537f94c320b20d681495d7f93099" title=" " alt="" coords="121,55,209,80"/>
-<area shape="poly" title=" " alt="" coords="55,65,105,65,105,70,55,70"/>
-<area shape="rect" href="addr2line_8cpp.html#af098af211275a41a03419345d18a8a59" title=" " alt="" coords="122,104,208,130"/>
-<area shape="poly" title=" " alt="" coords="56,74,114,96,113,101,54,79"/>
+<area shape="rect" title=" " alt="" coords="5,92,55,118"/>
+<area shape="rect" href="addr2line_8cpp.html#a0c79579de6b0e6b2ab9145d9ae03da59" title=" " alt="" coords="123,5,247,31"/>
+<area shape="poly" title=" " alt="" coords="41,90,67,65,101,41,115,35,117,39,104,46,71,69,45,94"/>
+<area shape="rect" href="classsysio_1_1vm_1_1binary__parser.html#af00d693aec3f3c628a2944a5b331f32f" title=" " alt="" coords="103,55,267,96"/>
+<area shape="poly" title=" " alt="" coords="55,98,87,91,88,97,56,103"/>
+<area shape="rect" href="fuzz__parser_8cpp.html#ab6d9537f94c320b20d681495d7f93099" title=" " alt="" coords="141,120,229,146"/>
+<area shape="poly" title=" " alt="" coords="56,107,126,120,125,125,55,112"/>
+<area shape="rect" href="addr2line_8cpp.html#af098af211275a41a03419345d18a8a59" title=" " alt="" coords="142,169,228,195"/>
+<area shape="poly" title=" " alt="" coords="47,116,73,136,104,156,129,166,127,171,101,161,70,141,44,120"/>
 </map>
 </div>
 

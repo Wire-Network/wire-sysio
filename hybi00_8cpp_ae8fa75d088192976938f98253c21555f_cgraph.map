@@ -1,7 +1,13 @@
 <map id="BOOST_AUTO_TEST_CASE" name="BOOST_AUTO_TEST_CASE">
-<area shape="rect" id="Node000001" title=" " alt="" coords="5,13,202,38"/>
-<area shape="rect" id="Node000002" href="$classwebsocketpp_1_1processor_1_1hybi00.html#a919aaed345cab679875be1d95c7302ec" title="Prepare a message for writing." alt="" coords="250,5,440,46"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="202,23,234,23,234,28,202,28"/>
-<area shape="rect" id="Node000003" href="$namespacewebsocketpp_1_1utf8__validator.html#ad088137c6f18e6844e20496d8782c835" title="Validate a UTF8 string." alt="" coords="488,5,672,46"/>
-<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="440,23,472,23,472,28,440,28"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,46,202,72"/>
+<area shape="rect" id="Node000002" href="$classwebsocketpp_1_1processor_1_1hybi00.html#a919aaed345cab679875be1d95c7302ec" title="Prepare a message for writing." alt="" coords="250,39,440,79"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="202,56,234,56,234,62,202,62"/>
+<area shape="rect" id="Node000003" href="$namespacewebsocketpp_1_1utf8__validator.html#ad088137c6f18e6844e20496d8782c835" title="Validate a UTF8 string." alt="" coords="488,39,672,79"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="440,56,472,56,472,62,440,62"/>
+<area shape="rect" id="Node000004" href="$classwebsocketpp_1_1utf8__validator_1_1validator.html#a89deb3bdfd8b94da908b806e543491ba" title="Return whether the input sequence ended on a valid utf8 codepoint." alt="" coords="720,5,905,46"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="673,43,704,38,705,44,673,48"/>
+<area shape="rect" id="Node000005" href="$classwebsocketpp_1_1utf8__validator_1_1validator.html#a2cde6cad6f1a0f66674010848ec80fba" title="Advance validator state with input from an iterator pair." alt="" coords="720,71,905,111"/>
+<area shape="poly" id="edge4_Node000003_Node000005" title=" " alt="" coords="673,69,705,74,704,79,673,74"/>
+<area shape="rect" id="Node000006" href="$namespacewebsocketpp_1_1utf8__validator.html#ae6dab1acad72af0396e2448394a07d98" title="Decode the next byte of a UTF8 sequence." alt="" coords="953,71,1137,111"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="905,88,937,88,937,94,905,94"/>
 </map>

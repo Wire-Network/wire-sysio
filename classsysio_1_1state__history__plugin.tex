@@ -6,7 +6,8 @@
 
 
 
-Inheritance diagram for sysio\+::state\+\_\+history\+\_\+plugin\+:\nopagebreak
+Inheritance diagram for sysio\+::state\+\_\+history\+\_\+plugin\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -15,7 +16,8 @@ Inheritance diagram for sysio\+::state\+\_\+history\+\_\+plugin\+:\nopagebreak
 \end{figure}
 
 
-Collaboration diagram for sysio\+::state\+\_\+history\+\_\+plugin\+:\nopagebreak
+Collaboration diagram for sysio\+::state\+\_\+history\+\_\+plugin\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -135,7 +137,7 @@ Definition at line \mbox{\hyperlink{state__history__plugin_8cpp_source_l00459}{4
 \begin{DoxyCode}{0}
 \DoxyCodeLine{00459\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
 \DoxyCodeLine{00460\ \ \ \ \textcolor{keywordflow}{try}\ \{}
-\DoxyCodeLine{00461\ \ \ \ \ \ \ \mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp_a40c2826a6fba35c1ffbf912bdf559792}{SYS\_ASSERT}}(\mbox{\hyperlink{namespacebenchmark_compile_acf738bbf3b8391aa78929ceeceb8a03b}{options}}.at(\textcolor{stringliteral}{"{}disable-\/replay-\/opts"{}}).as<\textcolor{keywordtype}{bool}>(),\ plugin\_exception,}
+\DoxyCodeLine{00461\ \ \ \ \ \ \ \mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp_a40c2826a6fba35c1ffbf912bdf559792}{SYS\_ASSERT}}(options.at(\textcolor{stringliteral}{"{}disable-\/replay-\/opts"{}}).as<\textcolor{keywordtype}{bool}>(),\ plugin\_exception,}
 \DoxyCodeLine{00462\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}state\_history\_plugin\ requires\ -\/-\/disable-\/replay-\/opts"{}});}
 \DoxyCodeLine{00463\ }
 \DoxyCodeLine{00464\ \ \ \ \ \ \ my-\/>chain\_plug\ =\ \mbox{\hyperlink{namespaceappbase_a99374dc23934f008a09f2f79be9eae40}{app}}().\mbox{\hyperlink{classappbase_1_1application_a1d2c585f90007be342c9c64ee9cc0f7c}{find\_plugin}}<\mbox{\hyperlink{classchain__plugin}{chain\_plugin}}>();}
@@ -150,7 +152,7 @@ Definition at line \mbox{\hyperlink{state__history__plugin_8cpp_source_l00459}{4
 \DoxyCodeLine{00473\ \ \ \ \ \ \ my-\/>block\_start\_connection.emplace(}
 \DoxyCodeLine{00474\ \ \ \ \ \ \ \ \ \ \ chain.block\_start.connect([\&](\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ block\_num)\ \{\ my-\/>on\_block\_start(block\_num);\ \}));}
 \DoxyCodeLine{00475\ }
-\DoxyCodeLine{00476\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ dir\_option\ =\ \mbox{\hyperlink{namespacebenchmark_compile_acf738bbf3b8391aa78929ceeceb8a03b}{options}}.at(\textcolor{stringliteral}{"{}state-\/history-\/dir"{}}).as<bfs::path>();}
+\DoxyCodeLine{00476\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ dir\_option\ =\ options.at(\textcolor{stringliteral}{"{}state-\/history-\/dir"{}}).as<bfs::path>();}
 \DoxyCodeLine{00477\ \ \ \ \ \ \ boost::filesystem::path\ state\_history\_dir;}
 \DoxyCodeLine{00478\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (dir\_option.is\_relative())}
 \DoxyCodeLine{00479\ \ \ \ \ \ \ \ \ \ state\_history\_dir\ =\ \mbox{\hyperlink{namespaceappbase_a99374dc23934f008a09f2f79be9eae40}{app}}().\mbox{\hyperlink{classappbase_1_1application_a5dfd3cfb1124c57963fa17b3f4aabbe1}{data\_dir}}()\ /\ dir\_option;}
@@ -159,36 +161,36 @@ Definition at line \mbox{\hyperlink{state__history__plugin_8cpp_source_l00459}{4
 \DoxyCodeLine{00482\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\textcolor{keyword}{auto}\ resmon\_plugin\ =\ \mbox{\hyperlink{namespaceappbase_a99374dc23934f008a09f2f79be9eae40}{app}}().find\_plugin<resource\_monitor\_plugin>())}
 \DoxyCodeLine{00483\ \ \ \ \ \ \ \ \ \ resmon\_plugin-\/>monitor\_directory(state\_history\_dir);}
 \DoxyCodeLine{00484\ }
-\DoxyCodeLine{00485\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ ip\_port\ \ \ \ \ \ \ \ \ =\ \mbox{\hyperlink{namespacebenchmark_compile_acf738bbf3b8391aa78929ceeceb8a03b}{options}}.at(\textcolor{stringliteral}{"{}state-\/history-\/endpoint"{}}).as<\textcolor{keywordtype}{string}>();}
+\DoxyCodeLine{00485\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ ip\_port\ \ \ \ \ \ \ \ \ =\ options.at(\textcolor{stringliteral}{"{}state-\/history-\/endpoint"{}}).as<\textcolor{keywordtype}{string}>();}
 \DoxyCodeLine{00486\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ port\ \ \ \ \ \ \ \ \ \ \ \ =\ ip\_port.substr(ip\_port.find(\textcolor{charliteral}{':'})\ +\ 1,\ ip\_port.size());}
 \DoxyCodeLine{00487\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ host\ \ \ \ \ \ \ \ \ \ \ \ =\ ip\_port.substr(0,\ ip\_port.find(\textcolor{charliteral}{':'}));}
 \DoxyCodeLine{00488\ \ \ \ \ \ \ my-\/>endpoint\_address\ =\ \mbox{\hyperlink{programs_2sysio-launcher_2main_8cpp_a8d747b8417c90b78c386111de7934753}{host}};}
 \DoxyCodeLine{00489\ \ \ \ \ \ \ my-\/>endpoint\_port\ \ \ \ =\ std::stoi(port);}
 \DoxyCodeLine{00490\ \ \ \ \ \ \ \mbox{\hyperlink{logger_8hpp_ac7f967269d8cfcc4cab16d2ec7a04b91}{idump}}((ip\_port)(host)(port));}
 \DoxyCodeLine{00491\ }
-\DoxyCodeLine{00492\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{namespacebenchmark_compile_acf738bbf3b8391aa78929ceeceb8a03b}{options}}.at(\textcolor{stringliteral}{"{}delete-\/state-\/history"{}}).as<\textcolor{keywordtype}{bool}>())\ \{}
+\DoxyCodeLine{00492\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (options.at(\textcolor{stringliteral}{"{}delete-\/state-\/history"{}}).as<\textcolor{keywordtype}{bool}>())\ \{}
 \DoxyCodeLine{00493\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{logger_8hpp_a831cf08dc63704c11fd154132c6e8bdb}{ilog}}(\textcolor{stringliteral}{"{}Deleting\ state\ history"{}});}
 \DoxyCodeLine{00494\ \ \ \ \ \ \ \ \ \ boost::filesystem::remove\_all(state\_history\_dir);}
 \DoxyCodeLine{00495\ \ \ \ \ \ \ \}}
 \DoxyCodeLine{00496\ \ \ \ \ \ \ boost::filesystem::create\_directories(state\_history\_dir);}
 \DoxyCodeLine{00497\ }
-\DoxyCodeLine{00498\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{namespacebenchmark_compile_acf738bbf3b8391aa78929ceeceb8a03b}{options}}.at(\textcolor{stringliteral}{"{}trace-\/history-\/debug-\/mode"{}}).as<\textcolor{keywordtype}{bool}>())\ \{}
+\DoxyCodeLine{00498\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (options.at(\textcolor{stringliteral}{"{}trace-\/history-\/debug-\/mode"{}}).as<\textcolor{keywordtype}{bool}>())\ \{}
 \DoxyCodeLine{00499\ \ \ \ \ \ \ \ \ \ my-\/>trace\_debug\_mode\ =\ \textcolor{keyword}{true};}
 \DoxyCodeLine{00500\ \ \ \ \ \ \ \}}
 \DoxyCodeLine{00501\ }
 \DoxyCodeLine{00502\ \ \ \ \ \ \ std::optional<state\_history\_log\_prune\_config>\ ship\_log\_prune\_conf;}
-\DoxyCodeLine{00503\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{namespacebenchmark_compile_acf738bbf3b8391aa78929ceeceb8a03b}{options}}.count(\textcolor{stringliteral}{"{}state-\/history-\/log-\/retain-\/blocks"{}}))\ \{}
+\DoxyCodeLine{00503\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (options.count(\textcolor{stringliteral}{"{}state-\/history-\/log-\/retain-\/blocks"{}}))\ \{}
 \DoxyCodeLine{00504\ \ \ \ \ \ \ \ \ \ ship\_log\_prune\_conf.emplace();}
-\DoxyCodeLine{00505\ \ \ \ \ \ \ \ \ \ ship\_log\_prune\_conf-\/>prune\_blocks\ =\ \mbox{\hyperlink{namespacebenchmark_compile_acf738bbf3b8391aa78929ceeceb8a03b}{options}}.at(\textcolor{stringliteral}{"{}state-\/history-\/log-\/retain-\/blocks"{}}).as<\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}>();}
+\DoxyCodeLine{00505\ \ \ \ \ \ \ \ \ \ ship\_log\_prune\_conf-\/>prune\_blocks\ =\ options.at(\textcolor{stringliteral}{"{}state-\/history-\/log-\/retain-\/blocks"{}}).as<\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}>();}
 \DoxyCodeLine{00506\ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//the\ arbitrary\ limit\ of\ 1000\ here\ is\ mainly\ so\ that\ there\ is\ enough\ buffer\ for\ newly\ applied\ forks\ to\ be\ delivered\ to\ clients}}
 \DoxyCodeLine{00507\ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ before\ getting\ pruned\ out.\ ideally\ pruning\ would\ have\ been\ smart\ enough\ to\ know\ not\ to\ prune\ reversible\ blocks}}
 \DoxyCodeLine{00508\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp_a40c2826a6fba35c1ffbf912bdf559792}{SYS\_ASSERT}}(ship\_log\_prune\_conf-\/>prune\_blocks\ >=\ 1000,\ plugin\_exception,\ \textcolor{stringliteral}{"{}state-\/history-\/log-\/retain-\/blocks\ must\ be\ 1000\ blocks\ or\ greater"{}});}
 \DoxyCodeLine{00509\ \ \ \ \ \ \ \}}
 \DoxyCodeLine{00510\ }
-\DoxyCodeLine{00511\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{namespacebenchmark_compile_acf738bbf3b8391aa78929ceeceb8a03b}{options}}.at(\textcolor{stringliteral}{"{}trace-\/history"{}}).as<\textcolor{keywordtype}{bool}>())}
+\DoxyCodeLine{00511\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (options.at(\textcolor{stringliteral}{"{}trace-\/history"{}}).as<\textcolor{keywordtype}{bool}>())}
 \DoxyCodeLine{00512\ \ \ \ \ \ \ \ \ \ my-\/>trace\_log.emplace(\textcolor{stringliteral}{"{}trace\_history"{}},\ (state\_history\_dir\ /\ \textcolor{stringliteral}{"{}trace\_history.log"{}}).\textcolor{keywordtype}{string}(),}
 \DoxyCodeLine{00513\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (state\_history\_dir\ /\ \textcolor{stringliteral}{"{}trace\_history.index"{}}).\textcolor{keywordtype}{string}(),\ ship\_log\_prune\_conf);}
-\DoxyCodeLine{00514\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{namespacebenchmark_compile_acf738bbf3b8391aa78929ceeceb8a03b}{options}}.at(\textcolor{stringliteral}{"{}chain-\/state-\/history"{}}).as<\textcolor{keywordtype}{bool}>())}
+\DoxyCodeLine{00514\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (options.at(\textcolor{stringliteral}{"{}chain-\/state-\/history"{}}).as<\textcolor{keywordtype}{bool}>())}
 \DoxyCodeLine{00515\ \ \ \ \ \ \ \ \ \ my-\/>chain\_state\_log.emplace(\textcolor{stringliteral}{"{}chain\_state\_history"{}},\ (state\_history\_dir\ /\ \textcolor{stringliteral}{"{}chain\_state\_history.log"{}}).\textcolor{keywordtype}{string}(),}
 \DoxyCodeLine{00516\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (state\_history\_dir\ /\ \textcolor{stringliteral}{"{}chain\_state\_history.index"{}}).\textcolor{keywordtype}{string}(),\ ship\_log\_prune\_conf);}
 \DoxyCodeLine{00517\ \ \ \ \}}
@@ -196,7 +198,8 @@ Definition at line \mbox{\hyperlink{state__history__plugin_8cpp_source_l00459}{4
 \DoxyCodeLine{00519\ \}\ \textcolor{comment}{//\ state\_history\_plugin::plugin\_initialize}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -257,23 +260,24 @@ Definition at line \mbox{\hyperlink{state__history__plugin_8cpp_source_l00443}{4
 
 \begin{DoxyCode}{0}
 \DoxyCodeLine{00443\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
-\DoxyCodeLine{00444\ \ \ \ \textcolor{keyword}{auto}\ \mbox{\hyperlink{namespacebenchmark_compile_acf738bbf3b8391aa78929ceeceb8a03b}{options}}\ =\ cfg.add\_options();}
-\DoxyCodeLine{00445\ \ \ \ \mbox{\hyperlink{namespacebenchmark_compile_acf738bbf3b8391aa78929ceeceb8a03b}{options}}(\textcolor{stringliteral}{"{}state-\/history-\/dir"{}},\ bpo::value<bfs::path>()-\/>default\_value(\textcolor{stringliteral}{"{}state-\/history"{}}),}
+\DoxyCodeLine{00444\ \ \ \ \textcolor{keyword}{auto}\ options\ =\ cfg.add\_options();}
+\DoxyCodeLine{00445\ \ \ \ options(\textcolor{stringliteral}{"{}state-\/history-\/dir"{}},\ bpo::value<bfs::path>()-\/>default\_value(\textcolor{stringliteral}{"{}state-\/history"{}}),}
 \DoxyCodeLine{00446\ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}the\ location\ of\ the\ state-\/history\ directory\ (absolute\ path\ or\ relative\ to\ application\ data\ dir)"{}});}
 \DoxyCodeLine{00447\ \ \ \ \mbox{\hyperlink{xbyak__mnemonic_8h_a4229a9b84f8b8673326f12bd41acd27c}{cli}}.add\_options()(\textcolor{stringliteral}{"{}delete-\/state-\/history"{}},\ bpo::bool\_switch()-\/>default\_value(\textcolor{keyword}{false}),\ \textcolor{stringliteral}{"{}clear\ state\ history\ files"{}});}
-\DoxyCodeLine{00448\ \ \ \ \mbox{\hyperlink{namespacebenchmark_compile_acf738bbf3b8391aa78929ceeceb8a03b}{options}}(\textcolor{stringliteral}{"{}trace-\/history"{}},\ bpo::bool\_switch()-\/>default\_value(\textcolor{keyword}{false}),\ \textcolor{stringliteral}{"{}enable\ trace\ history"{}});}
-\DoxyCodeLine{00449\ \ \ \ \mbox{\hyperlink{namespacebenchmark_compile_acf738bbf3b8391aa78929ceeceb8a03b}{options}}(\textcolor{stringliteral}{"{}chain-\/state-\/history"{}},\ bpo::bool\_switch()-\/>default\_value(\textcolor{keyword}{false}),\ \textcolor{stringliteral}{"{}enable\ chain\ state\ history"{}});}
-\DoxyCodeLine{00450\ \ \ \ \mbox{\hyperlink{namespacebenchmark_compile_acf738bbf3b8391aa78929ceeceb8a03b}{options}}(\textcolor{stringliteral}{"{}state-\/history-\/endpoint"{}},\ bpo::value<string>()-\/>default\_value(\textcolor{stringliteral}{"{}127.0.0.1:8080"{}}),}
+\DoxyCodeLine{00448\ \ \ \ options(\textcolor{stringliteral}{"{}trace-\/history"{}},\ bpo::bool\_switch()-\/>default\_value(\textcolor{keyword}{false}),\ \textcolor{stringliteral}{"{}enable\ trace\ history"{}});}
+\DoxyCodeLine{00449\ \ \ \ options(\textcolor{stringliteral}{"{}chain-\/state-\/history"{}},\ bpo::bool\_switch()-\/>default\_value(\textcolor{keyword}{false}),\ \textcolor{stringliteral}{"{}enable\ chain\ state\ history"{}});}
+\DoxyCodeLine{00450\ \ \ \ options(\textcolor{stringliteral}{"{}state-\/history-\/endpoint"{}},\ bpo::value<string>()-\/>default\_value(\textcolor{stringliteral}{"{}127.0.0.1:8080"{}}),}
 \DoxyCodeLine{00451\ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}the\ endpoint\ upon\ which\ to\ listen\ for\ incoming\ connections.\ Caution:\ only\ expose\ this\ port\ to\ "{}}}
 \DoxyCodeLine{00452\ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}your\ internal\ network."{}});}
-\DoxyCodeLine{00453\ \ \ \ \mbox{\hyperlink{namespacebenchmark_compile_acf738bbf3b8391aa78929ceeceb8a03b}{options}}(\textcolor{stringliteral}{"{}trace-\/history-\/debug-\/mode"{}},\ bpo::bool\_switch()-\/>default\_value(\textcolor{keyword}{false}),\ \textcolor{stringliteral}{"{}enable\ debug\ mode\ for\ trace\ history"{}});}
+\DoxyCodeLine{00453\ \ \ \ options(\textcolor{stringliteral}{"{}trace-\/history-\/debug-\/mode"{}},\ bpo::bool\_switch()-\/>default\_value(\textcolor{keyword}{false}),\ \textcolor{stringliteral}{"{}enable\ debug\ mode\ for\ trace\ history"{}});}
 \DoxyCodeLine{00454\ }
 \DoxyCodeLine{00455\ \ \ \ \textcolor{keywordflow}{if}(\mbox{\hyperlink{classfc_1_1cfile_a36ffef39be181b5580952817617ccf24}{cfile::supports\_hole\_punching}}())}
-\DoxyCodeLine{00456\ \ \ \ \ \ \ \mbox{\hyperlink{namespacebenchmark_compile_acf738bbf3b8391aa78929ceeceb8a03b}{options}}(\textcolor{stringliteral}{"{}state-\/history-\/log-\/retain-\/blocks"{}},\ bpo::value<uint32\_t>(),\ \textcolor{stringliteral}{"{}if\ set,\ periodically\ prune\ the\ state\ history\ files\ to\ store\ only\ configured\ number\ of\ most\ recent\ blocks"{}});}
+\DoxyCodeLine{00456\ \ \ \ \ \ \ options(\textcolor{stringliteral}{"{}state-\/history-\/log-\/retain-\/blocks"{}},\ bpo::value<uint32\_t>(),\ \textcolor{stringliteral}{"{}if\ set,\ periodically\ prune\ the\ state\ history\ files\ to\ store\ only\ configured\ number\ of\ most\ recent\ blocks"{}});}
 \DoxyCodeLine{00457\ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode

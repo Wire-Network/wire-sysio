@@ -112,7 +112,7 @@ $(function(){initNavTree('sortkeys_8cpp_source.html',''); initResizable(true); }
 <div class="line"><a id="l00011" name="l00011"></a><span class="lineno">   11</span><span class="keyword">static</span> <span class="keywordtype">void</span> printIt(<span class="keyword">const</span> <a class="code hl_class" href="class_generic_value.html">Value</a> &amp;doc) {</div>
 <div class="line"><a id="l00012" name="l00012"></a><span class="lineno">   12</span>    <span class="keywordtype">char</span> writeBuffer[65536];</div>
 <div class="line"><a id="l00013" name="l00013"></a><span class="lineno">   13</span>    <a class="code hl_class" href="class_file_write_stream.html">FileWriteStream</a> <a class="code hl_variable" href="environment_8hpp.html#a3951483d0b31c29ca95336206cd35238">os</a>(stdout, writeBuffer, <span class="keyword">sizeof</span>(writeBuffer));</div>
-<div class="line"><a id="l00014" name="l00014"></a><span class="lineno">   14</span>    <a class="code hl_class" href="class_pretty_writer.html">PrettyWriter&lt;FileWriteStream&gt;</a> writer(os);</div>
+<div class="line"><a id="l00014" name="l00014"></a><span class="lineno">   14</span>    <a class="code hl_class" href="class_pretty_writer.html">PrettyWriter&lt;FileWriteStream&gt;</a> writer(<a class="code hl_variable" href="environment_8hpp.html#a3951483d0b31c29ca95336206cd35238">os</a>);</div>
 <div class="line"><a id="l00015" name="l00015"></a><span class="lineno">   15</span>    doc.Accept(writer);</div>
 <div class="line"><a id="l00016" name="l00016"></a><span class="lineno">   16</span>    cout &lt;&lt; endl;</div>
 <div class="line"><a id="l00017" name="l00017"></a><span class="lineno">   17</span>}</div>

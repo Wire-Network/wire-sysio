@@ -86,7 +86,7 @@
 \DoxyCodeLine{\Hypertarget{gmock-cardinalities_8cc_source_l00082}00082\ \ \ \ \ \textcolor{keywordflow}{return}\ call\_count\ >=\ max\_;}
 \DoxyCodeLine{\Hypertarget{gmock-cardinalities_8cc_source_l00083}00083\ \ \ \}}
 \DoxyCodeLine{\Hypertarget{gmock-cardinalities_8cc_source_l00084}00084\ }
-\DoxyCodeLine{\Hypertarget{gmock-cardinalities_8cc_source_l00085}00085\ \ \ \textcolor{keyword}{virtual}\ \textcolor{keywordtype}{void}\ DescribeTo(::std::ostream*\ os)\ \textcolor{keyword}{const};}
+\DoxyCodeLine{\Hypertarget{gmock-cardinalities_8cc_source_l00085}00085\ \ \ \textcolor{keyword}{virtual}\ \textcolor{keywordtype}{void}\ DescribeTo(::std::ostream*\ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}})\ \textcolor{keyword}{const};}
 \DoxyCodeLine{\Hypertarget{gmock-cardinalities_8cc_source_l00086}00086\ }
 \DoxyCodeLine{\Hypertarget{gmock-cardinalities_8cc_source_l00087}00087\ \ \textcolor{keyword}{private}:}
 \DoxyCodeLine{\Hypertarget{gmock-cardinalities_8cc_source_l00088}00088\ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{int}\ min\_;}
@@ -109,22 +109,22 @@
 \DoxyCodeLine{\Hypertarget{gmock-cardinalities_8cc_source_l00105}00105\ \}}
 \DoxyCodeLine{\Hypertarget{gmock-cardinalities_8cc_source_l00106}00106\ }
 \DoxyCodeLine{\Hypertarget{gmock-cardinalities_8cc_source_l00107}00107\ \textcolor{comment}{//\ Describes\ the\ Between(m,\ n)\ cardinality\ in\ human-\/friendly\ text.}}
-\DoxyCodeLine{\Hypertarget{gmock-cardinalities_8cc_source_l00108}00108\ \textcolor{keywordtype}{void}\ BetweenCardinalityImpl::DescribeTo(::std::ostream*\ os)\textcolor{keyword}{\ const\ }\{}
+\DoxyCodeLine{\Hypertarget{gmock-cardinalities_8cc_source_l00108}00108\ \textcolor{keywordtype}{void}\ BetweenCardinalityImpl::DescribeTo(::std::ostream*\ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}})\textcolor{keyword}{\ const\ }\{}
 \DoxyCodeLine{\Hypertarget{gmock-cardinalities_8cc_source_l00109}00109\ \ \ \textcolor{keywordflow}{if}\ (min\_\ ==\ 0)\ \{}
 \DoxyCodeLine{\Hypertarget{gmock-cardinalities_8cc_source_l00110}00110\ \ \ \ \ \textcolor{keywordflow}{if}\ (max\_\ ==\ 0)\ \{}
-\DoxyCodeLine{\Hypertarget{gmock-cardinalities_8cc_source_l00111}00111\ \ \ \ \ \ \ *os\ <<\ \textcolor{stringliteral}{"{}never\ called"{}};}
+\DoxyCodeLine{\Hypertarget{gmock-cardinalities_8cc_source_l00111}00111\ \ \ \ \ \ \ *\mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}\ <<\ \textcolor{stringliteral}{"{}never\ called"{}};}
 \DoxyCodeLine{\Hypertarget{gmock-cardinalities_8cc_source_l00112}00112\ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}\ (max\_\ ==\ INT\_MAX)\ \{}
-\DoxyCodeLine{\Hypertarget{gmock-cardinalities_8cc_source_l00113}00113\ \ \ \ \ \ \ *os\ <<\ \textcolor{stringliteral}{"{}called\ any\ number\ of\ times"{}};}
+\DoxyCodeLine{\Hypertarget{gmock-cardinalities_8cc_source_l00113}00113\ \ \ \ \ \ \ *\mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}\ <<\ \textcolor{stringliteral}{"{}called\ any\ number\ of\ times"{}};}
 \DoxyCodeLine{\Hypertarget{gmock-cardinalities_8cc_source_l00114}00114\ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
-\DoxyCodeLine{\Hypertarget{gmock-cardinalities_8cc_source_l00115}00115\ \ \ \ \ \ \ *os\ <<\ \textcolor{stringliteral}{"{}called\ at\ most\ "{}}\ <<\ FormatTimes(max\_);}
+\DoxyCodeLine{\Hypertarget{gmock-cardinalities_8cc_source_l00115}00115\ \ \ \ \ \ \ *\mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}\ <<\ \textcolor{stringliteral}{"{}called\ at\ most\ "{}}\ <<\ FormatTimes(max\_);}
 \DoxyCodeLine{\Hypertarget{gmock-cardinalities_8cc_source_l00116}00116\ \ \ \ \ \}}
 \DoxyCodeLine{\Hypertarget{gmock-cardinalities_8cc_source_l00117}00117\ \ \ \}\ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}\ (min\_\ ==\ max\_)\ \{}
-\DoxyCodeLine{\Hypertarget{gmock-cardinalities_8cc_source_l00118}00118\ \ \ \ \ *os\ <<\ \textcolor{stringliteral}{"{}called\ "{}}\ <<\ FormatTimes(min\_);}
+\DoxyCodeLine{\Hypertarget{gmock-cardinalities_8cc_source_l00118}00118\ \ \ \ \ *\mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}\ <<\ \textcolor{stringliteral}{"{}called\ "{}}\ <<\ FormatTimes(min\_);}
 \DoxyCodeLine{\Hypertarget{gmock-cardinalities_8cc_source_l00119}00119\ \ \ \}\ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}\ (max\_\ ==\ INT\_MAX)\ \{}
-\DoxyCodeLine{\Hypertarget{gmock-cardinalities_8cc_source_l00120}00120\ \ \ \ \ *os\ <<\ \textcolor{stringliteral}{"{}called\ at\ least\ "{}}\ <<\ FormatTimes(min\_);}
+\DoxyCodeLine{\Hypertarget{gmock-cardinalities_8cc_source_l00120}00120\ \ \ \ \ *\mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}\ <<\ \textcolor{stringliteral}{"{}called\ at\ least\ "{}}\ <<\ FormatTimes(min\_);}
 \DoxyCodeLine{\Hypertarget{gmock-cardinalities_8cc_source_l00121}00121\ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
 \DoxyCodeLine{\Hypertarget{gmock-cardinalities_8cc_source_l00122}00122\ \ \ \ \ \textcolor{comment}{//\ 0\ <\ min\_\ <\ max\_\ <\ INT\_MAX}}
-\DoxyCodeLine{\Hypertarget{gmock-cardinalities_8cc_source_l00123}00123\ \ \ \ \ *os\ <<\ \textcolor{stringliteral}{"{}called\ between\ "{}}\ <<\ min\_\ <<\ \textcolor{stringliteral}{"{}\ and\ "{}}\ <<\ max\_\ <<\ \textcolor{stringliteral}{"{}\ times"{}};}
+\DoxyCodeLine{\Hypertarget{gmock-cardinalities_8cc_source_l00123}00123\ \ \ \ \ *\mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}\ <<\ \textcolor{stringliteral}{"{}called\ between\ "{}}\ <<\ min\_\ <<\ \textcolor{stringliteral}{"{}\ and\ "{}}\ <<\ max\_\ <<\ \textcolor{stringliteral}{"{}\ times"{}};}
 \DoxyCodeLine{\Hypertarget{gmock-cardinalities_8cc_source_l00124}00124\ \ \ \}}
 \DoxyCodeLine{\Hypertarget{gmock-cardinalities_8cc_source_l00125}00125\ \}}
 \DoxyCodeLine{\Hypertarget{gmock-cardinalities_8cc_source_l00126}00126\ }
@@ -132,11 +132,11 @@
 \DoxyCodeLine{\Hypertarget{gmock-cardinalities_8cc_source_l00128}00128\ }
 \DoxyCodeLine{\Hypertarget{gmock-cardinalities_8cc_source_l00129}00129\ \textcolor{comment}{//\ Describes\ the\ given\ call\ count\ to\ an\ ostream.}}
 \DoxyCodeLine{\Hypertarget{gmock-cardinalities_8cc_source_l00130}\mbox{\hyperlink{classtesting_1_1_cardinality_a7cbea339e2f3072a98367e087aa296e8}{00130}}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classtesting_1_1_cardinality_a7cbea339e2f3072a98367e087aa296e8}{Cardinality::DescribeActualCallCountTo}}(\textcolor{keywordtype}{int}\ actual\_call\_count,}
-\DoxyCodeLine{\Hypertarget{gmock-cardinalities_8cc_source_l00131}00131\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ::std::ostream*\ os)\ \{}
+\DoxyCodeLine{\Hypertarget{gmock-cardinalities_8cc_source_l00131}00131\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ::std::ostream*\ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}})\ \{}
 \DoxyCodeLine{\Hypertarget{gmock-cardinalities_8cc_source_l00132}00132\ \ \ \textcolor{keywordflow}{if}\ (actual\_call\_count\ >\ 0)\ \{}
-\DoxyCodeLine{\Hypertarget{gmock-cardinalities_8cc_source_l00133}00133\ \ \ \ \ *os\ <<\ \textcolor{stringliteral}{"{}called\ "{}}\ <<\ FormatTimes(actual\_call\_count);}
+\DoxyCodeLine{\Hypertarget{gmock-cardinalities_8cc_source_l00133}00133\ \ \ \ \ *\mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}\ <<\ \textcolor{stringliteral}{"{}called\ "{}}\ <<\ FormatTimes(actual\_call\_count);}
 \DoxyCodeLine{\Hypertarget{gmock-cardinalities_8cc_source_l00134}00134\ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
-\DoxyCodeLine{\Hypertarget{gmock-cardinalities_8cc_source_l00135}00135\ \ \ \ \ *os\ <<\ \textcolor{stringliteral}{"{}never\ called"{}};}
+\DoxyCodeLine{\Hypertarget{gmock-cardinalities_8cc_source_l00135}00135\ \ \ \ \ *\mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}\ <<\ \textcolor{stringliteral}{"{}never\ called"{}};}
 \DoxyCodeLine{\Hypertarget{gmock-cardinalities_8cc_source_l00136}00136\ \ \ \}}
 \DoxyCodeLine{\Hypertarget{gmock-cardinalities_8cc_source_l00137}00137\ \}}
 \DoxyCodeLine{\Hypertarget{gmock-cardinalities_8cc_source_l00138}00138\ }

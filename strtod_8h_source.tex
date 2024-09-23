@@ -151,8 +151,8 @@
 \DoxyCodeLine{\Hypertarget{strtod_8h_source_l00147}00147\ \ \ \ \ \mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\_t}}\ error\ =\ (remaining\ ==\ 0)\ ?\ 0\ :\ kUlp\ /\ 2;}
 \DoxyCodeLine{\Hypertarget{strtod_8h_source_l00148}00148\ }
 \DoxyCodeLine{\Hypertarget{strtod_8h_source_l00149}00149\ \ \ \ \ \mbox{\hyperlink{structinternal_1_1_diy_fp}{DiyFp}}\ v(significand,\ 0);}
-\DoxyCodeLine{\Hypertarget{strtod_8h_source_l00150}00150\ \ \ \ \ v\ =\ v.Normalize();}
-\DoxyCodeLine{\Hypertarget{strtod_8h_source_l00151}00151\ \ \ \ \ error\ <<=\ -\/v.e;}
+\DoxyCodeLine{\Hypertarget{strtod_8h_source_l00150}00150\ \ \ \ \ v\ =\ v.\mbox{\hyperlink{structinternal_1_1_diy_fp_aa6cbacc8dfcd92cb8c57884e45548976}{Normalize}}();}
+\DoxyCodeLine{\Hypertarget{strtod_8h_source_l00151}00151\ \ \ \ \ error\ <<=\ -\/v.\mbox{\hyperlink{structinternal_1_1_diy_fp_afa9db335eeb61c7f966d888d89b1e6f2}{e}};}
 \DoxyCodeLine{\Hypertarget{strtod_8h_source_l00152}00152\ }
 \DoxyCodeLine{\Hypertarget{strtod_8h_source_l00153}00153\ \ \ \ \ dExp\ +=\ remaining;}
 \DoxyCodeLine{\Hypertarget{strtod_8h_source_l00154}00154\ }
@@ -179,22 +179,22 @@
 \DoxyCodeLine{\Hypertarget{strtod_8h_source_l00175}00175\ }
 \DoxyCodeLine{\Hypertarget{strtod_8h_source_l00176}00176\ \ \ \ \ error\ +=\ kUlp\ +\ (error\ ==\ 0\ ?\ 0\ :\ 1);}
 \DoxyCodeLine{\Hypertarget{strtod_8h_source_l00177}00177\ }
-\DoxyCodeLine{\Hypertarget{strtod_8h_source_l00178}00178\ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{int}\ oldExp\ =\ v.e;}
-\DoxyCodeLine{\Hypertarget{strtod_8h_source_l00179}00179\ \ \ \ \ v\ =\ v.Normalize();}
-\DoxyCodeLine{\Hypertarget{strtod_8h_source_l00180}00180\ \ \ \ \ error\ <<=\ oldExp\ -\/\ v.e;}
+\DoxyCodeLine{\Hypertarget{strtod_8h_source_l00178}00178\ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{int}\ oldExp\ =\ v.\mbox{\hyperlink{structinternal_1_1_diy_fp_afa9db335eeb61c7f966d888d89b1e6f2}{e}};}
+\DoxyCodeLine{\Hypertarget{strtod_8h_source_l00179}00179\ \ \ \ \ v\ =\ v.\mbox{\hyperlink{structinternal_1_1_diy_fp_aa6cbacc8dfcd92cb8c57884e45548976}{Normalize}}();}
+\DoxyCodeLine{\Hypertarget{strtod_8h_source_l00180}00180\ \ \ \ \ error\ <<=\ oldExp\ -\/\ v.\mbox{\hyperlink{structinternal_1_1_diy_fp_afa9db335eeb61c7f966d888d89b1e6f2}{e}};}
 \DoxyCodeLine{\Hypertarget{strtod_8h_source_l00181}00181\ }
-\DoxyCodeLine{\Hypertarget{strtod_8h_source_l00182}00182\ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{int}\ effectiveSignificandSize\ =\ \mbox{\hyperlink{classinternal_1_1_double_aa710fa4f5e06b0ff4348a13475688f13}{Double::EffectiveSignificandSize}}(64\ +\ v.e);}
+\DoxyCodeLine{\Hypertarget{strtod_8h_source_l00182}00182\ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{int}\ effectiveSignificandSize\ =\ \mbox{\hyperlink{classinternal_1_1_double_aa710fa4f5e06b0ff4348a13475688f13}{Double::EffectiveSignificandSize}}(64\ +\ v.\mbox{\hyperlink{structinternal_1_1_diy_fp_afa9db335eeb61c7f966d888d89b1e6f2}{e}});}
 \DoxyCodeLine{\Hypertarget{strtod_8h_source_l00183}00183\ \ \ \ \ \textcolor{keywordtype}{int}\ precisionSize\ =\ 64\ -\/\ effectiveSignificandSize;}
 \DoxyCodeLine{\Hypertarget{strtod_8h_source_l00184}00184\ \ \ \ \ \textcolor{keywordflow}{if}\ (precisionSize\ +\ kUlpShift\ >=\ 64)\ \{}
 \DoxyCodeLine{\Hypertarget{strtod_8h_source_l00185}00185\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ scaleExp\ =\ (precisionSize\ +\ kUlpShift)\ -\/\ 63;}
-\DoxyCodeLine{\Hypertarget{strtod_8h_source_l00186}00186\ \ \ \ \ \ \ \ \ v.f\ >>=\ scaleExp;}
-\DoxyCodeLine{\Hypertarget{strtod_8h_source_l00187}00187\ \ \ \ \ \ \ \ \ v.e\ +=\ scaleExp;\ }
+\DoxyCodeLine{\Hypertarget{strtod_8h_source_l00186}00186\ \ \ \ \ \ \ \ \ v.\mbox{\hyperlink{structinternal_1_1_diy_fp_a09b9217a86e8a2e6aa8d2d48fc351008}{f}}\ >>=\ scaleExp;}
+\DoxyCodeLine{\Hypertarget{strtod_8h_source_l00187}00187\ \ \ \ \ \ \ \ \ v.\mbox{\hyperlink{structinternal_1_1_diy_fp_afa9db335eeb61c7f966d888d89b1e6f2}{e}}\ +=\ scaleExp;\ }
 \DoxyCodeLine{\Hypertarget{strtod_8h_source_l00188}00188\ \ \ \ \ \ \ \ \ error\ =\ (error\ >>\ scaleExp)\ +\ 1\ +\ kUlp;}
 \DoxyCodeLine{\Hypertarget{strtod_8h_source_l00189}00189\ \ \ \ \ \ \ \ \ precisionSize\ -\/=\ scaleExp;}
 \DoxyCodeLine{\Hypertarget{strtod_8h_source_l00190}00190\ \ \ \ \ \}}
 \DoxyCodeLine{\Hypertarget{strtod_8h_source_l00191}00191\ }
-\DoxyCodeLine{\Hypertarget{strtod_8h_source_l00192}00192\ \ \ \ \ \mbox{\hyperlink{structinternal_1_1_diy_fp}{DiyFp}}\ rounded(v.f\ >>\ precisionSize,\ v.e\ +\ precisionSize);}
-\DoxyCodeLine{\Hypertarget{strtod_8h_source_l00193}00193\ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ precisionBits\ =\ (v.f\ \&\ ((\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}(1)\ <<\ precisionSize)\ -\/\ 1))\ *\ kUlp;}
+\DoxyCodeLine{\Hypertarget{strtod_8h_source_l00192}00192\ \ \ \ \ \mbox{\hyperlink{structinternal_1_1_diy_fp}{DiyFp}}\ rounded(v.\mbox{\hyperlink{structinternal_1_1_diy_fp_a09b9217a86e8a2e6aa8d2d48fc351008}{f}}\ >>\ precisionSize,\ v.\mbox{\hyperlink{structinternal_1_1_diy_fp_afa9db335eeb61c7f966d888d89b1e6f2}{e}}\ +\ precisionSize);}
+\DoxyCodeLine{\Hypertarget{strtod_8h_source_l00193}00193\ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ precisionBits\ =\ (v.\mbox{\hyperlink{structinternal_1_1_diy_fp_a09b9217a86e8a2e6aa8d2d48fc351008}{f}}\ \&\ ((\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}(1)\ <<\ precisionSize)\ -\/\ 1))\ *\ kUlp;}
 \DoxyCodeLine{\Hypertarget{strtod_8h_source_l00194}00194\ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ halfWay\ =\ (\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}(1)\ <<\ (precisionSize\ -\/\ 1))\ *\ kUlp;}
 \DoxyCodeLine{\Hypertarget{strtod_8h_source_l00195}00195\ \ \ \ \ \textcolor{keywordflow}{if}\ (precisionBits\ >=\ halfWay\ +\ \textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{unsigned}\textcolor{keyword}{>}(error))\ \{}
 \DoxyCodeLine{\Hypertarget{strtod_8h_source_l00196}00196\ \ \ \ \ \ \ \ \ rounded.\mbox{\hyperlink{structinternal_1_1_diy_fp_a09b9217a86e8a2e6aa8d2d48fc351008}{f}}++;}

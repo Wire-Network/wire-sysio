@@ -208,10 +208,10 @@
 \DoxyCodeLine{\Hypertarget{_matchers_8tests_8cpp_source_l00204}00204\ \ \ \ \ \ \ \ \ \}}
 \DoxyCodeLine{\Hypertarget{_matchers_8tests_8cpp_source_l00205}00205\ }
 \DoxyCodeLine{\Hypertarget{_matchers_8tests_8cpp_source_l00206}00206\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_abd6e2aec703006b3da62cf7860c9808f}{TEST\_CASE}}(\textcolor{stringliteral}{"{}Vector\ matchers"{}},\ \textcolor{stringliteral}{"{}[matchers][vector]"{}})\ \{}
-\DoxyCodeLine{\Hypertarget{_matchers_8tests_8cpp_source_l00207}00207\ \ \ \ \ \ \ \ \ \ \ \ \ std::vector<int>\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}};}
-\DoxyCodeLine{\Hypertarget{_matchers_8tests_8cpp_source_l00208}00208\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.push\_back(1);}
-\DoxyCodeLine{\Hypertarget{_matchers_8tests_8cpp_source_l00209}00209\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.push\_back(2);}
-\DoxyCodeLine{\Hypertarget{_matchers_8tests_8cpp_source_l00210}00210\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.push\_back(3);}
+\DoxyCodeLine{\Hypertarget{_matchers_8tests_8cpp_source_l00207}00207\ \ \ \ \ \ \ \ \ \ \ \ \ std::vector<int>\ v;}
+\DoxyCodeLine{\Hypertarget{_matchers_8tests_8cpp_source_l00208}00208\ \ \ \ \ \ \ \ \ \ \ \ \ v.push\_back(1);}
+\DoxyCodeLine{\Hypertarget{_matchers_8tests_8cpp_source_l00209}00209\ \ \ \ \ \ \ \ \ \ \ \ \ v.push\_back(2);}
+\DoxyCodeLine{\Hypertarget{_matchers_8tests_8cpp_source_l00210}00210\ \ \ \ \ \ \ \ \ \ \ \ \ v.push\_back(3);}
 \DoxyCodeLine{\Hypertarget{_matchers_8tests_8cpp_source_l00211}00211\ }
 \DoxyCodeLine{\Hypertarget{_matchers_8tests_8cpp_source_l00212}00212\ \ \ \ \ \ \ \ \ \ \ \ \ std::vector<int>\ v2;}
 \DoxyCodeLine{\Hypertarget{_matchers_8tests_8cpp_source_l00213}00213\ \ \ \ \ \ \ \ \ \ \ \ \ v2.push\_back(1);}
@@ -260,7 +260,7 @@
 \DoxyCodeLine{\Hypertarget{_matchers_8tests_8cpp_source_l00256}00256\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_a5b8c33c63e0804d4458e2c761370b75d}{CHECK\_THAT}}(v,\ \mbox{\hyperlink{namespace_catch_1_1_matchers_acd42da14d75497b3ef635e5e096b0c77}{UnorderedEquals}}(v));}
 \DoxyCodeLine{\Hypertarget{_matchers_8tests_8cpp_source_l00257}00257\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_a5b8c33c63e0804d4458e2c761370b75d}{CHECK\_THAT}}(empty,\ \mbox{\hyperlink{namespace_catch_1_1_matchers_acd42da14d75497b3ef635e5e096b0c77}{UnorderedEquals}}(empty));}
 \DoxyCodeLine{\Hypertarget{_matchers_8tests_8cpp_source_l00258}00258\ }
-\DoxyCodeLine{\Hypertarget{_matchers_8tests_8cpp_source_l00259}00259\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ permuted\ =\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}};}
+\DoxyCodeLine{\Hypertarget{_matchers_8tests_8cpp_source_l00259}00259\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ permuted\ =\ v;}
 \DoxyCodeLine{\Hypertarget{_matchers_8tests_8cpp_source_l00260}00260\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ std::next\_permutation(begin(permuted),\ end(permuted));}
 \DoxyCodeLine{\Hypertarget{_matchers_8tests_8cpp_source_l00261}00261\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_ac1354db6f3e9c1e0a8eda0eea7ff1f0a}{REQUIRE\_THAT}}(permuted,\ \mbox{\hyperlink{namespace_catch_1_1_matchers_acd42da14d75497b3ef635e5e096b0c77}{UnorderedEquals}}(v));}
 \DoxyCodeLine{\Hypertarget{_matchers_8tests_8cpp_source_l00262}00262\ }
@@ -270,10 +270,10 @@
 \DoxyCodeLine{\Hypertarget{_matchers_8tests_8cpp_source_l00266}00266\ \ \ \ \ \ \ \ \ \}}
 \DoxyCodeLine{\Hypertarget{_matchers_8tests_8cpp_source_l00267}00267\ }
 \DoxyCodeLine{\Hypertarget{_matchers_8tests_8cpp_source_l00268}00268\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_abd6e2aec703006b3da62cf7860c9808f}{TEST\_CASE}}(\textcolor{stringliteral}{"{}Vector\ matchers\ that\ fail"{}},\ \textcolor{stringliteral}{"{}[matchers][vector][.][failing]"{}})\ \{}
-\DoxyCodeLine{\Hypertarget{_matchers_8tests_8cpp_source_l00269}00269\ \ \ \ \ \ \ \ \ \ \ \ \ std::vector<int>\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}};}
-\DoxyCodeLine{\Hypertarget{_matchers_8tests_8cpp_source_l00270}00270\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.push\_back(1);}
-\DoxyCodeLine{\Hypertarget{_matchers_8tests_8cpp_source_l00271}00271\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.push\_back(2);}
-\DoxyCodeLine{\Hypertarget{_matchers_8tests_8cpp_source_l00272}00272\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.push\_back(3);}
+\DoxyCodeLine{\Hypertarget{_matchers_8tests_8cpp_source_l00269}00269\ \ \ \ \ \ \ \ \ \ \ \ \ std::vector<int>\ v;}
+\DoxyCodeLine{\Hypertarget{_matchers_8tests_8cpp_source_l00270}00270\ \ \ \ \ \ \ \ \ \ \ \ \ v.push\_back(1);}
+\DoxyCodeLine{\Hypertarget{_matchers_8tests_8cpp_source_l00271}00271\ \ \ \ \ \ \ \ \ \ \ \ \ v.push\_back(2);}
+\DoxyCodeLine{\Hypertarget{_matchers_8tests_8cpp_source_l00272}00272\ \ \ \ \ \ \ \ \ \ \ \ \ v.push\_back(3);}
 \DoxyCodeLine{\Hypertarget{_matchers_8tests_8cpp_source_l00273}00273\ }
 \DoxyCodeLine{\Hypertarget{_matchers_8tests_8cpp_source_l00274}00274\ \ \ \ \ \ \ \ \ \ \ \ \ std::vector<int>\ v2;}
 \DoxyCodeLine{\Hypertarget{_matchers_8tests_8cpp_source_l00275}00275\ \ \ \ \ \ \ \ \ \ \ \ \ v2.push\_back(1);}
@@ -312,7 +312,7 @@
 \DoxyCodeLine{\Hypertarget{_matchers_8tests_8cpp_source_l00308}00308\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_a5b8c33c63e0804d4458e2c761370b75d}{CHECK\_THAT}}(v,\ \mbox{\hyperlink{namespace_catch_1_1_matchers_acd42da14d75497b3ef635e5e096b0c77}{UnorderedEquals}}(empty));}
 \DoxyCodeLine{\Hypertarget{_matchers_8tests_8cpp_source_l00309}00309\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_a5b8c33c63e0804d4458e2c761370b75d}{CHECK\_THAT}}(empty,\ \mbox{\hyperlink{namespace_catch_1_1_matchers_acd42da14d75497b3ef635e5e096b0c77}{UnorderedEquals}}(v));}
 \DoxyCodeLine{\Hypertarget{_matchers_8tests_8cpp_source_l00310}00310\ }
-\DoxyCodeLine{\Hypertarget{_matchers_8tests_8cpp_source_l00311}00311\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ permuted\ =\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}};}
+\DoxyCodeLine{\Hypertarget{_matchers_8tests_8cpp_source_l00311}00311\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ permuted\ =\ v;}
 \DoxyCodeLine{\Hypertarget{_matchers_8tests_8cpp_source_l00312}00312\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ std::next\_permutation(begin(permuted),\ end(permuted));}
 \DoxyCodeLine{\Hypertarget{_matchers_8tests_8cpp_source_l00313}00313\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ permuted.pop\_back();}
 \DoxyCodeLine{\Hypertarget{_matchers_8tests_8cpp_source_l00314}00314\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_a5b8c33c63e0804d4458e2c761370b75d}{CHECK\_THAT}}(permuted,\ \mbox{\hyperlink{namespace_catch_1_1_matchers_acd42da14d75497b3ef635e5e096b0c77}{UnorderedEquals}}(v));}

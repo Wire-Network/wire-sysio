@@ -1,15 +1,13 @@
 <map id="libff::edwards_G1::edwards_G1" name="libff::edwards_G1::edwards_G1">
-<area shape="rect" id="Node000001" title=" " alt="" coords="422,116,553,157"/>
-<area shape="rect" id="Node000002" href="$classlibff_1_1edwards___g1.html#a00f284621beeeb7330fbe6020f5ed696" title=" " alt="" coords="222,45,374,70"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="432,111,373,84,344,74,346,69,375,79,434,106"/>
-<area shape="rect" id="Node000005" href="$classlibff_1_1edwards___g1.html#af63e164cacda3ea51b888cd1a4bacf38" title=" " alt="" coords="224,94,372,120"/>
-<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="406,126,372,121,373,116,407,121"/>
-<area shape="rect" id="Node000006" href="$classlibff_1_1edwards___g1.html#ad5b6d6c7f0fac7eea9371c8a8e348c41" title=" " alt="" coords="232,144,364,185"/>
-<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="407,151,364,157,364,152,406,146"/>
-<area shape="rect" id="Node000007" href="$classlibff_1_1edwards___g1.html#a3587166ca6637e275989d3dd38fc5383" title=" " alt="" coords="232,209,364,250"/>
-<area shape="poly" id="edge6_Node000001_Node000007" title=" " alt="" coords="437,167,375,199,348,211,346,206,373,194,434,162"/>
-<area shape="rect" id="Node000003" href="$classlibff_1_1edwards___g1.html#a8bdf4bcaf204b33e4413b00463871257" title=" " alt="" coords="24,5,155,46"/>
-<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="206,46,155,38,156,33,207,41"/>
-<area shape="rect" id="Node000004" href="$classvalidate__reflection_1_1_empty_scope.html#a1fb4f76506790294268dc078986d7430" title=" " alt="" coords="5,71,174,111"/>
-<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="207,75,175,80,174,75,206,70"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="385,84,516,125"/>
+<area shape="rect" id="Node000002" href="$classlibff_1_1edwards___g1.html#a00f284621beeeb7330fbe6020f5ed696" title=" " alt="" coords="185,13,337,38"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="395,79,336,52,307,42,309,37,338,47,397,74"/>
+<area shape="rect" id="Node000004" href="$classlibff_1_1edwards___g1.html#af63e164cacda3ea51b888cd1a4bacf38" title=" " alt="" coords="187,62,335,88"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="369,94,335,89,336,84,370,89"/>
+<area shape="rect" id="Node000005" href="$classlibff_1_1edwards___g1.html#ad5b6d6c7f0fac7eea9371c8a8e348c41" title=" " alt="" coords="195,112,326,153"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="370,119,327,125,327,120,369,114"/>
+<area shape="rect" id="Node000006" href="$classlibff_1_1edwards___g1.html#a3587166ca6637e275989d3dd38fc5383" title=" " alt="" coords="195,177,326,218"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="400,135,338,167,311,179,309,174,336,162,397,130"/>
+<area shape="rect" id="Node000003" href="$classlibff_1_1edwards___g1.html#a8bdf4bcaf204b33e4413b00463871257" title=" " alt="" coords="5,5,137,46"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="169,28,137,28,137,23,169,23"/>
 </map>

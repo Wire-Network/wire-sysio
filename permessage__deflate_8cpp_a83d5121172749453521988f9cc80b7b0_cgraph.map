@@ -1,0 +1,9 @@
+<map id="BOOST_AUTO_TEST_CASE" name="BOOST_AUTO_TEST_CASE">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,114,202,140"/>
+<area shape="rect" id="Node000002" href="$classwebsocketpp_1_1extensions_1_1permessage__deflate_1_1enabled.html#a9275c22cfd6782ef72a722168d663d8b" title="Reset server&#39;s outgoing LZ77 sliding window for each new message." alt="" coords="250,5,419,76"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="139,111,235,75,237,80,141,116"/>
+<area shape="rect" id="Node000003" href="$classwebsocketpp_1_1extensions_1_1permessage__deflate_1_1enabled.html#a5190a82b1571a94704cef6959ed78ce2" title="Test if the extension was negotiated for this connection." alt="" coords="250,100,419,155"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="202,125,234,125,234,130,202,130"/>
+<area shape="rect" id="Node000004" href="$classwebsocketpp_1_1extensions_1_1permessage__deflate_1_1enabled.html#aa05eda4f6a0231c13708445480181ff4" title="Negotiate extension." alt="" coords="250,180,419,235"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="144,138,239,171,237,177,142,143"/>
+</map>

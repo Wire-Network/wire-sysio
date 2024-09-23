@@ -283,12 +283,13 @@ Public Attributes</h2></td></tr>
 <p class="definition">Definition at line <a class="el" href="test__compressed__file_8cpp_source.html#l00026">26</a> of file <a class="el" href="test__compressed__file_8cpp_source.html">test_compressed_file.cpp</a>.</p>
 <div class="fragment"><div class="line"><span class="lineno">   26</span>                                                           {</div>
 <div class="line"><span class="lineno">   27</span>      <span class="keyword">auto</span> <a class="code hl_class" href="classfc_1_1path.html">path</a> = bfs::temp_directory_path() / bfs::unique_path();</div>
-<div class="line"><span class="lineno">   28</span>      <span class="keyword">auto</span> os = bfs::ofstream(<a class="code hl_class" href="classfc_1_1path.html">path</a>, std::ios_base::out);</div>
-<div class="line"><span class="lineno">   29</span>      os &lt;&lt; contents;</div>
-<div class="line"><span class="lineno">   30</span>      os.close();</div>
+<div class="line"><span class="lineno">   28</span>      <span class="keyword">auto</span> <a class="code hl_variable" href="environment_8hpp.html#a3951483d0b31c29ca95336206cd35238">os</a> = bfs::ofstream(<a class="code hl_class" href="classfc_1_1path.html">path</a>, std::ios_base::out);</div>
+<div class="line"><span class="lineno">   29</span>      <a class="code hl_variable" href="environment_8hpp.html#a3951483d0b31c29ca95336206cd35238">os</a> &lt;&lt; contents;</div>
+<div class="line"><span class="lineno">   30</span>      <a class="code hl_variable" href="environment_8hpp.html#a3951483d0b31c29ca95336206cd35238">os</a>.close();</div>
 <div class="line"><span class="lineno">   31</span>      <span class="keywordflow">return</span> <a class="code hl_variable" href="#a8641500328301e32a05bce0f9d737560">paths</a>.emplace_back(std::move(<a class="code hl_class" href="classfc_1_1path.html">path</a>)).generic_string();</div>
 <div class="line"><span class="lineno">   32</span>   }</div>
 <div class="ttc" id="aclassfc_1_1path_html"><div class="ttname"><a href="classfc_1_1path.html">fc::path</a></div><div class="ttdoc">wraps boost::filesystem::path to provide platform independent path manipulation.</div><div class="ttdef"><b>Definition</b> <a href="filesystem_8hpp_source.html#l00028">filesystem.hpp:28</a></div></div>
+<div class="ttc" id="aenvironment_8hpp_html_a3951483d0b31c29ca95336206cd35238"><div class="ttname"><a href="environment_8hpp.html#a3951483d0b31c29ca95336206cd35238">os</a></div><div class="ttdeci">os_t os</div><div class="ttdef"><b>Definition</b> <a href="environment_8hpp_source.html#l00023">environment.hpp:23</a></div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -318,9 +319,9 @@ Public Attributes</h2></td></tr>
 <p class="definition">Definition at line <a class="el" href="test__configuration__utils_8cpp_source.html#l00026">26</a> of file <a class="el" href="test__configuration__utils_8cpp_source.html">test_configuration_utils.cpp</a>.</p>
 <div class="fragment"><div class="line"><span class="lineno">   26</span>                                                           {</div>
 <div class="line"><span class="lineno">   27</span>      <span class="keyword">auto</span> <a class="code hl_class" href="classfc_1_1path.html">path</a> = bfs::temp_directory_path() / bfs::unique_path();</div>
-<div class="line"><span class="lineno">   28</span>      <span class="keyword">auto</span> os = bfs::ofstream(<a class="code hl_class" href="classfc_1_1path.html">path</a>, std::ios_base::out);</div>
-<div class="line"><span class="lineno">   29</span>      os &lt;&lt; contents;</div>
-<div class="line"><span class="lineno">   30</span>      os.close();</div>
+<div class="line"><span class="lineno">   28</span>      <span class="keyword">auto</span> <a class="code hl_variable" href="environment_8hpp.html#a3951483d0b31c29ca95336206cd35238">os</a> = bfs::ofstream(<a class="code hl_class" href="classfc_1_1path.html">path</a>, std::ios_base::out);</div>
+<div class="line"><span class="lineno">   29</span>      <a class="code hl_variable" href="environment_8hpp.html#a3951483d0b31c29ca95336206cd35238">os</a> &lt;&lt; contents;</div>
+<div class="line"><span class="lineno">   30</span>      <a class="code hl_variable" href="environment_8hpp.html#a3951483d0b31c29ca95336206cd35238">os</a>.close();</div>
 <div class="line"><span class="lineno">   31</span>      <span class="keywordflow">return</span> <a class="code hl_variable" href="#a8641500328301e32a05bce0f9d737560">paths</a>.emplace_back(std::move(<a class="code hl_class" href="classfc_1_1path.html">path</a>)).generic_string();</div>
 <div class="line"><span class="lineno">   32</span>   }</div>
 </div><!-- fragment -->
@@ -356,10 +357,10 @@ Public Attributes</h2></td></tr>
 <p class="definition">Definition at line <a class="el" href="test__compressed__file_8cpp_source.html#l00034">34</a> of file <a class="el" href="test__compressed__file_8cpp_source.html">test_compressed_file.cpp</a>.</p>
 <div class="fragment"><div class="line"><span class="lineno">   34</span>                                                               {</div>
 <div class="line"><span class="lineno">   35</span>      <span class="keyword">auto</span> <a class="code hl_class" href="classfc_1_1path.html">path</a> = bfs::temp_directory_path() / bfs::unique_path();</div>
-<div class="line"><span class="lineno">   36</span>      <span class="keyword">auto</span> os = bfs::ofstream(<a class="code hl_class" href="classfc_1_1path.html">path</a>, std::ios_base::out|std::ios_base::binary);</div>
+<div class="line"><span class="lineno">   36</span>      <span class="keyword">auto</span> <a class="code hl_variable" href="environment_8hpp.html#a3951483d0b31c29ca95336206cd35238">os</a> = bfs::ofstream(<a class="code hl_class" href="classfc_1_1path.html">path</a>, std::ios_base::out|std::ios_base::binary);</div>
 <div class="line"><span class="lineno">   37</span>      <span class="keywordflow">if</span> (data &amp;&amp; size)</div>
-<div class="line"><span class="lineno">   38</span>         os.write(<span class="keyword">reinterpret_cast&lt;</span><span class="keyword">const </span><span class="keywordtype">char</span>*<span class="keyword">&gt;</span>(data), size);</div>
-<div class="line"><span class="lineno">   39</span>      os.close();</div>
+<div class="line"><span class="lineno">   38</span>         <a class="code hl_variable" href="environment_8hpp.html#a3951483d0b31c29ca95336206cd35238">os</a>.write(<span class="keyword">reinterpret_cast&lt;</span><span class="keyword">const </span><span class="keywordtype">char</span>*<span class="keyword">&gt;</span>(data), size);</div>
+<div class="line"><span class="lineno">   39</span>      <a class="code hl_variable" href="environment_8hpp.html#a3951483d0b31c29ca95336206cd35238">os</a>.close();</div>
 <div class="line"><span class="lineno">   40</span>      <span class="keywordflow">return</span> <a class="code hl_variable" href="#a8641500328301e32a05bce0f9d737560">paths</a>.emplace_back(std::move(<a class="code hl_class" href="classfc_1_1path.html">path</a>)).generic_string();</div>
 <div class="line"><span class="lineno">   41</span>   }</div>
 </div><!-- fragment -->

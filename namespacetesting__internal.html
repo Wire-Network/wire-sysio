@@ -105,7 +105,7 @@ $(function(){initNavTree('namespacetesting__internal.html',''); initResizable(tr
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="func-members" name="func-members"></a>
 Functions</h2></td></tr>
 <tr class="memitem:a3f49d3d0c996242f9d383c850097a656" id="r_a3f49d3d0c996242f9d383c850097a656"><td class="memTemplParams" colspan="2">template&lt;typename <a class="el" href="prettywritertest_8cpp.html#a6283df8c4e365cc8a01727e2d7ad44bf">T</a> &gt; </td></tr>
-<tr class="memitem:a3f49d3d0c996242f9d383c850097a656"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="#a3f49d3d0c996242f9d383c850097a656">DefaultPrintNonContainerTo</a> (const <a class="el" href="prettywritertest_8cpp.html#a6283df8c4e365cc8a01727e2d7ad44bf">T</a> &amp;<a class="el" href="pkcs11_8h.html#a32aff7c6c4cd253fdf6563677afab5ce">value</a>, ::std::ostream *os)</td></tr>
+<tr class="memitem:a3f49d3d0c996242f9d383c850097a656"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="#a3f49d3d0c996242f9d383c850097a656">DefaultPrintNonContainerTo</a> (const <a class="el" href="prettywritertest_8cpp.html#a6283df8c4e365cc8a01727e2d7ad44bf">T</a> &amp;<a class="el" href="pkcs11_8h.html#a32aff7c6c4cd253fdf6563677afab5ce">value</a>, ::std::ostream *<a class="el" href="environment_8hpp.html#a3951483d0b31c29ca95336206cd35238">os</a>)</td></tr>
 <tr class="separator:a3f49d3d0c996242f9d383c850097a656"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <h2 class="groupheader">Function Documentation</h2>
@@ -158,8 +158,9 @@ template&lt;typename <a class="el" href="prettywritertest_8cpp.html#a6283df8c4e3
 <div class="line"><span class="lineno">  282</span>  <span class="comment">// impossible to define #1 (e.g. when foo is ::std, defining</span></div>
 <div class="line"><span class="lineno">  283</span>  <span class="comment">// anything in it is undefined behavior unless you are a compiler</span></div>
 <div class="line"><span class="lineno">  284</span>  <span class="comment">// vendor.).</span></div>
-<div class="line"><span class="lineno">  285</span>  *os &lt;&lt; <a class="code hl_define" href="pkcs11_8h.html#a32aff7c6c4cd253fdf6563677afab5ce">value</a>;</div>
+<div class="line"><span class="lineno">  285</span>  *<a class="code hl_variable" href="environment_8hpp.html#a3951483d0b31c29ca95336206cd35238">os</a> &lt;&lt; <a class="code hl_define" href="pkcs11_8h.html#a32aff7c6c4cd253fdf6563677afab5ce">value</a>;</div>
 <div class="line"><span class="lineno">  286</span>}</div>
+<div class="ttc" id="aenvironment_8hpp_html_a3951483d0b31c29ca95336206cd35238"><div class="ttname"><a href="environment_8hpp.html#a3951483d0b31c29ca95336206cd35238">os</a></div><div class="ttdeci">os_t os</div><div class="ttdef"><b>Definition</b> <a href="environment_8hpp_source.html#l00023">environment.hpp:23</a></div></div>
 <div class="ttc" id="anamespacetesting_1_1internal2_html"><div class="ttname"><a href="namespacetesting_1_1internal2.html">testing::internal2</a></div><div class="ttdef"><b>Definition</b> <a href="gtest-printers_8h_source.html#l00123">gtest-printers.h:123</a></div></div>
 <div class="ttc" id="apkcs11_8h_html_a32aff7c6c4cd253fdf6563677afab5ce"><div class="ttname"><a href="pkcs11_8h.html#a32aff7c6c4cd253fdf6563677afab5ce">value</a></div><div class="ttdeci">#define value</div><div class="ttdef"><b>Definition</b> <a href="pkcs11_8h_source.html#l00157">pkcs11.h:157</a></div></div>
 </div><!-- fragment --><div class="dynheader">

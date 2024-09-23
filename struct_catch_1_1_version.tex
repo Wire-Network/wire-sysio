@@ -29,7 +29,7 @@ unsigned int const \mbox{\hyperlink{struct_catch_1_1_version_a15facd4f9ac18f5ff2
 \doxysubsubsection*{Friends}
 \begin{DoxyCompactItemize}
 \item 
-std\+::ostream \& \mbox{\hyperlink{struct_catch_1_1_version_a6730b4be4f5fa640b39de13d8ffe1dce}{operator$<$$<$}} (std\+::ostream \&os, \mbox{\hyperlink{struct_catch_1_1_version}{Version}} const \&version)
+std\+::ostream \& \mbox{\hyperlink{struct_catch_1_1_version_a6730b4be4f5fa640b39de13d8ffe1dce}{operator$<$$<$}} (std\+::ostream \&\mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}, \mbox{\hyperlink{struct_catch_1_1_version}{Version}} const \&version)
 \end{DoxyCompactItemize}
 
 
@@ -92,12 +92,12 @@ Definition at line \mbox{\hyperlink{catch__version_8cpp_source_l00027}{27}} of f
 
 \begin{DoxyCode}{0}
 \DoxyCodeLine{00027\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
-\DoxyCodeLine{00028\ \ \ \ \ \ \ \ \ os\ \ <<\ \mbox{\hyperlink{namespacewebsocketpp_1_1http_1_1parser_1_1state_a12f378e0c6dbf373781e7988ee4a0853a08c88a938bc459c7997b48f74248752f}{version}}.majorVersion\ <<\ \textcolor{charliteral}{'.'}}
+\DoxyCodeLine{00028\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}\ \ <<\ \mbox{\hyperlink{namespacewebsocketpp_1_1http_1_1parser_1_1state_a12f378e0c6dbf373781e7988ee4a0853a08c88a938bc459c7997b48f74248752f}{version}}.majorVersion\ <<\ \textcolor{charliteral}{'.'}}
 \DoxyCodeLine{00029\ \ \ \ \ \ \ \ \ \ \ \ \ <<\ \mbox{\hyperlink{namespacewebsocketpp_1_1http_1_1parser_1_1state_a12f378e0c6dbf373781e7988ee4a0853a08c88a938bc459c7997b48f74248752f}{version}}.minorVersion\ <<\ \textcolor{charliteral}{'.'}}
 \DoxyCodeLine{00030\ \ \ \ \ \ \ \ \ \ \ \ \ <<\ \mbox{\hyperlink{namespacewebsocketpp_1_1http_1_1parser_1_1state_a12f378e0c6dbf373781e7988ee4a0853a08c88a938bc459c7997b48f74248752f}{version}}.patchNumber;}
 \DoxyCodeLine{00031\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ branchName\ is\ never\ null\ -\/>\ 0th\ char\ is\ \(\backslash\)0\ if\ it\ is\ empty}}
 \DoxyCodeLine{00032\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{namespacewebsocketpp_1_1http_1_1parser_1_1state_a12f378e0c6dbf373781e7988ee4a0853a08c88a938bc459c7997b48f74248752f}{version}}.branchName[0])\ \{}
-\DoxyCodeLine{00033\ \ \ \ \ \ \ \ \ \ \ \ \ os\ <<\ \textcolor{charliteral}{'-\/'}\ <<\ \mbox{\hyperlink{namespacewebsocketpp_1_1http_1_1parser_1_1state_a12f378e0c6dbf373781e7988ee4a0853a08c88a938bc459c7997b48f74248752f}{version}}.branchName}
+\DoxyCodeLine{00033\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}\ <<\ \textcolor{charliteral}{'-\/'}\ <<\ \mbox{\hyperlink{namespacewebsocketpp_1_1http_1_1parser_1_1state_a12f378e0c6dbf373781e7988ee4a0853a08c88a938bc459c7997b48f74248752f}{version}}.branchName}
 \DoxyCodeLine{00034\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ <<\ \textcolor{charliteral}{'.'}\ <<\ \mbox{\hyperlink{namespacewebsocketpp_1_1http_1_1parser_1_1state_a12f378e0c6dbf373781e7988ee4a0853a08c88a938bc459c7997b48f74248752f}{version}}.buildNumber;}
 \DoxyCodeLine{00035\ \ \ \ \ \ \ \ \ \}}
 \DoxyCodeLine{00036\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}};}

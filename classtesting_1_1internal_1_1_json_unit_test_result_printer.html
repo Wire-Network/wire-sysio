@@ -233,9 +233,9 @@ Public Member Functions</h2></td></tr>
 <div class="fragment"><div class="line"><span class="lineno"> 3885</span>                                                         {</div>
 <div class="line"><span class="lineno"> 3886</span>  FILE* jsonout = NULL;</div>
 <div class="line"><span class="lineno"> 3887</span>  FilePath output_file(output_file_);</div>
-<div class="line"><span class="lineno"> 3888</span>  FilePath <a class="code hl_variable" href="namespaceversiongenerate.html#aab714e0aa9036025ba7c83eb7422c567">output_dir</a>(output_file.RemoveFileName());</div>
+<div class="line"><span class="lineno"> 3888</span>  FilePath output_dir(output_file.RemoveFileName());</div>
 <div class="line"><span class="lineno"> 3889</span> </div>
-<div class="line"><span class="lineno"> 3890</span>  <span class="keywordflow">if</span> (<a class="code hl_variable" href="namespaceversiongenerate.html#aab714e0aa9036025ba7c83eb7422c567">output_dir</a>.CreateDirectoriesRecursively()) {</div>
+<div class="line"><span class="lineno"> 3890</span>  <span class="keywordflow">if</span> (output_dir.CreateDirectoriesRecursively()) {</div>
 <div class="line"><span class="lineno"> 3891</span>    jsonout = <a class="code hl_function" href="namespacetesting_1_1internal_1_1posix.html#affa05d06d3e3b1ce975935cb0eac4fa7">posix::FOpen</a>(output_file_.c_str(), <span class="stringliteral">&quot;w&quot;</span>);</div>
 <div class="line"><span class="lineno"> 3892</span>  }</div>
 <div class="line"><span class="lineno"> 3893</span>  <span class="keywordflow">if</span> (jsonout == NULL) {</div>
@@ -259,23 +259,48 @@ Public Member Functions</h2></td></tr>
 <div class="line"><span class="lineno"> 3911</span>}</div>
 <div class="ttc" id="anamespacetesting_1_1internal_1_1posix_html_affa05d06d3e3b1ce975935cb0eac4fa7"><div class="ttname"><a href="namespacetesting_1_1internal_1_1posix.html#affa05d06d3e3b1ce975935cb0eac4fa7">testing::internal::posix::FOpen</a></div><div class="ttdeci">FILE * FOpen(const char *path, const char *mode)</div><div class="ttdef"><b>Definition</b> <a href="gtest-port_8h_source.html#l02499">gtest-port.h:2499</a></div></div>
 <div class="ttc" id="anamespacetesting_1_1internal_html_ac0a2b7f69fc829d80a39e925b6417e39"><div class="ttname"><a href="namespacetesting_1_1internal.html#ac0a2b7f69fc829d80a39e925b6417e39">testing::internal::StringStreamToString</a></div><div class="ttdeci">GTEST_API_ std::string StringStreamToString(::std::stringstream *stream)</div><div class="ttdef"><b>Definition</b> <a href="gtest_8cc_source.html#l01997">gtest.cc:1997</a></div></div>
-<div class="ttc" id="anamespaceversiongenerate_html_aab714e0aa9036025ba7c83eb7422c567"><div class="ttname"><a href="namespaceversiongenerate.html#aab714e0aa9036025ba7c83eb7422c567">versiongenerate.output_dir</a></div><div class="ttdeci">output_dir</div><div class="ttdef"><b>Definition</b> <a href="versiongenerate_8py_source.html#l00061">versiongenerate.py:61</a></div></div>
 </div><!-- fragment --><div class="dynheader">
 Here is the call graph for this function:</div>
 <div class="dyncontent">
 <div class="center"><img src="classtesting_1_1internal_1_1_json_unit_test_result_printer_a44edb54cf1ab8cdcd56bda5058b8f1d6_cgraph.png" border="0" usemap="#aclasstesting_1_1internal_1_1_json_unit_test_result_printer_a44edb54cf1ab8cdcd56bda5058b8f1d6_cgraph" alt=""/></div>
 <map name="aclasstesting_1_1internal_1_1_json_unit_test_result_printer_a44edb54cf1ab8cdcd56bda5058b8f1d6_cgraph" id="aclasstesting_1_1internal_1_1_json_unit_test_result_printer_a44edb54cf1ab8cdcd56bda5058b8f1d6_cgraph">
-<area shape="rect" title=" " alt="" coords="5,63,180,119"/>
-<area shape="rect" href="namespacetesting_1_1internal_1_1posix.html#affa05d06d3e3b1ce975935cb0eac4fa7" title=" " alt="" coords="260,5,378,46"/>
-<area shape="poly" title=" " alt="" coords="180,63,244,44,245,49,181,68"/>
-<area shape="rect" href="classtesting_1_1internal_1_1_file_path.html#a49e030b5a62ca7dcc7f920a63a96fa55" title=" " alt="" coords="228,71,410,111"/>
-<area shape="poly" title=" " alt="" coords="180,88,212,88,212,94,180,94"/>
-<area shape="rect" href="namespacetesting_1_1internal.html#ac0a2b7f69fc829d80a39e925b6417e39" title=" " alt="" coords="246,136,392,177"/>
-<area shape="poly" title=" " alt="" coords="181,114,232,129,231,134,180,119"/>
-<area shape="rect" href="classtesting_1_1internal_1_1_file_path.html#a60a30c518a0298affcc262f5904cf308" title=" " alt="" coords="462,39,580,79"/>
-<area shape="poly" title=" " alt="" coords="410,74,446,68,447,73,411,79"/>
-<area shape="rect" href="classtesting_1_1internal_1_1_file_path.html#a3504a51accbca78a52fe586133ea5499" title=" " alt="" coords="458,104,583,145"/>
-<area shape="poly" title=" " alt="" coords="411,103,444,109,443,114,410,109"/>
+<area shape="rect" title=" " alt="" coords="5,308,180,364"/>
+<area shape="rect" href="classtesting_1_1internal_1_1_file_path.html#a26790e530dd738f7fc8202c1ce718406" title=" " alt="" coords="228,167,407,223"/>
+<area shape="poly" title=" " alt="" coords="137,306,257,229,260,234,140,310"/>
+<area shape="rect" href="classtesting_1_1internal_1_1_file_path.html#a49e030b5a62ca7dcc7f920a63a96fa55" title=" " alt="" coords="655,301,838,342"/>
+<area shape="poly" title=" " alt="" coords="180,331,228,330,640,321,640,326,228,335,180,336"/>
+<area shape="rect" href="namespacetesting_1_1internal_1_1posix.html#affa05d06d3e3b1ce975935cb0eac4fa7" title=" " alt="" coords="258,344,376,385"/>
+<area shape="poly" title=" " alt="" coords="180,345,243,352,242,358,179,350"/>
+<area shape="rect" href="namespacetesting_1_1internal.html#ac0a2b7f69fc829d80a39e925b6417e39" title=" " alt="" coords="245,409,390,450"/>
+<area shape="poly" title=" " alt="" coords="156,362,229,394,246,401,244,406,227,399,154,367"/>
+<area shape="poly" title=" " alt="" coords="275,167,276,157,283,148,297,142,317,141,340,143,354,150,351,155,338,148,317,146,299,148,286,152,281,159,281,167"/>
+<area shape="rect" href="classtesting_1_1internal_1_1_file_path.html#ae3a455e7c9fc967c2443b703e958f8bd" title=" " alt="" coords="455,175,607,215"/>
+<area shape="poly" title=" " alt="" coords="408,192,439,192,439,198,408,198"/>
+<area shape="rect" href="classtesting_1_1internal_1_1_file_path.html#ab47ada111cc940cf2359f6533bada6ca" title=" " alt="" coords="886,30,1081,86"/>
+<area shape="poly" title=" " alt="" coords="407,168,524,137,655,107,870,70,871,76,656,112,526,142,408,173"/>
+<area shape="rect" href="classtesting_1_1internal_1_1_file_path.html#a73fc042ad65e85bbecb956eb4603a6f2" title=" " alt="" coords="1142,5,1283,46"/>
+<area shape="poly" title=" " alt="" coords="362,164,406,140,454,118,623,58,694,38,761,25,828,17,901,13,1081,15,1126,17,1126,22,1081,20,901,18,829,22,761,30,695,44,625,63,456,123,408,145,365,169"/>
+<area shape="poly" title=" " alt="" coords="408,219,661,294,659,299,407,224"/>
+<area shape="rect" href="classtesting_1_1internal_1_1_file_path.html#a60a30c518a0298affcc262f5904cf308" title=" " alt="" coords="924,305,1042,346"/>
+<area shape="poly" title=" " alt="" coords="605,213,910,302,908,307,604,219"/>
+<area shape="rect" href="classtesting_1_1internal_1_1_file_path.html#a74ba8435e822d77f79f137c38de9bfeb" title=" " alt="" coords="663,175,830,215"/>
+<area shape="poly" title=" " alt="" coords="607,192,647,192,647,198,607,198"/>
+<area shape="poly" title=" " alt="" coords="600,172,874,88,875,93,602,177"/>
+<area shape="poly" title=" " alt="" coords="803,214,839,236,854,250,863,264,872,277,887,290,911,303,908,308,884,295,868,281,859,267,850,254,836,240,800,218"/>
+<area shape="rect" href="namespacetesting_1_1internal_1_1posix.html#af0d04ed5baeed28353fa38742748a421" title=" " alt="" coords="924,109,1042,150"/>
+<area shape="poly" title=" " alt="" coords="822,172,908,147,910,153,823,177"/>
+<area shape="rect" href="classtesting_1_1internal_1_1_file_path.html#a0661adf59aec40c40c8e39b888d68142" title=" " alt="" coords="899,240,1068,281"/>
+<area shape="poly" title=" " alt="" coords="823,213,893,233,892,238,822,218"/>
+<area shape="poly" title=" " alt="" coords="786,172,836,140,859,117,884,96,892,91,895,95,887,100,863,121,839,144,788,176"/>
+<area shape="rect" href="namespacetesting_1_1internal_1_1posix.html#a2b87b7ff647a128614daf50667eb9304" title=" " alt="" coords="924,175,1042,215"/>
+<area shape="poly" title=" " alt="" coords="830,192,909,192,909,198,830,198"/>
+<area shape="rect" href="classtesting_1_1internal_1_1_file_path.html#ae17e5581e7996021e598851fe947df9c" title=" " alt="" coords="1129,240,1295,281"/>
+<area shape="poly" title=" " alt="" coords="1068,258,1113,258,1113,263,1068,263"/>
+<area shape="rect" href="classtesting_1_1internal_1_1_file_path.html#a3504a51accbca78a52fe586133ea5499" title=" " alt="" coords="1150,333,1275,374"/>
+<area shape="poly" title=" " alt="" coords="1070,84,1083,96,1100,121,1109,146,1111,192,1112,240,1118,264,1131,291,1145,308,1162,322,1158,326,1141,311,1127,294,1113,266,1106,240,1106,193,1103,147,1095,124,1079,99,1066,88"/>
+<area shape="poly" title=" " alt="" coords="1081,41,1126,35,1126,40,1082,47"/>
+<area shape="poly" title=" " alt="" coords="838,321,909,322,909,327,838,326"/>
+<area shape="poly" title=" " alt="" coords="815,340,886,355,951,361,1017,362,1134,358,1134,363,1017,368,951,366,885,360,814,345"/>
 </map>
 </div>
 

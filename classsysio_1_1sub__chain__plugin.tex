@@ -6,7 +6,8 @@
 
 
 
-Inheritance diagram for sysio\+::sub\+\_\+chain\+\_\+plugin\+:\nopagebreak
+Inheritance diagram for sysio\+::sub\+\_\+chain\+\_\+plugin\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -15,7 +16,8 @@ Inheritance diagram for sysio\+::sub\+\_\+chain\+\_\+plugin\+:\nopagebreak
 \end{figure}
 
 
-Collaboration diagram for sysio\+::sub\+\_\+chain\+\_\+plugin\+:\nopagebreak
+Collaboration diagram for sysio\+::sub\+\_\+chain\+\_\+plugin\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -176,7 +178,8 @@ Definition at line \mbox{\hyperlink{sub__chain__plugin_8cpp_source_l00084}{84}} 
 \DoxyCodeLine{00092\ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -230,7 +233,8 @@ Definition at line \mbox{\hyperlink{sub__chain__plugin_8cpp_source_l00127}{127}}
 \DoxyCodeLine{00149\ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -278,14 +282,16 @@ Definition at line \mbox{\hyperlink{sub__chain__plugin_8cpp_source_l00100}{100}}
 \DoxyCodeLine{00118\ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
 \includegraphics[width=350pt]{classsysio_1_1sub__chain__plugin_aa1aadd4174d2f23fd38bc235d14dc413_cgraph}
 \end{center}
 \end{figure}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -328,14 +334,16 @@ Definition at line \mbox{\hyperlink{sub__chain__plugin_8cpp_source_l00156}{156}}
 \DoxyCodeLine{00169\ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
 \includegraphics[width=350pt]{classsysio_1_1sub__chain__plugin_aaac3c80301ede51c90d925992bc14c7c_cgraph}
 \end{center}
 \end{figure}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -376,7 +384,8 @@ Definition at line \mbox{\hyperlink{sub__chain__plugin_8cpp_source_l00065}{65}} 
 \DoxyCodeLine{00067\ \}}
 
 \end{DoxyCode}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -413,7 +422,8 @@ Definition at line \mbox{\hyperlink{sub__chain__plugin_8cpp_source_l00176}{176}}
 \DoxyCodeLine{00183\ \}}
 
 \end{DoxyCode}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -434,14 +444,14 @@ Definition at line \mbox{\hyperlink{sub__chain__plugin_8cpp_source_l00023}{23}} 
 \begin{DoxyCode}{0}
 \DoxyCodeLine{00023\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
 \DoxyCodeLine{00024\ \ \ \ \textcolor{keywordflow}{try}\ \{}
-\DoxyCodeLine{00025\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!\mbox{\hyperlink{namespacebenchmark_compile_acf738bbf3b8391aa78929ceeceb8a03b}{options}}.count(\textcolor{stringliteral}{"{}s-\/chain-\/contract"{}})\ ||\ !\mbox{\hyperlink{namespacebenchmark_compile_acf738bbf3b8391aa78929ceeceb8a03b}{options}}.count(\textcolor{stringliteral}{"{}s-\/chain-\/actions"{}}))\ \{}
+\DoxyCodeLine{00025\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!options.count(\textcolor{stringliteral}{"{}s-\/chain-\/contract"{}})\ ||\ !options.count(\textcolor{stringliteral}{"{}s-\/chain-\/actions"{}}))\ \{}
 \DoxyCodeLine{00026\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp_a40c2826a6fba35c1ffbf912bdf559792}{SYS\_ASSERT}}(\textcolor{keyword}{false},\ plugin\_config\_exception,\ \textcolor{stringliteral}{"{}sub\_chain\_plugin\ requires\ both\ -\/-\/s-\/chain-\/contract\ and\ -\/-\/s-\/chain-\/actions\ to\ be\ set"{}});}
 \DoxyCodeLine{00027\ \ \ \ \ \ \ \}}
 \DoxyCodeLine{00028\ \ \ \ \ \ \ \textcolor{keywordflow}{else}\ \{}
-\DoxyCodeLine{00029\ \ \ \ \ \ \ \ \ \ std::string\ contract\_name\_str\ =\ \mbox{\hyperlink{namespacebenchmark_compile_acf738bbf3b8391aa78929ceeceb8a03b}{options}}.at(\textcolor{stringliteral}{"{}s-\/chain-\/contract"{}}).as<std::string>();}
+\DoxyCodeLine{00029\ \ \ \ \ \ \ \ \ \ std::string\ contract\_name\_str\ =\ options.at(\textcolor{stringliteral}{"{}s-\/chain-\/contract"{}}).as<std::string>();}
 \DoxyCodeLine{00030\ \ \ \ \ \ \ \ \ \ my-\/>contract\_name\ =\ \mbox{\hyperlink{structsysio_1_1chain_1_1name}{sysio::chain::name}}(contract\_name\_str);\ \ \textcolor{comment}{//\ Convert\ std::string\ to\ sysio::chain::name}}
 \DoxyCodeLine{00031\ }
-\DoxyCodeLine{00032\ \ \ \ \ \ \ \ \ \ std::vector<std::string>\ actions\ =\ \mbox{\hyperlink{namespacebenchmark_compile_acf738bbf3b8391aa78929ceeceb8a03b}{options}}.at(\textcolor{stringliteral}{"{}s-\/chain-\/actions"{}}).as<std::vector<std::string>>();}
+\DoxyCodeLine{00032\ \ \ \ \ \ \ \ \ \ std::vector<std::string>\ actions\ =\ options.at(\textcolor{stringliteral}{"{}s-\/chain-\/actions"{}}).as<std::vector<std::string>>();}
 \DoxyCodeLine{00033\ \ \ \ \ \ \ \ \ \ my-\/>action\_names.clear();}
 \DoxyCodeLine{00034\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keyword}{const}\ std::string\&\ \mbox{\hyperlink{namespacesysio_1_1chain_a7a1685bcc352cda9e45f055932069428}{action\_name}}\ :\ actions)\ \{}
 \DoxyCodeLine{00035\ \ \ \ \ \ \ \ \ \ \ \ \ my-\/>action\_names.push\_back(\mbox{\hyperlink{structsysio_1_1chain_1_1name}{sysio::chain::name}}(\mbox{\hyperlink{namespacesysio_1_1chain_a7a1685bcc352cda9e45f055932069428}{action\_name}}));\ \ \textcolor{comment}{//\ Convert\ std::string\ to\ action\_name}}
@@ -500,7 +510,8 @@ Definition at line \mbox{\hyperlink{sub__chain__plugin_8cpp_source_l00043}{43}} 
 \DoxyCodeLine{00056\ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode

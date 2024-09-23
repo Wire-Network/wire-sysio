@@ -8,14 +8,20 @@
 <area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="196,135,251,142,250,147,196,140"/>
 <area shape="rect" id="Node000010" href="$namespacewebsocketpp_1_1utf8__validator.html#ad088137c6f18e6844e20496d8782c835" title="Validate a UTF8 string." alt="" coords="244,201,428,242"/>
 <area shape="poly" id="edge9_Node000001_Node000010" title=" " alt="" coords="147,143,245,186,262,193,261,198,243,191,144,147"/>
-<area shape="rect" id="Node000004" href="$namespacewebsocketpp_1_1frame.html#a417650d76aa2433163942d6a13334a6a" title="Byte by byte mask/unmask." alt="" coords="476,71,615,111"/>
-<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="418,88,461,88,461,94,418,94"/>
-<area shape="rect" id="Node000006" href="$namespacewebsocketpp_1_1frame.html#abd4f23c906cc48fb3b34603fd4284b01" title="Calculates the full length of the header based on the first bytes." alt="" coords="476,136,615,177"/>
-<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="406,154,461,154,461,159,406,159"/>
-<area shape="rect" id="Node000007" href="$namespacewebsocketpp_1_1frame.html#a4e8cf8ae88a7a8fdb2b3ea86623d01d2" title="check whether the frame is masked" alt="" coords="679,103,819,143"/>
-<area shape="poly" id="edge6_Node000006_Node000007" title=" " alt="" coords="615,142,664,134,665,140,616,148"/>
-<area shape="rect" id="Node000008" href="$namespacewebsocketpp_1_1frame.html#a001d6c5e538d5eb1ef5ddc21aeb61ee3" title="Calculate the offset location of the masking key within the extended header." alt="" coords="663,168,835,209"/>
-<area shape="poly" id="edge7_Node000006_Node000008" title=" " alt="" coords="616,165,648,170,647,175,615,170"/>
-<area shape="rect" id="Node000009" href="$namespacewebsocketpp_1_1frame.html#a2ceb63e6a2fe19964d13363ba2bb9e15" title="Extracts the raw payload length specified in the basic header." alt="" coords="883,168,1022,209"/>
-<area shape="poly" id="edge8_Node000008_Node000009" title=" " alt="" coords="835,186,867,186,867,191,835,191"/>
+<area shape="rect" id="Node000004" href="$namespacewebsocketpp_1_1frame.html#a417650d76aa2433163942d6a13334a6a" title="Byte by byte mask/unmask." alt="" coords="498,71,638,111"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="418,88,483,88,483,94,418,94"/>
+<area shape="rect" id="Node000006" href="$namespacewebsocketpp_1_1frame.html#abd4f23c906cc48fb3b34603fd4284b01" title="Calculates the full length of the header based on the first bytes." alt="" coords="498,136,638,177"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="406,154,483,154,483,159,406,159"/>
+<area shape="rect" id="Node000007" href="$namespacewebsocketpp_1_1frame.html#a4e8cf8ae88a7a8fdb2b3ea86623d01d2" title="check whether the frame is masked" alt="" coords="731,104,870,145"/>
+<area shape="poly" id="edge6_Node000006_Node000007" title=" " alt="" coords="638,144,715,133,716,139,639,149"/>
+<area shape="rect" id="Node000008" href="$namespacewebsocketpp_1_1frame.html#a001d6c5e538d5eb1ef5ddc21aeb61ee3" title="Calculate the offset location of the masking key within the extended header." alt="" coords="715,169,886,210"/>
+<area shape="poly" id="edge7_Node000006_Node000008" title=" " alt="" coords="639,164,700,173,699,178,638,169"/>
+<area shape="rect" id="Node000009" href="$namespacewebsocketpp_1_1frame.html#a2ceb63e6a2fe19964d13363ba2bb9e15" title="Extracts the raw payload length specified in the basic header." alt="" coords="941,169,1080,210"/>
+<area shape="poly" id="edge8_Node000008_Node000009" title=" " alt="" coords="887,187,925,187,925,192,887,192"/>
+<area shape="rect" id="Node000011" href="$classwebsocketpp_1_1utf8__validator_1_1validator.html#a89deb3bdfd8b94da908b806e543491ba" title="Return whether the input sequence ended on a valid utf8 codepoint." alt="" coords="476,201,660,242"/>
+<area shape="poly" id="edge10_Node000010_Node000011" title=" " alt="" coords="429,219,460,219,460,224,429,224"/>
+<area shape="rect" id="Node000012" href="$classwebsocketpp_1_1utf8__validator_1_1validator.html#a2cde6cad6f1a0f66674010848ec80fba" title="Advance validator state with input from an iterator pair." alt="" coords="476,267,660,307"/>
+<area shape="poly" id="edge11_Node000010_Node000012" title=" " alt="" coords="411,240,479,259,478,264,410,245"/>
+<area shape="rect" id="Node000013" href="$namespacewebsocketpp_1_1utf8__validator.html#ae6dab1acad72af0396e2448394a07d98" title="Decode the next byte of a UTF8 sequence." alt="" coords="708,267,893,307"/>
+<area shape="poly" id="edge12_Node000012_Node000013" title=" " alt="" coords="661,284,692,284,692,290,661,290"/>
 </map>

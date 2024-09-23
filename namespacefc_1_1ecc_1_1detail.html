@@ -327,19 +327,22 @@ Here is the caller graph for this function:</div>
 <p class="definition">Definition at line <a class="el" href="elliptic__common_8cpp_source.html#l00026">26</a> of file <a class="el" href="elliptic__common_8cpp_source.html">elliptic_common.cpp</a>.</p>
 <div class="fragment"><div class="line"><span class="lineno">   27</span>        {</div>
 <div class="line"><span class="lineno">   28</span>            <a class="code hl_class" href="classfc_1_1sha256.html">fc::sha256</a> result;</div>
-<div class="line"><span class="lineno">   29</span>            <a class="code hl_function" href="yubihsm__pkcs11_8c.html#ae785d5badbf1f08b491af31f32a135a1">memcpy</a>( result.data(), v.data(), 32 );</div>
+<div class="line"><span class="lineno">   29</span>            <a class="code hl_function" href="yubihsm__pkcs11_8c.html#ae785d5badbf1f08b491af31f32a135a1">memcpy</a>( result.data(), v.<a class="code hl_function" href="classfc_1_1sha512.html#ad8e5e86882db16c32ceea6516d7c9f14">data</a>(), 32 );</div>
 <div class="line"><span class="lineno">   30</span>            <span class="keywordflow">return</span> result;</div>
 <div class="line"><span class="lineno">   31</span>        }</div>
 <div class="ttc" id="aclassfc_1_1sha256_html"><div class="ttname"><a href="classfc_1_1sha256.html">fc::sha256</a></div><div class="ttdef"><b>Definition</b> <a href="sha256_8hpp_source.html#l00011">sha256.hpp:12</a></div></div>
+<div class="ttc" id="aclassfc_1_1sha512_html_ad8e5e86882db16c32ceea6516d7c9f14"><div class="ttname"><a href="classfc_1_1sha512.html#ad8e5e86882db16c32ceea6516d7c9f14">fc::sha512::data</a></div><div class="ttdeci">char * data()</div><div class="ttdef"><b>Definition</b> <a href="sha512_8cpp_source.html#l00024">sha512.cpp:24</a></div></div>
 <div class="ttc" id="ayubihsm__pkcs11_8c_html_ae785d5badbf1f08b491af31f32a135a1"><div class="ttname"><a href="yubihsm__pkcs11_8c.html#ae785d5badbf1f08b491af31f32a135a1">memcpy</a></div><div class="ttdeci">memcpy((char *) pInfo-&gt;slotDescription, s, l)</div></div>
 </div><!-- fragment --><div class="dynheader">
 Here is the call graph for this function:</div>
 <div class="dyncontent">
 <div class="center"><img src="namespacefc_1_1ecc_1_1detail_ab7363d849635fb8ae78b79d30da3f81f_cgraph.png" border="0" usemap="#anamespacefc_1_1ecc_1_1detail_ab7363d849635fb8ae78b79d30da3f81f_cgraph" alt=""/></div>
 <map name="anamespacefc_1_1ecc_1_1detail_ab7363d849635fb8ae78b79d30da3f81f_cgraph" id="anamespacefc_1_1ecc_1_1detail_ab7363d849635fb8ae78b79d30da3f81f_cgraph">
-<area shape="rect" title=" " alt="" coords="5,5,139,31"/>
-<area shape="rect" href="yubihsm__pkcs11_8c.html#ae785d5badbf1f08b491af31f32a135a1" title=" " alt="" coords="187,5,258,31"/>
-<area shape="poly" title=" " alt="" coords="139,16,171,16,171,21,139,21"/>
+<area shape="rect" title=" " alt="" coords="5,31,139,56"/>
+<area shape="rect" href="classfc_1_1sha512.html#ad8e5e86882db16c32ceea6516d7c9f14" title=" " alt="" coords="187,5,302,31"/>
+<area shape="poly" title=" " alt="" coords="139,31,171,26,172,31,139,36"/>
+<area shape="rect" href="yubihsm__pkcs11_8c.html#ae785d5badbf1f08b491af31f32a135a1" title=" " alt="" coords="209,55,280,80"/>
+<area shape="poly" title=" " alt="" coords="139,50,194,58,193,63,139,55"/>
 </map>
 </div>
 
@@ -363,7 +366,7 @@ Here is the call graph for this function:</div>
 <p class="definition">Definition at line <a class="el" href="elliptic__common_8cpp_source.html#l00033">33</a> of file <a class="el" href="elliptic__common_8cpp_source.html">elliptic_common.cpp</a>.</p>
 <div class="fragment"><div class="line"><span class="lineno">   34</span>        {</div>
 <div class="line"><span class="lineno">   35</span>            <a class="code hl_class" href="classfc_1_1sha256.html">fc::sha256</a> result;</div>
-<div class="line"><span class="lineno">   36</span>            <a class="code hl_function" href="yubihsm__pkcs11_8c.html#ae785d5badbf1f08b491af31f32a135a1">memcpy</a>( result.data(), v.data() + 32, 32 );</div>
+<div class="line"><span class="lineno">   36</span>            <a class="code hl_function" href="yubihsm__pkcs11_8c.html#ae785d5badbf1f08b491af31f32a135a1">memcpy</a>( result.data(), v.<a class="code hl_function" href="classfc_1_1sha512.html#ad8e5e86882db16c32ceea6516d7c9f14">data</a>() + 32, 32 );</div>
 <div class="line"><span class="lineno">   37</span>            <span class="keywordflow">return</span> result;</div>
 <div class="line"><span class="lineno">   38</span>        }</div>
 </div><!-- fragment --><div class="dynheader">
@@ -371,9 +374,11 @@ Here is the call graph for this function:</div>
 <div class="dyncontent">
 <div class="center"><img src="namespacefc_1_1ecc_1_1detail_a87091140a69385a95d2c4adf833cc0c3_cgraph.png" border="0" usemap="#anamespacefc_1_1ecc_1_1detail_a87091140a69385a95d2c4adf833cc0c3_cgraph" alt=""/></div>
 <map name="anamespacefc_1_1ecc_1_1detail_a87091140a69385a95d2c4adf833cc0c3_cgraph" id="anamespacefc_1_1ecc_1_1detail_a87091140a69385a95d2c4adf833cc0c3_cgraph">
-<area shape="rect" title=" " alt="" coords="5,5,146,31"/>
-<area shape="rect" href="yubihsm__pkcs11_8c.html#ae785d5badbf1f08b491af31f32a135a1" title=" " alt="" coords="194,5,265,31"/>
-<area shape="poly" title=" " alt="" coords="146,16,178,16,178,21,146,21"/>
+<area shape="rect" title=" " alt="" coords="5,31,146,56"/>
+<area shape="rect" href="classfc_1_1sha512.html#ad8e5e86882db16c32ceea6516d7c9f14" title=" " alt="" coords="194,5,309,31"/>
+<area shape="poly" title=" " alt="" coords="146,31,178,26,179,31,147,36"/>
+<area shape="rect" href="yubihsm__pkcs11_8c.html#ae785d5badbf1f08b491af31f32a135a1" title=" " alt="" coords="216,55,287,80"/>
+<area shape="poly" title=" " alt="" coords="147,50,201,58,200,63,146,56"/>
 </map>
 </div>
 

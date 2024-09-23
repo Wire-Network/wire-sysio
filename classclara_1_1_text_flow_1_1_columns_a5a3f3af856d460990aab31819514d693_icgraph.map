@@ -1,32 +1,9 @@
 <map id="clara::TextFlow::Columns::end" name="clara::TextFlow::Columns::end">
-<area shape="rect" id="Node000001" title=" " alt="" coords="511,272,710,298"/>
-<area shape="rect" id="Node000002" href="$classcpp_1_1tokenize_1_1_token.html#ad93a4059e9932fa2dea149510f0ef002" title=" " alt="" coords="281,76,420,117"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="590,261,538,196,502,161,462,131,419,113,421,108,464,127,505,157,542,192,594,258"/>
-<area shape="rect" id="Node000003" href="$classcpp_1_1ast_1_1_node.html#aade2369ed75b8cd0b9e76752bf6ae7fb" title=" " alt="" coords="259,141,442,167"/>
-<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="582,263,529,220,496,199,462,181,432,170,434,165,464,176,499,194,532,216,586,259"/>
-<area shape="rect" id="Node000010" href="$classpump_1_1_token.html#a808876dd5a7b1bf6c43a3855dc4a8868" title=" " alt="" coords="285,215,416,240"/>
-<area shape="poly" id="edge9_Node000001_Node000010" title=" " alt="" coords="534,271,412,244,413,238,535,266"/>
-<area shape="rect" id="Node000011" href="$classclara_1_1_text_flow_1_1_columns_1_1iterator.html#abf278923f48d7b4c3541e0eb9c335c12" title=" " alt="" coords="265,264,436,305"/>
-<area shape="poly" id="edge11_Node000001_Node000011" title=" " alt="" coords="495,288,436,288,436,282,495,282"/>
-<area shape="rect" id="Node000012" href="$classclara_1_1_text_flow_1_1_columns_1_1iterator.html#a63c45d497ce076890664f15889876423" title=" " alt="" coords="265,330,436,370"/>
-<area shape="poly" id="edge12_Node000001_Node000012" title=" " alt="" coords="543,304,435,332,434,327,541,299"/>
-<area shape="rect" id="Node000014" href="$classvalidate__reflection_1_1_empty_scope.html#a1fb4f76506790294268dc078986d7430" title=" " alt="" coords="266,395,434,436"/>
-<area shape="poly" id="edge14_Node000001_Node000014" title=" " alt="" coords="583,310,529,347,464,385,433,397,431,392,462,380,526,343,579,305"/>
-<area shape="rect" id="Node000015" href="$classvalidate__reflection_1_1_reflections.html#a1e9c57ee99963e105d57f104baea9534" title=" " alt="" coords="238,460,463,486"/>
-<area shape="poly" id="edge15_Node000001_Node000015" title=" " alt="" coords="595,313,543,382,506,419,464,450,438,462,435,457,462,445,503,415,539,378,591,310"/>
-<area shape="rect" id="Node000004" href="$classcpp_1_1ast_1_1_define.html#a8e51e0611e1a76c5874f6b39e27a6d6a" title=" " alt="" coords="21,5,174,31"/>
-<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="244,136,236,131,218,109,211,86,205,65,188,44,170,34,173,29,191,40,209,62,216,85,223,107,239,127,247,132"/>
-<area shape="rect" id="Node000005" href="$classcpp_1_1ast_1_1_expr.html#a47968bf1be367a77836f211ced014ec0" title=" " alt="" coords="27,55,168,80"/>
-<area shape="poly" id="edge4_Node000003_Node000005" title=" " alt="" coords="255,139,236,131,222,122,212,112,202,103,188,94,162,83,164,79,191,89,206,99,215,108,225,118,239,126,257,134"/>
-<area shape="rect" id="Node000006" href="$classcpp_1_1ast_1_1_goto.html#ad3bb8a557e3075d7b68c5b0449fb494c" title=" " alt="" coords="26,104,169,130"/>
-<area shape="poly" id="edge5_Node000003_Node000006" title=" " alt="" coords="243,141,169,130,170,125,244,136"/>
-<area shape="rect" id="Node000007" href="$classcpp_1_1ast_1_1_using.html#aa489ba90656b2c28290af718f644d2f4" title=" " alt="" coords="23,153,172,179"/>
-<area shape="poly" id="edge6_Node000003_Node000007" title=" " alt="" coords="244,162,173,165,172,160,243,157"/>
-<area shape="rect" id="Node000008" href="$classcpp_1_1ast_1_1_variable_declaration.html#aeafe1b55bcf3005d00951f0accb18def" title=" " alt="" coords="5,203,190,244"/>
-<area shape="poly" id="edge7_Node000003_Node000008" title=" " alt="" coords="267,174,238,181,159,205,157,200,237,176,266,168"/>
-<area shape="rect" id="Node000009" href="$classcpp_1_1ast_1_1_node.html#acceba1aa15a332dd139ba9587d439a51" title=" " alt="" coords="11,268,184,294"/>
-<area shape="poly" id="edge8_Node000003_Node000009" title=" " alt="" coords="247,176,239,180,223,198,216,217,208,238,191,258,170,270,167,265,188,253,204,235,211,216,218,195,236,176,244,171"/>
-<area shape="poly" id="edge10_Node000010_Node000010" title=" " alt="" coords="395,203,380,196,350,193,323,195,309,200,306,205,313,212,309,216,300,206,305,196,322,190,350,188,382,191,397,198"/>
-<area shape="rect" id="Node000013" href="$classclara_1_1_text_flow_1_1_columns_1_1iterator.html#a6f1020e1f8fcaa575f17874d536c9bcc" title=" " alt="" coords="12,330,183,370"/>
-<area shape="poly" id="edge13_Node000012_Node000013" title=" " alt="" coords="250,353,183,353,183,348,250,348"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="442,46,641,72"/>
+<area shape="rect" id="Node000002" href="$classclara_1_1_text_flow_1_1_columns_1_1iterator.html#abf278923f48d7b4c3541e0eb9c335c12" title=" " alt="" coords="224,5,394,46"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="432,46,394,41,395,35,433,41"/>
+<area shape="rect" id="Node000003" href="$classclara_1_1_text_flow_1_1_columns_1_1iterator.html#a63c45d497ce076890664f15889876423" title=" " alt="" coords="224,71,394,111"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="429,77,395,82,394,77,428,72"/>
+<area shape="rect" id="Node000004" href="$classclara_1_1_text_flow_1_1_columns_1_1iterator.html#a6f1020e1f8fcaa575f17874d536c9bcc" title=" " alt="" coords="5,71,176,111"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="208,94,176,94,176,88,208,88"/>
 </map>

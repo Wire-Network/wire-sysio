@@ -1185,7 +1185,7 @@ template&lt;typename Context &gt; </div>
 <p class="definition">Definition at line <a class="el" href="sysio_2vm_2profile_8hpp_source.html#l00174">174</a> of file <a class="el" href="sysio_2vm_2profile_8hpp_source.html">profile.hpp</a>.</p>
 <div class="fragment"><div class="line"><span class="lineno">  174</span>                                    {</div>
 <div class="line"><span class="lineno">  175</span>      std::size_t hash = new_item-&gt;hash();</div>
-<div class="line"><span class="lineno">  176</span>      std::size_t <a class="code hl_variable" href="namespacehost__functions__tests__1.html#a8496a24b5236a2dc07bb4f2930d88342">idx</a> = hash &amp; (<a class="code hl_variable" href="#a31c411d5fe84663ea1177cca08f030d4">table_size</a> - 1);</div>
+<div class="line"><span class="lineno">  176</span>      std::size_t idx = hash &amp; (<a class="code hl_variable" href="#a31c411d5fe84663ea1177cca08f030d4">table_size</a> - 1);</div>
 <div class="line"><span class="lineno">  177</span>      <span class="keywordflow">for</span>(item* bucket_entry = table[idx]; bucket_entry; bucket_entry = bucket_entry-&gt;next) {</div>
 <div class="line"><span class="lineno">  178</span>         <span class="keywordflow">if</span>(<a class="code hl_function" href="#aff3dbe0b0ec2841db80662c10588b558">traces_equal</a>(new_item, bucket_entry)) {</div>
 <div class="line"><span class="lineno">  179</span>            ++bucket_entry-&gt;count;</div>
@@ -1193,13 +1193,12 @@ template&lt;typename Context &gt; </div>
 <div class="line"><span class="lineno">  181</span>            <span class="keywordflow">return</span>;</div>
 <div class="line"><span class="lineno">  182</span>         }</div>
 <div class="line"><span class="lineno">  183</span>      }</div>
-<div class="line"><span class="lineno">  184</span>      new_item-&gt;next = table[<a class="code hl_variable" href="namespacehost__functions__tests__1.html#a8496a24b5236a2dc07bb4f2930d88342">idx</a>];</div>
-<div class="line"><span class="lineno">  185</span>      new_item-&gt;bucket = <a class="code hl_variable" href="namespacehost__functions__tests__1.html#a8496a24b5236a2dc07bb4f2930d88342">idx</a>;</div>
+<div class="line"><span class="lineno">  184</span>      new_item-&gt;next = table[idx];</div>
+<div class="line"><span class="lineno">  185</span>      new_item-&gt;bucket = idx;</div>
 <div class="line"><span class="lineno">  186</span>      new_item-&gt;count = 1;</div>
-<div class="line"><span class="lineno">  187</span>      table[<a class="code hl_variable" href="namespacehost__functions__tests__1.html#a8496a24b5236a2dc07bb4f2930d88342">idx</a>] = new_item;</div>
+<div class="line"><span class="lineno">  187</span>      table[idx] = new_item;</div>
 <div class="line"><span class="lineno">  188</span>      <a class="code hl_function" href="#a8aee8486e5a5979a8642bf9249499468">move_to_head</a>(&amp;new_item-&gt;mru);</div>
 <div class="line"><span class="lineno">  189</span>   }</div>
-<div class="ttc" id="anamespacehost__functions__tests__1_html_a8496a24b5236a2dc07bb4f2930d88342"><div class="ttname"><a href="namespacehost__functions__tests__1.html#a8496a24b5236a2dc07bb4f2930d88342">host_functions_tests_1.idx</a></div><div class="ttdeci">int idx</div><div class="ttdef"><b>Definition</b> <a href="host__functions__tests__1_8py_source.html#l00021">host_functions_tests_1.py:21</a></div></div>
 <div class="ttc" id="astructsysio_1_1vm_1_1profile__data_html_a8aee8486e5a5979a8642bf9249499468"><div class="ttname"><a href="#a8aee8486e5a5979a8642bf9249499468">sysio::vm::profile_data::move_to_head</a></div><div class="ttdeci">void move_to_head(list_header *new_head)</div><div class="ttdef"><b>Definition</b> <a href="sysio_2vm_2profile_8hpp_source.html#l00164">profile.hpp:164</a></div></div>
 <div class="ttc" id="astructsysio_1_1vm_1_1profile__data_html_aff3dbe0b0ec2841db80662c10588b558"><div class="ttname"><a href="#aff3dbe0b0ec2841db80662c10588b558">sysio::vm::profile_data::traces_equal</a></div><div class="ttdeci">static bool traces_equal(const item *lhs, const item *rhs)</div><div class="ttdef"><b>Definition</b> <a href="sysio_2vm_2profile_8hpp_source.html#l00133">profile.hpp:133</a></div></div>
 </div><!-- fragment --><div class="dynheader">
@@ -1261,7 +1260,7 @@ Here is the caller graph for this function:</div>
 <p class="definition">Definition at line <a class="el" href="vm_2profile_8hpp_source.html#l00174">174</a> of file <a class="el" href="vm_2profile_8hpp_source.html">profile.hpp</a>.</p>
 <div class="fragment"><div class="line"><span class="lineno">  174</span>                                    {</div>
 <div class="line"><span class="lineno">  175</span>      std::size_t hash = new_item-&gt;hash();</div>
-<div class="line"><span class="lineno">  176</span>      std::size_t <a class="code hl_variable" href="namespacehost__functions__tests__1.html#a8496a24b5236a2dc07bb4f2930d88342">idx</a> = hash &amp; (<a class="code hl_variable" href="#a31c411d5fe84663ea1177cca08f030d4">table_size</a> - 1);</div>
+<div class="line"><span class="lineno">  176</span>      std::size_t idx = hash &amp; (<a class="code hl_variable" href="#a31c411d5fe84663ea1177cca08f030d4">table_size</a> - 1);</div>
 <div class="line"><span class="lineno">  177</span>      <span class="keywordflow">for</span>(item* bucket_entry = table[idx]; bucket_entry; bucket_entry = bucket_entry-&gt;next) {</div>
 <div class="line"><span class="lineno">  178</span>         <span class="keywordflow">if</span>(<a class="code hl_function" href="#aff3dbe0b0ec2841db80662c10588b558">traces_equal</a>(new_item, bucket_entry)) {</div>
 <div class="line"><span class="lineno">  179</span>            ++bucket_entry-&gt;count;</div>
@@ -1269,10 +1268,10 @@ Here is the caller graph for this function:</div>
 <div class="line"><span class="lineno">  181</span>            <span class="keywordflow">return</span>;</div>
 <div class="line"><span class="lineno">  182</span>         }</div>
 <div class="line"><span class="lineno">  183</span>      }</div>
-<div class="line"><span class="lineno">  184</span>      new_item-&gt;next = table[<a class="code hl_variable" href="namespacehost__functions__tests__1.html#a8496a24b5236a2dc07bb4f2930d88342">idx</a>];</div>
-<div class="line"><span class="lineno">  185</span>      new_item-&gt;bucket = <a class="code hl_variable" href="namespacehost__functions__tests__1.html#a8496a24b5236a2dc07bb4f2930d88342">idx</a>;</div>
+<div class="line"><span class="lineno">  184</span>      new_item-&gt;next = table[idx];</div>
+<div class="line"><span class="lineno">  185</span>      new_item-&gt;bucket = idx;</div>
 <div class="line"><span class="lineno">  186</span>      new_item-&gt;count = 1;</div>
-<div class="line"><span class="lineno">  187</span>      table[<a class="code hl_variable" href="namespacehost__functions__tests__1.html#a8496a24b5236a2dc07bb4f2930d88342">idx</a>] = new_item;</div>
+<div class="line"><span class="lineno">  187</span>      table[idx] = new_item;</div>
 <div class="line"><span class="lineno">  188</span>      <a class="code hl_function" href="#a8aee8486e5a5979a8642bf9249499468">move_to_head</a>(&amp;new_item-&gt;mru);</div>
 <div class="line"><span class="lineno">  189</span>   }</div>
 </div><!-- fragment --><div class="dynheader">

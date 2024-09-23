@@ -428,7 +428,7 @@
 \DoxyCodeLine{\Hypertarget{gmock-internal-utils__test_8cc_source_l00424}00424\ \textcolor{keywordtype}{void}\ TestLogWithSeverity(\textcolor{keyword}{const}\ std::string\&\ verbosity,\ \mbox{\hyperlink{namespacetesting_1_1internal_a203d1a8a2147a53d12bbdae40d443914}{LogSeverity}}\ severity,}
 \DoxyCodeLine{\Hypertarget{gmock-internal-utils__test_8cc_source_l00425}00425\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{bool}\ should\_print)\ \{}
 \DoxyCodeLine{\Hypertarget{gmock-internal-utils__test_8cc_source_l00426}00426\ \ \ \textcolor{keyword}{const}\ std::string\ old\_flag\ =\ \mbox{\hyperlink{gmock-port_8h_ad7119adfef06be5e7b1551633f5a1436}{GMOCK\_FLAG}}(verbose);}
-\DoxyCodeLine{\Hypertarget{gmock-internal-utils__test_8cc_source_l00427}00427\ \ \ \mbox{\hyperlink{gmock-port_8h_ad7119adfef06be5e7b1551633f5a1436}{GMOCK\_FLAG}}(verbose)\ =\ \mbox{\hyperlink{namespaceupload_a79aff46409a98c4e5f608c8df1fd4612}{verbosity}};}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils__test_8cc_source_l00427}00427\ \ \ \mbox{\hyperlink{gmock-port_8h_ad7119adfef06be5e7b1551633f5a1436}{GMOCK\_FLAG}}(verbose)\ =\ verbosity;}
 \DoxyCodeLine{\Hypertarget{gmock-internal-utils__test_8cc_source_l00428}00428\ \ \ \mbox{\hyperlink{namespacetesting_1_1internal_acba06d4f0343dec407738ba5544af990}{CaptureStdout}}();}
 \DoxyCodeLine{\Hypertarget{gmock-internal-utils__test_8cc_source_l00429}00429\ \ \ \mbox{\hyperlink{namespace_log}{Log}}(severity,\ \textcolor{stringliteral}{"{}Test\ log.\(\backslash\)n"{}},\ 0);}
 \DoxyCodeLine{\Hypertarget{gmock-internal-utils__test_8cc_source_l00430}00430\ \ \ \textcolor{keywordflow}{if}\ (should\_print)\ \{}
@@ -571,7 +571,7 @@
 \DoxyCodeLine{\Hypertarget{gmock-internal-utils__test_8cc_source_l00567}00567\ \textcolor{comment}{//\ and\ log\ severity.}}
 \DoxyCodeLine{\Hypertarget{gmock-internal-utils__test_8cc_source_l00568}00568\ std::string\ GrabOutput(\textcolor{keywordtype}{void}(*\mbox{\hyperlink{http__plugin_8cpp_a0c4bb3822f844b23219a9412e356659d}{logger}})(),\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ verbosity)\ \{}
 \DoxyCodeLine{\Hypertarget{gmock-internal-utils__test_8cc_source_l00569}00569\ \ \ \textcolor{keyword}{const}\ std::string\ saved\_flag\ =\ \mbox{\hyperlink{gmock-port_8h_ad7119adfef06be5e7b1551633f5a1436}{GMOCK\_FLAG}}(verbose);}
-\DoxyCodeLine{\Hypertarget{gmock-internal-utils__test_8cc_source_l00570}00570\ \ \ \mbox{\hyperlink{gmock-port_8h_ad7119adfef06be5e7b1551633f5a1436}{GMOCK\_FLAG}}(verbose)\ =\ \mbox{\hyperlink{namespaceupload_a79aff46409a98c4e5f608c8df1fd4612}{verbosity}};}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils__test_8cc_source_l00570}00570\ \ \ \mbox{\hyperlink{gmock-port_8h_ad7119adfef06be5e7b1551633f5a1436}{GMOCK\_FLAG}}(verbose)\ =\ verbosity;}
 \DoxyCodeLine{\Hypertarget{gmock-internal-utils__test_8cc_source_l00571}00571\ \ \ \mbox{\hyperlink{namespacetesting_1_1internal_acba06d4f0343dec407738ba5544af990}{CaptureStdout}}();}
 \DoxyCodeLine{\Hypertarget{gmock-internal-utils__test_8cc_source_l00572}00572\ \ \ \mbox{\hyperlink{http__plugin_8cpp_a0c4bb3822f844b23219a9412e356659d}{logger}}();}
 \DoxyCodeLine{\Hypertarget{gmock-internal-utils__test_8cc_source_l00573}00573\ \ \ \mbox{\hyperlink{gmock-port_8h_ad7119adfef06be5e7b1551633f5a1436}{GMOCK\_FLAG}}(verbose)\ =\ saved\_flag;}

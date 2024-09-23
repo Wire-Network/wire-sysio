@@ -2,7 +2,8 @@
 \hypertarget{_benchmark_8tests_8cpp}{}\label{_benchmark_8tests_8cpp}\index{libraries/sys-\/vm/external/Catch2/projects/SelfTest/UsageTests/Benchmark.tests.cpp@{libraries/sys-\/vm/external/Catch2/projects/SelfTest/UsageTests/Benchmark.tests.cpp}}
 {\ttfamily \#include "{}catch.\+hpp"{}}\newline
 {\ttfamily \#include $<$map$>$}\newline
-Include dependency graph for Benchmark.\+tests.\+cpp\+:\nopagebreak
+Include dependency graph for Benchmark.\+tests.\+cpp\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -33,15 +34,15 @@ Definition at line \mbox{\hyperlink{_benchmark_8tests_8cpp_source_l00005}{5}} of
 \DoxyCodeLine{00006\ }
 \DoxyCodeLine{00007\ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{int}\ size\ =\ 100;}
 \DoxyCodeLine{00008\ }
-\DoxyCodeLine{00009\ \ \ \ \ std::vector<int>\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}};}
+\DoxyCodeLine{00009\ \ \ \ \ std::vector<int>\ v;}
 \DoxyCodeLine{00010\ \ \ \ \ std::map<int,\ int>\ m;}
 \DoxyCodeLine{00011\ }
 \DoxyCodeLine{00012\ \ \ \ \ \mbox{\hyperlink{catch__benchmark_8h_aaba0eec6ef0736ca2b022a98a7c855e4}{BENCHMARK}}(\ \textcolor{stringliteral}{"{}Load\ up\ a\ vector"{}}\ )\ \{}
-\DoxyCodeLine{00013\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}\ =\ std::vector<int>();}
+\DoxyCodeLine{00013\ \ \ \ \ \ \ \ \ v\ =\ std::vector<int>();}
 \DoxyCodeLine{00014\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int}\ i\ =0;\ i\ <\ size;\ ++i\ )}
-\DoxyCodeLine{00015\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.push\_back(\ i\ );}
+\DoxyCodeLine{00015\ \ \ \ \ \ \ \ \ \ \ \ \ v.push\_back(\ i\ );}
 \DoxyCodeLine{00016\ \ \ \ \ \}}
-\DoxyCodeLine{00017\ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_ad57835ba8f1bb419a865ada6bd011a85}{REQUIRE}}(\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.size()\ ==\ size\ );}
+\DoxyCodeLine{00017\ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_ad57835ba8f1bb419a865ada6bd011a85}{REQUIRE}}(\ v.size()\ ==\ size\ );}
 \DoxyCodeLine{00018\ }
 \DoxyCodeLine{00019\ \ \ \ \ \mbox{\hyperlink{catch__benchmark_8h_aaba0eec6ef0736ca2b022a98a7c855e4}{BENCHMARK}}(\ \textcolor{stringliteral}{"{}Load\ up\ a\ map"{}}\ )\ \{}
 \DoxyCodeLine{00020\ \ \ \ \ \ \ \ \ m\ =\ std::map<int,\ int>();}
@@ -51,12 +52,12 @@ Definition at line \mbox{\hyperlink{_benchmark_8tests_8cpp_source_l00005}{5}} of
 \DoxyCodeLine{00024\ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_ad57835ba8f1bb419a865ada6bd011a85}{REQUIRE}}(\ m.size()\ ==\ size\ );}
 \DoxyCodeLine{00025\ }
 \DoxyCodeLine{00026\ \ \ \ \ \mbox{\hyperlink{catch__benchmark_8h_aaba0eec6ef0736ca2b022a98a7c855e4}{BENCHMARK}}(\ \textcolor{stringliteral}{"{}Reserved\ vector"{}}\ )\ \{}
-\DoxyCodeLine{00027\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}\ =\ std::vector<int>();}
-\DoxyCodeLine{00028\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.reserve(size);}
+\DoxyCodeLine{00027\ \ \ \ \ \ \ \ \ v\ =\ std::vector<int>();}
+\DoxyCodeLine{00028\ \ \ \ \ \ \ \ \ v.reserve(size);}
 \DoxyCodeLine{00029\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int}\ i\ =0;\ i\ <\ size;\ ++i\ )}
-\DoxyCodeLine{00030\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.push\_back(\ i\ );}
+\DoxyCodeLine{00030\ \ \ \ \ \ \ \ \ \ \ \ \ v.push\_back(\ i\ );}
 \DoxyCodeLine{00031\ \ \ \ \ \}}
-\DoxyCodeLine{00032\ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_ad57835ba8f1bb419a865ada6bd011a85}{REQUIRE}}(\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.size()\ ==\ size\ );}
+\DoxyCodeLine{00032\ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_ad57835ba8f1bb419a865ada6bd011a85}{REQUIRE}}(\ v.size()\ ==\ size\ );}
 \DoxyCodeLine{00033\ }
 \DoxyCodeLine{00034\ \ \ \ \ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{namespacepicojson_ac1e72166adfe3d96dc58cddc7ebd536a}{array}}[size];}
 \DoxyCodeLine{00035\ \ \ \ \ \mbox{\hyperlink{catch__benchmark_8h_aaba0eec6ef0736ca2b022a98a7c855e4}{BENCHMARK}}(\ \textcolor{stringliteral}{"{}A\ fixed\ size\ array\ that\ should\ require\ no\ allocations"{}}\ )\ \{}

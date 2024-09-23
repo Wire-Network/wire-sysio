@@ -91,7 +91,7 @@
 \DoxyCodeLine{\Hypertarget{sha224_8cpp_source_l00087}00087\ \ \ \}}
 \DoxyCodeLine{\Hypertarget{sha224_8cpp_source_l00088}\mbox{\hyperlink{namespacefc_ae868229a5d2d2893b709b926b9844d3a}{00088}}\ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespacefc_accef08adf4ee05c36ccc550d8101b08f}{from\_variant}}(\ \textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1variant}{variant}}\&\ v,\ \mbox{\hyperlink{classfc_1_1sha224}{sha224}}\&\ bi\ )}
 \DoxyCodeLine{\Hypertarget{sha224_8cpp_source_l00089}00089\ \ \ \{}
-\DoxyCodeLine{\Hypertarget{sha224_8cpp_source_l00090}00090\ \ \ \ \ std::vector<char>\ ve\ =\ v.as<\ std::vector<char>\ >();}
+\DoxyCodeLine{\Hypertarget{sha224_8cpp_source_l00090}00090\ \ \ \ \ std::vector<char>\ ve\ =\ v.\mbox{\hyperlink{classfc_1_1variant_a82edd1f33199355d3a1f19bbb92909cc}{as}}<\ std::vector<char>\ >();}
 \DoxyCodeLine{\Hypertarget{sha224_8cpp_source_l00091}00091\ \ \ \ \ \textcolor{keywordflow}{if}(\ ve.size()\ )}
 \DoxyCodeLine{\Hypertarget{sha224_8cpp_source_l00092}00092\ \ \ \ \ \{}
 \DoxyCodeLine{\Hypertarget{sha224_8cpp_source_l00093}00093\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_ae785d5badbf1f08b491af31f32a135a1}{memcpy}}(\&bi,\ ve.\mbox{\hyperlink{classfc_1_1sha224_ab83a3e8af100f9f4e956a6917f0557b1}{data}}(),\ \mbox{\hyperlink{namespacefc_aa3ea11c18de71ec23b19c3cc571fb8ff}{fc::min<size\_t>}}(ve.size(),\textcolor{keyword}{sizeof}(bi))\ );}

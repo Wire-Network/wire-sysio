@@ -183,19 +183,19 @@
 \DoxyCodeLine{\Hypertarget{gmock-spec-builders_8cc_source_l00179}00179\ }
 \DoxyCodeLine{\Hypertarget{gmock-spec-builders_8cc_source_l00180}00180\ \textcolor{comment}{//\ Describes\ how\ many\ times\ a\ function\ call\ matching\ this}}
 \DoxyCodeLine{\Hypertarget{gmock-spec-builders_8cc_source_l00181}00181\ \textcolor{comment}{//\ expectation\ has\ occurred.}}
-\DoxyCodeLine{\Hypertarget{gmock-spec-builders_8cc_source_l00182}\mbox{\hyperlink{classtesting_1_1internal_1_1_expectation_base_a2beebed3ade29077bcf294b449bb8b9d}{00182}}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classtesting_1_1internal_1_1_expectation_base_a2beebed3ade29077bcf294b449bb8b9d}{ExpectationBase::DescribeCallCountTo}}(::std::ostream*\ os)\ \textcolor{keyword}{const}}
+\DoxyCodeLine{\Hypertarget{gmock-spec-builders_8cc_source_l00182}\mbox{\hyperlink{classtesting_1_1internal_1_1_expectation_base_a2beebed3ade29077bcf294b449bb8b9d}{00182}}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classtesting_1_1internal_1_1_expectation_base_a2beebed3ade29077bcf294b449bb8b9d}{ExpectationBase::DescribeCallCountTo}}(::std::ostream*\ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}})\ \textcolor{keyword}{const}}
 \DoxyCodeLine{\Hypertarget{gmock-spec-builders_8cc_source_l00183}00183\ \ \ \ \ \mbox{\hyperlink{gtest-port_8h_a149f693bd59fa1bc937af54c0cdcb32f}{GTEST\_EXCLUSIVE\_LOCK\_REQUIRED\_}}(g\_gmock\_mutex)\ \{}
 \DoxyCodeLine{\Hypertarget{gmock-spec-builders_8cc_source_l00184}00184\ \ \ g\_gmock\_mutex.AssertHeld();}
 \DoxyCodeLine{\Hypertarget{gmock-spec-builders_8cc_source_l00185}00185\ }
 \DoxyCodeLine{\Hypertarget{gmock-spec-builders_8cc_source_l00186}00186\ \ \ \textcolor{comment}{//\ Describes\ how\ many\ times\ the\ function\ is\ expected\ to\ be\ called.}}
-\DoxyCodeLine{\Hypertarget{gmock-spec-builders_8cc_source_l00187}00187\ \ \ *os\ <<\ \textcolor{stringliteral}{"{}\ \ \ \ \ \ \ \ \ Expected:\ to\ be\ "{}};}
-\DoxyCodeLine{\Hypertarget{gmock-spec-builders_8cc_source_l00188}00188\ \ \ cardinality().DescribeTo(os);}
-\DoxyCodeLine{\Hypertarget{gmock-spec-builders_8cc_source_l00189}00189\ \ \ *os\ <<\ \textcolor{stringliteral}{"{}\(\backslash\)n\ \ \ \ \ \ \ \ \ \ \ Actual:\ "{}};}
-\DoxyCodeLine{\Hypertarget{gmock-spec-builders_8cc_source_l00190}00190\ \ \ \mbox{\hyperlink{classtesting_1_1_cardinality_a7cbea339e2f3072a98367e087aa296e8}{Cardinality::DescribeActualCallCountTo}}(call\_count(),\ os);}
+\DoxyCodeLine{\Hypertarget{gmock-spec-builders_8cc_source_l00187}00187\ \ \ *\mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}\ <<\ \textcolor{stringliteral}{"{}\ \ \ \ \ \ \ \ \ Expected:\ to\ be\ "{}};}
+\DoxyCodeLine{\Hypertarget{gmock-spec-builders_8cc_source_l00188}00188\ \ \ cardinality().DescribeTo(\mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}});}
+\DoxyCodeLine{\Hypertarget{gmock-spec-builders_8cc_source_l00189}00189\ \ \ *\mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}\ <<\ \textcolor{stringliteral}{"{}\(\backslash\)n\ \ \ \ \ \ \ \ \ \ \ Actual:\ "{}};}
+\DoxyCodeLine{\Hypertarget{gmock-spec-builders_8cc_source_l00190}00190\ \ \ \mbox{\hyperlink{classtesting_1_1_cardinality_a7cbea339e2f3072a98367e087aa296e8}{Cardinality::DescribeActualCallCountTo}}(call\_count(),\ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}});}
 \DoxyCodeLine{\Hypertarget{gmock-spec-builders_8cc_source_l00191}00191\ }
 \DoxyCodeLine{\Hypertarget{gmock-spec-builders_8cc_source_l00192}00192\ \ \ \textcolor{comment}{//\ Describes\ the\ state\ of\ the\ expectation\ (e.g.\ is\ it\ satisfied?}}
 \DoxyCodeLine{\Hypertarget{gmock-spec-builders_8cc_source_l00193}00193\ \ \ \textcolor{comment}{//\ is\ it\ active?).}}
-\DoxyCodeLine{\Hypertarget{gmock-spec-builders_8cc_source_l00194}00194\ \ \ *os\ <<\ \textcolor{stringliteral}{"{}\ -\/\ "{}}\ <<\ (IsOverSaturated()\ ?\ \textcolor{stringliteral}{"{}over-\/saturated"{}}\ :}
+\DoxyCodeLine{\Hypertarget{gmock-spec-builders_8cc_source_l00194}00194\ \ \ *\mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}\ <<\ \textcolor{stringliteral}{"{}\ -\/\ "{}}\ <<\ (IsOverSaturated()\ ?\ \textcolor{stringliteral}{"{}over-\/saturated"{}}\ :}
 \DoxyCodeLine{\Hypertarget{gmock-spec-builders_8cc_source_l00195}00195\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ IsSaturated()\ ?\ \textcolor{stringliteral}{"{}saturated"{}}\ :}
 \DoxyCodeLine{\Hypertarget{gmock-spec-builders_8cc_source_l00196}00196\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ IsSatisfied()\ ?\ \textcolor{stringliteral}{"{}satisfied"{}}\ :\ \textcolor{stringliteral}{"{}unsatisfied"{}})}
 \DoxyCodeLine{\Hypertarget{gmock-spec-builders_8cc_source_l00197}00197\ \ \ \ \ \ \ <<\ \textcolor{stringliteral}{"{}\ and\ "{}}}
@@ -783,7 +783,7 @@
 \DoxyCodeLine{\Hypertarget{gmock-spec-builders_8cc_source_l00779}00779\ \ \ MockObjectState\&\ \mbox{\hyperlink{structstate}{state}}\ =\ g\_mock\_object\_registry.states()[mock\_obj];}
 \DoxyCodeLine{\Hypertarget{gmock-spec-builders_8cc_source_l00780}00780\ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{structstate}{state}}.first\_used\_file\ ==\ NULL)\ \{}
 \DoxyCodeLine{\Hypertarget{gmock-spec-builders_8cc_source_l00781}00781\ \ \ \ \ \mbox{\hyperlink{structstate}{state}}.first\_used\_file\ =\ file;}
-\DoxyCodeLine{\Hypertarget{gmock-spec-builders_8cc_source_l00782}00782\ \ \ \ \ \mbox{\hyperlink{structstate}{state}}.first\_used\_line\ =\ \mbox{\hyperlink{namespacevalidate__reflection_a54d4e98ade8417b88a7e3859a693630a}{line}};}
+\DoxyCodeLine{\Hypertarget{gmock-spec-builders_8cc_source_l00782}00782\ \ \ \ \ \mbox{\hyperlink{structstate}{state}}.first\_used\_line\ =\ line;}
 \DoxyCodeLine{\Hypertarget{gmock-spec-builders_8cc_source_l00783}00783\ \ \ \ \ \textcolor{keyword}{const}\ TestInfo*\ \textcolor{keyword}{const}\ test\_info\ =}
 \DoxyCodeLine{\Hypertarget{gmock-spec-builders_8cc_source_l00784}00784\ \ \ \ \ \ \ \ \ UnitTest::GetInstance()-\/>current\_test\_info();}
 \DoxyCodeLine{\Hypertarget{gmock-spec-builders_8cc_source_l00785}00785\ \ \ \ \ \textcolor{keywordflow}{if}\ (test\_info\ !=\ NULL)\ \{}

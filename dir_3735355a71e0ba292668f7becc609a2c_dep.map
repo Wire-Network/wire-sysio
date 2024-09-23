@@ -1,12 +1,12 @@
 <map id="plugins/http_client_plugin" name="plugins/http_client_plugin">
 <area shape="rect" id="node2" href="dir_da268edb4795a38ba1224116cf449058.html" title="include" alt="" coords="52,137,114,162"/>
-<area shape="poly" id="edge2" href="dir_000133_000160.html" alt="" coords="99,89,91,122,86,121,94,88"/>
-<area shape="rect" id="edge2-headlabel" href="dir_000133_000160.html" title="1" alt="" coords="94,113,101,128"/>
+<area shape="poly" id="edge2" href="dir_000131_000158.html" alt="" coords="99,89,91,122,86,121,94,88"/>
+<area shape="rect" id="edge2-headlabel" href="dir_000131_000158.html" title="1" alt="" coords="94,113,101,128"/>
 <area shape="rect" id="node3" href="dir_428556e0652617aa37d2f7d8bcaf7fdf.html" title="libraries" alt="" coords="83,210,149,236"/>
-<area shape="poly" id="edge1" href="dir_000133_000208.html" alt="" coords="108,87,119,109,128,136,130,167,126,196,121,195,124,167,123,137,114,111,103,90"/>
-<area shape="rect" id="edge1-headlabel" href="dir_000133_000208.html" title="3" alt="" coords="129,187,136,202"/>
-<area shape="poly" id="edge3" href="dir_000160_000208.html" alt="" coords="91,161,106,195,101,197,86,164"/>
-<area shape="rect" id="edge3-headlabel" href="dir_000160_000208.html" title="2" alt="" coords="107,182,114,197"/>
+<area shape="poly" id="edge1" href="dir_000131_000206.html" alt="" coords="108,87,119,109,128,136,130,167,126,196,121,195,124,167,123,137,114,111,103,90"/>
+<area shape="rect" id="edge1-headlabel" href="dir_000131_000206.html" title="3" alt="" coords="129,187,136,202"/>
+<area shape="poly" id="edge3" href="dir_000158_000206.html" alt="" coords="91,161,106,195,101,197,86,164"/>
+<area shape="rect" id="edge3-headlabel" href="dir_000158_000206.html" title="2" alt="" coords="107,182,114,197"/>
 <area shape="rect" id="clust2" href="dir_3735355a71e0ba292668f7becc609a2c.html" alt="" coords="27,52,171,173"/>
 <area shape="rect" id="clust1" href="dir_4500636a3a05d93d2a8a287b45607964.html" title="plugins" alt="" coords="16,16,181,184"/>
 </map>

@@ -1,11 +1,7 @@
 <map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
-<area shape="rect" id="Node000000" href="$structfc_1_1visitor.html" title=" " alt="" coords="5,128,129,154"/>
-<area shape="rect" id="Node000001" href="$structfc_1_1crypto_1_1eq__comparator_3_01std_1_1variant_3_01_ts_8_8_8_01_4_01_4_1_1visitor.html" title=" " alt="" coords="182,5,352,61"/>
-<area shape="poly" id="edge399_Node000000_Node000001" title=" " alt="" coords="99,117,175,71,198,59,201,64,178,75,102,122"/>
-<area shape="rect" id="Node000002" href="$structfc_1_1crypto_1_1is__valid__visitor.html" title=" " alt="" coords="203,85,331,126"/>
-<area shape="poly" id="edge400_Node000000_Node000002" title=" " alt="" coords="144,125,202,114,203,119,145,130"/>
-<area shape="rect" id="Node000003" href="$structfc_1_1crypto_1_1less__comparator_3_01std_1_1variant_3_01_ts_8_8_8_01_4_01_4_1_1visitor.html" title=" " alt="" coords="177,149,357,205"/>
-<area shape="poly" id="edge401_Node000000_Node000003" title=" " alt="" coords="145,152,177,158,176,164,144,158"/>
-<area shape="rect" id="Node000004" href="$structfc_1_1http__client__impl_1_1check__closed__visitor.html" title=" " alt="" coords="191,229,342,270"/>
-<area shape="poly" id="edge402_Node000000_Node000004" title=" " alt="" coords="98,162,135,189,178,215,202,226,200,231,175,220,132,193,95,166"/>
+<area shape="rect" id="Node000000" href="$structfc_1_1visitor.html" title=" " alt="" coords="5,39,150,79"/>
+<area shape="rect" id="Node000001" href="$structfc_1_1crypto_1_1public__key__visitor.html" title=" " alt="" coords="206,5,324,46"/>
+<area shape="poly" id="edge407_Node000000_Node000001" title=" " alt="" coords="165,41,205,34,206,39,165,46"/>
+<area shape="rect" id="Node000002" href="$structfc_1_1crypto_1_1recovery__visitor.html" title=" " alt="" coords="198,71,332,111"/>
+<area shape="poly" id="edge408_Node000000_Node000002" title=" " alt="" coords="166,71,198,77,197,82,165,77"/>
 </map>

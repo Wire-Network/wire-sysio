@@ -2,7 +2,8 @@
 \hypertarget{structsysio_1_1txn__test__gen__plugin__impl}{}\label{structsysio_1_1txn__test__gen__plugin__impl}\index{sysio::txn\_test\_gen\_plugin\_impl@{sysio::txn\_test\_gen\_plugin\_impl}}
 
 
-Collaboration diagram for sysio\+::txn\+\_\+test\+\_\+gen\+\_\+plugin\+\_\+impl\+:\nopagebreak
+Collaboration diagram for sysio\+::txn\+\_\+test\+\_\+gen\+\_\+plugin\+\_\+impl\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -244,10 +245,10 @@ Definition at line \mbox{\hyperlink{txn__test__gen__plugin_8cpp_source_l00138}{1
 \DoxyCodeLine{00267\ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{catch}\ (\ \textcolor{keyword}{const}\ boost::interprocess::bad\_alloc\&\ )\ \{}
 \DoxyCodeLine{00268\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw};}
 \DoxyCodeLine{00269\ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{catch}\ (\textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1exception}{fc::exception}}\&\ e)\ \{}
-\DoxyCodeLine{00270\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacecpp_1_1ast_a25b104cfd21fb8487a07063b6ce62062}{next}}(e.\mbox{\hyperlink{classfc_1_1exception_a38ac38d910ba13a339ce5855a51c9127}{dynamic\_copy\_exception}}());}
+\DoxyCodeLine{00270\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespaceutf8_afc093dfde66a6f52cb4a5caefe0e580d}{next}}(e.\mbox{\hyperlink{classfc_1_1exception_a38ac38d910ba13a339ce5855a51c9127}{dynamic\_copy\_exception}}());}
 \DoxyCodeLine{00271\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return};}
 \DoxyCodeLine{00272\ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{catch}\ (\textcolor{keyword}{const}\ std::exception\&\ e)\ \{}
-\DoxyCodeLine{00273\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacecpp_1_1ast_a25b104cfd21fb8487a07063b6ce62062}{next}}(\mbox{\hyperlink{classfc_1_1std__exception__wrapper_ae5ad64f84b1d373f5b92031566284c7c}{fc::std\_exception\_wrapper::from\_current\_exception}}(e).dynamic\_copy\_exception());}
+\DoxyCodeLine{00273\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespaceutf8_afc093dfde66a6f52cb4a5caefe0e580d}{next}}(\mbox{\hyperlink{classfc_1_1std__exception__wrapper_ae5ad64f84b1d373f5b92031566284c7c}{fc::std\_exception\_wrapper::from\_current\_exception}}(e).dynamic\_copy\_exception());}
 \DoxyCodeLine{00274\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return};}
 \DoxyCodeLine{00275\ \ \ \ \ \ \ \}}
 \DoxyCodeLine{00276\ }
@@ -255,7 +256,8 @@ Definition at line \mbox{\hyperlink{txn__test__gen__plugin_8cpp_source_l00138}{1
 \DoxyCodeLine{00278\ \ \ \ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -288,7 +290,7 @@ Definition at line \mbox{\hyperlink{txn__test__gen__plugin_8cpp_source_l00106}{1
 \DoxyCodeLine{00117\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
 \DoxyCodeLine{00118\ }
 \DoxyCodeLine{00119\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (except\_ptr)\ \{}
-\DoxyCodeLine{00120\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacecpp_1_1ast_a25b104cfd21fb8487a07063b6ce62062}{next}}(std::get<fc::exception\_ptr>(result));}
+\DoxyCodeLine{00120\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespaceutf8_afc093dfde66a6f52cb4a5caefe0e580d}{next}}(std::get<fc::exception\_ptr>(result));}
 \DoxyCodeLine{00121\ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
 \DoxyCodeLine{00122\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (std::holds\_alternative<transaction\_trace\_ptr>(result)\ \&\&\ std::get<transaction\_trace\_ptr>(result)-\/>receipt)\ \{}
 \DoxyCodeLine{00123\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1txn__test__gen__plugin__impl_a760f3dd4c6ae2d69f0cff6f4ad26e1d5}{\_total\_us}}\ +=\ std::get<transaction\_trace\_ptr>(result)-\/>receipt-\/>cpu\_usage\_us;}
@@ -300,7 +302,8 @@ Definition at line \mbox{\hyperlink{txn__test__gen__plugin_8cpp_source_l00106}{1
 \DoxyCodeLine{00129\ \ \ \ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -327,7 +330,8 @@ Definition at line \mbox{\hyperlink{txn__test__gen__plugin_8cpp_source_l00131}{1
 \DoxyCodeLine{00136\ \ \ \ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -399,16 +403,17 @@ Definition at line \mbox{\hyperlink{txn__test__gen__plugin_8cpp_source_l00347}{3
 \DoxyCodeLine{00397\ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{catch}\ (\ \textcolor{keyword}{const}\ boost::interprocess::bad\_alloc\&\ )\ \{}
 \DoxyCodeLine{00398\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw};}
 \DoxyCodeLine{00399\ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{catch}\ (\ \textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1exception}{fc::exception}}\&\ e\ )\ \{}
-\DoxyCodeLine{00400\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacecpp_1_1ast_a25b104cfd21fb8487a07063b6ce62062}{next}}(e.\mbox{\hyperlink{classfc_1_1exception_a38ac38d910ba13a339ce5855a51c9127}{dynamic\_copy\_exception}}());}
+\DoxyCodeLine{00400\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespaceutf8_afc093dfde66a6f52cb4a5caefe0e580d}{next}}(e.\mbox{\hyperlink{classfc_1_1exception_a38ac38d910ba13a339ce5855a51c9127}{dynamic\_copy\_exception}}());}
 \DoxyCodeLine{00401\ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{catch}\ (\textcolor{keyword}{const}\ std::exception\&\ e)\ \{}
-\DoxyCodeLine{00402\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacecpp_1_1ast_a25b104cfd21fb8487a07063b6ce62062}{next}}(\mbox{\hyperlink{classfc_1_1std__exception__wrapper_ae5ad64f84b1d373f5b92031566284c7c}{fc::std\_exception\_wrapper::from\_current\_exception}}(e).dynamic\_copy\_exception());}
+\DoxyCodeLine{00402\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespaceutf8_afc093dfde66a6f52cb4a5caefe0e580d}{next}}(\mbox{\hyperlink{classfc_1_1std__exception__wrapper_ae5ad64f84b1d373f5b92031566284c7c}{fc::std\_exception\_wrapper::from\_current\_exception}}(e).dynamic\_copy\_exception());}
 \DoxyCodeLine{00403\ \ \ \ \ \ \ \}}
 \DoxyCodeLine{00404\ }
 \DoxyCodeLine{00405\ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1txn__test__gen__plugin__impl_a4cebdfa3e64ab8d5c494aa8415492e2f}{push\_transactions}}(std::move(trxs),\ next);}
 \DoxyCodeLine{00406\ \ \ \ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -477,7 +482,8 @@ Definition at line \mbox{\hyperlink{txn__test__gen__plugin_8cpp_source_l00280}{2
 \DoxyCodeLine{00327\ \ \ \ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode

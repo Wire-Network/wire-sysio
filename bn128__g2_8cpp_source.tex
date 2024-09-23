@@ -21,7 +21,7 @@
 \DoxyCodeLine{\Hypertarget{bn128__g2_8cpp_source_l00023}00023\ }
 \DoxyCodeLine{\Hypertarget{bn128__g2_8cpp_source_l00024}00024\ \mbox{\hyperlink{structbn_1_1_fp2_t}{bn::Fp2}}\ bn128\_G2::sqrt(\textcolor{keyword}{const}\ \mbox{\hyperlink{structbn_1_1_fp2_t}{bn::Fp2}}\ \&el)}
 \DoxyCodeLine{\Hypertarget{bn128__g2_8cpp_source_l00025}00025\ \{}
-\DoxyCodeLine{\Hypertarget{bn128__g2_8cpp_source_l00026}00026\ \ \ \ \ \textcolor{keywordtype}{size\_t}\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}\ =\ \mbox{\hyperlink{namespacelibff_a1112b4d1ba35f7970584b58e71cc67d1}{bn128\_Fq2\_s}};}
+\DoxyCodeLine{\Hypertarget{bn128__g2_8cpp_source_l00026}00026\ \ \ \ \ \textcolor{keywordtype}{size\_t}\ v\ =\ \mbox{\hyperlink{namespacelibff_a1112b4d1ba35f7970584b58e71cc67d1}{bn128\_Fq2\_s}};}
 \DoxyCodeLine{\Hypertarget{bn128__g2_8cpp_source_l00027}00027\ \ \ \ \ \mbox{\hyperlink{structbn_1_1_fp2_t}{bn::Fp2}}\ z\ =\ \mbox{\hyperlink{namespacelibff_a78ffae38ed0a2ff96a1cd52d15c8ea5a}{bn128\_Fq2\_nqr\_to\_t}};}
 \DoxyCodeLine{\Hypertarget{bn128__g2_8cpp_source_l00028}00028\ \ \ \ \ \mbox{\hyperlink{structbn_1_1_fp2_t}{bn::Fp2}}\ w\ =\ \mbox{\hyperlink{namespacemie_a595f193249b72c666b84e42439a60817}{mie::power}}(el,\ \mbox{\hyperlink{namespacelibff_a828eae4a6832493134229f574df7fdbd}{bn128\_Fq2\_t\_minus\_1\_over\_2}});}
 \DoxyCodeLine{\Hypertarget{bn128__g2_8cpp_source_l00029}00029\ \ \ \ \ \mbox{\hyperlink{structbn_1_1_fp2_t}{bn::Fp2}}\ x\ =\ el\ *\ w;}
@@ -30,7 +30,7 @@
 \DoxyCodeLine{\Hypertarget{bn128__g2_8cpp_source_l00032}00032\ \textcolor{preprocessor}{\#if\ DEBUG}}
 \DoxyCodeLine{\Hypertarget{bn128__g2_8cpp_source_l00033}00033\ \ \ \ \ \textcolor{comment}{//\ check\ if\ square\ with\ Euler's\ criterion}}
 \DoxyCodeLine{\Hypertarget{bn128__g2_8cpp_source_l00034}00034\ \ \ \ \ \mbox{\hyperlink{structbn_1_1_fp2_t}{bn::Fp2}}\ check\ =\ b;}
-\DoxyCodeLine{\Hypertarget{bn128__g2_8cpp_source_l00035}00035\ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{size\_t}\ i\ =\ 0;\ i\ <\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}-\/1;\ ++i)}
+\DoxyCodeLine{\Hypertarget{bn128__g2_8cpp_source_l00035}00035\ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{size\_t}\ i\ =\ 0;\ i\ <\ v-\/1;\ ++i)}
 \DoxyCodeLine{\Hypertarget{bn128__g2_8cpp_source_l00036}00036\ \ \ \ \ \{}
 \DoxyCodeLine{\Hypertarget{bn128__g2_8cpp_source_l00037}00037\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structbn_1_1_fp2_t_a4f9744dae3a0fba74fe4a0ff89353c42}{bn::Fp2::square}}(check,\ check);}
 \DoxyCodeLine{\Hypertarget{bn128__g2_8cpp_source_l00038}00038\ \ \ \ \ \}}
@@ -52,7 +52,7 @@
 \DoxyCodeLine{\Hypertarget{bn128__g2_8cpp_source_l00054}00054\ \ \ \ \ \ \ \ \ \ \ \ \ m\ +=\ 1;}
 \DoxyCodeLine{\Hypertarget{bn128__g2_8cpp_source_l00055}00055\ \ \ \ \ \ \ \ \ \}}
 \DoxyCodeLine{\Hypertarget{bn128__g2_8cpp_source_l00056}00056\ }
-\DoxyCodeLine{\Hypertarget{bn128__g2_8cpp_source_l00057}00057\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a538d097420e725c4dad63c3caa9e55bd}{j}}\ =\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}-\/m-\/1;}
+\DoxyCodeLine{\Hypertarget{bn128__g2_8cpp_source_l00057}00057\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a538d097420e725c4dad63c3caa9e55bd}{j}}\ =\ v-\/m-\/1;}
 \DoxyCodeLine{\Hypertarget{bn128__g2_8cpp_source_l00058}00058\ \ \ \ \ \ \ \ \ w\ =\ z;}
 \DoxyCodeLine{\Hypertarget{bn128__g2_8cpp_source_l00059}00059\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{while}\ (\mbox{\hyperlink{yubihsm__pkcs11_8c_a538d097420e725c4dad63c3caa9e55bd}{j}}\ >\ 0)}
 \DoxyCodeLine{\Hypertarget{bn128__g2_8cpp_source_l00060}00060\ \ \ \ \ \ \ \ \ \{}
@@ -63,7 +63,7 @@
 \DoxyCodeLine{\Hypertarget{bn128__g2_8cpp_source_l00065}00065\ \ \ \ \ \ \ \ \ z\ =\ w\ *\ w;}
 \DoxyCodeLine{\Hypertarget{bn128__g2_8cpp_source_l00066}00066\ \ \ \ \ \ \ \ \ b\ =\ b\ *\ z;}
 \DoxyCodeLine{\Hypertarget{bn128__g2_8cpp_source_l00067}00067\ \ \ \ \ \ \ \ \ x\ =\ x\ *\ w;}
-\DoxyCodeLine{\Hypertarget{bn128__g2_8cpp_source_l00068}00068\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}\ =\ m;}
+\DoxyCodeLine{\Hypertarget{bn128__g2_8cpp_source_l00068}00068\ \ \ \ \ \ \ \ \ v\ =\ m;}
 \DoxyCodeLine{\Hypertarget{bn128__g2_8cpp_source_l00069}00069\ \ \ \ \ \}}
 \DoxyCodeLine{\Hypertarget{bn128__g2_8cpp_source_l00070}00070\ }
 \DoxyCodeLine{\Hypertarget{bn128__g2_8cpp_source_l00071}00071\ \ \ \ \ \textcolor{keywordflow}{return}\ x;}

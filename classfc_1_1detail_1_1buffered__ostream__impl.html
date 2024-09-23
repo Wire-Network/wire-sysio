@@ -106,7 +106,7 @@ $(function(){initNavTree('classfc_1_1detail_1_1buffered__ostream__impl.html','')
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-methods" name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:afb5a9c7366e4724c2f7a5d42bdb4bc37" id="r_afb5a9c7366e4724c2f7a5d42bdb4bc37"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#afb5a9c7366e4724c2f7a5d42bdb4bc37">buffered_ostream_impl</a> (ostream_ptr os)</td></tr>
+<tr class="memitem:afb5a9c7366e4724c2f7a5d42bdb4bc37" id="r_afb5a9c7366e4724c2f7a5d42bdb4bc37"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#afb5a9c7366e4724c2f7a5d42bdb4bc37">buffered_ostream_impl</a> (ostream_ptr <a class="el" href="environment_8hpp.html#a3951483d0b31c29ca95336206cd35238">os</a>)</td></tr>
 <tr class="separator:afb5a9c7366e4724c2f7a5d42bdb4bc37"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-attribs" name="pub-attribs"></a>
@@ -149,13 +149,14 @@ Public Attributes</h2></td></tr>
 
 <p class="definition">Definition at line <a class="el" href="buffered__iostream_8cpp_source.html#l00137">137</a> of file <a class="el" href="buffered__iostream_8cpp_source.html">buffered_iostream.cpp</a>.</p>
 <div class="fragment"><div class="line"><span class="lineno">  137</span>                                                     :</div>
-<div class="line"><span class="lineno">  138</span>               <a class="code hl_variable" href="#a478a7f64f25359f4b6b4685b0891d1df">_ostr</a>(fc::move(os))</div>
+<div class="line"><span class="lineno">  138</span>               <a class="code hl_variable" href="#a478a7f64f25359f4b6b4685b0891d1df">_ostr</a>(fc::move(<a class="code hl_variable" href="environment_8hpp.html#a3951483d0b31c29ca95336206cd35238">os</a>))</div>
 <div class="line"><span class="lineno">  139</span><span class="preprocessor">#ifndef NDEBUG</span></div>
 <div class="line"><span class="lineno">  140</span>               ,<a class="code hl_variable" href="#aeb1d23dc08f41b686dab2b3e0259c4ad">_shared_write_buffer_in_use</a>(<span class="keyword">false</span>)</div>
 <div class="line"><span class="lineno">  141</span><span class="preprocessor">#endif</span></div>
 <div class="line"><span class="lineno">  142</span>             {}</div>
 <div class="ttc" id="aclassfc_1_1detail_1_1buffered__ostream__impl_html_a478a7f64f25359f4b6b4685b0891d1df"><div class="ttname"><a href="#a478a7f64f25359f4b6b4685b0891d1df">fc::detail::buffered_ostream_impl::_ostr</a></div><div class="ttdeci">ostream_ptr _ostr</div><div class="ttdef"><b>Definition</b> <a href="buffered__iostream_8cpp_source.html#l00144">buffered_iostream.cpp:144</a></div></div>
 <div class="ttc" id="aclassfc_1_1detail_1_1buffered__ostream__impl_html_aeb1d23dc08f41b686dab2b3e0259c4ad"><div class="ttname"><a href="#aeb1d23dc08f41b686dab2b3e0259c4ad">fc::detail::buffered_ostream_impl::_shared_write_buffer_in_use</a></div><div class="ttdeci">bool _shared_write_buffer_in_use</div><div class="ttdef"><b>Definition</b> <a href="buffered__iostream_8cpp_source.html#l00148">buffered_iostream.cpp:148</a></div></div>
+<div class="ttc" id="aenvironment_8hpp_html_a3951483d0b31c29ca95336206cd35238"><div class="ttname"><a href="environment_8hpp.html#a3951483d0b31c29ca95336206cd35238">os</a></div><div class="ttdeci">os_t os</div><div class="ttdef"><b>Definition</b> <a href="environment_8hpp_source.html#l00023">environment.hpp:23</a></div></div>
 </div><!-- fragment -->
 </div>
 </div>

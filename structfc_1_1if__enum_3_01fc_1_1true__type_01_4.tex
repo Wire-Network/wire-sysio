@@ -35,13 +35,21 @@ Definition at line \mbox{\hyperlink{fc_2include_2fc_2reflect_2variant_8hpp_sourc
 
 \begin{DoxyCode}{0}
 \DoxyCodeLine{00088\ \ \ \ \ \ \ \ \{\ }
-\DoxyCodeLine{00089\ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.is\_string()\ )}
-\DoxyCodeLine{00090\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ o\ =\ \mbox{\hyperlink{structfc_1_1reflector}{fc::reflector<T>::from\_string}}(\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.get\_string().c\_str()\ );}
+\DoxyCodeLine{00089\ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ v.\mbox{\hyperlink{classfc_1_1variant_ac51c0354c1fcef2cc5ce43a5062e8de6}{is\_string}}()\ )}
+\DoxyCodeLine{00090\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ o\ =\ \mbox{\hyperlink{structfc_1_1reflector}{fc::reflector<T>::from\_string}}(\ v.\mbox{\hyperlink{classfc_1_1variant_a2ca9f4d2feb8c9743da4128b18bfa886}{get\_string}}().c\_str()\ );}
 \DoxyCodeLine{00091\ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}}
-\DoxyCodeLine{00092\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ o\ =\ \mbox{\hyperlink{structfc_1_1reflector}{fc::reflector<T>::from\_int}}(\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.as\_int64()\ );}
+\DoxyCodeLine{00092\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ o\ =\ \mbox{\hyperlink{structfc_1_1reflector}{fc::reflector<T>::from\_int}}(\ v.\mbox{\hyperlink{classfc_1_1variant_ab5d7877d2c19dbd6ac9eac7a1205dbeb}{as\_int64}}()\ );}
 \DoxyCodeLine{00093\ \ \ \ \ \ \ \ \}}
 
 \end{DoxyCode}
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{structfc_1_1if__enum_3_01fc_1_1true__type_01_4_a4d28193c3ee53bef7021897448489ba2_cgraph}
+\end{center}
+\end{figure}
 \Hypertarget{structfc_1_1if__enum_3_01fc_1_1true__type_01_4_a11eac43004dde4068db8314f3dc2650d}\index{fc::if\_enum$<$ fc::true\_type $>$@{fc::if\_enum$<$ fc::true\_type $>$}!to\_variant@{to\_variant}}
 \index{to\_variant@{to\_variant}!fc::if\_enum$<$ fc::true\_type $>$@{fc::if\_enum$<$ fc::true\_type $>$}}
 \doxysubsubsection{\texorpdfstring{to\_variant()}{to\_variant()}}
@@ -56,7 +64,7 @@ Definition at line \mbox{\hyperlink{fc_2include_2fc_2reflect_2variant_8hpp_sourc
 
 \begin{DoxyCode}{0}
 \DoxyCodeLine{00083\ \ \ \ \ \ \ \ \{\ }
-\DoxyCodeLine{00084\ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}\ =\ \mbox{\hyperlink{structfc_1_1reflector}{fc::reflector<T>::to\_fc\_string}}(o);}
+\DoxyCodeLine{00084\ \ \ \ \ \ \ \ \ \ \ \ v\ =\ \mbox{\hyperlink{structfc_1_1reflector}{fc::reflector<T>::to\_fc\_string}}(o);}
 \DoxyCodeLine{00085\ \ \ \ \ \ \ \ \}}
 
 \end{DoxyCode}

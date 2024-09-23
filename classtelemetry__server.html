@@ -325,22 +325,22 @@ Here is the caller graph for this function:</div>
 <div class="line"><span class="lineno">  111</span>        <a class="code hl_typedef" href="classwebsocketpp_1_1server.html#abb895563dddafdc1426997d245cbd7cb">server::connection_ptr</a> con = m_endpoint.<a class="code hl_function" href="classwebsocketpp_1_1endpoint.html#a0fe4457427d4124abe7ca022ba7afbb4">get_con_from_hdl</a>(hdl);</div>
 <div class="line"><span class="lineno">  112</span>    </div>
 <div class="line"><span class="lineno">  113</span>        std::ifstream file;</div>
-<div class="line"><span class="lineno">  114</span>        std::string <a class="code hl_variable" href="namespaceembed_clara.html#a1e1bd594f85f58f5dca6c41c0ac720fb">filename</a> = con-&gt;get_resource();</div>
+<div class="line"><span class="lineno">  114</span>        std::string filename = con-&gt;get_resource();</div>
 <div class="line"><span class="lineno">  115</span>        std::string response;</div>
 <div class="line"><span class="lineno">  116</span>    </div>
 <div class="line"><span class="lineno">  117</span>        m_endpoint.<a class="code hl_function" href="classwebsocketpp_1_1endpoint.html#a1d9163813aa02ed32100f443b4ddbd8e">get_alog</a>().write(<a class="code hl_variable" href="structwebsocketpp_1_1log_1_1alevel.html#aaf67c94a68502c49308489ff01d8d0a8">websocketpp::log::alevel::app</a>,</div>
 <div class="line"><span class="lineno">  118</span>            <span class="stringliteral">&quot;http request1: &quot;</span>+filename);</div>
 <div class="line"><span class="lineno">  119</span>    </div>
 <div class="line"><span class="lineno">  120</span>        <span class="keywordflow">if</span> (filename == <span class="stringliteral">&quot;/&quot;</span>) {</div>
-<div class="line"><span class="lineno">  121</span>            <a class="code hl_variable" href="namespaceembed_clara.html#a1e1bd594f85f58f5dca6c41c0ac720fb">filename</a> = m_docroot+<span class="stringliteral">&quot;index.html&quot;</span>;</div>
+<div class="line"><span class="lineno">  121</span>            filename = m_docroot+<span class="stringliteral">&quot;index.html&quot;</span>;</div>
 <div class="line"><span class="lineno">  122</span>        } <span class="keywordflow">else</span> {</div>
-<div class="line"><span class="lineno">  123</span>            <a class="code hl_variable" href="namespaceembed_clara.html#a1e1bd594f85f58f5dca6c41c0ac720fb">filename</a> = m_docroot+<a class="code hl_variable" href="namespaceembed_clara.html#a1e1bd594f85f58f5dca6c41c0ac720fb">filename</a>.substr(1);</div>
+<div class="line"><span class="lineno">  123</span>            filename = m_docroot+filename.substr(1);</div>
 <div class="line"><span class="lineno">  124</span>        }</div>
 <div class="line"><span class="lineno">  125</span>        </div>
 <div class="line"><span class="lineno">  126</span>        m_endpoint.<a class="code hl_function" href="classwebsocketpp_1_1endpoint.html#a1d9163813aa02ed32100f443b4ddbd8e">get_alog</a>().write(<a class="code hl_variable" href="structwebsocketpp_1_1log_1_1alevel.html#aaf67c94a68502c49308489ff01d8d0a8">websocketpp::log::alevel::app</a>,</div>
 <div class="line"><span class="lineno">  127</span>            <span class="stringliteral">&quot;http request2: &quot;</span>+filename);</div>
 <div class="line"><span class="lineno">  128</span>    </div>
-<div class="line"><span class="lineno">  129</span>        file.open(<a class="code hl_variable" href="namespaceembed_clara.html#a1e1bd594f85f58f5dca6c41c0ac720fb">filename</a>.c_str(), std::ios::in);</div>
+<div class="line"><span class="lineno">  129</span>        file.open(filename.c_str(), std::ios::in);</div>
 <div class="line"><span class="lineno">  130</span>        <span class="keywordflow">if</span> (!file) {</div>
 <div class="line"><span class="lineno">  131</span>            <span class="comment">// 404 error</span></div>
 <div class="line"><span class="lineno">  132</span>            std::stringstream <a class="code hl_function" href="namespace_xbyak_1_1util.html#a67cd5471fb751b186b53fdab6da7d3f7">ss</a>;</div>
@@ -348,7 +348,7 @@ Here is the caller graph for this function:</div>
 <div class="line"><span class="lineno">  134</span>            <a class="code hl_function" href="namespace_xbyak_1_1util.html#a67cd5471fb751b186b53fdab6da7d3f7">ss</a> &lt;&lt; <span class="stringliteral">&quot;&lt;!doctype html&gt;&lt;html&gt;&lt;head&gt;&quot;</span></div>
 <div class="line"><span class="lineno">  135</span>               &lt;&lt; <span class="stringliteral">&quot;&lt;title&gt;Error 404 (Resource not found)&lt;/title&gt;&lt;body&gt;&quot;</span></div>
 <div class="line"><span class="lineno">  136</span>               &lt;&lt; <span class="stringliteral">&quot;&lt;h1&gt;Error 404&lt;/h1&gt;&quot;</span></div>
-<div class="line"><span class="lineno">  137</span>               &lt;&lt; <span class="stringliteral">&quot;&lt;p&gt;The requested URL &quot;</span> &lt;&lt; <a class="code hl_variable" href="namespaceembed_clara.html#a1e1bd594f85f58f5dca6c41c0ac720fb">filename</a> &lt;&lt; <span class="stringliteral">&quot; was not found on this server.&lt;/p&gt;&quot;</span></div>
+<div class="line"><span class="lineno">  137</span>               &lt;&lt; <span class="stringliteral">&quot;&lt;p&gt;The requested URL &quot;</span> &lt;&lt; filename &lt;&lt; <span class="stringliteral">&quot; was not found on this server.&lt;/p&gt;&quot;</span></div>
 <div class="line"><span class="lineno">  138</span>               &lt;&lt; <span class="stringliteral">&quot;&lt;/body&gt;&lt;/head&gt;&lt;/html&gt;&quot;</span>;</div>
 <div class="line"><span class="lineno">  139</span>        </div>
 <div class="line"><span class="lineno">  140</span>            con-&gt;set_body(<a class="code hl_function" href="namespace_xbyak_1_1util.html#a67cd5471fb751b186b53fdab6da7d3f7">ss</a>.str());</div>
@@ -370,7 +370,6 @@ Here is the caller graph for this function:</div>
 <div class="ttc" id="aclasswebsocketpp_1_1endpoint_html_a1d9163813aa02ed32100f443b4ddbd8e"><div class="ttname"><a href="classwebsocketpp_1_1endpoint.html#a1d9163813aa02ed32100f443b4ddbd8e">websocketpp::endpoint::get_alog</a></div><div class="ttdeci">alog_type &amp; get_alog()</div><div class="ttdoc">Get reference to access logger.</div><div class="ttdef"><b>Definition</b> <a href="endpoint_8hpp_source.html#l00261">endpoint.hpp:261</a></div></div>
 <div class="ttc" id="aclasswebsocketpp_1_1server_html_abb895563dddafdc1426997d245cbd7cb"><div class="ttname"><a href="classwebsocketpp_1_1server.html#abb895563dddafdc1426997d245cbd7cb">websocketpp::server&lt; websocketpp::config::asio &gt;::connection_ptr</a></div><div class="ttdeci">connection_type::ptr connection_ptr</div><div class="ttdef"><b>Definition</b> <a href="server__endpoint_8hpp_source.html#l00057">server_endpoint.hpp:57</a></div></div>
 <div class="ttc" id="anamespace_xbyak_1_1util_html_a67cd5471fb751b186b53fdab6da7d3f7"><div class="ttname"><a href="namespace_xbyak_1_1util.html#a67cd5471fb751b186b53fdab6da7d3f7">Xbyak::util::ss</a></div><div class="ttdeci">static const Segment ss(Segment::ss)</div></div>
-<div class="ttc" id="anamespaceembed_clara_html_a1e1bd594f85f58f5dca6c41c0ac720fb"><div class="ttname"><a href="namespaceembed_clara.html#a1e1bd594f85f58f5dca6c41c0ac720fb">embedClara.filename</a></div><div class="ttdeci">filename</div><div class="ttdef"><b>Definition</b> <a href="embed_clara_8py_source.html#l00010">embedClara.py:10</a></div></div>
 <div class="ttc" id="anamespacewebsocketpp_1_1http_1_1status__code_html_ae0d61c309e053ee5673517b54e2886c6a289caa931313b2f373b33032e3661733"><div class="ttname"><a href="namespacewebsocketpp_1_1http_1_1status__code.html#ae0d61c309e053ee5673517b54e2886c6a289caa931313b2f373b33032e3661733">websocketpp::http::status_code::ok</a></div><div class="ttdeci">@ ok</div><div class="ttdef"><b>Definition</b> <a href="fc_2vendor_2websocketpp_2websocketpp_2http_2constants_8hpp_source.html#l00128">constants.hpp:128</a></div></div>
 <div class="ttc" id="anamespacewebsocketpp_1_1http_1_1status__code_html_ae0d61c309e053ee5673517b54e2886c6a33f0060510af28d5d220dc4523c3b3e2"><div class="ttname"><a href="namespacewebsocketpp_1_1http_1_1status__code.html#ae0d61c309e053ee5673517b54e2886c6a33f0060510af28d5d220dc4523c3b3e2">websocketpp::http::status_code::not_found</a></div><div class="ttdeci">@ not_found</div><div class="ttdef"><b>Definition</b> <a href="fc_2vendor_2websocketpp_2websocketpp_2http_2constants_8hpp_source.html#l00148">constants.hpp:148</a></div></div>
 </div><!-- fragment --><div class="dynheader">

@@ -13,9 +13,9 @@ typedef \mbox{\hyperlink{classtesting_1_1internal_1_1_property_matcher_ac16ed4d7
 \item 
 \mbox{\hyperlink{classtesting_1_1internal_1_1_property_matcher_a234aa9bcbfee8520b2225dd784fdcbb6}{Property\+Matcher}} (const std\+::string \&property\+\_\+name, \mbox{\hyperlink{namespacetesting_a48ab638d9b31f27ef01a1701ffa4e5cb}{Property}} property, const \mbox{\hyperlink{classtesting_1_1_matcher}{Matcher}}$<$ Ref\+To\+Const\+Property $>$ \&matcher)
 \item 
-void \mbox{\hyperlink{classtesting_1_1internal_1_1_property_matcher_adb3edb13cfb37aeb676a3dff7dda91d9}{Describe\+To}} (\+::std\+::ostream \texorpdfstring{$\ast$}{*}os) const
+void \mbox{\hyperlink{classtesting_1_1internal_1_1_property_matcher_adb3edb13cfb37aeb676a3dff7dda91d9}{Describe\+To}} (\+::std\+::ostream \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}) const
 \item 
-void \mbox{\hyperlink{classtesting_1_1internal_1_1_property_matcher_a9a61385c05e8a87eeb6c37043bc5de39}{Describe\+Negation\+To}} (\+::std\+::ostream \texorpdfstring{$\ast$}{*}os) const
+void \mbox{\hyperlink{classtesting_1_1internal_1_1_property_matcher_a9a61385c05e8a87eeb6c37043bc5de39}{Describe\+Negation\+To}} (\+::std\+::ostream \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}) const
 \item 
 {\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ }\\bool \mbox{\hyperlink{classtesting_1_1internal_1_1_property_matcher_aad14e52735fdabbacd2901eb27393a52}{Match\+And\+Explain}} (const \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \&\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}}, \mbox{\hyperlink{classtesting_1_1_match_result_listener}{Match\+Result\+Listener}} \texorpdfstring{$\ast$}{*}listener) const
 \end{DoxyCompactItemize}
@@ -84,12 +84,13 @@ Definition at line \mbox{\hyperlink{gmock-matchers_8h_source_l02544}{2544}} of f
 
 \begin{DoxyCode}{0}
 \DoxyCodeLine{02544\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
-\DoxyCodeLine{02545\ \ \ \ \ *os\ <<\ \textcolor{stringliteral}{"{}is\ an\ object\ "{}}\ <<\ whose\_property\_;}
-\DoxyCodeLine{02546\ \ \ \ \ matcher\_.\mbox{\hyperlink{classtesting_1_1internal_1_1_matcher_base_ac1089d49b6b8a381900618985cd69b7f}{DescribeNegationTo}}(os);}
+\DoxyCodeLine{02545\ \ \ \ \ *\mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}\ <<\ \textcolor{stringliteral}{"{}is\ an\ object\ "{}}\ <<\ whose\_property\_;}
+\DoxyCodeLine{02546\ \ \ \ \ matcher\_.\mbox{\hyperlink{classtesting_1_1internal_1_1_matcher_base_ac1089d49b6b8a381900618985cd69b7f}{DescribeNegationTo}}(\mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}});}
 \DoxyCodeLine{02547\ \ \ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -110,12 +111,13 @@ Definition at line \mbox{\hyperlink{gmock-matchers_8h_source_l02539}{2539}} of f
 
 \begin{DoxyCode}{0}
 \DoxyCodeLine{02539\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
-\DoxyCodeLine{02540\ \ \ \ \ *os\ <<\ \textcolor{stringliteral}{"{}is\ an\ object\ "{}}\ <<\ whose\_property\_;}
-\DoxyCodeLine{02541\ \ \ \ \ matcher\_.\mbox{\hyperlink{classtesting_1_1internal_1_1_matcher_base_a7e0c883c7745e0d646463077ef1c1267}{DescribeTo}}(os);}
+\DoxyCodeLine{02540\ \ \ \ \ *\mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}\ <<\ \textcolor{stringliteral}{"{}is\ an\ object\ "{}}\ <<\ whose\_property\_;}
+\DoxyCodeLine{02541\ \ \ \ \ matcher\_.\mbox{\hyperlink{classtesting_1_1internal_1_1_matcher_base_a7e0c883c7745e0d646463077ef1c1267}{DescribeTo}}(\mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}});}
 \DoxyCodeLine{02542\ \ \ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode

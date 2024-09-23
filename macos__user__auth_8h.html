@@ -154,20 +154,7 @@ Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-
-<p class="definition">Definition at line <a class="el" href="macos__user__auth_8m_source.html#l00003">3</a> of file <a class="el" href="macos__user__auth_8m_source.html">macos_user_auth.m</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">    3</span>                                                                                    {</div>
-<div class="line"><span class="lineno">    4</span>   <span class="keyword">static</span> LAContext* ctx;</div>
-<div class="line"><span class="lineno">    5</span>   <span class="keywordflow">if</span>(ctx)</div>
-<div class="line"><span class="lineno">    6</span>      [ctx dealloc];</div>
-<div class="line"><span class="lineno">    7</span>   ctx = [[LAContext alloc] <a class="code hl_function" href="lib_8h.html#a02fd73d861ef2e4aabb38c0c9ff82947">init</a>];</div>
-<div class="line"><span class="lineno">    8</span>   [ctx evaluatePolicy:kLAPolicyDeviceOwnerAuthentication localizedReason:(NSString*)message reply:^(BOOL <a class="code hl_enumvalue" href="namespacesysio_1_1chain_1_1webassembly.html#a72ffd6653260a2dedcc4b55e39e10973a4e09c20e9a85794807a130e8283e8769">success</a>, NSError* error) {</div>
-<div class="line"><span class="lineno">    9</span>        cb(success, cb_userdata);</div>
-<div class="line"><span class="lineno">   10</span>    }];</div>
-<div class="line"><span class="lineno">   11</span>}</div>
-<div class="ttc" id="alib_8h_html_a02fd73d861ef2e4aabb38c0c9ff82947"><div class="ttname"><a href="lib_8h.html#a02fd73d861ef2e4aabb38c0c9ff82947">init</a></div><div class="ttdeci">void init()</div><div class="ttdef"><b>Definition</b> <a href="lib__test_8cpp_source.html#l00003">lib_test.cpp:3</a></div></div>
-<div class="ttc" id="anamespacesysio_1_1chain_1_1webassembly_html_a72ffd6653260a2dedcc4b55e39e10973a4e09c20e9a85794807a130e8283e8769"><div class="ttname"><a href="namespacesysio_1_1chain_1_1webassembly.html#a72ffd6653260a2dedcc4b55e39e10973a4e09c20e9a85794807a130e8283e8769">sysio::chain::webassembly::success</a></div><div class="ttdeci">@ success</div><div class="ttdef"><b>Definition</b> <a href="return__codes_8hpp_source.html#l00008">return_codes.hpp:8</a></div></div>
-</div><!-- fragment --><div class="dynheader">
+<div class="dynheader">
 Here is the caller graph for this function:</div>
 <div class="dyncontent">
 <div class="center"><img src="macos__user__auth_8h_af17e895352b722eb1a08dd36478bce9f_icgraph.png" border="0" usemap="#amacos__user__auth_8h_af17e895352b722eb1a08dd36478bce9f_icgraph" alt=""/></div>

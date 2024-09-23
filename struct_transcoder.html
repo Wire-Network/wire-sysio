@@ -111,14 +111,14 @@ $(function(){initNavTree('struct_transcoder.html',''); initResizable(true); });
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-static-methods" name="pub-static-methods"></a>
 Static Public Member Functions</h2></td></tr>
 <tr class="memitem:a0ea2edfe35784ebf1063921d2bd5fb66" id="r_a0ea2edfe35784ebf1063921d2bd5fb66"><td class="memTemplParams" colspan="2">template&lt;typename InputStream , typename OutputStream &gt; </td></tr>
-<tr class="memitem:a0ea2edfe35784ebf1063921d2bd5fb66"><td class="memTemplItemLeft" align="right" valign="top">static RAPIDJSON_FORCEINLINE bool&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="#a0ea2edfe35784ebf1063921d2bd5fb66">Transcode</a> (InputStream &amp;is, OutputStream &amp;os)</td></tr>
+<tr class="memitem:a0ea2edfe35784ebf1063921d2bd5fb66"><td class="memTemplItemLeft" align="right" valign="top">static RAPIDJSON_FORCEINLINE bool&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="#a0ea2edfe35784ebf1063921d2bd5fb66">Transcode</a> (InputStream &amp;is, OutputStream &amp;<a class="el" href="environment_8hpp.html#a3951483d0b31c29ca95336206cd35238">os</a>)</td></tr>
 <tr class="memdesc:a0ea2edfe35784ebf1063921d2bd5fb66"><td class="mdescLeft">&#160;</td><td class="mdescRight">Take one Unicode codepoint from source encoding, convert it to target encoding and put it to the output stream.  <br /></td></tr>
 <tr class="separator:a0ea2edfe35784ebf1063921d2bd5fb66"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a16345a912c679b2ea197328eb1444f82" id="r_a16345a912c679b2ea197328eb1444f82"><td class="memTemplParams" colspan="2">template&lt;typename InputStream , typename OutputStream &gt; </td></tr>
-<tr class="memitem:a16345a912c679b2ea197328eb1444f82"><td class="memTemplItemLeft" align="right" valign="top">static RAPIDJSON_FORCEINLINE bool&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="#a16345a912c679b2ea197328eb1444f82">TranscodeUnsafe</a> (InputStream &amp;is, OutputStream &amp;os)</td></tr>
+<tr class="memitem:a16345a912c679b2ea197328eb1444f82"><td class="memTemplItemLeft" align="right" valign="top">static RAPIDJSON_FORCEINLINE bool&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="#a16345a912c679b2ea197328eb1444f82">TranscodeUnsafe</a> (InputStream &amp;is, OutputStream &amp;<a class="el" href="environment_8hpp.html#a3951483d0b31c29ca95336206cd35238">os</a>)</td></tr>
 <tr class="separator:a16345a912c679b2ea197328eb1444f82"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a8a64aa837f7962894a99f63232472543" id="r_a8a64aa837f7962894a99f63232472543"><td class="memTemplParams" colspan="2">template&lt;typename InputStream , typename OutputStream &gt; </td></tr>
-<tr class="memitem:a8a64aa837f7962894a99f63232472543"><td class="memTemplItemLeft" align="right" valign="top">static RAPIDJSON_FORCEINLINE bool&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="#a8a64aa837f7962894a99f63232472543">Validate</a> (InputStream &amp;is, OutputStream &amp;os)</td></tr>
+<tr class="memitem:a8a64aa837f7962894a99f63232472543"><td class="memTemplItemLeft" align="right" valign="top">static RAPIDJSON_FORCEINLINE bool&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="#a8a64aa837f7962894a99f63232472543">Validate</a> (InputStream &amp;is, OutputStream &amp;<a class="el" href="environment_8hpp.html#a3951483d0b31c29ca95336206cd35238">os</a>)</td></tr>
 <tr class="memdesc:a8a64aa837f7962894a99f63232472543"><td class="mdescLeft">&#160;</td><td class="mdescRight">Validate one Unicode codepoint from an encoded stream.  <br /></td></tr>
 <tr class="separator:a8a64aa837f7962894a99f63232472543"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
@@ -163,9 +163,10 @@ template&lt;typename InputStream , typename OutputStream &gt; </div>
 <div class="line"><span class="lineno">  662</span>        <span class="keywordtype">unsigned</span> codepoint;</div>
 <div class="line"><span class="lineno">  663</span>        <span class="keywordflow">if</span> (!SourceEncoding::Decode(is, &amp;codepoint))</div>
 <div class="line"><span class="lineno">  664</span>            <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
-<div class="line"><span class="lineno">  665</span>        TargetEncoding::Encode(os, codepoint);</div>
+<div class="line"><span class="lineno">  665</span>        TargetEncoding::Encode(<a class="code hl_variable" href="environment_8hpp.html#a3951483d0b31c29ca95336206cd35238">os</a>, codepoint);</div>
 <div class="line"><span class="lineno">  666</span>        <span class="keywordflow">return</span> <span class="keyword">true</span>;</div>
 <div class="line"><span class="lineno">  667</span>    }</div>
+<div class="ttc" id="aenvironment_8hpp_html_a3951483d0b31c29ca95336206cd35238"><div class="ttname"><a href="environment_8hpp.html#a3951483d0b31c29ca95336206cd35238">os</a></div><div class="ttdeci">os_t os</div><div class="ttdef"><b>Definition</b> <a href="environment_8hpp_source.html#l00023">environment.hpp:23</a></div></div>
 </div><!-- fragment --><div class="dynheader">
 Here is the caller graph for this function:</div>
 <div class="dyncontent">
@@ -215,7 +216,7 @@ template&lt;typename InputStream , typename OutputStream &gt; </div>
 <div class="line"><span class="lineno">  671</span>        <span class="keywordtype">unsigned</span> codepoint;</div>
 <div class="line"><span class="lineno">  672</span>        <span class="keywordflow">if</span> (!SourceEncoding::Decode(is, &amp;codepoint))</div>
 <div class="line"><span class="lineno">  673</span>            <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
-<div class="line"><span class="lineno">  674</span>        TargetEncoding::EncodeUnsafe(os, codepoint);</div>
+<div class="line"><span class="lineno">  674</span>        TargetEncoding::EncodeUnsafe(<a class="code hl_variable" href="environment_8hpp.html#a3951483d0b31c29ca95336206cd35238">os</a>, codepoint);</div>
 <div class="line"><span class="lineno">  675</span>        <span class="keywordflow">return</span> <span class="keyword">true</span>;</div>
 <div class="line"><span class="lineno">  676</span>    }</div>
 </div><!-- fragment -->
@@ -254,7 +255,7 @@ template&lt;typename InputStream , typename OutputStream &gt; </div>
 
 <p class="definition">Definition at line <a class="el" href="encodings_8h_source.html#l00680">680</a> of file <a class="el" href="encodings_8h_source.html">encodings.h</a>.</p>
 <div class="fragment"><div class="line"><span class="lineno">  680</span>                                                                                  {</div>
-<div class="line"><span class="lineno">  681</span>        <span class="keywordflow">return</span> <a class="code hl_function" href="#a0ea2edfe35784ebf1063921d2bd5fb66">Transcode</a>(is, os);   <span class="comment">// Since source/target encoding is different, must transcode.</span></div>
+<div class="line"><span class="lineno">  681</span>        <span class="keywordflow">return</span> <a class="code hl_function" href="#a0ea2edfe35784ebf1063921d2bd5fb66">Transcode</a>(is, <a class="code hl_variable" href="environment_8hpp.html#a3951483d0b31c29ca95336206cd35238">os</a>);   <span class="comment">// Since source/target encoding is different, must transcode.</span></div>
 <div class="line"><span class="lineno">  682</span>    }</div>
 <div class="ttc" id="astruct_transcoder_html_a0ea2edfe35784ebf1063921d2bd5fb66"><div class="ttname"><a href="#a0ea2edfe35784ebf1063921d2bd5fb66">Transcoder::Transcode</a></div><div class="ttdeci">static RAPIDJSON_FORCEINLINE bool Transcode(InputStream &amp;is, OutputStream &amp;os)</div><div class="ttdoc">Take one Unicode codepoint from source encoding, convert it to target encoding and put it to the outp...</div><div class="ttdef"><b>Definition</b> <a href="encodings_8h_source.html#l00661">encodings.h:661</a></div></div>
 </div><!-- fragment --><div class="dynheader">

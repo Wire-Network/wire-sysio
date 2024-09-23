@@ -6,7 +6,8 @@
 
 
 
-Inheritance diagram for sysio\+::trace\+\_\+api\+\_\+plugin\+:\nopagebreak
+Inheritance diagram for sysio\+::trace\+\_\+api\+\_\+plugin\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -15,7 +16,8 @@ Inheritance diagram for sysio\+::trace\+\_\+api\+\_\+plugin\+:\nopagebreak
 \end{figure}
 
 
-Collaboration diagram for sysio\+::trace\+\_\+api\+\_\+plugin\+:\nopagebreak
+Collaboration diagram for sysio\+::trace\+\_\+api\+\_\+plugin\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -133,14 +135,16 @@ Definition at line \mbox{\hyperlink{trace__api__plugin_8cpp_source_l00461}{461}}
 \DoxyCodeLine{00463\ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
 \includegraphics[width=350pt]{classsysio_1_1trace__api__plugin_aca24a14fa319b5bed80374e065c4302f_cgraph}
 \end{center}
 \end{figure}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -160,13 +164,13 @@ Definition at line \mbox{\hyperlink{trace__api__plugin_8cpp_source_l00437}{437}}
 
 \begin{DoxyCode}{0}
 \DoxyCodeLine{00437\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
-\DoxyCodeLine{00438\ \ \ \ \textcolor{keyword}{auto}\ \mbox{\hyperlink{namespacecommon}{common}}\ =\ std::make\_shared<trace\_api\_common\_impl>();}
-\DoxyCodeLine{00439\ \ \ \ \mbox{\hyperlink{namespacecommon}{common}}-\/>plugin\_initialize(options);}
+\DoxyCodeLine{00438\ \ \ \ \textcolor{keyword}{auto}\ common\ =\ std::make\_shared<trace\_api\_common\_impl>();}
+\DoxyCodeLine{00439\ \ \ \ common-\/>plugin\_initialize(options);}
 \DoxyCodeLine{00440\ }
-\DoxyCodeLine{00441\ \ \ \ my\ =\ std::make\_shared<trace\_api\_plugin\_impl>(\mbox{\hyperlink{namespacecommon}{common}});}
+\DoxyCodeLine{00441\ \ \ \ my\ =\ std::make\_shared<trace\_api\_plugin\_impl>(common);}
 \DoxyCodeLine{00442\ \ \ \ my-\/>plugin\_initialize(options);}
 \DoxyCodeLine{00443\ }
-\DoxyCodeLine{00444\ \ \ \ rpc\ =\ std::make\_shared<trace\_api\_rpc\_plugin\_impl>(\mbox{\hyperlink{namespacecommon}{common}});}
+\DoxyCodeLine{00444\ \ \ \ rpc\ =\ std::make\_shared<trace\_api\_rpc\_plugin\_impl>(common);}
 \DoxyCodeLine{00445\ \ \ \ rpc-\/>plugin\_initialize(options);}
 \DoxyCodeLine{00446\ \}}
 
@@ -210,7 +214,8 @@ Definition at line \mbox{\hyperlink{trace__api__plugin_8cpp_source_l00448}{448}}
 \DoxyCodeLine{00453\ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -240,7 +245,8 @@ Definition at line \mbox{\hyperlink{trace__api__plugin_8cpp_source_l00431}{431}}
 \DoxyCodeLine{00435\ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode

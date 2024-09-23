@@ -192,7 +192,7 @@ FileWriteStream (Output)</h2>
 <div class="line"><span class="keywordtype">char</span> writeBuffer[65536];</div>
 <div class="line"><a class="code hl_class" href="class_file_write_stream.html">FileWriteStream</a> <a class="code hl_variable" href="environment_8hpp.html#a3951483d0b31c29ca95336206cd35238">os</a>(fp, writeBuffer, <span class="keyword">sizeof</span>(writeBuffer));</div>
 <div class="line"> </div>
-<div class="line"><a class="code hl_class" href="class_writer.html">Writer&lt;FileWriteStream&gt;</a> writer(os);</div>
+<div class="line"><a class="code hl_class" href="class_writer.html">Writer&lt;FileWriteStream&gt;</a> writer(<a class="code hl_variable" href="environment_8hpp.html#a3951483d0b31c29ca95336206cd35238">os</a>);</div>
 <div class="line"><a class="code hl_variable" href="yubihsm__pkcs11_8c.html#a107648633008a7f2d872b4b3d98c2f96">d</a>.Accept(writer);</div>
 <div class="line"> </div>
 <div class="line">fclose(fp);</div>
@@ -419,7 +419,7 @@ Example: ostream wrapper</h2>
 <div class="line"><span class="keyword">public</span>:</div>
 <div class="line">    <span class="keyword">typedef</span> <span class="keywordtype">char</span> <a class="code hl_define" href="hash__impl_8h.html#ab0a0d1ad13c7e4d3cb38c89f7127c85a">Ch</a>;</div>
 <div class="line"> </div>
-<div class="line">    <a class="code hl_typedef" href="ostreamwrapper_8h.html#aa8f833ae8c21c308bc48717f056ac4b6">OStreamWrapper</a>(std::ostream&amp; os) : os_(os) {</div>
+<div class="line">    <a class="code hl_typedef" href="ostreamwrapper_8h.html#aa8f833ae8c21c308bc48717f056ac4b6">OStreamWrapper</a>(std::ostream&amp; <a class="code hl_variable" href="environment_8hpp.html#a3951483d0b31c29ca95336206cd35238">os</a>) : os_(<a class="code hl_variable" href="environment_8hpp.html#a3951483d0b31c29ca95336206cd35238">os</a>) {</div>
 <div class="line">    }</div>
 <div class="line"> </div>
 <div class="line">    <a class="code hl_define" href="hash__impl_8h.html#ab0a0d1ad13c7e4d3cb38c89f7127c85a">Ch</a> Peek()<span class="keyword"> const </span>{ assert(<span class="keyword">false</span>); <span class="keywordflow">return</span> <span class="charliteral">&#39;\0&#39;</span>; }</div>
@@ -445,7 +445,7 @@ Example: ostream wrapper</h2>
 <div class="line">std::stringstream ss;</div>
 <div class="line">MyOStreamWrapper <a class="code hl_variable" href="environment_8hpp.html#a3951483d0b31c29ca95336206cd35238">os</a>(ss);</div>
 <div class="line"> </div>
-<div class="line"><a class="code hl_class" href="class_writer.html">Writer&lt;MyOStreamWrapper&gt;</a> writer(os);</div>
+<div class="line"><a class="code hl_class" href="class_writer.html">Writer&lt;MyOStreamWrapper&gt;</a> writer(<a class="code hl_variable" href="environment_8hpp.html#a3951483d0b31c29ca95336206cd35238">os</a>);</div>
 <div class="line"><a class="code hl_variable" href="yubihsm__pkcs11_8c.html#a107648633008a7f2d872b4b3d98c2f96">d</a>.Accept(writer);</div>
 </div><!-- fragment --><p>但要注意，由于标准库的内部开销问，此实现的性能可能不如 RapidJSON 的内存／文件流。</p>
 <h1><a class="anchor" id="Summary"></a>

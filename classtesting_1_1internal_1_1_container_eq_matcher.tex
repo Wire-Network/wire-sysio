@@ -18,9 +18,9 @@ typedef \mbox{\hyperlink{classtesting_1_1internal_1_1_stl_container_view_a6d0982
 \item 
 \mbox{\hyperlink{classtesting_1_1internal_1_1_container_eq_matcher_ad9a4c224c92176d57a865191f419802f}{Container\+Eq\+Matcher}} (const Container \&expected)
 \item 
-void \mbox{\hyperlink{classtesting_1_1internal_1_1_container_eq_matcher_a28ace6da475d05134916eb50e54baf1e}{Describe\+To}} (\+::std\+::ostream \texorpdfstring{$\ast$}{*}os) const
+void \mbox{\hyperlink{classtesting_1_1internal_1_1_container_eq_matcher_a28ace6da475d05134916eb50e54baf1e}{Describe\+To}} (\+::std\+::ostream \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}) const
 \item 
-void \mbox{\hyperlink{classtesting_1_1internal_1_1_container_eq_matcher_a3dc9e61b6aff65039325138dccccb8ec}{Describe\+Negation\+To}} (\+::std\+::ostream \texorpdfstring{$\ast$}{*}os) const
+void \mbox{\hyperlink{classtesting_1_1internal_1_1_container_eq_matcher_a3dc9e61b6aff65039325138dccccb8ec}{Describe\+Negation\+To}} (\+::std\+::ostream \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}) const
 \item 
 {\footnotesize template$<$typename Lhs\+Container $>$ }\\bool \mbox{\hyperlink{classtesting_1_1internal_1_1_container_eq_matcher_a348c6139776dd7d713d100e406ee38f4}{Match\+And\+Explain}} (const Lhs\+Container \&lhs, \mbox{\hyperlink{classtesting_1_1_match_result_listener}{Match\+Result\+Listener}} \texorpdfstring{$\ast$}{*}listener) const
 \end{DoxyCompactItemize}
@@ -93,7 +93,8 @@ Definition at line \mbox{\hyperlink{gmock-matchers_8h_source_l02824}{2824}} of f
 \DoxyCodeLine{02830\ \ \ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -117,12 +118,13 @@ Definition at line \mbox{\hyperlink{gmock-matchers_8h_source_l02836}{2836}} of f
 
 \begin{DoxyCode}{0}
 \DoxyCodeLine{02836\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
-\DoxyCodeLine{02837\ \ \ \ \ *os\ <<\ \textcolor{stringliteral}{"{}does\ not\ equal\ "{}};}
-\DoxyCodeLine{02838\ \ \ \ \ \mbox{\hyperlink{namespacetesting_1_1internal_a30708fa2bacf11895b03bdb21eb72309}{UniversalPrint}}(expected\_,\ os);}
+\DoxyCodeLine{02837\ \ \ \ \ *\mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}\ <<\ \textcolor{stringliteral}{"{}does\ not\ equal\ "{}};}
+\DoxyCodeLine{02838\ \ \ \ \ \mbox{\hyperlink{namespacetesting_1_1internal_a30708fa2bacf11895b03bdb21eb72309}{UniversalPrint}}(expected\_,\ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}});}
 \DoxyCodeLine{02839\ \ \ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -143,12 +145,13 @@ Definition at line \mbox{\hyperlink{gmock-matchers_8h_source_l02832}{2832}} of f
 
 \begin{DoxyCode}{0}
 \DoxyCodeLine{02832\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
-\DoxyCodeLine{02833\ \ \ \ \ *os\ <<\ \textcolor{stringliteral}{"{}equals\ "{}};}
-\DoxyCodeLine{02834\ \ \ \ \ \mbox{\hyperlink{namespacetesting_1_1internal_a30708fa2bacf11895b03bdb21eb72309}{UniversalPrint}}(expected\_,\ os);}
+\DoxyCodeLine{02833\ \ \ \ \ *\mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}\ <<\ \textcolor{stringliteral}{"{}equals\ "{}};}
+\DoxyCodeLine{02834\ \ \ \ \ \mbox{\hyperlink{namespacetesting_1_1internal_a30708fa2bacf11895b03bdb21eb72309}{UniversalPrint}}(expected\_,\ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}});}
 \DoxyCodeLine{02835\ \ \ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -179,8 +182,8 @@ Definition at line \mbox{\hyperlink{gmock-matchers_8h_source_l02842}{2842}} of f
 \DoxyCodeLine{02850\ \ \ \ \ \textcolor{keywordflow}{if}\ (lhs\_stl\_container\ ==\ expected\_)}
 \DoxyCodeLine{02851\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};}
 \DoxyCodeLine{02852\ }
-\DoxyCodeLine{02853\ \ \ \ \ ::std::ostream*\ \textcolor{keyword}{const}\ os\ =\ listener-\/>stream();}
-\DoxyCodeLine{02854\ \ \ \ \ \textcolor{keywordflow}{if}\ (os\ !=\ NULL)\ \{}
+\DoxyCodeLine{02853\ \ \ \ \ ::std::ostream*\ \textcolor{keyword}{const}\ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}\ =\ listener-\/>stream();}
+\DoxyCodeLine{02854\ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}\ !=\ NULL)\ \{}
 \DoxyCodeLine{02855\ \ \ \ \ \ \ \textcolor{comment}{//\ Something\ is\ different.\ Check\ for\ extra\ values\ first.}}
 \DoxyCodeLine{02856\ \ \ \ \ \ \ \textcolor{keywordtype}{bool}\ printed\_header\ =\ \textcolor{keyword}{false};}
 \DoxyCodeLine{02857\ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keyword}{typename}\ LhsStlContainer::const\_iterator\ it\ =}
@@ -189,12 +192,12 @@ Definition at line \mbox{\hyperlink{gmock-matchers_8h_source_l02842}{2842}} of f
 \DoxyCodeLine{02860\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{namespacetesting_1_1internal_a94a857fe6ff32cf4fdc4769a4071f239}{internal::ArrayAwareFind}}(expected\_.begin(),\ expected\_.end(),\ *it)\ ==}
 \DoxyCodeLine{02861\ \ \ \ \ \ \ \ \ \ \ \ \ expected\_.end())\ \{}
 \DoxyCodeLine{02862\ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (printed\_header)\ \{}
-\DoxyCodeLine{02863\ \ \ \ \ \ \ \ \ \ \ \ \ *os\ <<\ \textcolor{stringliteral}{"{},\ "{}};}
+\DoxyCodeLine{02863\ \ \ \ \ \ \ \ \ \ \ \ \ *\mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}\ <<\ \textcolor{stringliteral}{"{},\ "{}};}
 \DoxyCodeLine{02864\ \ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
-\DoxyCodeLine{02865\ \ \ \ \ \ \ \ \ \ \ \ \ *os\ <<\ \textcolor{stringliteral}{"{}which\ has\ these\ unexpected\ elements:\ "{}};}
+\DoxyCodeLine{02865\ \ \ \ \ \ \ \ \ \ \ \ \ *\mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}\ <<\ \textcolor{stringliteral}{"{}which\ has\ these\ unexpected\ elements:\ "{}};}
 \DoxyCodeLine{02866\ \ \ \ \ \ \ \ \ \ \ \ \ printed\_header\ =\ \textcolor{keyword}{true};}
 \DoxyCodeLine{02867\ \ \ \ \ \ \ \ \ \ \ \}}
-\DoxyCodeLine{02868\ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacetesting_1_1internal_a30708fa2bacf11895b03bdb21eb72309}{UniversalPrint}}(*it,\ os);}
+\DoxyCodeLine{02868\ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacetesting_1_1internal_a30708fa2bacf11895b03bdb21eb72309}{UniversalPrint}}(*it,\ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}});}
 \DoxyCodeLine{02869\ \ \ \ \ \ \ \ \ \}}
 \DoxyCodeLine{02870\ \ \ \ \ \ \ \}}
 \DoxyCodeLine{02871\ }
@@ -206,13 +209,13 @@ Definition at line \mbox{\hyperlink{gmock-matchers_8h_source_l02842}{2842}} of f
 \DoxyCodeLine{02877\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ lhs\_stl\_container.begin(),\ lhs\_stl\_container.end(),\ *it)\ ==}
 \DoxyCodeLine{02878\ \ \ \ \ \ \ \ \ \ \ \ \ lhs\_stl\_container.end())\ \{}
 \DoxyCodeLine{02879\ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (printed\_header2)\ \{}
-\DoxyCodeLine{02880\ \ \ \ \ \ \ \ \ \ \ \ \ *os\ <<\ \textcolor{stringliteral}{"{},\ "{}};}
+\DoxyCodeLine{02880\ \ \ \ \ \ \ \ \ \ \ \ \ *\mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}\ <<\ \textcolor{stringliteral}{"{},\ "{}};}
 \DoxyCodeLine{02881\ \ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
-\DoxyCodeLine{02882\ \ \ \ \ \ \ \ \ \ \ \ \ *os\ <<\ (printed\_header\ ?\ \textcolor{stringliteral}{"{},\(\backslash\)nand"{}}\ :\ \textcolor{stringliteral}{"{}which"{}})}
+\DoxyCodeLine{02882\ \ \ \ \ \ \ \ \ \ \ \ \ *\mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}\ <<\ (printed\_header\ ?\ \textcolor{stringliteral}{"{},\(\backslash\)nand"{}}\ :\ \textcolor{stringliteral}{"{}which"{}})}
 \DoxyCodeLine{02883\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ <<\ \textcolor{stringliteral}{"{}\ doesn't\ have\ these\ expected\ elements:\ "{}};}
 \DoxyCodeLine{02884\ \ \ \ \ \ \ \ \ \ \ \ \ printed\_header2\ =\ \textcolor{keyword}{true};}
 \DoxyCodeLine{02885\ \ \ \ \ \ \ \ \ \ \ \}}
-\DoxyCodeLine{02886\ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacetesting_1_1internal_a30708fa2bacf11895b03bdb21eb72309}{UniversalPrint}}(*it,\ os);}
+\DoxyCodeLine{02886\ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacetesting_1_1internal_a30708fa2bacf11895b03bdb21eb72309}{UniversalPrint}}(*it,\ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}});}
 \DoxyCodeLine{02887\ \ \ \ \ \ \ \ \ \}}
 \DoxyCodeLine{02888\ \ \ \ \ \ \ \}}
 \DoxyCodeLine{02889\ \ \ \ \ \}}
@@ -221,7 +224,8 @@ Definition at line \mbox{\hyperlink{gmock-matchers_8h_source_l02842}{2842}} of f
 \DoxyCodeLine{02892\ \ \ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode

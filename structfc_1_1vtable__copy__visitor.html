@@ -221,9 +221,8 @@ template&lt;typename <a class="el" href="sys-vm_2include_2sysio_2sysio_2vm_2pars
 <p class="definition">Definition at line <a class="el" href="api_8hpp_source.html#l00034">34</a> of file <a class="el" href="api_8hpp_source.html">api.hpp</a>.</p>
 <div class="fragment"><div class="line"><span class="lineno">   34</span>                                                                                           {</div>
 <div class="line"><span class="lineno">   35</span>        OtherType* src = &amp;<a class="code hl_variable" href="#a1feff63c4724f4c192b76522f5f81aed">_source</a>;</div>
-<div class="line"><span class="lineno">   36</span>        memb = [src,m]( Args... <a class="code hl_variable" href="namespacebenchmark_compile.html#ad0ed96ae1454e4347ca61ac3887c379e">args</a> ){ <span class="keywordflow">return</span> (src-&gt;*m)(<a class="code hl_variable" href="namespacebenchmark_compile.html#ad0ed96ae1454e4347ca61ac3887c379e">args</a>...); };</div>
+<div class="line"><span class="lineno">   36</span>        memb = [src,m]( Args... args ){ <span class="keywordflow">return</span> (src-&gt;*m)(args...); };</div>
 <div class="line"><span class="lineno">   37</span>      }</div>
-<div class="ttc" id="anamespacebenchmark_compile_html_ad0ed96ae1454e4347ca61ac3887c379e"><div class="ttname"><a href="namespacebenchmark_compile.html#ad0ed96ae1454e4347ca61ac3887c379e">benchmarkCompile.args</a></div><div class="ttdeci">args</div><div class="ttdef"><b>Definition</b> <a href="benchmark_compile_8py_source.html#l00122">benchmarkCompile.py:122</a></div></div>
 </div><!-- fragment -->
 </div>
 </div>

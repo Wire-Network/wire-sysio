@@ -932,23 +932,23 @@ Here is the caller graph for this function:</div>
 <div class="line"><span class="lineno"> 7732</span>        }</div>
 <div class="line"><span class="lineno"> 7733</span> </div>
 <div class="line"><span class="lineno"> 7734</span>        <span class="keywordflow">if</span>(parents.size() &gt; 1) {</div>
-<div class="line"><span class="lineno"> 7735</span>            std::size_t <a class="code hl_namespace" href="namespacecommon.html">common</a> = 0;</div>
+<div class="line"><span class="lineno"> 7735</span>            std::size_t common = 0;</div>
 <div class="line"><span class="lineno"> 7736</span>            std::size_t mpair = (std::min)(output.back().parents.size(), parents.size() - 1);</div>
 <div class="line"><span class="lineno"> 7737</span>            <span class="keywordflow">for</span>(std::size_t ii = 0; ii &lt; mpair; ++ii) {</div>
 <div class="line"><span class="lineno"> 7738</span>                <span class="keywordflow">if</span>(output.back().parents[ii] != parents[ii]) {</div>
 <div class="line"><span class="lineno"> 7739</span>                    <span class="keywordflow">break</span>;</div>
 <div class="line"><span class="lineno"> 7740</span>                }</div>
-<div class="line"><span class="lineno"> 7741</span>                ++<a class="code hl_namespace" href="namespacecommon.html">common</a>;</div>
+<div class="line"><span class="lineno"> 7741</span>                ++common;</div>
 <div class="line"><span class="lineno"> 7742</span>            }</div>
-<div class="line"><span class="lineno"> 7743</span>            <span class="keywordflow">if</span>(<a class="code hl_namespace" href="namespacecommon.html">common</a> == mpair) {</div>
+<div class="line"><span class="lineno"> 7743</span>            <span class="keywordflow">if</span>(common == mpair) {</div>
 <div class="line"><span class="lineno"> 7744</span>                output.pop_back();</div>
 <div class="line"><span class="lineno"> 7745</span>            } <span class="keywordflow">else</span> {</div>
-<div class="line"><span class="lineno"> 7746</span>                <span class="keywordflow">while</span>(output.back().parents.size() &gt; <a class="code hl_namespace" href="namespacecommon.html">common</a> + 1) {</div>
+<div class="line"><span class="lineno"> 7746</span>                <span class="keywordflow">while</span>(output.back().parents.size() &gt; common + 1) {</div>
 <div class="line"><span class="lineno"> 7747</span>                    output.push_back(output.back());</div>
 <div class="line"><span class="lineno"> 7748</span>                    output.back().parents.pop_back();</div>
 <div class="line"><span class="lineno"> 7749</span>                }</div>
 <div class="line"><span class="lineno"> 7750</span>            }</div>
-<div class="line"><span class="lineno"> 7751</span>            <span class="keywordflow">for</span>(std::size_t ii = <a class="code hl_namespace" href="namespacecommon.html">common</a>; ii &lt; parents.size() - 1; ++ii) {</div>
+<div class="line"><span class="lineno"> 7751</span>            <span class="keywordflow">for</span>(std::size_t ii = common; ii &lt; parents.size() - 1; ++ii) {</div>
 <div class="line"><span class="lineno"> 7752</span>                output.emplace_back();</div>
 <div class="line"><span class="lineno"> 7753</span>                output.back().parents.assign(parents.begin(), parents.begin() + <span class="keyword">static_cast&lt;</span>std::ptrdiff_t<span class="keyword">&gt;</span>(ii) + 1);</div>
 <div class="line"><span class="lineno"> 7754</span>                output.back().name = <span class="stringliteral">&quot;++&quot;</span>;</div>
@@ -967,7 +967,6 @@ Here is the caller graph for this function:</div>
 <div class="line"><span class="lineno"> 7767</span>    output.back().parents = std::move(parents);</div>
 <div class="line"><span class="lineno"> 7768</span>    output.back().name = <span class="stringliteral">&quot;++&quot;</span>;</div>
 <div class="line"><span class="lineno"> 7769</span>}</div>
-<div class="ttc" id="anamespacecommon_html"><div class="ttname"><a href="namespacecommon.html">common</a></div><div class="ttdef"><b>Definition</b> <a href="common_8py_source.html#l00001">common.py:1</a></div></div>
 </div><!-- fragment --><div class="dynheader">
 Here is the call graph for this function:</div>
 <div class="dyncontent">
@@ -1992,13 +1991,12 @@ Here is the caller graph for this function:</div>
 <div class="line"><span class="lineno"> 7689</span>        }</div>
 <div class="line"><span class="lineno"> 7690</span>        joined.append(<a class="code hl_function" href="#ac73a25f982318a475fa067b6561c43f5">convert_arg_for_ini</a>(arg));</div>
 <div class="line"><span class="lineno"> 7691</span>    }</div>
-<div class="line"><span class="lineno"> 7692</span>    <span class="keywordflow">if</span>(<a class="code hl_variable" href="namespacebenchmark_compile.html#ad0ed96ae1454e4347ca61ac3887c379e">args</a>.size() &gt; 1 &amp;&amp; arrayEnd != <span class="charliteral">&#39;\0&#39;</span>) {</div>
+<div class="line"><span class="lineno"> 7692</span>    <span class="keywordflow">if</span>(args.size() &gt; 1 &amp;&amp; arrayEnd != <span class="charliteral">&#39;\0&#39;</span>) {</div>
 <div class="line"><span class="lineno"> 7693</span>        joined.push_back(arrayEnd);</div>
 <div class="line"><span class="lineno"> 7694</span>    }</div>
 <div class="line"><span class="lineno"> 7695</span>    <span class="keywordflow">return</span> joined;</div>
 <div class="line"><span class="lineno"> 7696</span>}</div>
 <div class="ttc" id="anamespace_c_l_i_1_1detail_html_ac73a25f982318a475fa067b6561c43f5"><div class="ttname"><a href="#ac73a25f982318a475fa067b6561c43f5">CLI::detail::convert_arg_for_ini</a></div><div class="ttdeci">std::string convert_arg_for_ini(const std::string &amp;arg)</div><div class="ttdef"><b>Definition</b> <a href="_c_l_i11_8hpp_source.html#l07631">CLI11.hpp:7631</a></div></div>
-<div class="ttc" id="anamespacebenchmark_compile_html_ad0ed96ae1454e4347ca61ac3887c379e"><div class="ttname"><a href="namespacebenchmark_compile.html#ad0ed96ae1454e4347ca61ac3887c379e">benchmarkCompile.args</a></div><div class="ttdeci">args</div><div class="ttdef"><b>Definition</b> <a href="benchmark_compile_8py_source.html#l00122">benchmarkCompile.py:122</a></div></div>
 </div><!-- fragment --><div class="dynheader">
 Here is the call graph for this function:</div>
 <div class="dyncontent">
@@ -2622,116 +2620,119 @@ Here is the caller graph for this function:</div>
 <div class="dyncontent">
 <div class="center"><img src="namespace_c_l_i_1_1detail_a5359a7a0e33366a12e15523b100f591a_icgraph.png" border="0" usemap="#anamespace_c_l_i_1_1detail_a5359a7a0e33366a12e15523b100f591a_icgraph" alt=""/></div>
 <map name="anamespace_c_l_i_1_1detail_a5359a7a0e33366a12e15523b100f591a_icgraph" id="anamespace_c_l_i_1_1detail_a5359a7a0e33366a12e15523b100f591a_icgraph">
-<area shape="rect" title="remove underscores from a string" alt="" coords="1742,896,1874,937"/>
-<area shape="rect" href="class_c_l_i_1_1_app.html#a3ba6eb33f3ee9cd1a126385fa44f2c16" title="Check the name, case insensitive and underscore insensitive if set." alt="" coords="1538,756,1694,782"/>
-<area shape="poly" title=" " alt="" coords="1766,889,1633,784,1636,780,1770,884"/>
-<area shape="rect" href="class_c_l_i_1_1_option.html#af457a9a493f06f212cad9f854b281200" title="Check a name. Requires &quot;&#45;&quot; or &quot;&#45;&#45;&quot; for short / long, supports positional name." alt="" coords="862,1027,1032,1052"/>
-<area shape="poly" title=" " alt="" coords="1729,945,1526,1001,1403,1029,1278,1049,1225,1053,1184,1053,1090,1049,1032,1047,1033,1041,1090,1043,1184,1048,1225,1048,1277,1044,1402,1023,1525,996,1728,940"/>
-<area shape="rect" href="namespace_c_l_i_1_1detail.html#a356b9c9cc904af2b0a918fd55e86cd9c" title="Check if a string is a member of a list of strings and optionally ignore case or ignore underscores." alt="" coords="1325,904,1490,930"/>
-<area shape="poly" title=" " alt="" coords="1726,919,1490,919,1490,914,1726,914"/>
-<area shape="rect" href="namespace_c_l_i.html#a111b6f05d21b9b84e7ba933ade79884c" title="Helper function to allow ignore_underscore to be passed to IsMember or Transform." alt="" coords="1538,879,1694,904"/>
-<area shape="poly" title=" " alt="" coords="1726,909,1694,904,1695,899,1727,903"/>
-<area shape="rect" href="class_c_l_i_1_1_app.html#aade2ac30d86141da0d55d9181ac8b710" title="Helper function to run through all possible comparisons of subcommand names to check there is no over..." alt="" coords="1331,667,1484,708"/>
-<area shape="poly" title=" " alt="" coords="1565,752,1461,711,1463,706,1567,747"/>
-<area shape="poly" title=" " alt="" coords="1441,654,1429,648,1407,646,1388,648,1376,652,1371,658,1373,666,1368,667,1366,657,1373,648,1386,643,1408,640,1430,643,1444,649"/>
-<area shape="rect" href="class_c_l_i_1_1_app.html#a99e2ddf1ae27593e19162eba3aec5fcd" title="Add a previously created app as a subcommand." alt="" coords="1090,348,1277,374"/>
-<area shape="poly" title=" " alt="" coords="1399,652,1386,594,1364,522,1347,485,1328,449,1304,416,1276,387,1260,376,1262,372,1279,383,1308,412,1332,446,1352,482,1369,520,1392,592,1404,651"/>
-<area shape="rect" href="class_c_l_i_1_1_app.html#ad5d02ee857879c6abd007c8293a1151a" title="Set an alias for the app." alt="" coords="1130,649,1238,675"/>
-<area shape="poly" title=" " alt="" coords="1315,680,1238,671,1239,666,1316,674"/>
-<area shape="rect" href="class_c_l_i_1_1_app.html#a1e0b05ed58f80301b945ffc344b61aa3" title="Ignore case. Subcommands inherit value." alt="" coords="1108,699,1259,724"/>
-<area shape="poly" title=" " alt="" coords="1316,700,1260,706,1259,701,1316,695"/>
-<area shape="rect" href="class_c_l_i_1_1_app.html#aca4afbde81a59b25fc514b960d472c08" title="Ignore underscore. Subcommands inherit value." alt="" coords="1090,748,1277,774"/>
-<area shape="poly" title=" " alt="" coords="1343,716,1278,739,1242,750,1240,745,1277,734,1341,711"/>
-<area shape="rect" href="class_c_l_i_1_1_app.html#a76d7d45b60647632df392dd5e696877a" title="Set a name for the app (empty will use parser to set the name)" alt="" coords="1127,397,1240,423"/>
-<area shape="poly" title=" " alt="" coords="1378,656,1194,425,1198,422,1382,653"/>
-<area shape="rect" href="classcpp_1_1ast_1_1_typedef.html#ac461b1e6209716f39cc06baa5d726f56" title=" " alt="" coords="866,679,1028,704"/>
-<area shape="poly" title=" " alt="" coords="1115,673,1028,684,1027,679,1114,668"/>
-<area shape="rect" href="classcpp_1_1ast_1_1_typedef.html#ad94253075cea5a5110bf5e9b8fe0ee61" title=" " alt="" coords="862,728,1032,754"/>
-<area shape="poly" title=" " alt="" coords="1116,680,1091,689,1067,704,1043,719,1013,730,1011,725,1041,714,1065,699,1089,684,1114,675"/>
-<area shape="poly" title=" " alt="" coords="1178,438,1161,488,1134,550,1095,614,1071,643,1044,668,1023,680,1020,676,1040,664,1067,639,1091,611,1129,548,1156,486,1173,437"/>
-<area shape="rect" href="classcpp_1_1ast_1_1___nested_type.html#a944c5478ca7586a71d1d10bfcc7be1bb" title=" " alt="" coords="872,254,1022,294"/>
-<area shape="poly" title=" " alt="" coords="1111,401,1088,388,1071,368,1063,348,1056,327,1040,308,1021,296,1023,291,1044,304,1061,325,1068,346,1075,365,1092,384,1113,396"/>
-<area shape="rect" href="classcpp_1_1ast_1_1_class.html#a572953e3438a048cdc5f103fbf6ab7b0" title=" " alt="" coords="872,319,1022,344"/>
-<area shape="poly" title=" " alt="" coords="1111,397,1089,389,1065,373,1041,358,1011,347,1013,342,1043,353,1067,369,1091,384,1113,392"/>
-<area shape="rect" href="classcpp_1_1ast_1_1_define.html#a8e51e0611e1a76c5874f6b39e27a6d6a" title=" " alt="" coords="870,368,1024,394"/>
-<area shape="poly" title=" " alt="" coords="1112,404,1024,393,1024,388,1112,399"/>
-<area shape="rect" href="classcpp_1_1ast_1_1_function.html#a61e8eadca35b3848183554f62acf0ffb" title=" " alt="" coords="882,418,1012,458"/>
-<area shape="poly" title=" " alt="" coords="1112,421,1012,433,1012,428,1111,416"/>
-<area shape="rect" href="classcpp_1_1ast_1_1_parameter.html#aebd069a2a057dc791df21c56e22912bb" title=" " alt="" coords="881,483,1012,524"/>
-<area shape="poly" title=" " alt="" coords="1140,432,1043,473,1010,485,1008,480,1041,468,1137,427"/>
-<area shape="rect" href="classcpp_1_1tokenize_1_1_token.html#ad93a4059e9932fa2dea149510f0ef002" title=" " alt="" coords="878,548,1016,589"/>
-<area shape="poly" title=" " alt="" coords="1163,436,1111,487,1078,514,1043,538,1017,551,1015,546,1041,533,1075,510,1108,483,1159,433"/>
-<area shape="rect" href="classvalidate__reflection_1_1_empty_scope.html#a423076007160dd8dd8e9b314aa1429b1" title=" " alt="" coords="863,614,1031,654"/>
-<area shape="poly" title=" " alt="" coords="1172,438,1151,475,1123,519,1086,564,1044,603,1022,616,1020,611,1040,599,1083,560,1118,516,1147,472,1167,435"/>
-<area shape="rect" href="classvalidate__reflection_1_1_empty_scope.html#a5c2e058527ec1f3b72266c29c77ad0b2" title=" " alt="" coords="863,58,1031,98"/>
-<area shape="poly" title=" " alt="" coords="1111,403,1088,388,1065,353,1056,318,1056,284,1062,250,1068,216,1069,182,1061,148,1040,113,1026,101,1029,97,1044,110,1066,146,1074,181,1073,216,1067,251,1062,284,1061,318,1070,351,1092,384,1114,399"/>
-<area shape="rect" href="classvalidate__reflection_1_1_empty_scope.html#a1fb4f76506790294268dc078986d7430" title=" " alt="" coords="635,30,803,70"/>
-<area shape="poly" title=" " alt="" coords="1111,404,1088,388,1072,366,1061,344,1055,322,1053,299,1058,254,1069,210,1078,167,1081,126,1078,106,1071,86,1058,67,1040,48,1011,29,979,16,944,10,909,8,838,16,778,32,776,27,837,11,909,3,945,4,981,11,1014,24,1044,44,1063,64,1075,84,1083,104,1086,125,1084,168,1074,212,1063,255,1059,299,1060,321,1066,342,1076,363,1092,384,1114,400"/>
-<area shape="rect" href="classcpp_1_1ast_1_1___generic_declaration.html#a4851c5ea09b0a312d762342b71211bb1" title=" " alt="" coords="852,123,1042,164"/>
-<area shape="poly" title=" " alt="" coords="1111,403,1088,388,1069,362,1061,335,1060,309,1062,282,1065,256,1064,230,1057,205,1040,179,1026,166,1029,162,1044,175,1062,202,1070,230,1070,256,1068,283,1065,309,1066,334,1074,359,1092,384,1114,399"/>
-<area shape="rect" href="classcpp_1_1ast_1_1_variable_declaration.html#ad8821ceb26b91d7c3604486a424c3f8f" title=" " alt="" coords="855,188,1039,229"/>
-<area shape="poly" title=" " alt="" coords="1111,402,1088,388,1073,370,1066,352,1063,315,1060,279,1053,262,1040,244,1024,232,1028,228,1044,240,1058,259,1065,278,1068,315,1071,350,1078,367,1092,384,1114,398"/>
-<area shape="poly" title=" " alt="" coords="847,69,803,63,804,58,848,63"/>
-<area shape="rect" href="class_c_l_i_1_1_app.html#aa429cf3265602a5a1d60b87504ec33c5" title="Get an option by name (noexcept const version)" alt="" coords="648,1084,790,1125"/>
-<area shape="poly" title=" " alt="" coords="885,1060,791,1087,789,1082,884,1055"/>
-<area shape="rect" href="class_c_l_i_1_1_app.html#a5125f786c409fe0bbba684fe99f2c5fe" title="Get an option by name (noexcept non&#45;const version)" alt="" coords="648,1019,790,1060"/>
-<area shape="poly" title=" " alt="" coords="846,1042,790,1042,790,1037,846,1037"/>
-<area shape="rect" href="class_c_l_i_1_1_app.html#a1f7a70f4bc4c375a7de10073a5de709d" title="Fill in a single config option." alt="" coords="425,954,586,994"/>
-<area shape="poly" title=" " alt="" coords="635,1017,574,998,575,993,637,1012"/>
-<area shape="rect" href="class_c_l_i_1_1_app.html#addab9d99dce6a2f96b5c8748d20ebea8" title="Selects a Classifier enum based on the type of the current argument." alt="" coords="434,1164,578,1190"/>
-<area shape="poly" title=" " alt="" coords="646,1069,636,1075,582,1116,524,1166,520,1162,578,1112,633,1071,644,1065"/>
-<area shape="rect" href="class_c_l_i_1_1_app.html#a3424bdc3973b2c7a6e3e13ba50de748a" title="Get an option by name (non&#45;const version)" alt="" coords="435,1019,576,1044"/>
-<area shape="poly" title=" " alt="" coords="633,1039,577,1037,577,1031,633,1034"/>
-<area shape="rect" href="class_c_l_i_1_1_app.html#ad098a287e9a398ec6b24630335d068c8" title="Get an option by name." alt="" coords="435,1068,576,1094"/>
-<area shape="poly" title=" " alt="" coords="634,1059,576,1070,575,1065,633,1053"/>
-<area shape="rect" href="class_c_l_i_1_1_app.html#aee09795046c3b47948e6c2fa45349eca" title=" " alt="" coords="215,961,377,987"/>
-<area shape="poly" title=" " alt="" coords="410,977,377,977,377,971,410,971"/>
-<area shape="rect" href="class_c_l_i_1_1_app.html#a73c9decd5eb2b0c7eeda63cc4bd5048e" title=" " alt="" coords="223,1239,368,1264"/>
-<area shape="poly" title=" " alt="" coords="454,1198,335,1241,334,1236,452,1193"/>
-<area shape="rect" href="class_c_l_i_1_1_app.html#a02368e2fe89470ab9b4131c7e3288349" title=" " alt="" coords="5,1201,167,1227"/>
-<area shape="poly" title=" " alt="" coords="418,1187,215,1205,167,1209,167,1204,214,1200,418,1182"/>
-<area shape="poly" title=" " alt="" coords="332,1226,320,1220,296,1217,274,1219,262,1224,259,1229,265,1237,261,1240,254,1230,258,1220,272,1214,296,1212,322,1215,335,1222"/>
-<area shape="poly" title=" " alt="" coords="207,1238,161,1230,162,1225,208,1233"/>
-<area shape="rect" href="class_c_l_i_1_1_app.html#a89776486006cb61d112ae1cdd73848e1" title="Counts the number of times the given option was passed." alt="" coords="239,1113,352,1139"/>
-<area shape="poly" title=" " alt="" coords="429,1100,353,1117,352,1111,427,1095"/>
-<area shape="rect" href="class_c_l_i_1_1_app.html#a443c945fd3d3f03d33ad24be91b0ccbb" title="Shortcut bracket operator for getting a pointer to an option." alt="" coords="228,1015,364,1040"/>
-<area shape="poly" title=" " alt="" coords="437,1066,349,1044,350,1038,438,1061"/>
-<area shape="rect" href="class_c_l_i_1_1_app.html#a05c1dbeb654a91b792889551656c0ab8" title="Shortcut bracket operator for getting a pointer to an option." alt="" coords="228,1064,364,1090"/>
-<area shape="poly" title=" " alt="" coords="420,1082,364,1081,364,1075,420,1077"/>
-<area shape="rect" href="class_c_l_i_1_1_option.html#a4d2329268bae134aa58e704fa61f4b57" title="Requires &quot;&#45;&#45;&quot; to be removed from string." alt="" coords="1118,863,1249,904"/>
-<area shape="poly" title=" " alt="" coords="1310,905,1249,896,1250,891,1311,900"/>
-<area shape="rect" href="class_c_l_i_1_1_option.html#a481001137137be0d6a4e5998866d604a" title="Requires &quot;&#45;&#45;&quot; to be removed from string." alt="" coords="1118,928,1249,969"/>
-<area shape="poly" title=" " alt="" coords="1311,933,1250,942,1249,937,1310,928"/>
-<area shape="rect" href="class_c_l_i_1_1_option.html#acfa639ba77f034615c7e66028da1fc3b" title="Requires &quot;&#45;&quot; to be removed from string." alt="" coords="1118,994,1249,1034"/>
-<area shape="poly" title=" " alt="" coords="1369,940,1278,983,1247,996,1245,991,1276,978,1367,935"/>
-<area shape="rect" href="class_c_l_i_1_1_option.html#a4eb6212ac30a0b139da52d258a3a1790" title=" " alt="" coords="1112,798,1255,838"/>
-<area shape="poly" title=" " alt="" coords="1367,899,1276,854,1245,841,1247,837,1278,849,1370,894"/>
-<area shape="rect" href="class_c_l_i_1_1_option.html#ab84751fbf9037efaed5b64fed17fe57f" title="Gets a comma separated list of names. Will include / prefer the positional name if positional is true..." alt="" coords="870,805,1024,831"/>
-<area shape="poly" title=" " alt="" coords="1103,864,996,834,997,829,1104,859"/>
-<area shape="rect" href="class_c_l_i_1_1_app.html#aaabfb31d7fb10ee7465716b948b376dc" title="function that could be used by subclasses of App to shift options around into subcommands" alt="" coords="638,592,800,618"/>
-<area shape="poly" title=" " alt="" coords="893,800,870,786,850,768,837,749,831,731,827,696,823,663,815,647,802,631,787,620,790,616,805,627,820,644,828,661,832,695,836,730,842,747,854,764,873,782,895,796"/>
-<area shape="rect" href="class_c_l_i_1_1_app.html#a4e0c00ce18bbfca1ae890a653bbd2b93" title="Verify required options and cross requirements. Subcommands too (only if selected)." alt="" coords="652,954,786,994"/>
-<area shape="poly" title=" " alt="" coords="925,844,873,894,840,921,805,944,783,956,781,951,802,940,837,916,869,890,921,840"/>
-<area shape="rect" href="class_c_l_i_1_1_app.html#aaa53fda3b6aa477158ea8b1768342cc0" title="Special private constructor for subcommand." alt="" coords="667,641,771,667"/>
-<area shape="poly" title=" " alt="" coords="896,801,872,786,850,768,833,744,826,722,819,701,802,680,770,664,773,660,805,676,824,698,831,720,838,742,854,764,875,782,899,796"/>
-<area shape="rect" href="namespace_c_l_i.html#a6cb6f8bfff8c49385fb24f6f23a23c21" title="Helper function to mark an option as deprecated." alt="" coords="644,691,794,716"/>
-<area shape="poly" title=" " alt="" coords="904,800,850,768,827,749,802,731,774,719,776,714,805,727,830,744,853,764,907,795"/>
-<area shape="rect" href="class_c_l_i_1_1_formatter.html#ad29eb726bf961560f0c6419fd74332d0" title="This is the name part of an option, Default: left column." alt="" coords="646,740,792,781"/>
-<area shape="poly" title=" " alt="" coords="877,804,792,782,793,777,879,798"/>
-<area shape="rect" href="class_c_l_i_1_1_option.html#a251a3c10c556855c236fddbd419709b1" title="Get the results as a specified type." alt="" coords="651,805,787,831"/>
-<area shape="poly" title=" " alt="" coords="855,821,787,821,787,815,855,815"/>
-<area shape="rect" href="namespace_c_l_i.html#a36cfe4a6a80bf143735c0b80960bc252" title="Helper function to mark an option as retired." alt="" coords="658,855,780,880"/>
-<area shape="poly" title=" " alt="" coords="870,837,781,857,780,852,869,832"/>
-<area shape="rect" href="class_c_l_i_1_1_option.html#ab06eb6c31666a4a003aeb2cf3e5cdcd9" title="Process the callback." alt="" coords="634,904,804,930"/>
-<area shape="poly" title=" " alt="" coords="912,842,862,869,805,895,774,906,772,901,803,890,859,864,909,837"/>
-<area shape="poly" title=" " alt="" coords="636,977,587,977,587,971,636,971"/>
-<area shape="poly" title=" " alt="" coords="1110,977,1091,985,981,1029,979,1024,1089,980,1108,972"/>
-<area shape="rect" href="class_c_l_i_1_1_option.html#ad95e4bba59db33e4bfe4caf91ca7be21" title="If options share any of the same names, find it." alt="" coords="853,957,1041,983"/>
-<area shape="poly" title=" " alt="" coords="1103,959,1042,964,1041,959,1103,953"/>
-<area shape="poly" title=" " alt="" coords="1103,1025,1033,1033,1032,1028,1103,1020"/>
-<area shape="poly" title=" " alt="" coords="1102,1002,1019,986,1020,981,1103,997"/>
-<area shape="poly" title=" " alt="" coords="1097,821,1024,821,1024,815,1097,815"/>
-<area shape="poly" title=" " alt="" coords="1523,905,1491,909,1490,904,1522,900"/>
+<area shape="rect" title="remove underscores from a string" alt="" coords="2128,430,2260,470"/>
+<area shape="rect" href="class_c_l_i_1_1_app.html#a3ba6eb33f3ee9cd1a126385fa44f2c16" title="Check the name, case insensitive and underscore insensitive if set." alt="" coords="1924,288,2079,314"/>
+<area shape="poly" title=" " alt="" coords="2153,422,2018,316,2022,312,2156,418"/>
+<area shape="rect" href="class_c_l_i_1_1_option.html#af457a9a493f06f212cad9f854b281200" title="Check a name. Requires &quot;&#45;&quot; or &quot;&#45;&#45;&quot; for short / long, supports positional name." alt="" coords="1248,592,1419,618"/>
+<area shape="poly" title=" " alt="" coords="2140,480,2081,503,1991,528,1899,549,1715,579,1549,596,1419,605,1419,599,1548,591,1714,574,1898,544,1990,523,2079,498,2138,475"/>
+<area shape="rect" href="namespace_c_l_i_1_1detail.html#a356b9c9cc904af2b0a918fd55e86cd9c" title="Check if a string is a member of a list of strings and optionally ignore case or ignore underscores." alt="" coords="1711,437,1875,463"/>
+<area shape="poly" title=" " alt="" coords="2112,453,1876,453,1876,448,2112,448"/>
+<area shape="rect" href="namespace_c_l_i.html#a111b6f05d21b9b84e7ba933ade79884c" title="Helper function to allow ignore_underscore to be passed to IsMember or Transform." alt="" coords="1923,463,2080,488"/>
+<area shape="poly" title=" " alt="" coords="2113,464,2080,468,2080,463,2112,458"/>
+<area shape="rect" href="class_c_l_i_1_1_app.html#aade2ac30d86141da0d55d9181ac8b710" title="Helper function to run through all possible comparisons of subcommand names to check there is no over..." alt="" coords="1717,200,1869,241"/>
+<area shape="poly" title=" " alt="" coords="1951,284,1847,244,1849,239,1953,280"/>
+<area shape="poly" title=" " alt="" coords="1827,187,1814,181,1793,179,1773,181,1761,186,1757,192,1759,199,1754,200,1752,191,1758,182,1772,176,1793,174,1816,176,1829,182"/>
+<area shape="rect" href="class_c_l_i_1_1_app.html#a99e2ddf1ae27593e19162eba3aec5fcd" title="Add a previously created app as a subcommand." alt="" coords="1476,84,1663,110"/>
+<area shape="poly" title=" " alt="" coords="1758,192,1714,156,1662,123,1635,113,1637,108,1664,118,1717,152,1761,188"/>
+<area shape="rect" href="class_c_l_i_1_1_app.html#ad5d02ee857879c6abd007c8293a1151a" title="Set an alias for the app." alt="" coords="1515,133,1624,159"/>
+<area shape="poly" title=" " alt="" coords="1728,197,1662,173,1623,161,1624,156,1664,168,1730,192"/>
+<area shape="rect" href="class_c_l_i_1_1_app.html#a1e0b05ed58f80301b945ffc344b61aa3" title="Ignore case. Subcommands inherit value." alt="" coords="1494,183,1645,208"/>
+<area shape="poly" title=" " alt="" coords="1701,213,1645,207,1646,201,1702,208"/>
+<area shape="rect" href="class_c_l_i_1_1_app.html#aca4afbde81a59b25fc514b960d472c08" title="Ignore underscore. Subcommands inherit value." alt="" coords="1476,232,1663,258"/>
+<area shape="poly" title=" " alt="" coords="1702,233,1664,237,1663,232,1701,228"/>
+<area shape="rect" href="class_c_l_i_1_1_app.html#a76d7d45b60647632df392dd5e696877a" title="Set a name for the app (empty will use parser to set the name)" alt="" coords="1513,281,1626,307"/>
+<area shape="poly" title=" " alt="" coords="1729,249,1664,273,1627,283,1626,278,1662,268,1727,244"/>
+<area shape="rect" href="class_c_l_i_1_1_app.html#aa429cf3265602a5a1d60b87504ec33c5" title="Get an option by name (noexcept const version)" alt="" coords="1036,584,1177,625"/>
+<area shape="poly" title=" " alt="" coords="1233,608,1178,608,1178,602,1233,602"/>
+<area shape="rect" href="class_c_l_i_1_1_app.html#a5125f786c409fe0bbba684fe99f2c5fe" title="Get an option by name (noexcept non&#45;const version)" alt="" coords="1036,650,1177,690"/>
+<area shape="poly" title=" " alt="" coords="1272,625,1178,652,1177,647,1271,620"/>
+<area shape="rect" href="class_c_l_i_1_1_app.html#a1f7a70f4bc4c375a7de10073a5de709d" title="Fill in a single config option." alt="" coords="800,574,961,614"/>
+<area shape="poly" title=" " alt="" coords="1028,647,942,618,944,613,1030,642"/>
+<area shape="rect" href="class_c_l_i_1_1_app.html#addab9d99dce6a2f96b5c8748d20ebea8" title="Selects a Classifier enum based on the type of the current argument." alt="" coords="585,639,730,664"/>
+<area shape="poly" title=" " alt="" coords="1020,669,730,657,730,652,1021,664"/>
+<area shape="rect" href="class_c_l_i_1_1_app.html#a3424bdc3973b2c7a6e3e13ba50de748a" title="Get an option by name (non&#45;const version)" alt="" coords="810,689,951,715"/>
+<area shape="poly" title=" " alt="" coords="1021,685,952,695,951,690,1021,680"/>
+<area shape="rect" href="class_c_l_i_1_1_app.html#ad098a287e9a398ec6b24630335d068c8" title="Get an option by name." alt="" coords="810,739,951,764"/>
+<area shape="poly" title=" " alt="" coords="1050,700,975,730,940,741,938,735,973,725,1048,695"/>
+<area shape="rect" href="class_c_l_i_1_1_app.html#aee09795046c3b47948e6c2fa45349eca" title=" " alt="" coords="576,581,739,607"/>
+<area shape="poly" title=" " alt="" coords="785,597,739,597,739,592,785,592"/>
+<area shape="rect" href="class_c_l_i_1_1_app.html#a7a15e5743d4a8eccac57955ed5a6a3b6" title="Read and process a configuration file (main app only)" alt="" coords="388,574,523,614"/>
+<area shape="poly" title=" " alt="" coords="560,597,523,597,523,592,560,592"/>
+<area shape="rect" href="class_c_l_i_1_1_app.html#a0fec24c804daf5b458bb5762e4e75a73" title="Process callbacks and such." alt="" coords="187,581,322,607"/>
+<area shape="poly" title=" " alt="" coords="373,597,322,597,322,592,373,592"/>
+<area shape="rect" href="class_c_l_i_1_1_app.html#a26a92886a7d7f10a9afbd39b6535f42b" title="Internal parse function." alt="" coords="5,635,126,660"/>
+<area shape="poly" title=" " alt="" coords="192,614,115,637,113,631,191,609"/>
+<area shape="rect" href="class_c_l_i_1_1_app.html#a241ba75a6c98b36349ae2f71a9137291" title="Internal parse function." alt="" coords="5,581,126,607"/>
+<area shape="poly" title=" " alt="" coords="172,597,126,597,126,592,172,592"/>
+<area shape="rect" href="class_c_l_i_1_1_app.html#a73c9decd5eb2b0c7eeda63cc4bd5048e" title=" " alt="" coords="383,713,528,739"/>
+<area shape="poly" title=" " alt="" coords="598,672,577,679,488,715,486,710,575,674,596,667"/>
+<area shape="rect" href="class_c_l_i_1_1_app.html#a02368e2fe89470ab9b4131c7e3288349" title=" " alt="" coords="174,637,335,663"/>
+<area shape="poly" title=" " alt="" coords="570,654,335,653,335,648,570,649"/>
+<area shape="poly" title=" " alt="" coords="490,701,479,694,456,692,434,694,423,699,421,704,426,711,422,715,415,705,419,695,433,689,456,687,480,689,493,696"/>
+<area shape="poly" title=" " alt="" coords="404,710,290,666,292,661,406,705"/>
+<area shape="poly" title=" " alt="" coords="158,651,126,651,126,646,158,646"/>
+<area shape="poly" title=" " alt="" coords="193,635,111,610,112,605,195,630"/>
+<area shape="rect" href="class_c_l_i_1_1_app.html#a89776486006cb61d112ae1cdd73848e1" title="Counts the number of times the given option was passed." alt="" coords="601,788,714,814"/>
+<area shape="poly" title=" " alt="" coords="805,771,715,791,714,786,803,766"/>
+<area shape="rect" href="class_c_l_i_1_1_app.html#a443c945fd3d3f03d33ad24be91b0ccbb" title="Shortcut bracket operator for getting a pointer to an option." alt="" coords="589,689,726,715"/>
+<area shape="poly" title=" " alt="" coords="804,737,718,718,720,713,805,732"/>
+<area shape="rect" href="class_c_l_i_1_1_app.html#a05c1dbeb654a91b792889551656c0ab8" title="Shortcut bracket operator for getting a pointer to an option." alt="" coords="589,739,726,764"/>
+<area shape="poly" title=" " alt="" coords="794,754,726,754,726,749,794,749"/>
+<area shape="rect" href="class_c_l_i_1_1_option.html#a4d2329268bae134aa58e704fa61f4b57" title="Requires &quot;&#45;&#45;&quot; to be removed from string." alt="" coords="1504,396,1635,437"/>
+<area shape="poly" title=" " alt="" coords="1696,438,1635,429,1636,424,1696,433"/>
+<area shape="rect" href="class_c_l_i_1_1_option.html#a481001137137be0d6a4e5998866d604a" title="Requires &quot;&#45;&#45;&quot; to be removed from string." alt="" coords="1504,527,1635,568"/>
+<area shape="poly" title=" " alt="" coords="1755,473,1664,517,1633,529,1631,524,1662,512,1752,468"/>
+<area shape="rect" href="class_c_l_i_1_1_option.html#acfa639ba77f034615c7e66028da1fc3b" title="Requires &quot;&#45;&quot; to be removed from string." alt="" coords="1504,462,1635,502"/>
+<area shape="poly" title=" " alt="" coords="1696,467,1636,475,1635,470,1696,461"/>
+<area shape="rect" href="class_c_l_i_1_1_option.html#a4eb6212ac30a0b139da52d258a3a1790" title=" " alt="" coords="1498,331,1640,372"/>
+<area shape="poly" title=" " alt="" coords="1753,432,1662,387,1631,375,1633,370,1664,382,1755,427"/>
+<area shape="rect" href="class_c_l_i_1_1_option.html#ab84751fbf9037efaed5b64fed17fe57f" title="Gets a comma separated list of names. Will include / prefer the positional name if positional is true..." alt="" coords="1257,331,1410,356"/>
+<area shape="poly" title=" " alt="" coords="1488,394,1377,360,1379,354,1489,389"/>
+<area shape="rect" href="class_c_l_i_1_1_app.html#aaabfb31d7fb10ee7465716b948b376dc" title="function that could be used by subclasses of App to shift options around into subcommands" alt="" coords="1026,371,1188,396"/>
+<area shape="poly" title=" " alt="" coords="1243,362,1184,373,1183,367,1242,357"/>
+<area shape="rect" href="class_c_l_i_1_1_app.html#a4e0c00ce18bbfca1ae890a653bbd2b93" title="Verify required options and cross requirements. Subcommands too (only if selected)." alt="" coords="1040,470,1174,510"/>
+<area shape="poly" title=" " alt="" coords="1310,369,1258,415,1193,460,1170,472,1168,467,1190,456,1255,410,1306,365"/>
+<area shape="rect" href="class_c_l_i_1_1_app.html#aaa53fda3b6aa477158ea8b1768342cc0" title="Special private constructor for subcommand." alt="" coords="1054,420,1159,446"/>
+<area shape="poly" title=" " alt="" coords="1294,366,1192,411,1160,422,1158,417,1190,406,1292,361"/>
+<area shape="rect" href="namespace_c_l_i.html#a6cb6f8bfff8c49385fb24f6f23a23c21" title="Helper function to mark an option as deprecated." alt="" coords="1032,55,1181,80"/>
+<area shape="poly" title=" " alt="" coords="1314,319,1261,241,1189,148,1154,112,1122,83,1125,79,1158,108,1193,144,1265,238,1318,316"/>
+<area shape="rect" href="class_c_l_i_1_1_formatter.html#ad29eb726bf961560f0c6419fd74332d0" title="This is the name part of an option, Default: left column." alt="" coords="1034,158,1180,198"/>
+<area shape="poly" title=" " alt="" coords="1310,321,1258,267,1225,238,1190,212,1169,202,1172,197,1193,208,1229,234,1262,263,1313,317"/>
+<area shape="rect" href="class_c_l_i_1_1_option.html#a251a3c10c556855c236fddbd419709b1" title="Get the results as a specified type." alt="" coords="1039,223,1174,248"/>
+<area shape="poly" title=" " alt="" coords="1300,324,1249,292,1190,262,1161,251,1163,246,1192,257,1252,288,1302,319"/>
+<area shape="rect" href="namespace_c_l_i.html#a36cfe4a6a80bf143735c0b80960bc252" title="Helper function to mark an option as retired." alt="" coords="1046,272,1167,298"/>
+<area shape="poly" title=" " alt="" coords="1265,329,1159,301,1160,296,1267,324"/>
+<area shape="rect" href="class_c_l_i_1_1_option.html#ab06eb6c31666a4a003aeb2cf3e5cdcd9" title="Process the callback." alt="" coords="1022,321,1191,347"/>
+<area shape="poly" title=" " alt="" coords="1241,342,1192,340,1192,335,1241,337"/>
+<area shape="rect" href="class_c_l_i_1_1_option__group.html#a29c346abf87173bccd860d3a9813a5c5" title="Add an existing option to the Option_group." alt="" coords="813,334,948,374"/>
+<area shape="poly" title=" " alt="" coords="1010,374,948,366,949,360,1011,368"/>
+<area shape="poly" title=" " alt="" coords="1033,520,1023,524,999,541,975,558,938,576,936,571,973,553,996,537,1021,520,1031,515"/>
+<area shape="poly" title=" " alt="" coords="1024,502,974,507,808,522,678,530,548,541,383,565,302,583,301,578,383,560,548,535,677,524,807,516,974,502,1024,497"/>
+<area shape="poly" title=" " alt="" coords="1024,492,659,489,454,489,402,492,349,499,247,525,159,556,96,583,94,578,157,551,245,520,348,494,401,486,454,484,659,484,1024,486"/>
+<area shape="rect" href="class_c_l_i_1_1_app.html#a8b461d2233ec4121259011b5ed24b336" title="Add a subcommand. Inherits INHERITABLE and OptionDefaults, and help flag." alt="" coords="787,423,974,448"/>
+<area shape="poly" title=" " alt="" coords="1039,436,975,437,974,432,1039,431"/>
+<area shape="poly" title=" " alt="" coords="919,410,906,404,880,401,857,403,844,408,841,413,848,421,843,424,836,414,840,404,856,398,880,396,908,399,921,406"/>
+<area shape="rect" href="namespace_c_l_i.html#a5e83d92a6ec271c2439141feaede1136" title="Helper function to mark an option as deprecated." alt="" coords="806,5,955,31"/>
+<area shape="poly" title=" " alt="" coords="1029,53,942,34,943,29,1030,48"/>
+<area shape="rect" href="namespace_c_l_i.html#ad6d89b5d1aba2ebdca5f94534d658cab" title="Helper function to mark an option as deprecated." alt="" coords="806,55,955,80"/>
+<area shape="poly" title=" " alt="" coords="1016,70,955,70,955,65,1016,65"/>
+<area shape="rect" href="class_c_l_i_1_1_formatter.html#a1503e498cef1cab66a01d84bac59b5d8" title="This prints out an option help line, either positional or optional form." alt="" coords="807,104,954,145"/>
+<area shape="poly" title=" " alt="" coords="1018,160,953,145,955,139,1019,155"/>
+<area shape="rect" href="class_c_l_i_1_1_formatter.html#afd69c393a40e9b1212f3552a1f48a414" title="This is used to print the name on the USAGE line." alt="" coords="807,170,954,210"/>
+<area shape="poly" title=" " alt="" coords="1018,186,954,189,954,184,1018,180"/>
+<area shape="rect" href="namespace_c_l_i.html#a77cd1a3639a91dea33a7d144ea476df6" title="Helper function to mark an option as retired." alt="" coords="820,284,941,310"/>
+<area shape="poly" title=" " alt="" coords="1030,292,942,296,941,291,1030,286"/>
+<area shape="rect" href="namespace_c_l_i.html#a52390f850f663cf38a27e134c1a39b61" title="Helper function to mark an option as retired." alt="" coords="820,235,941,260"/>
+<area shape="poly" title=" " alt="" coords="1030,275,941,260,942,255,1031,270"/>
+<area shape="poly" title=" " alt="" coords="1489,570,1390,594,1389,589,1488,564"/>
+<area shape="rect" href="class_c_l_i_1_1_option.html#ad95e4bba59db33e4bfe4caf91ca7be21" title="If options share any of the same names, find it." alt="" coords="1239,535,1428,560"/>
+<area shape="poly" title=" " alt="" coords="1488,550,1428,550,1428,545,1488,545"/>
+<area shape="rect" href="class_c_l_i_1_1_option.html#ae72ff0b89bebb2987d548c186c577e50" title="If options share any of the same names, they are equal (not counting positional)" alt="" coords="1027,535,1186,560"/>
+<area shape="poly" title=" " alt="" coords="1224,550,1187,550,1187,545,1224,545"/>
+<area shape="poly" title=" " alt="" coords="1491,509,1477,518,1463,532,1454,546,1445,560,1429,575,1391,594,1389,589,1426,571,1441,557,1449,543,1458,528,1474,513,1488,505"/>
+<area shape="poly" title=" " alt="" coords="1489,507,1384,537,1382,531,1488,502"/>
+<area shape="poly" title=" " alt="" coords="1483,351,1410,349,1411,343,1483,346"/>
+<area shape="poly" title=" " alt="" coords="1908,467,1876,463,1876,458,1908,462"/>
 </map>
 </div>
 
@@ -3617,119 +3618,122 @@ Here is the caller graph for this function:</div>
 <div class="dyncontent">
 <div class="center"><img src="namespace_c_l_i_1_1detail_ae83709ec148057ec53df4383645727e9_icgraph.png" border="0" usemap="#anamespace_c_l_i_1_1detail_ae83709ec148057ec53df4383645727e9_icgraph" alt=""/></div>
 <map name="anamespace_c_l_i_1_1detail_ae83709ec148057ec53df4383645727e9_icgraph" id="anamespace_c_l_i_1_1detail_ae83709ec148057ec53df4383645727e9_icgraph">
-<area shape="rect" title="Return a lower case version of a string." alt="" coords="1748,822,1886,847"/>
-<area shape="rect" href="class_c_l_i_1_1_as_number_with_unit.html#af5d2fc29cd92c1821e653a97f91b00cb" title=" " alt="" coords="1537,601,1700,641"/>
-<area shape="poly" title=" " alt="" coords="1803,809,1763,733,1734,691,1698,655,1682,644,1685,640,1702,651,1738,688,1768,730,1807,806"/>
-<area shape="rect" href="class_c_l_i_1_1_app.html#a3ba6eb33f3ee9cd1a126385fa44f2c16" title="Check the name, case insensitive and underscore insensitive if set." alt="" coords="1541,666,1696,691"/>
-<area shape="poly" title=" " alt="" coords="1796,811,1754,761,1727,735,1699,713,1662,694,1665,689,1701,708,1731,731,1758,758,1800,807"/>
-<area shape="rect" href="class_c_l_i_1_1_option.html#af457a9a493f06f212cad9f854b281200" title="Check a name. Requires &quot;&#45;&quot; or &quot;&#45;&#45;&quot; for short / long, supports positional name." alt="" coords="861,778,1031,803"/>
-<area shape="poly" title=" " alt="" coords="1751,820,1629,792,1464,765,1373,755,1278,750,1183,750,1089,757,1000,780,999,774,1089,752,1182,744,1278,744,1373,750,1465,760,1630,787,1752,815"/>
-<area shape="rect" href="namespace_c_l_i_1_1detail.html#a356b9c9cc904af2b0a918fd55e86cd9c" title="Check if a string is a member of a list of strings and optionally ignore case or ignore underscores." alt="" coords="1324,844,1489,870"/>
-<area shape="poly" title=" " alt="" coords="1732,833,1638,832,1537,837,1471,846,1471,841,1536,832,1638,827,1732,828"/>
-<area shape="rect" href="class_c_l_i_1_1_config_base.html#a1395eecde5af65b73e3670529df0e17b" title="Convert a configuration into an app." alt="" coords="1106,1027,1259,1068"/>
-<area shape="poly" title=" " alt="" coords="1801,862,1760,914,1732,940,1701,963,1647,992,1588,1014,1528,1030,1468,1042,1354,1053,1259,1055,1259,1049,1353,1048,1467,1036,1527,1025,1587,1009,1645,987,1699,959,1729,936,1756,910,1797,859"/>
-<area shape="rect" href="namespace_c_l_i_1_1detail.html#aa6876cdd19b6e5807239b574a9ce0e3c" title=" " alt="" coords="1549,909,1688,949"/>
-<area shape="poly" title=" " alt="" coords="1776,857,1664,910,1662,906,1773,852"/>
-<area shape="rect" href="namespace_c_l_i.html#a0c52326d2681814c22aa1a93ce43375e" title="Helper function to allow ignore_case to be passed to IsMember or Transform." alt="" coords="1558,847,1678,873"/>
-<area shape="poly" title=" " alt="" coords="1733,848,1679,855,1679,849,1732,842"/>
-<area shape="rect" href="class_c_l_i_1_1_formatter.html#a9e6b7c4c6eee50b11fe1ca785002db04" title="This prints out all the subcommands." alt="" coords="1545,1106,1692,1147"/>
-<area shape="poly" title=" " alt="" coords="1809,863,1769,956,1739,1012,1702,1064,1679,1088,1654,1107,1650,1103,1675,1084,1698,1061,1734,1009,1764,954,1804,861"/>
-<area shape="rect" href="class_c_l_i_1_1_app.html#aade2ac30d86141da0d55d9181ac8b710" title="Helper function to run through all possible comparisons of subcommand names to check there is no over..." alt="" coords="1330,475,1483,516"/>
-<area shape="poly" title=" " alt="" coords="1545,661,1535,655,1496,623,1463,585,1417,518,1421,515,1467,582,1500,619,1538,651,1547,656"/>
-<area shape="poly" title=" " alt="" coords="1441,462,1428,456,1406,454,1386,456,1374,461,1370,467,1372,474,1366,475,1364,465,1371,456,1385,451,1407,449,1429,451,1443,457"/>
-<area shape="rect" href="class_c_l_i_1_1_app.html#a99e2ddf1ae27593e19162eba3aec5fcd" title="Add a previously created app as a subcommand." alt="" coords="1089,376,1276,402"/>
-<area shape="poly" title=" " alt="" coords="1365,468,1323,440,1275,415,1246,405,1247,400,1277,411,1325,436,1368,464"/>
-<area shape="rect" href="class_c_l_i_1_1_app.html#ad5d02ee857879c6abd007c8293a1151a" title="Set an alias for the app." alt="" coords="1128,539,1237,565"/>
-<area shape="poly" title=" " alt="" coords="1315,521,1238,541,1237,536,1314,516"/>
-<area shape="rect" href="class_c_l_i_1_1_app.html#a1e0b05ed58f80301b945ffc344b61aa3" title="Ignore case. Subcommands inherit value." alt="" coords="1107,588,1258,614"/>
-<area shape="poly" title=" " alt="" coords="1367,527,1325,555,1277,579,1247,590,1246,585,1275,575,1322,550,1364,523"/>
-<area shape="rect" href="class_c_l_i_1_1_app.html#aca4afbde81a59b25fc514b960d472c08" title="Ignore underscore. Subcommands inherit value." alt="" coords="1089,327,1276,353"/>
-<area shape="poly" title=" " alt="" coords="1380,465,1335,413,1306,388,1275,366,1252,355,1254,351,1278,361,1309,383,1338,410,1384,461"/>
-<area shape="rect" href="class_c_l_i_1_1_app.html#a76d7d45b60647632df392dd5e696877a" title="Set a name for the app (empty will use parser to set the name)" alt="" coords="1126,426,1239,451"/>
-<area shape="poly" title=" " alt="" coords="1314,475,1235,454,1237,449,1316,470"/>
-<area shape="rect" href="classcpp_1_1ast_1_1_typedef.html#ac461b1e6209716f39cc06baa5d726f56" title=" " alt="" coords="865,679,1026,705"/>
-<area shape="poly" title=" " alt="" coords="1115,564,1091,578,1074,599,1068,622,1061,645,1043,668,1022,681,1019,676,1039,664,1056,643,1062,620,1069,597,1087,574,1113,560"/>
-<area shape="rect" href="classcpp_1_1ast_1_1_typedef.html#ad94253075cea5a5110bf5e9b8fe0ee61" title=" " alt="" coords="861,728,1031,754"/>
-<area shape="poly" title=" " alt="" coords="1115,563,1091,578,1077,594,1070,611,1068,647,1065,683,1057,701,1043,719,1027,730,1024,725,1039,715,1053,699,1060,682,1062,646,1065,610,1073,592,1087,574,1112,559"/>
-<area shape="poly" title=" " alt="" coords="1153,463,1121,492,1091,528,1081,547,1076,566,1072,601,1066,634,1058,651,1043,668,1025,681,1022,676,1039,664,1053,648,1061,632,1067,600,1071,565,1076,545,1087,525,1117,488,1149,459"/>
-<area shape="rect" href="classcpp_1_1ast_1_1___nested_type.html#a944c5478ca7586a71d1d10bfcc7be1bb" title=" " alt="" coords="871,254,1020,295"/>
-<area shape="poly" title=" " alt="" coords="1110,430,1087,416,1075,403,1068,389,1062,361,1057,334,1050,321,1039,308,1019,295,1022,290,1043,304,1055,318,1062,333,1067,360,1073,387,1079,400,1091,412,1113,425"/>
-<area shape="rect" href="classcpp_1_1ast_1_1_class.html#a572953e3438a048cdc5f103fbf6ab7b0" title=" " alt="" coords="871,319,1020,345"/>
-<area shape="poly" title=" " alt="" coords="1110,428,1087,417,1071,402,1063,386,1054,372,1039,358,1018,347,1021,343,1043,353,1059,368,1067,384,1076,398,1091,412,1113,423"/>
-<area shape="rect" href="classcpp_1_1ast_1_1_define.html#a8e51e0611e1a76c5874f6b39e27a6d6a" title=" " alt="" coords="869,368,1022,394"/>
-<area shape="poly" title=" " alt="" coords="1111,424,1001,397,1003,392,1113,419"/>
-<area shape="rect" href="classcpp_1_1ast_1_1_function.html#a61e8eadca35b3848183554f62acf0ffb" title=" " alt="" coords="881,418,1010,459"/>
-<area shape="poly" title=" " alt="" coords="1111,441,1011,441,1011,436,1111,436"/>
-<area shape="rect" href="classcpp_1_1ast_1_1_parameter.html#aebd069a2a057dc791df21c56e22912bb" title=" " alt="" coords="880,483,1012,524"/>
-<area shape="poly" title=" " alt="" coords="1120,458,1013,488,1011,483,1118,453"/>
-<area shape="rect" href="classcpp_1_1tokenize_1_1_token.html#ad93a4059e9932fa2dea149510f0ef002" title=" " alt="" coords="877,549,1015,589"/>
-<area shape="poly" title=" " alt="" coords="1155,463,1104,500,1042,538,1014,551,1012,546,1040,533,1101,496,1152,459"/>
-<area shape="rect" href="classvalidate__reflection_1_1_empty_scope.html#a423076007160dd8dd8e9b314aa1429b1" title=" " alt="" coords="862,614,1030,655"/>
-<area shape="poly" title=" " alt="" coords="1155,464,1123,493,1091,528,1078,549,1070,567,1060,585,1043,603,1023,616,1020,611,1039,599,1056,582,1065,565,1073,546,1087,525,1120,490,1152,460"/>
-<area shape="rect" href="classvalidate__reflection_1_1_empty_scope.html#a5c2e058527ec1f3b72266c29c77ad0b2" title=" " alt="" coords="862,58,1030,99"/>
-<area shape="poly" title=" " alt="" coords="1110,432,1087,416,1062,378,1052,340,1054,302,1061,264,1068,227,1070,189,1062,152,1039,113,1025,101,1029,97,1043,110,1067,150,1075,189,1073,227,1066,265,1059,302,1058,339,1067,376,1091,412,1113,427"/>
-<area shape="rect" href="classvalidate__reflection_1_1_empty_scope.html#a1fb4f76506790294268dc078986d7430" title=" " alt="" coords="634,30,803,71"/>
-<area shape="poly" title=" " alt="" coords="1110,432,1087,416,1070,392,1058,368,1052,344,1050,320,1056,272,1068,224,1079,178,1083,132,1080,111,1072,90,1059,69,1039,48,1010,29,978,16,944,10,908,8,837,16,776,32,775,27,836,11,908,3,944,4,980,11,1013,24,1043,44,1063,65,1077,87,1085,109,1088,132,1085,178,1073,225,1061,273,1056,320,1057,343,1063,367,1074,390,1091,412,1113,428"/>
-<area shape="rect" href="classcpp_1_1ast_1_1___generic_declaration.html#a4851c5ea09b0a312d762342b71211bb1" title=" " alt="" coords="851,123,1041,164"/>
-<area shape="poly" title=" " alt="" coords="1110,432,1087,416,1066,386,1058,356,1057,326,1061,297,1065,267,1065,238,1058,208,1039,179,1025,167,1028,163,1043,175,1063,206,1070,237,1070,267,1066,297,1063,327,1063,355,1071,384,1091,412,1113,427"/>
-<area shape="rect" href="classcpp_1_1ast_1_1_variable_declaration.html#ad8821ceb26b91d7c3604486a424c3f8f" title=" " alt="" coords="854,189,1038,229"/>
-<area shape="poly" title=" " alt="" coords="1110,431,1087,416,1071,395,1063,373,1061,329,1061,286,1054,265,1039,244,1024,232,1027,228,1043,241,1059,263,1066,285,1067,329,1068,372,1075,392,1091,412,1113,427"/>
-<area shape="poly" title=" " alt="" coords="846,69,803,63,804,58,847,64"/>
-<area shape="rect" href="class_c_l_i_1_1_app.html#aa429cf3265602a5a1d60b87504ec33c5" title="Get an option by name (noexcept const version)" alt="" coords="648,733,789,773"/>
-<area shape="poly" title=" " alt="" coords="848,777,789,767,790,762,849,772"/>
-<area shape="rect" href="class_c_l_i_1_1_app.html#a5125f786c409fe0bbba684fe99f2c5fe" title="Get an option by name (noexcept non&#45;const version)" alt="" coords="648,798,789,839"/>
-<area shape="poly" title=" " alt="" coords="846,805,790,812,789,807,845,800"/>
-<area shape="rect" href="class_c_l_i_1_1_app.html#a1f7a70f4bc4c375a7de10073a5de709d" title="Fill in a single config option." alt="" coords="425,682,586,723"/>
-<area shape="poly" title=" " alt="" coords="646,794,633,787,580,756,534,725,537,721,582,752,636,783,648,789"/>
-<area shape="rect" href="class_c_l_i_1_1_app.html#addab9d99dce6a2f96b5c8748d20ebea8" title="Selects a Classifier enum based on the type of the current argument." alt="" coords="434,780,578,806"/>
-<area shape="poly" title=" " alt="" coords="632,811,578,804,579,799,633,805"/>
-<area shape="rect" href="class_c_l_i_1_1_app.html#a3424bdc3973b2c7a6e3e13ba50de748a" title="Get an option by name (non&#45;const version)" alt="" coords="435,830,576,855"/>
-<area shape="poly" title=" " alt="" coords="632,831,577,837,576,832,632,825"/>
-<area shape="rect" href="class_c_l_i_1_1_app.html#ad098a287e9a398ec6b24630335d068c8" title="Get an option by name." alt="" coords="435,879,576,905"/>
-<area shape="poly" title=" " alt="" coords="651,847,587,870,554,881,552,876,585,865,649,842"/>
-<area shape="rect" href="class_c_l_i_1_1_app.html#aee09795046c3b47948e6c2fa45349eca" title=" " alt="" coords="215,672,377,698"/>
-<area shape="poly" title=" " alt="" coords="410,697,377,694,378,689,410,692"/>
-<area shape="rect" href="class_c_l_i_1_1_app.html#a73c9decd5eb2b0c7eeda63cc4bd5048e" title=" " alt="" coords="223,798,368,823"/>
-<area shape="poly" title=" " alt="" coords="418,803,369,807,369,802,418,798"/>
-<area shape="rect" href="class_c_l_i_1_1_app.html#a02368e2fe89470ab9b4131c7e3288349" title=" " alt="" coords="5,760,167,786"/>
-<area shape="poly" title=" " alt="" coords="447,778,377,764,322,759,267,759,167,765,167,760,267,754,323,754,377,758,448,773"/>
-<area shape="poly" title=" " alt="" coords="332,785,320,779,296,776,274,778,262,783,259,788,265,796,261,799,254,789,258,779,272,773,296,771,322,774,335,780"/>
-<area shape="poly" title=" " alt="" coords="207,797,161,789,162,784,208,792"/>
-<area shape="rect" href="class_c_l_i_1_1_app.html#a89776486006cb61d112ae1cdd73848e1" title="Counts the number of times the given option was passed." alt="" coords="239,847,352,873"/>
-<area shape="poly" title=" " alt="" coords="420,881,353,871,354,866,421,876"/>
-<area shape="rect" href="class_c_l_i_1_1_app.html#a443c945fd3d3f03d33ad24be91b0ccbb" title="Shortcut bracket operator for getting a pointer to an option." alt="" coords="228,896,364,922"/>
-<area shape="poly" title=" " alt="" coords="420,901,365,906,364,901,419,896"/>
-<area shape="rect" href="class_c_l_i_1_1_app.html#a05c1dbeb654a91b792889551656c0ab8" title="Shortcut bracket operator for getting a pointer to an option." alt="" coords="228,946,364,971"/>
-<area shape="poly" title=" " alt="" coords="452,912,378,937,344,947,342,942,376,932,450,907"/>
-<area shape="rect" href="class_c_l_i_1_1_option.html#a4d2329268bae134aa58e704fa61f4b57" title="Requires &quot;&#45;&#45;&quot; to be removed from string." alt="" coords="1117,897,1248,937"/>
-<area shape="poly" title=" " alt="" coords="1342,877,1249,902,1248,897,1340,872"/>
-<area shape="rect" href="class_c_l_i_1_1_option.html#a481001137137be0d6a4e5998866d604a" title="Requires &quot;&#45;&#45;&quot; to be removed from string." alt="" coords="1117,766,1248,807"/>
-<area shape="poly" title=" " alt="" coords="1348,842,1248,810,1249,804,1350,836"/>
-<area shape="rect" href="class_c_l_i_1_1_option.html#acfa639ba77f034615c7e66028da1fc3b" title="Requires &quot;&#45;&quot; to be removed from string." alt="" coords="1117,831,1248,872"/>
-<area shape="poly" title=" " alt="" coords="1309,857,1249,856,1249,851,1309,852"/>
-<area shape="rect" href="class_c_l_i_1_1_option.html#a4eb6212ac30a0b139da52d258a3a1790" title=" " alt="" coords="1112,962,1254,1003"/>
-<area shape="poly" title=" " alt="" coords="1372,881,1326,912,1303,933,1278,951,1251,964,1249,959,1275,947,1299,929,1323,908,1369,876"/>
-<area shape="rect" href="class_c_l_i_1_1_option.html#ab84751fbf9037efaed5b64fed17fe57f" title="Gets a comma separated list of names. Will include / prefer the positional name if positional is true..." alt="" coords="869,936,1022,962"/>
-<area shape="poly" title=" " alt="" coords="1102,931,1023,941,1022,936,1101,925"/>
-<area shape="rect" href="class_c_l_i_1_1_app.html#aaabfb31d7fb10ee7465716b948b376dc" title="function that could be used by subclasses of App to shift options around into subcommands" alt="" coords="637,936,800,962"/>
-<area shape="poly" title=" " alt="" coords="854,952,800,952,800,946,854,946"/>
-<area shape="poly" title=" " alt="" coords="1101,790,1031,792,1031,786,1101,785"/>
-<area shape="rect" href="class_c_l_i_1_1_option.html#ad95e4bba59db33e4bfe4caf91ca7be21" title="If options share any of the same names, find it." alt="" coords="852,835,1040,861"/>
-<area shape="poly" title=" " alt="" coords="1103,810,999,837,998,832,1101,805"/>
-<area shape="poly" title=" " alt="" coords="1101,833,998,806,999,801,1103,828"/>
-<area shape="poly" title=" " alt="" coords="1101,853,1040,852,1041,847,1101,848"/>
-<area shape="poly" title=" " alt="" coords="1096,973,1023,962,1023,957,1096,968"/>
-<area shape="poly" title=" " alt="" coords="1533,922,1484,921,1430,925,1376,937,1326,957,1310,969,1302,984,1293,1000,1278,1016,1256,1029,1253,1025,1275,1012,1289,997,1297,982,1306,966,1323,952,1375,931,1429,920,1484,916,1533,917"/>
-<area shape="rect" href="namespace_c_l_i_1_1detail.html#a65e109bd9b97994ead2ca0173f56d617" title="assuming non default segments do a check on the close and open of the segments in a configItem struct..." alt="" coords="1325,966,1488,1007"/>
-<area shape="poly" title=" " alt="" coords="1535,954,1485,968,1484,963,1533,949"/>
-<area shape="poly" title=" " alt="" coords="1316,1014,1260,1029,1258,1024,1314,1009"/>
-<area shape="poly" title=" " alt="" coords="1543,861,1489,861,1489,855,1543,856"/>
-<area shape="rect" href="class_c_l_i_1_1_formatter.html#ade54fd392e2c9f5364744dca82408e60" title="This prints out a subcommand in help&#45;all." alt="" coords="1333,1131,1480,1172"/>
-<area shape="poly" title=" " alt="" coords="1530,1148,1481,1154,1480,1149,1530,1143"/>
-<area shape="rect" href="class_c_l_i_1_1_formatter.html#a838e0f47efa4fbd1b738eedb156887b9" title="This puts everything together." alt="" coords="1094,1111,1271,1137"/>
-<area shape="poly" title=" " alt="" coords="1529,1124,1489,1122,1271,1123,1271,1118,1489,1117,1530,1119"/>
-<area shape="poly" title=" " alt="" coords="1495,1130,1545,1124,1545,1129,1496,1135"/>
-<area shape="poly" title=" " alt="" coords="1317,1143,1271,1137,1272,1132,1318,1138"/>
+<area shape="rect" title="Return a lower case version of a string." alt="" coords="2109,359,2247,384"/>
+<area shape="rect" href="class_c_l_i_1_1_as_number_with_unit.html#af5d2fc29cd92c1821e653a97f91b00cb" title=" " alt="" coords="1897,138,2061,178"/>
+<area shape="poly" title=" " alt="" coords="2163,346,2124,270,2095,229,2059,192,2042,181,2045,177,2062,188,2099,225,2129,267,2168,343"/>
+<area shape="rect" href="class_c_l_i_1_1_app.html#a3ba6eb33f3ee9cd1a126385fa44f2c16" title="Check the name, case insensitive and underscore insensitive if set." alt="" coords="1901,203,2057,228"/>
+<area shape="poly" title=" " alt="" coords="2156,348,2115,299,2088,273,2059,250,2023,231,2025,227,2062,245,2092,269,2119,295,2160,344"/>
+<area shape="rect" href="class_c_l_i_1_1_option.html#af457a9a493f06f212cad9f854b281200" title="Check a name. Requires &quot;&#45;&quot; or &quot;&#45;&#45;&quot; for short / long, supports positional name." alt="" coords="1222,253,1393,279"/>
+<area shape="poly" title=" " alt="" coords="2093,358,2060,353,1849,320,1637,294,1393,274,1393,269,1637,289,1850,314,2061,348,2094,353"/>
+<area shape="rect" href="namespace_c_l_i_1_1detail.html#a356b9c9cc904af2b0a918fd55e86cd9c" title="Check if a string is a member of a list of strings and optionally ignore case or ignore underscores." alt="" coords="1685,380,1849,406"/>
+<area shape="poly" title=" " alt="" coords="2093,371,1999,370,1898,374,1837,382,1836,377,1897,369,1999,364,2093,365"/>
+<area shape="rect" href="class_c_l_i_1_1_config_base.html#a1395eecde5af65b73e3670529df0e17b" title="Convert a configuration into an app." alt="" coords="1467,564,1620,605"/>
+<area shape="poly" title=" " alt="" coords="2163,399,2122,452,2094,480,2062,503,2007,531,1949,552,1888,568,1828,579,1714,590,1620,592,1620,586,1714,585,1827,574,1887,563,1947,547,2005,526,2059,499,2090,476,2118,449,2158,396"/>
+<area shape="rect" href="namespace_c_l_i_1_1detail.html#aa6876cdd19b6e5807239b574a9ce0e3c" title=" " alt="" coords="1909,448,2049,489"/>
+<area shape="poly" title=" " alt="" coords="2137,394,2023,450,2021,446,2135,389"/>
+<area shape="rect" href="namespace_c_l_i.html#a0c52326d2681814c22aa1a93ce43375e" title="Helper function to allow ignore_case to be passed to IsMember or Transform." alt="" coords="1919,384,2039,410"/>
+<area shape="poly" title=" " alt="" coords="2094,385,2040,392,2039,387,2093,380"/>
+<area shape="rect" href="class_c_l_i_1_1_formatter.html#a9e6b7c4c6eee50b11fe1ca785002db04" title="This prints out all the subcommands." alt="" coords="1906,639,2052,680"/>
+<area shape="poly" title=" " alt="" coords="2169,400,2129,492,2099,546,2063,597,2039,621,2014,641,2011,636,2036,617,2059,594,2094,543,2124,489,2164,398"/>
+<area shape="rect" href="class_c_l_i_1_1_app.html#aade2ac30d86141da0d55d9181ac8b710" title="Helper function to run through all possible comparisons of subcommand names to check there is no over..." alt="" coords="1691,122,1843,162"/>
+<area shape="poly" title=" " alt="" coords="1919,200,1896,193,1822,166,1824,161,1898,188,1920,195"/>
+<area shape="poly" title=" " alt="" coords="1802,109,1789,103,1767,100,1747,102,1735,107,1730,113,1732,121,1727,122,1725,112,1732,103,1746,97,1767,95,1790,98,1804,104"/>
+<area shape="rect" href="class_c_l_i_1_1_app.html#a99e2ddf1ae27593e19162eba3aec5fcd" title="Add a previously created app as a subcommand." alt="" coords="1450,203,1637,228"/>
+<area shape="poly" title=" " alt="" coords="1703,171,1638,194,1601,205,1600,199,1636,189,1701,166"/>
+<area shape="rect" href="class_c_l_i_1_1_app.html#ad5d02ee857879c6abd007c8293a1151a" title="Set an alias for the app." alt="" coords="1489,5,1598,31"/>
+<area shape="poly" title=" " alt="" coords="1732,113,1688,77,1636,45,1597,31,1599,26,1638,40,1691,73,1735,109"/>
+<area shape="rect" href="class_c_l_i_1_1_app.html#a1e0b05ed58f80301b945ffc344b61aa3" title="Ignore case. Subcommands inherit value." alt="" coords="1468,55,1619,80"/>
+<area shape="poly" title=" " alt="" coords="1702,118,1636,94,1600,83,1601,78,1638,89,1704,113"/>
+<area shape="rect" href="class_c_l_i_1_1_app.html#aca4afbde81a59b25fc514b960d472c08" title="Ignore underscore. Subcommands inherit value." alt="" coords="1450,104,1637,130"/>
+<area shape="poly" title=" " alt="" coords="1675,134,1637,130,1638,125,1676,129"/>
+<area shape="rect" href="class_c_l_i_1_1_app.html#a76d7d45b60647632df392dd5e696877a" title="Set a name for the app (empty will use parser to set the name)" alt="" coords="1487,153,1600,179"/>
+<area shape="poly" title=" " alt="" coords="1676,155,1601,163,1600,157,1675,149"/>
+<area shape="rect" href="class_c_l_i_1_1_app.html#aa429cf3265602a5a1d60b87504ec33c5" title="Get an option by name (noexcept const version)" alt="" coords="1010,180,1151,221"/>
+<area shape="poly" title=" " alt="" coords="1245,251,1151,224,1152,219,1246,246"/>
+<area shape="rect" href="class_c_l_i_1_1_app.html#a5125f786c409fe0bbba684fe99f2c5fe" title="Get an option by name (noexcept non&#45;const version)" alt="" coords="1010,246,1151,286"/>
+<area shape="poly" title=" " alt="" coords="1207,269,1152,269,1152,264,1207,264"/>
+<area shape="rect" href="class_c_l_i_1_1_app.html#a1f7a70f4bc4c375a7de10073a5de709d" title="Fill in a single config option." alt="" coords="787,466,948,506"/>
+<area shape="poly" title=" " alt="" coords="1002,297,998,300,950,368,884,467,880,464,946,365,994,296,998,293"/>
+<area shape="rect" href="class_c_l_i_1_1_app.html#addab9d99dce6a2f96b5c8748d20ebea8" title="Selects a Classifier enum based on the type of the current argument." alt="" coords="585,341,730,367"/>
+<area shape="poly" title=" " alt="" coords="995,292,949,303,730,345,729,340,947,298,994,287"/>
+<area shape="rect" href="class_c_l_i_1_1_app.html#a3424bdc3973b2c7a6e3e13ba50de748a" title="Get an option by name (non&#45;const version)" alt="" coords="797,263,938,288"/>
+<area shape="poly" title=" " alt="" coords="995,273,939,275,938,270,994,267"/>
+<area shape="rect" href="class_c_l_i_1_1_app.html#ad098a287e9a398ec6b24630335d068c8" title="Get an option by name." alt="" coords="797,213,938,239"/>
+<area shape="poly" title=" " alt="" coords="994,253,938,242,939,237,995,248"/>
+<area shape="rect" href="class_c_l_i_1_1_app.html#aee09795046c3b47948e6c2fa45349eca" title=" " alt="" coords="576,473,739,499"/>
+<area shape="poly" title=" " alt="" coords="771,489,739,489,739,484,771,484"/>
+<area shape="rect" href="class_c_l_i_1_1_app.html#a7a15e5743d4a8eccac57955ed5a6a3b6" title="Read and process a configuration file (main app only)" alt="" coords="388,466,523,506"/>
+<area shape="poly" title=" " alt="" coords="560,489,523,489,523,484,560,484"/>
+<area shape="rect" href="class_c_l_i_1_1_app.html#a0fec24c804daf5b458bb5762e4e75a73" title="Process callbacks and such." alt="" coords="187,473,322,499"/>
+<area shape="poly" title=" " alt="" coords="373,489,322,489,322,484,373,484"/>
+<area shape="rect" href="class_c_l_i_1_1_app.html#a26a92886a7d7f10a9afbd39b6535f42b" title="Internal parse function." alt="" coords="5,424,126,450"/>
+<area shape="poly" title=" " alt="" coords="187,471,117,453,118,448,188,466"/>
+<area shape="rect" href="class_c_l_i_1_1_app.html#a241ba75a6c98b36349ae2f71a9137291" title="Internal parse function." alt="" coords="5,473,126,499"/>
+<area shape="poly" title=" " alt="" coords="172,489,126,489,126,484,172,484"/>
+<area shape="rect" href="class_c_l_i_1_1_app.html#a73c9decd5eb2b0c7eeda63cc4bd5048e" title=" " alt="" coords="383,416,528,442"/>
+<area shape="poly" title=" " alt="" coords="607,375,494,418,492,413,605,370"/>
+<area shape="rect" href="class_c_l_i_1_1_app.html#a02368e2fe89470ab9b4131c7e3288349" title=" " alt="" coords="174,420,335,446"/>
+<area shape="poly" title=" " alt="" coords="570,358,479,365,384,382,329,401,282,422,280,417,327,396,382,377,479,360,570,353"/>
+<area shape="poly" title=" " alt="" coords="490,404,479,397,456,395,434,397,423,401,421,407,426,414,422,417,415,407,419,398,433,391,456,389,480,392,493,399"/>
+<area shape="poly" title=" " alt="" coords="368,433,335,434,335,429,368,428"/>
+<area shape="poly" title=" " alt="" coords="158,438,126,438,126,433,158,432"/>
+<area shape="poly" title=" " alt="" coords="192,453,115,475,113,470,191,448"/>
+<area shape="rect" href="class_c_l_i_1_1_app.html#a89776486006cb61d112ae1cdd73848e1" title="Counts the number of times the given option was passed." alt="" coords="601,213,714,239"/>
+<area shape="poly" title=" " alt="" coords="781,229,715,229,715,224,781,224"/>
+<area shape="rect" href="class_c_l_i_1_1_app.html#a443c945fd3d3f03d33ad24be91b0ccbb" title="Shortcut bracket operator for getting a pointer to an option." alt="" coords="589,263,726,288"/>
+<area shape="poly" title=" " alt="" coords="795,246,716,265,715,259,794,241"/>
+<area shape="rect" href="class_c_l_i_1_1_app.html#a05c1dbeb654a91b792889551656c0ab8" title="Shortcut bracket operator for getting a pointer to an option." alt="" coords="589,164,726,190"/>
+<area shape="poly" title=" " alt="" coords="794,212,715,193,716,188,795,207"/>
+<area shape="rect" href="class_c_l_i_1_1_option.html#a4d2329268bae134aa58e704fa61f4b57" title="Requires &quot;&#45;&#45;&quot; to be removed from string." alt="" coords="1478,434,1609,474"/>
+<area shape="poly" title=" " alt="" coords="1703,413,1610,439,1609,434,1702,408"/>
+<area shape="rect" href="class_c_l_i_1_1_option.html#a481001137137be0d6a4e5998866d604a" title="Requires &quot;&#45;&#45;&quot; to be removed from string." alt="" coords="1478,303,1609,344"/>
+<area shape="poly" title=" " alt="" coords="1708,378,1609,346,1610,341,1710,372"/>
+<area shape="rect" href="class_c_l_i_1_1_option.html#acfa639ba77f034615c7e66028da1fc3b" title="Requires &quot;&#45;&quot; to be removed from string." alt="" coords="1478,368,1609,409"/>
+<area shape="poly" title=" " alt="" coords="1669,394,1609,393,1610,387,1669,388"/>
+<area shape="rect" href="class_c_l_i_1_1_option.html#a4eb6212ac30a0b139da52d258a3a1790" title=" " alt="" coords="1472,499,1614,540"/>
+<area shape="poly" title=" " alt="" coords="1724,415,1687,439,1664,464,1654,476,1638,488,1615,501,1612,496,1636,484,1650,472,1659,460,1683,435,1721,411"/>
+<area shape="rect" href="class_c_l_i_1_1_option.html#ab84751fbf9037efaed5b64fed17fe57f" title="Gets a comma separated list of names. Will include / prefer the positional name if positional is true..." alt="" coords="1231,515,1384,540"/>
+<area shape="poly" title=" " alt="" coords="1463,482,1353,517,1351,511,1462,477"/>
+<area shape="rect" href="class_c_l_i_1_1_app.html#aaabfb31d7fb10ee7465716b948b376dc" title="function that could be used by subclasses of App to shift options around into subcommands" alt="" coords="1000,688,1162,714"/>
+<area shape="poly" title=" " alt="" coords="1291,555,1240,617,1205,651,1167,679,1144,690,1142,685,1164,675,1202,646,1236,614,1287,552"/>
+<area shape="rect" href="class_c_l_i_1_1_app.html#a4e0c00ce18bbfca1ae890a653bbd2b93" title="Verify required options and cross requirements. Subcommands too (only if selected)." alt="" coords="1014,574,1148,614"/>
+<area shape="poly" title=" " alt="" coords="1247,548,1149,577,1147,572,1245,543"/>
+<area shape="rect" href="class_c_l_i_1_1_app.html#aaa53fda3b6aa477158ea8b1768342cc0" title="Special private constructor for subcommand." alt="" coords="1028,737,1133,763"/>
+<area shape="poly" title=" " alt="" coords="1297,556,1277,595,1248,641,1211,688,1167,728,1135,744,1132,739,1164,724,1207,685,1244,638,1272,592,1292,554"/>
+<area shape="rect" href="namespace_c_l_i.html#a6cb6f8bfff8c49385fb24f6f23a23c21" title="Helper function to mark an option as deprecated." alt="" coords="1006,360,1155,386"/>
+<area shape="poly" title=" " alt="" coords="1283,504,1232,452,1199,424,1164,401,1137,389,1140,384,1167,396,1203,420,1236,448,1287,501"/>
+<area shape="rect" href="class_c_l_i_1_1_formatter.html#ad29eb726bf961560f0c6419fd74332d0" title="This is the name part of an option, Default: left column." alt="" coords="1008,410,1154,450"/>
+<area shape="poly" title=" " alt="" coords="1264,510,1164,465,1137,454,1139,449,1166,460,1266,505"/>
+<area shape="rect" href="class_c_l_i_1_1_option.html#a251a3c10c556855c236fddbd419709b1" title="Get the results as a specified type." alt="" coords="1013,475,1148,500"/>
+<area shape="poly" title=" " alt="" coords="1216,514,1148,502,1149,497,1217,509"/>
+<area shape="rect" href="namespace_c_l_i.html#a36cfe4a6a80bf143735c0b80960bc252" title="Helper function to mark an option as retired." alt="" coords="1020,524,1141,550"/>
+<area shape="poly" title=" " alt="" coords="1215,534,1142,537,1142,532,1215,529"/>
+<area shape="rect" href="class_c_l_i_1_1_option.html#ab06eb6c31666a4a003aeb2cf3e5cdcd9" title="Process the callback." alt="" coords="996,639,1165,664"/>
+<area shape="poly" title=" " alt="" coords="1281,553,1230,591,1167,629,1136,640,1134,636,1164,624,1227,587,1278,548"/>
+<area shape="rect" href="class_c_l_i_1_1_option__group.html#a29c346abf87173bccd860d3a9813a5c5" title="Add an existing option to the Option_group." alt="" coords="800,680,935,721"/>
+<area shape="poly" title=" " alt="" coords="984,704,936,704,936,698,984,698"/>
+<area shape="poly" title=" " alt="" coords="1004,569,995,564,970,546,947,527,914,509,917,505,949,523,973,542,997,560,1006,565"/>
+<area shape="poly" title=" " alt="" coords="998,585,948,578,789,562,665,554,541,544,383,521,302,502,303,497,383,516,541,539,665,549,789,557,948,573,998,579"/>
+<area shape="poly" title=" " alt="" coords="998,597,659,597,454,597,401,594,348,586,245,560,157,529,94,502,96,497,159,524,247,555,349,581,402,589,454,592,659,592,998,592"/>
+<area shape="poly" title=" " alt="" coords="1462,307,1363,282,1364,277,1463,301"/>
+<area shape="rect" href="class_c_l_i_1_1_option.html#ad95e4bba59db33e4bfe4caf91ca7be21" title="If options share any of the same names, find it." alt="" coords="1213,311,1402,336"/>
+<area shape="poly" title=" " alt="" coords="1462,326,1402,326,1402,321,1462,321"/>
+<area shape="rect" href="class_c_l_i_1_1_option.html#ae72ff0b89bebb2987d548c186c577e50" title="If options share any of the same names, they are equal (not counting positional)" alt="" coords="1001,311,1160,336"/>
+<area shape="poly" title=" " alt="" coords="1198,326,1161,326,1161,321,1198,321"/>
+<area shape="poly" title=" " alt="" coords="1462,366,1448,358,1432,343,1423,328,1415,314,1400,300,1363,282,1365,277,1403,296,1419,311,1428,325,1437,339,1451,353,1465,362"/>
+<area shape="poly" title=" " alt="" coords="1462,369,1356,340,1358,334,1463,364"/>
+<area shape="poly" title=" " alt="" coords="1457,525,1385,528,1384,522,1457,520"/>
+<area shape="poly" title=" " alt="" coords="1895,494,1621,567,1619,562,1894,488"/>
+<area shape="rect" href="namespace_c_l_i_1_1detail.html#a65e109bd9b97994ead2ca0173f56d617" title="assuming non default segments do a check on the close and open of the segments in a configItem struct..." alt="" coords="1686,448,1848,489"/>
+<area shape="poly" title=" " alt="" coords="1894,472,1849,472,1849,466,1894,466"/>
+<area shape="poly" title=" " alt="" coords="1704,499,1687,510,1663,532,1638,554,1613,566,1611,562,1636,549,1659,528,1683,505,1701,494"/>
+<area shape="poly" title=" " alt="" coords="1903,398,1850,397,1850,392,1903,393"/>
+<area shape="rect" href="class_c_l_i_1_1_formatter.html#ade54fd392e2c9f5364744dca82408e60" title="This prints out a subcommand in help&#45;all." alt="" coords="1694,664,1840,705"/>
+<area shape="poly" title=" " alt="" coords="1891,682,1841,687,1841,682,1890,676"/>
+<area shape="rect" href="class_c_l_i_1_1_formatter.html#a838e0f47efa4fbd1b738eedb156887b9" title="This puts everything together." alt="" coords="1455,651,1632,676"/>
+<area shape="poly" title=" " alt="" coords="1890,657,1849,655,1767,654,1685,655,1633,658,1632,653,1685,650,1767,648,1849,650,1890,652"/>
+<area shape="poly" title=" " alt="" coords="1856,663,1905,657,1906,662,1856,668"/>
+<area shape="poly" title=" " alt="" coords="1678,679,1632,675,1633,669,1679,674"/>
 </map>
 </div>
 
@@ -4352,15 +4356,15 @@ Here is the caller graph for this function:</div>
 <div class="dyncontent">
 <div class="center"><img src="namespace_c_l_i_1_1detail_a841371d5dbb0a52f453de4cc1d00cc51_icgraph.png" border="0" usemap="#anamespace_c_l_i_1_1detail_a841371d5dbb0a52f453de4cc1d00cc51_icgraph" alt=""/></div>
 <map name="anamespace_c_l_i_1_1detail_a841371d5dbb0a52f453de4cc1d00cc51_icgraph" id="anamespace_c_l_i_1_1detail_a841371d5dbb0a52f453de4cc1d00cc51_icgraph">
-<area shape="rect" title="Verify following characters of an option." alt="" coords="670,2919,787,2959"/>
-<area shape="rect" href="namespace_c_l_i_1_1detail.html#a4274628d24f9e3fbc719284f1db263b8" title="Verify an option name." alt="" coords="506,2919,622,2959"/>
-<area shape="poly" title=" " alt="" coords="654,2942,623,2942,623,2936,654,2936"/>
+<area shape="rect" title="Verify following characters of an option." alt="" coords="670,1824,787,1865"/>
+<area shape="rect" href="namespace_c_l_i_1_1detail.html#a4274628d24f9e3fbc719284f1db263b8" title="Verify an option name." alt="" coords="506,1824,622,1865"/>
+<area shape="poly" title=" " alt="" coords="654,1847,623,1847,623,1842,654,1842"/>
 <area shape="rect" href="class_c_l_i_1_1_app.html#a8b461d2233ec4121259011b5ed24b336" title="Add a subcommand. Inherits INHERITABLE and OptionDefaults, and help flag." alt="" coords="271,1445,458,1470"/>
-<area shape="poly" title=" " alt="" coords="555,2904,365,1471,370,1470,561,2903"/>
-<area shape="rect" href="class_c_l_i_1_1_app.html#ad5d02ee857879c6abd007c8293a1151a" title="Set an alias for the app." alt="" coords="310,2926,418,2952"/>
-<area shape="poly" title=" " alt="" coords="491,2942,419,2942,419,2936,491,2936"/>
-<area shape="rect" href="namespace_c_l_i_1_1detail.html#a2f845e274b0701ae700150328804badf" title="Get a vector of short names, one of long names, and a single name." alt="" coords="288,2976,441,3001"/>
-<area shape="poly" title=" " alt="" coords="492,2960,420,2977,419,2972,490,2954"/>
+<area shape="poly" title=" " alt="" coords="543,1811,370,1472,375,1470,548,1809"/>
+<area shape="rect" href="class_c_l_i_1_1_app.html#ad5d02ee857879c6abd007c8293a1151a" title="Set an alias for the app." alt="" coords="310,1832,418,1857"/>
+<area shape="poly" title=" " alt="" coords="491,1847,419,1847,419,1842,491,1842"/>
+<area shape="rect" href="namespace_c_l_i_1_1detail.html#a2f845e274b0701ae700150328804badf" title="Get a vector of short names, one of long names, and a single name." alt="" coords="288,2556,441,2581"/>
+<area shape="poly" title=" " alt="" coords="556,1881,372,2556,367,2554,551,1879"/>
 <area shape="poly" title=" " alt="" coords="399,1432,387,1426,364,1423,343,1425,332,1430,330,1436,335,1443,331,1446,324,1436,328,1426,342,1420,364,1418,389,1421,401,1428"/>
 <area shape="rect" href="class_c_l_i_1_1_app.html#a5e114076a7cfa20a5895e9f6e8fd7dd5" title="creates an option group as part of the given app" alt="" coords="42,5,186,46"/>
 <area shape="poly" title=" " alt="" coords="359,1430,347,1152,321,715,302,492,279,294,252,142,237,92,221,61,205,47,185,37,188,33,208,42,225,57,241,90,257,141,284,293,307,491,326,715,353,1152,365,1430"/>
@@ -4421,37 +4425,35 @@ Here is the caller graph for this function:</div>
 <area shape="rect" href="structrentnet__subcommand.html#af44e949826393fed2ab0e0dda3c78b2b" title=" " alt="" coords="37,1861,191,1902"/>
 <area shape="poly" title=" " alt="" coords="364,1487,355,1559,332,1657,314,1709,291,1760,261,1808,224,1850,193,1870,190,1865,221,1846,257,1805,286,1758,309,1707,327,1655,349,1558,359,1486"/>
 <area shape="rect" href="structrexexec__subcommand.html#ae01c272a46ec790ca302c0c9a3c0da2b" title=" " alt="" coords="34,1927,194,1967"/>
-<area shape="poly" title=" " alt="" coords="366,1486,360,1569,353,1624,340,1684,323,1746,298,1808,266,1865,224,1916,196,1935,193,1930,221,1912,261,1862,293,1805,318,1745,335,1683,347,1624,355,1569,360,1486"/>
+<area shape="poly" title=" " alt="" coords="359,1487,295,1724,256,1848,239,1891,225,1916,196,1935,193,1930,221,1912,234,1889,251,1846,290,1723,353,1485"/>
 <area shape="rect" href="structsellram__subcommand.html#a9b98e3bf09fcf2f35466274f7ae099ac" title=" " alt="" coords="36,1992,192,2033"/>
-<area shape="poly" title=" " alt="" coords="362,1486,344,1594,314,1742,296,1817,274,1886,250,1942,225,1981,210,1993,194,2001,191,1997,207,1988,221,1977,246,1940,269,1884,290,1816,309,1741,339,1593,356,1485"/>
+<area shape="poly" title=" " alt="" coords="358,1486,285,1769,246,1914,225,1980,210,1993,194,2001,191,1997,207,1988,220,1978,241,1912,280,1768,353,1485"/>
 <area shape="rect" href="structsellrex__subcommand.html#aecf86f109f12f61f6297c5c6b8cbd519" title=" " alt="" coords="38,2057,190,2098"/>
-<area shape="poly" title=" " alt="" coords="363,1486,347,1606,319,1774,300,1859,278,1937,253,2002,225,2046,209,2059,192,2068,189,2063,206,2054,221,2043,248,1999,273,1936,295,1858,314,1773,342,1606,357,1486"/>
+<area shape="poly" title=" " alt="" coords="358,1486,273,1820,267,1854,266,1886,266,1941,265,1966,259,1992,246,2018,225,2046,209,2059,192,2068,189,2063,206,2054,221,2042,241,2016,253,1990,259,1966,261,1941,260,1886,262,1854,268,1818,353,1485"/>
 <area shape="rect" href="structset__account__permission__subcommand.html#a2da47985a64e4a5c68e17ef4df9f8126" title=" " alt="" coords="21,2122,207,2178"/>
-<area shape="poly" title=" " alt="" coords="363,1487,349,1618,322,1805,303,1900,280,1988,255,2061,240,2089,225,2111,209,2125,205,2121,221,2108,236,2087,250,2059,275,1987,298,1899,316,1804,344,1618,358,1486"/>
+<area shape="poly" title=" " alt="" coords="358,1486,319,1628,273,1819,267,1864,266,1904,270,1974,270,2007,264,2040,250,2075,225,2111,209,2126,206,2122,221,2108,245,2072,259,2039,265,2007,265,1975,261,1904,262,1864,268,1819,314,1627,353,1485"/>
 <area shape="rect" href="structset__action__permission__subcommand.html#a21e2eff93402582965baf60440fb85b0" title=" " alt="" coords="26,2202,202,2258"/>
-<area shape="poly" title=" " alt="" coords="364,1486,352,1632,326,1843,308,1951,285,2051,257,2134,242,2166,225,2191,204,2209,201,2205,221,2188,237,2164,253,2132,280,2050,303,1950,321,1842,347,1632,359,1486"/>
+<area shape="poly" title=" " alt="" coords="357,1486,318,1628,273,1819,266,1902,263,2011,252,2116,241,2159,225,2191,204,2209,201,2205,221,2188,236,2157,247,2115,258,2010,261,1902,268,1819,313,1627,352,1484"/>
 <area shape="rect" href="structunapprove__producer__subcommand.html#ac184906416dda7600bbcd5163e0a3071" title=" " alt="" coords="27,2282,201,2338"/>
-<area shape="poly" title=" " alt="" coords="364,1487,355,1646,331,1881,313,2002,289,2114,260,2207,243,2243,225,2271,203,2289,200,2285,221,2268,239,2241,255,2205,284,2113,307,2001,326,1880,349,1646,359,1486"/>
+<area shape="poly" title=" " alt="" coords="357,1486,317,1628,293,1723,273,1819,269,1864,267,1920,266,2052,263,2118,256,2180,244,2232,225,2271,203,2290,200,2286,221,2268,239,2231,251,2179,258,2118,260,2052,262,1920,263,1863,268,1819,288,1721,312,1626,352,1484"/>
 <area shape="rect" href="structundelegate__bandwidth__subcommand.html#a536b6238ada347a9d2754c096e45556a" title=" " alt="" coords="25,2362,203,2418"/>
-<area shape="poly" title=" " alt="" coords="365,1486,357,1660,336,1918,318,2053,294,2177,263,2280,245,2320,225,2351,205,2369,201,2365,221,2348,240,2318,258,2278,289,2176,312,2052,330,1918,352,1659,360,1486"/>
+<area shape="poly" title=" " alt="" coords="357,1486,316,1628,293,1722,273,1819,268,1872,267,1938,269,2093,267,2171,260,2244,247,2305,237,2331,225,2351,205,2369,202,2365,221,2348,232,2328,242,2304,255,2243,261,2171,263,2093,262,1938,263,1871,268,1819,288,1721,311,1626,352,1484"/>
 <area shape="rect" href="structunregister__producer__subcommand.html#a9ebc05d6e9ea36f11f6366d18cb2e5b4" title=" " alt="" coords="28,2442,200,2498"/>
-<area shape="poly" title=" " alt="" coords="365,1486,360,1673,352,1808,340,1955,323,2103,298,2239,283,2300,266,2353,247,2397,225,2431,202,2451,198,2447,221,2428,242,2395,261,2351,278,2298,293,2238,317,2102,335,1955,347,1808,354,1673,360,1486"/>
+<area shape="poly" title=" " alt="" coords="357,1486,316,1628,293,1722,273,1819,268,1879,268,1956,272,2134,271,2224,264,2308,250,2378,239,2408,225,2431,202,2451,198,2447,221,2428,234,2405,245,2377,259,2307,265,2224,266,2134,263,1956,263,1879,268,1819,287,1721,311,1626,352,1484"/>
 <area shape="rect" href="structunregproxy__subcommand.html#a377c1391b9536c1371dd13426e99d25d" title=" " alt="" coords="25,2521,203,2562"/>
-<area shape="poly" title=" " alt="" coords="366,1486,363,1687,358,1834,347,1995,330,2156,305,2304,289,2369,270,2427,249,2475,225,2511,206,2527,202,2523,221,2508,244,2472,265,2425,284,2368,300,2303,325,2155,342,1994,352,1834,358,1687,361,1486"/>
+<area shape="poly" title=" " alt="" coords="357,1486,316,1628,292,1722,273,1819,267,1951,263,2170,251,2387,241,2466,233,2494,225,2511,205,2528,202,2524,221,2508,228,2492,235,2465,246,2387,257,2170,262,1950,268,1819,287,1721,310,1626,352,1484"/>
 <area shape="rect" href="structunstaketorex__subcommand.html#a7497d59f269a1c944562ec4b05b41a07" title=" " alt="" coords="19,2587,209,2627"/>
-<area shape="poly" title=" " alt="" coords="366,1486,365,1698,360,1854,350,2025,333,2196,308,2354,292,2424,273,2485,250,2536,225,2575,211,2588,207,2584,221,2572,246,2534,268,2483,287,2422,303,2353,328,2195,345,2024,355,1854,360,1698,361,1486"/>
+<area shape="poly" title=" " alt="" coords="357,1486,315,1628,292,1722,273,1819,268,1963,264,2203,260,2328,253,2440,242,2526,234,2556,225,2575,211,2588,207,2584,221,2572,229,2554,236,2525,248,2439,255,2328,259,2203,262,1963,268,1819,287,1721,310,1626,352,1484"/>
 <area shape="rect" href="structupdaterex__subcommand.html#ad329f8b1ceacebe9e11073cee0554453" title=" " alt="" coords="28,2652,200,2693"/>
-<area shape="poly" title=" " alt="" coords="364,1486,349,1726,320,2092,300,2279,278,2445,253,2571,239,2614,225,2641,202,2659,198,2655,221,2637,234,2612,248,2569,273,2444,295,2279,314,2092,344,1725,359,1486"/>
+<area shape="poly" title=" " alt="" coords="357,1486,315,1628,292,1722,273,1819,270,1877,268,1975,265,2236,262,2372,255,2493,243,2587,235,2620,225,2641,202,2659,199,2655,221,2637,230,2618,238,2586,249,2493,256,2372,260,2236,262,1975,264,1877,268,1819,287,1721,310,1626,352,1484"/>
 <area shape="rect" href="structvote__producer__proxy__subcommand.html#aa7e9f190f70f0452fdd02b40d6b3fe16" title=" " alt="" coords="16,2716,212,2772"/>
-<area shape="poly" title=" " alt="" coords="364,1486,350,1737,321,2124,301,2322,279,2497,253,2631,239,2677,225,2706,213,2718,209,2714,221,2703,234,2675,248,2630,273,2496,296,2321,315,2123,344,1736,359,1486"/>
+<area shape="poly" title=" " alt="" coords="357,1486,315,1628,292,1722,273,1819,269,1882,268,1987,266,2268,262,2415,255,2546,244,2648,235,2683,225,2706,214,2718,210,2714,220,2703,230,2682,238,2647,250,2546,257,2415,260,2268,262,1987,264,1882,268,1819,287,1721,310,1626,351,1484"/>
 <area shape="rect" href="structvote__producers__subcommand.html#a0eef881cfd270a15c3e2f6be6def9c36" title=" " alt="" coords="12,2796,216,2837"/>
-<area shape="poly" title=" " alt="" coords="365,1486,352,1752,324,2165,305,2376,282,2564,256,2707,241,2756,225,2786,213,2797,209,2793,221,2783,236,2754,250,2706,277,2563,300,2376,319,2165,346,1751,359,1486"/>
+<area shape="poly" title=" " alt="" coords="357,1486,315,1628,292,1722,273,1819,269,1888,268,2003,268,2310,265,2470,259,2613,246,2723,236,2762,225,2786,213,2798,209,2794,221,2783,231,2760,240,2722,253,2613,260,2470,263,2310,263,2003,264,1887,268,1819,286,1721,310,1626,351,1484"/>
 <area shape="rect" href="structwithdraw__subcommand.html#a01107075444e5c11a70c76e5a66d46e5" title=" " alt="" coords="31,2861,197,2902"/>
-<area shape="poly" title=" " alt="" coords="365,1486,353,1763,326,2197,307,2419,284,2616,257,2767,241,2818,225,2850,199,2870,196,2866,221,2847,236,2816,251,2765,279,2615,302,2419,321,2197,347,1763,359,1486"/>
-<area shape="rect" href="classcpp_1_1ast_1_1_typedef.html#ac461b1e6209716f39cc06baa5d726f56" title=" " alt="" coords="33,2926,195,2952"/>
-<area shape="poly" title=" " alt="" coords="295,2942,195,2942,195,2936,295,2936"/>
-<area shape="rect" href="classcpp_1_1ast_1_1_typedef.html#ad94253075cea5a5110bf5e9b8fe0ee61" title=" " alt="" coords="29,2976,199,3001"/>
-<area shape="poly" title=" " alt="" coords="295,2955,184,2977,182,2972,294,2950"/>
+<area shape="poly" title=" " alt="" coords="357,1486,315,1628,292,1722,273,1819,269,1892,269,2015,269,2342,267,2513,260,2665,247,2783,237,2824,225,2850,199,2870,196,2866,221,2847,232,2822,242,2782,255,2665,262,2513,264,2342,263,2015,264,1892,268,1819,286,1721,310,1626,351,1484"/>
+<area shape="rect" href="class_c_l_i_1_1_option.html#a35e90f0fc810ccca676f7fa39bf4cc27" title="Making an option by hand is not defined, it must be made by the App class." alt="" coords="47,2926,181,2952"/>
+<area shape="poly" title=" " alt="" coords="363,2597,352,2663,328,2749,310,2795,287,2839,259,2880,224,2916,204,2928,182,2936,180,2931,202,2924,221,2912,255,2877,283,2836,305,2792,323,2747,347,2662,358,2596"/>
 </map>
 </div>
 
@@ -4508,13 +4510,13 @@ Here is the caller graph for this function:</div>
 <div class="dyncontent">
 <div class="center"><img src="namespace_c_l_i_1_1detail_a4274628d24f9e3fbc719284f1db263b8_icgraph.png" border="0" usemap="#anamespace_c_l_i_1_1detail_a4274628d24f9e3fbc719284f1db263b8_icgraph" alt=""/></div>
 <map name="anamespace_c_l_i_1_1detail_a4274628d24f9e3fbc719284f1db263b8_icgraph" id="anamespace_c_l_i_1_1detail_a4274628d24f9e3fbc719284f1db263b8_icgraph">
-<area shape="rect" title="Verify an option name." alt="" coords="506,2944,622,2985"/>
+<area shape="rect" title="Verify an option name." alt="" coords="506,1824,622,1865"/>
 <area shape="rect" href="class_c_l_i_1_1_app.html#a8b461d2233ec4121259011b5ed24b336" title="Add a subcommand. Inherits INHERITABLE and OptionDefaults, and help flag." alt="" coords="271,1445,458,1470"/>
-<area shape="poly" title=" " alt="" coords="556,2929,365,1471,370,1471,561,2928"/>
-<area shape="rect" href="class_c_l_i_1_1_app.html#ad5d02ee857879c6abd007c8293a1151a" title="Set an alias for the app." alt="" coords="310,2952,418,2977"/>
-<area shape="poly" title=" " alt="" coords="491,2967,419,2967,419,2962,491,2962"/>
-<area shape="rect" href="namespace_c_l_i_1_1detail.html#a2f845e274b0701ae700150328804badf" title="Get a vector of short names, one of long names, and a single name." alt="" coords="288,3001,441,3026"/>
-<area shape="poly" title=" " alt="" coords="492,2985,420,3003,419,2998,490,2980"/>
+<area shape="poly" title=" " alt="" coords="543,1811,370,1472,375,1470,548,1809"/>
+<area shape="rect" href="class_c_l_i_1_1_app.html#ad5d02ee857879c6abd007c8293a1151a" title="Set an alias for the app." alt="" coords="310,1832,418,1857"/>
+<area shape="poly" title=" " alt="" coords="491,1847,419,1847,419,1842,491,1842"/>
+<area shape="rect" href="namespace_c_l_i_1_1detail.html#a2f845e274b0701ae700150328804badf" title="Get a vector of short names, one of long names, and a single name." alt="" coords="288,2556,441,2581"/>
+<area shape="poly" title=" " alt="" coords="556,1881,372,2556,367,2554,551,1879"/>
 <area shape="poly" title=" " alt="" coords="399,1432,387,1426,364,1423,343,1425,332,1430,330,1436,335,1443,331,1446,324,1436,328,1426,342,1420,364,1418,389,1421,401,1428"/>
 <area shape="rect" href="class_c_l_i_1_1_app.html#a5e114076a7cfa20a5895e9f6e8fd7dd5" title="creates an option group as part of the given app" alt="" coords="42,5,186,46"/>
 <area shape="poly" title=" " alt="" coords="359,1430,347,1152,321,715,302,492,279,294,252,142,237,92,221,61,205,47,185,37,188,33,208,42,225,57,241,90,257,141,284,293,307,491,326,715,353,1152,365,1430"/>
@@ -4575,39 +4577,35 @@ Here is the caller graph for this function:</div>
 <area shape="rect" href="structrentnet__subcommand.html#af44e949826393fed2ab0e0dda3c78b2b" title=" " alt="" coords="37,1861,191,1902"/>
 <area shape="poly" title=" " alt="" coords="364,1487,355,1559,332,1657,314,1709,291,1760,261,1808,224,1850,193,1870,190,1865,221,1846,257,1805,286,1758,309,1707,327,1655,349,1558,359,1486"/>
 <area shape="rect" href="structrexexec__subcommand.html#ae01c272a46ec790ca302c0c9a3c0da2b" title=" " alt="" coords="34,1927,194,1967"/>
-<area shape="poly" title=" " alt="" coords="366,1486,360,1569,353,1624,340,1684,323,1746,298,1808,266,1865,224,1916,196,1935,193,1930,221,1912,261,1862,293,1805,318,1745,335,1683,347,1624,355,1569,360,1486"/>
+<area shape="poly" title=" " alt="" coords="359,1487,295,1724,256,1848,239,1891,225,1916,196,1935,193,1930,221,1912,234,1889,251,1846,290,1723,353,1485"/>
 <area shape="rect" href="structsellram__subcommand.html#a9b98e3bf09fcf2f35466274f7ae099ac" title=" " alt="" coords="36,1992,192,2033"/>
-<area shape="poly" title=" " alt="" coords="362,1486,344,1594,314,1742,296,1817,274,1886,250,1942,225,1981,210,1993,194,2001,191,1997,207,1988,221,1977,246,1940,269,1884,290,1816,309,1741,339,1593,356,1485"/>
+<area shape="poly" title=" " alt="" coords="358,1486,285,1769,246,1914,225,1980,210,1993,194,2001,191,1997,207,1988,220,1978,241,1912,280,1768,353,1485"/>
 <area shape="rect" href="structsellrex__subcommand.html#aecf86f109f12f61f6297c5c6b8cbd519" title=" " alt="" coords="38,2057,190,2098"/>
-<area shape="poly" title=" " alt="" coords="363,1486,347,1606,319,1774,300,1859,278,1937,253,2002,225,2046,209,2059,192,2068,189,2063,206,2054,221,2043,248,1999,273,1936,295,1858,314,1773,342,1606,357,1486"/>
+<area shape="poly" title=" " alt="" coords="358,1486,273,1820,267,1854,266,1886,266,1941,265,1966,259,1992,246,2018,225,2046,209,2059,192,2068,189,2063,206,2054,221,2042,241,2016,253,1990,259,1966,261,1941,260,1886,262,1854,268,1818,353,1485"/>
 <area shape="rect" href="structset__account__permission__subcommand.html#a2da47985a64e4a5c68e17ef4df9f8126" title=" " alt="" coords="21,2122,207,2178"/>
-<area shape="poly" title=" " alt="" coords="363,1487,349,1618,322,1805,303,1900,280,1988,255,2061,240,2089,225,2111,209,2125,205,2121,221,2108,236,2087,250,2059,275,1987,298,1899,316,1804,344,1618,358,1486"/>
+<area shape="poly" title=" " alt="" coords="358,1486,319,1628,273,1819,267,1864,266,1904,270,1974,270,2007,264,2040,250,2075,225,2111,209,2126,206,2122,221,2108,245,2072,259,2039,265,2007,265,1975,261,1904,262,1864,268,1819,314,1627,353,1485"/>
 <area shape="rect" href="structset__action__permission__subcommand.html#a21e2eff93402582965baf60440fb85b0" title=" " alt="" coords="26,2202,202,2258"/>
-<area shape="poly" title=" " alt="" coords="364,1486,352,1632,326,1843,308,1951,285,2051,257,2134,242,2166,225,2191,204,2209,201,2205,221,2188,237,2164,253,2132,280,2050,303,1950,321,1842,347,1632,359,1486"/>
+<area shape="poly" title=" " alt="" coords="357,1486,318,1628,273,1819,266,1902,263,2011,252,2116,241,2159,225,2191,204,2209,201,2205,221,2188,236,2157,247,2115,258,2010,261,1902,268,1819,313,1627,352,1484"/>
 <area shape="rect" href="structunapprove__producer__subcommand.html#ac184906416dda7600bbcd5163e0a3071" title=" " alt="" coords="27,2282,201,2338"/>
-<area shape="poly" title=" " alt="" coords="364,1487,355,1646,331,1881,313,2002,289,2114,260,2207,243,2243,225,2271,203,2289,200,2285,221,2268,239,2241,255,2205,284,2113,307,2001,326,1880,349,1646,359,1486"/>
+<area shape="poly" title=" " alt="" coords="357,1486,317,1628,293,1723,273,1819,269,1864,267,1920,266,2052,263,2118,256,2180,244,2232,225,2271,203,2290,200,2286,221,2268,239,2231,251,2179,258,2118,260,2052,262,1920,263,1863,268,1819,288,1721,312,1626,352,1484"/>
 <area shape="rect" href="structundelegate__bandwidth__subcommand.html#a536b6238ada347a9d2754c096e45556a" title=" " alt="" coords="25,2362,203,2418"/>
-<area shape="poly" title=" " alt="" coords="365,1486,357,1660,336,1918,318,2053,294,2177,263,2280,245,2320,225,2351,205,2369,201,2365,221,2348,240,2318,258,2278,289,2176,312,2052,330,1918,352,1659,360,1486"/>
+<area shape="poly" title=" " alt="" coords="357,1486,316,1628,293,1722,273,1819,268,1872,267,1938,269,2093,267,2171,260,2244,247,2305,237,2331,225,2351,205,2369,202,2365,221,2348,232,2328,242,2304,255,2243,261,2171,263,2093,262,1938,263,1871,268,1819,288,1721,311,1626,352,1484"/>
 <area shape="rect" href="structunregister__producer__subcommand.html#a9ebc05d6e9ea36f11f6366d18cb2e5b4" title=" " alt="" coords="28,2442,200,2498"/>
-<area shape="poly" title=" " alt="" coords="365,1486,360,1673,352,1808,340,1955,323,2103,298,2239,283,2300,266,2353,247,2397,225,2431,202,2451,198,2447,221,2428,242,2395,261,2351,278,2298,293,2238,317,2102,335,1955,347,1808,354,1673,360,1486"/>
+<area shape="poly" title=" " alt="" coords="357,1486,316,1628,293,1722,273,1819,268,1879,268,1956,272,2134,271,2224,264,2308,250,2378,239,2408,225,2431,202,2451,198,2447,221,2428,234,2405,245,2377,259,2307,265,2224,266,2134,263,1956,263,1879,268,1819,287,1721,311,1626,352,1484"/>
 <area shape="rect" href="structunregproxy__subcommand.html#a377c1391b9536c1371dd13426e99d25d" title=" " alt="" coords="25,2521,203,2562"/>
-<area shape="poly" title=" " alt="" coords="366,1486,363,1687,358,1834,347,1995,330,2156,305,2304,289,2369,270,2427,249,2475,225,2511,206,2527,202,2523,221,2508,244,2472,265,2425,284,2368,300,2303,325,2155,342,1994,352,1834,358,1687,361,1486"/>
+<area shape="poly" title=" " alt="" coords="357,1486,316,1628,292,1722,273,1819,267,1951,263,2170,251,2387,241,2466,233,2494,225,2511,205,2528,202,2524,221,2508,228,2492,235,2465,246,2387,257,2170,262,1950,268,1819,287,1721,310,1626,352,1484"/>
 <area shape="rect" href="structunstaketorex__subcommand.html#a7497d59f269a1c944562ec4b05b41a07" title=" " alt="" coords="19,2587,209,2627"/>
-<area shape="poly" title=" " alt="" coords="366,1486,365,1698,360,1854,350,2025,333,2196,308,2354,292,2424,273,2485,250,2536,225,2575,211,2588,207,2584,221,2572,246,2534,268,2483,287,2422,303,2353,328,2195,345,2024,355,1854,360,1698,361,1486"/>
+<area shape="poly" title=" " alt="" coords="357,1486,315,1628,292,1722,273,1819,268,1963,264,2203,260,2328,253,2440,242,2526,234,2556,225,2575,211,2588,207,2584,221,2572,229,2554,236,2525,248,2439,255,2328,259,2203,262,1963,268,1819,287,1721,310,1626,352,1484"/>
 <area shape="rect" href="structupdaterex__subcommand.html#ad329f8b1ceacebe9e11073cee0554453" title=" " alt="" coords="28,2652,200,2693"/>
-<area shape="poly" title=" " alt="" coords="364,1486,349,1726,320,2092,300,2279,278,2445,253,2571,239,2614,225,2641,202,2659,198,2655,221,2637,234,2612,248,2569,273,2444,295,2279,314,2092,344,1725,359,1486"/>
+<area shape="poly" title=" " alt="" coords="357,1486,315,1628,292,1722,273,1819,270,1877,268,1975,265,2236,262,2372,255,2493,243,2587,235,2620,225,2641,202,2659,199,2655,221,2637,230,2618,238,2586,249,2493,256,2372,260,2236,262,1975,264,1877,268,1819,287,1721,310,1626,352,1484"/>
 <area shape="rect" href="structvote__producer__proxy__subcommand.html#aa7e9f190f70f0452fdd02b40d6b3fe16" title=" " alt="" coords="16,2716,212,2772"/>
-<area shape="poly" title=" " alt="" coords="364,1486,350,1737,321,2124,301,2322,279,2497,253,2631,239,2677,225,2706,213,2718,209,2714,221,2703,234,2675,248,2630,273,2496,296,2321,315,2123,344,1736,359,1486"/>
+<area shape="poly" title=" " alt="" coords="357,1486,315,1628,292,1722,273,1819,269,1882,268,1987,266,2268,262,2415,255,2546,244,2648,235,2683,225,2706,214,2718,210,2714,220,2703,230,2682,238,2647,250,2546,257,2415,260,2268,262,1987,264,1882,268,1819,287,1721,310,1626,351,1484"/>
 <area shape="rect" href="structvote__producers__subcommand.html#a0eef881cfd270a15c3e2f6be6def9c36" title=" " alt="" coords="12,2796,216,2837"/>
-<area shape="poly" title=" " alt="" coords="365,1486,352,1752,324,2165,305,2376,282,2564,256,2707,241,2756,225,2786,213,2797,209,2793,221,2783,236,2754,250,2706,277,2563,300,2376,319,2165,346,1751,359,1486"/>
+<area shape="poly" title=" " alt="" coords="357,1486,315,1628,292,1722,273,1819,269,1888,268,2003,268,2310,265,2470,259,2613,246,2723,236,2762,225,2786,213,2798,209,2794,221,2783,231,2760,240,2722,253,2613,260,2470,263,2310,263,2003,264,1887,268,1819,286,1721,310,1626,351,1484"/>
 <area shape="rect" href="structwithdraw__subcommand.html#a01107075444e5c11a70c76e5a66d46e5" title=" " alt="" coords="31,2861,197,2902"/>
-<area shape="poly" title=" " alt="" coords="365,1486,353,1763,326,2197,307,2419,284,2616,257,2767,241,2818,225,2850,199,2870,196,2866,221,2847,236,2816,251,2765,279,2615,302,2419,321,2197,347,1763,359,1486"/>
-<area shape="rect" href="classcpp_1_1ast_1_1_typedef.html#ac461b1e6209716f39cc06baa5d726f56" title=" " alt="" coords="33,2926,195,2952"/>
-<area shape="poly" title=" " alt="" coords="295,2960,195,2950,195,2945,295,2955"/>
-<area shape="rect" href="classcpp_1_1ast_1_1_typedef.html#ad94253075cea5a5110bf5e9b8fe0ee61" title=" " alt="" coords="29,2976,199,3001"/>
-<area shape="poly" title=" " alt="" coords="295,2974,200,2983,199,2978,295,2968"/>
-<area shape="rect" href="class_c_l_i_1_1_option.html#a35e90f0fc810ccca676f7fa39bf4cc27" title="Making an option by hand is not defined, it must be made by the App class." alt="" coords="47,3025,181,3050"/>
-<area shape="poly" title=" " alt="" coords="272,3025,182,3034,181,3029,272,3020"/>
+<area shape="poly" title=" " alt="" coords="357,1486,315,1628,292,1722,273,1819,269,1892,269,2015,269,2342,267,2513,260,2665,247,2783,237,2824,225,2850,199,2870,196,2866,221,2847,232,2822,242,2782,255,2665,262,2513,264,2342,263,2015,264,1892,268,1819,286,1721,310,1626,351,1484"/>
+<area shape="rect" href="class_c_l_i_1_1_option.html#a35e90f0fc810ccca676f7fa39bf4cc27" title="Making an option by hand is not defined, it must be made by the App class." alt="" coords="47,2926,181,2952"/>
+<area shape="poly" title=" " alt="" coords="363,2597,352,2663,328,2749,310,2795,287,2839,259,2880,224,2916,204,2928,182,2936,180,2931,202,2924,221,2912,255,2877,283,2836,305,2792,323,2747,347,2662,358,2596"/>
 </map>
 </div>
 

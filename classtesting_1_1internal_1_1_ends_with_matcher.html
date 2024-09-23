@@ -115,9 +115,9 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a0d3b4f762a3172bb378671a9e6863891" id="r_a0d3b4f762a3172bb378671a9e6863891"><td class="memTemplParams" colspan="2">template&lt;typename MatcheeStringType &gt; </td></tr>
 <tr class="memitem:a0d3b4f762a3172bb378671a9e6863891"><td class="memTemplItemLeft" align="right" valign="top">bool&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="#a0d3b4f762a3172bb378671a9e6863891">MatchAndExplain</a> (const MatcheeStringType &amp;<a class="el" href="yubihsm__pkcs11_8c.html#a506da415c9307c897ca9be93acfe1d0f">s</a>, <a class="el" href="classtesting_1_1_match_result_listener.html">MatchResultListener</a> *) const</td></tr>
 <tr class="separator:a0d3b4f762a3172bb378671a9e6863891"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aec33451ab09428a97ab0793e332416d8" id="r_aec33451ab09428a97ab0793e332416d8"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aec33451ab09428a97ab0793e332416d8">DescribeTo</a> (::std::ostream *os) const</td></tr>
+<tr class="memitem:aec33451ab09428a97ab0793e332416d8" id="r_aec33451ab09428a97ab0793e332416d8"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aec33451ab09428a97ab0793e332416d8">DescribeTo</a> (::std::ostream *<a class="el" href="environment_8hpp.html#a3951483d0b31c29ca95336206cd35238">os</a>) const</td></tr>
 <tr class="separator:aec33451ab09428a97ab0793e332416d8"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:af5dd55c6c3a2ce57bd85f12e07cb604a" id="r_af5dd55c6c3a2ce57bd85f12e07cb604a"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#af5dd55c6c3a2ce57bd85f12e07cb604a">DescribeNegationTo</a> (::std::ostream *os) const</td></tr>
+<tr class="memitem:af5dd55c6c3a2ce57bd85f12e07cb604a" id="r_af5dd55c6c3a2ce57bd85f12e07cb604a"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#af5dd55c6c3a2ce57bd85f12e07cb604a">DescribeNegationTo</a> (::std::ostream *<a class="el" href="environment_8hpp.html#a3951483d0b31c29ca95336206cd35238">os</a>) const</td></tr>
 <tr class="separator:af5dd55c6c3a2ce57bd85f12e07cb604a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
@@ -183,9 +183,10 @@ template&lt;typename StringType &gt; </div>
 
 <p class="definition">Definition at line <a class="el" href="gmock-matchers_8h_source.html#l01533">1533</a> of file <a class="el" href="gmock-matchers_8h_source.html">gmock-matchers.h</a>.</p>
 <div class="fragment"><div class="line"><span class="lineno"> 1533</span>                                                {</div>
-<div class="line"><span class="lineno"> 1534</span>    *os &lt;&lt; <span class="stringliteral">&quot;doesn&#39;t end with &quot;</span>;</div>
-<div class="line"><span class="lineno"> 1535</span>    <a class="code hl_function" href="namespacetesting_1_1internal.html#a30708fa2bacf11895b03bdb21eb72309">UniversalPrint</a>(suffix_, os);</div>
+<div class="line"><span class="lineno"> 1534</span>    *<a class="code hl_variable" href="environment_8hpp.html#a3951483d0b31c29ca95336206cd35238">os</a> &lt;&lt; <span class="stringliteral">&quot;doesn&#39;t end with &quot;</span>;</div>
+<div class="line"><span class="lineno"> 1535</span>    <a class="code hl_function" href="namespacetesting_1_1internal.html#a30708fa2bacf11895b03bdb21eb72309">UniversalPrint</a>(suffix_, <a class="code hl_variable" href="environment_8hpp.html#a3951483d0b31c29ca95336206cd35238">os</a>);</div>
 <div class="line"><span class="lineno"> 1536</span>  }</div>
+<div class="ttc" id="aenvironment_8hpp_html_a3951483d0b31c29ca95336206cd35238"><div class="ttname"><a href="environment_8hpp.html#a3951483d0b31c29ca95336206cd35238">os</a></div><div class="ttdeci">os_t os</div><div class="ttdef"><b>Definition</b> <a href="environment_8hpp_source.html#l00023">environment.hpp:23</a></div></div>
 <div class="ttc" id="anamespacetesting_1_1internal_html_a30708fa2bacf11895b03bdb21eb72309"><div class="ttname"><a href="namespacetesting_1_1internal.html#a30708fa2bacf11895b03bdb21eb72309">testing::internal::UniversalPrint</a></div><div class="ttdeci">void UniversalPrint(const T &amp;value, ::std::ostream *os)</div><div class="ttdef"><b>Definition</b> <a href="gtest-printers_8h_source.html#l00931">gtest-printers.h:931</a></div></div>
 </div><!-- fragment --><div class="dynheader">
 Here is the call graph for this function:</div>
@@ -232,8 +233,8 @@ template&lt;typename StringType &gt; </div>
 
 <p class="definition">Definition at line <a class="el" href="gmock-matchers_8h_source.html#l01528">1528</a> of file <a class="el" href="gmock-matchers_8h_source.html">gmock-matchers.h</a>.</p>
 <div class="fragment"><div class="line"><span class="lineno"> 1528</span>                                        {</div>
-<div class="line"><span class="lineno"> 1529</span>    *os &lt;&lt; <span class="stringliteral">&quot;ends with &quot;</span>;</div>
-<div class="line"><span class="lineno"> 1530</span>    <a class="code hl_function" href="namespacetesting_1_1internal.html#a30708fa2bacf11895b03bdb21eb72309">UniversalPrint</a>(suffix_, os);</div>
+<div class="line"><span class="lineno"> 1529</span>    *<a class="code hl_variable" href="environment_8hpp.html#a3951483d0b31c29ca95336206cd35238">os</a> &lt;&lt; <span class="stringliteral">&quot;ends with &quot;</span>;</div>
+<div class="line"><span class="lineno"> 1530</span>    <a class="code hl_function" href="namespacetesting_1_1internal.html#a30708fa2bacf11895b03bdb21eb72309">UniversalPrint</a>(suffix_, <a class="code hl_variable" href="environment_8hpp.html#a3951483d0b31c29ca95336206cd35238">os</a>);</div>
 <div class="line"><span class="lineno"> 1531</span>  }</div>
 </div><!-- fragment --><div class="dynheader">
 Here is the call graph for this function:</div>

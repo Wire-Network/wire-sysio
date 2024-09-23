@@ -14,14 +14,11 @@ var dir_9f0b31ca4dcaa6212aafafbbdb00cb80 =
     [ "gmock-spec-builders_test.cc", "gmock-spec-builders__test_8cc.html", "gmock-spec-builders__test_8cc" ],
     [ "gmock_all_test.cc", "gmock__all__test_8cc.html", null ],
     [ "gmock_ex_test.cc", "gmock__ex__test_8cc.html", null ],
-    [ "gmock_leak_test.py", "gmock__leak__test_8py.html", "gmock__leak__test_8py" ],
     [ "gmock_leak_test_.cc", "gmock__leak__test___8cc.html", null ],
     [ "gmock_link2_test.cc", "gmock__link2__test_8cc.html", "gmock__link2__test_8cc" ],
     [ "gmock_link_test.cc", "gmock__link__test_8cc.html", "gmock__link__test_8cc" ],
     [ "gmock_link_test.h", "gmock__link__test_8h.html", "gmock__link__test_8h" ],
-    [ "gmock_output_test.py", "gmock__output__test_8py.html", "gmock__output__test_8py" ],
     [ "gmock_output_test_.cc", "gmock__output__test___8cc.html", "gmock__output__test___8cc" ],
     [ "gmock_stress_test.cc", "gmock__stress__test_8cc.html", "gmock__stress__test_8cc" ],
-    [ "gmock_test.cc", "gmock__test_8cc.html", "gmock__test_8cc" ],
-    [ "gmock_test_utils.py", "gmock__test__utils_8py.html", "gmock__test__utils_8py" ]
+    [ "gmock_test.cc", "gmock__test_8cc.html", "gmock__test_8cc" ]
 ];

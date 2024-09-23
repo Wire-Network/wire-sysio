@@ -124,11 +124,11 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:aab88b1d23b6b94a8495ce6a0e0c576ce"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:abc0dbefa4daff0a49943ca8740e987a6" id="r_abc0dbefa4daff0a49943ca8740e987a6"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#abc0dbefa4daff0a49943ca8740e987a6">Matches</a> (<a class="el" href="gtest-port_8h.html#a9f91fcd24cae0b48fdaeb19102dac525">GTEST_REFERENCE_TO_CONST_</a>(<a class="el" href="prettywritertest_8cpp.html#a6283df8c4e365cc8a01727e2d7ad44bf">T</a>) x) const</td></tr>
 <tr class="separator:abc0dbefa4daff0a49943ca8740e987a6"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a7e0c883c7745e0d646463077ef1c1267" id="r_a7e0c883c7745e0d646463077ef1c1267"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a7e0c883c7745e0d646463077ef1c1267">DescribeTo</a> (::std::ostream *os) const</td></tr>
+<tr class="memitem:a7e0c883c7745e0d646463077ef1c1267" id="r_a7e0c883c7745e0d646463077ef1c1267"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a7e0c883c7745e0d646463077ef1c1267">DescribeTo</a> (::std::ostream *<a class="el" href="environment_8hpp.html#a3951483d0b31c29ca95336206cd35238">os</a>) const</td></tr>
 <tr class="separator:a7e0c883c7745e0d646463077ef1c1267"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ac1089d49b6b8a381900618985cd69b7f" id="r_ac1089d49b6b8a381900618985cd69b7f"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ac1089d49b6b8a381900618985cd69b7f">DescribeNegationTo</a> (::std::ostream *os) const</td></tr>
+<tr class="memitem:ac1089d49b6b8a381900618985cd69b7f" id="r_ac1089d49b6b8a381900618985cd69b7f"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ac1089d49b6b8a381900618985cd69b7f">DescribeNegationTo</a> (::std::ostream *<a class="el" href="environment_8hpp.html#a3951483d0b31c29ca95336206cd35238">os</a>) const</td></tr>
 <tr class="separator:ac1089d49b6b8a381900618985cd69b7f"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a2fc6f6b3b5526e30503d13161e8afc47" id="r_a2fc6f6b3b5526e30503d13161e8afc47"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a2fc6f6b3b5526e30503d13161e8afc47">ExplainMatchResultTo</a> (<a class="el" href="gtest-port_8h.html#a9f91fcd24cae0b48fdaeb19102dac525">GTEST_REFERENCE_TO_CONST_</a>(<a class="el" href="prettywritertest_8cpp.html#a6283df8c4e365cc8a01727e2d7ad44bf">T</a>) x, ::std::ostream *os) const</td></tr>
+<tr class="memitem:a2fc6f6b3b5526e30503d13161e8afc47" id="r_a2fc6f6b3b5526e30503d13161e8afc47"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a2fc6f6b3b5526e30503d13161e8afc47">ExplainMatchResultTo</a> (<a class="el" href="gtest-port_8h.html#a9f91fcd24cae0b48fdaeb19102dac525">GTEST_REFERENCE_TO_CONST_</a>(<a class="el" href="prettywritertest_8cpp.html#a6283df8c4e365cc8a01727e2d7ad44bf">T</a>) x, ::std::ostream *<a class="el" href="environment_8hpp.html#a3951483d0b31c29ca95336206cd35238">os</a>) const</td></tr>
 <tr class="separator:a2fc6f6b3b5526e30503d13161e8afc47"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:adee316aa61c9648c0aad73ed347c1307" id="r_adee316aa61c9648c0aad73ed347c1307"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="classtesting_1_1_matcher_describer_interface.html">MatcherDescriberInterface</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#adee316aa61c9648c0aad73ed347c1307">GetDescriber</a> () const</td></tr>
 <tr class="separator:adee316aa61c9648c0aad73ed347c1307"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -304,8 +304,9 @@ template&lt;typename <a class="el" href="prettywritertest_8cpp.html#a6283df8c4e3
 
 <p class="definition">Definition at line <a class="el" href="gmock-matchers_8h_source.html#l00299">299</a> of file <a class="el" href="gmock-matchers_8h_source.html">gmock-matchers.h</a>.</p>
 <div class="fragment"><div class="line"><span class="lineno">  299</span>                                                {</div>
-<div class="line"><span class="lineno">  300</span>    impl_-&gt;DescribeNegationTo(os);</div>
+<div class="line"><span class="lineno">  300</span>    impl_-&gt;DescribeNegationTo(<a class="code hl_variable" href="environment_8hpp.html#a3951483d0b31c29ca95336206cd35238">os</a>);</div>
 <div class="line"><span class="lineno">  301</span>  }</div>
+<div class="ttc" id="aenvironment_8hpp_html_a3951483d0b31c29ca95336206cd35238"><div class="ttname"><a href="environment_8hpp.html#a3951483d0b31c29ca95336206cd35238">os</a></div><div class="ttdeci">os_t os</div><div class="ttdef"><b>Definition</b> <a href="environment_8hpp_source.html#l00023">environment.hpp:23</a></div></div>
 </div><!-- fragment --><div class="dynheader">
 Here is the caller graph for this function:</div>
 <div class="dyncontent">
@@ -367,7 +368,7 @@ template&lt;typename <a class="el" href="prettywritertest_8cpp.html#a6283df8c4e3
 </div><div class="memdoc">
 
 <p class="definition">Definition at line <a class="el" href="gmock-matchers_8h_source.html#l00296">296</a> of file <a class="el" href="gmock-matchers_8h_source.html">gmock-matchers.h</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">  296</span>{ impl_-&gt;DescribeTo(os); }</div>
+<div class="fragment"><div class="line"><span class="lineno">  296</span>{ impl_-&gt;DescribeTo(<a class="code hl_variable" href="environment_8hpp.html#a3951483d0b31c29ca95336206cd35238">os</a>); }</div>
 </div><!-- fragment --><div class="dynheader">
 Here is the caller graph for this function:</div>
 <div class="dyncontent">
@@ -442,7 +443,7 @@ template&lt;typename <a class="el" href="prettywritertest_8cpp.html#a6283df8c4e3
 
 <p class="definition">Definition at line <a class="el" href="gmock-matchers_8h_source.html#l00304">304</a> of file <a class="el" href="gmock-matchers_8h_source.html">gmock-matchers.h</a>.</p>
 <div class="fragment"><div class="line"><span class="lineno">  305</span>                                                  {</div>
-<div class="line"><span class="lineno">  306</span>    StreamMatchResultListener listener(os);</div>
+<div class="line"><span class="lineno">  306</span>    StreamMatchResultListener listener(<a class="code hl_variable" href="environment_8hpp.html#a3951483d0b31c29ca95336206cd35238">os</a>);</div>
 <div class="line"><span class="lineno">  307</span>    <a class="code hl_function" href="#aab88b1d23b6b94a8495ce6a0e0c576ce">MatchAndExplain</a>(x, &amp;listener);</div>
 <div class="line"><span class="lineno">  308</span>  }</div>
 <div class="ttc" id="aclasstesting_1_1internal_1_1_matcher_base_html_aab88b1d23b6b94a8495ce6a0e0c576ce"><div class="ttname"><a href="#aab88b1d23b6b94a8495ce6a0e0c576ce">testing::internal::MatcherBase::MatchAndExplain</a></div><div class="ttdeci">bool MatchAndExplain(GTEST_REFERENCE_TO_CONST_(T) x, MatchResultListener *listener) const</div><div class="ttdef"><b>Definition</b> <a href="gmock-matchers_8h_source.html#l00284">gmock-matchers.h:284</a></div></div>

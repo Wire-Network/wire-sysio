@@ -78,7 +78,8 @@ Definition at line \mbox{\hyperlink{compressed__file_8cpp_source_l00171}{171}} o
 \DoxyCodeLine{00177\ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -275,7 +276,7 @@ Definition at line \mbox{\hyperlink{compressed__file_8cpp_source_l00197}{197}} o
 \DoxyCodeLine{00228\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
 \DoxyCodeLine{00229\ \ \ \ \}}
 \DoxyCodeLine{00230\ }
-\DoxyCodeLine{00231\ \ \ \ \textcolor{keyword}{constexpr}\ \textcolor{keywordtype}{size\_t}\ \mbox{\hyperlink{namespaceversiongenerate_a5656c48d43f7e869041b6a30c124702e}{buffer\_size}}\ =\ 64*1024;}
+\DoxyCodeLine{00231\ \ \ \ \textcolor{keyword}{constexpr}\ \textcolor{keywordtype}{size\_t}\ buffer\_size\ =\ 64*1024;}
 \DoxyCodeLine{00232\ \ \ \ \textcolor{keyword}{auto}\ input\_buffer\ =\ std::vector<uint8\_t>(buffer\_size);}
 \DoxyCodeLine{00233\ \ \ \ \textcolor{keyword}{auto}\ output\_buffer\ =\ std::vector<uint8\_t>(buffer\_size);}
 \DoxyCodeLine{00234\ }
@@ -309,7 +310,7 @@ Definition at line \mbox{\hyperlink{compressed__file_8cpp_source_l00197}{197}} o
 \DoxyCodeLine{00262\ \ \ \ \textcolor{keywordtype}{size\_t}\ read\_offset\ =\ 0;}
 \DoxyCodeLine{00263\ \ \ \ \textcolor{keywordflow}{while}\ (read\_offset\ <\ input\_size)\ \{}
 \DoxyCodeLine{00264\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\ bytes\_remaining\ =\ input\_size\ -\/\ read\_offset;}
-\DoxyCodeLine{00265\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\ read\_size\ =\ std::min(\{\ \mbox{\hyperlink{namespaceversiongenerate_a5656c48d43f7e869041b6a30c124702e}{buffer\_size}},\ bytes\_remaining,\ bytes\_remaining\_before\_sync\ \});}
+\DoxyCodeLine{00265\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\ read\_size\ =\ std::min(\{\ buffer\_size,\ bytes\_remaining,\ bytes\_remaining\_before\_sync\ \});}
 \DoxyCodeLine{00266\ \ \ \ \ \ \ input\_file.\mbox{\hyperlink{classfc_1_1cfile_a247250a28d17544a57dfafe07012d27b}{read}}(\textcolor{keyword}{reinterpret\_cast<}\textcolor{keywordtype}{char}*\textcolor{keyword}{>}(input\_buffer.data()),\ read\_size);}
 \DoxyCodeLine{00267\ }
 \DoxyCodeLine{00268\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}\ =\ process\_chunk(read\_size,\ Z\_NO\_FLUSH);}
@@ -360,14 +361,16 @@ Definition at line \mbox{\hyperlink{compressed__file_8cpp_source_l00197}{197}} o
 \DoxyCodeLine{00313\ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
 \includegraphics[width=350pt]{classsysio_1_1trace__api_1_1compressed__file_ab13021e139e2ee1be1e38e84499810e2_cgraph}
 \end{center}
 \end{figure}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -409,7 +412,8 @@ Definition at line \mbox{\hyperlink{compressed__file_8cpp_source_l00187}{187}} o
 \DoxyCodeLine{00189\ \}}
 
 \end{DoxyCode}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode

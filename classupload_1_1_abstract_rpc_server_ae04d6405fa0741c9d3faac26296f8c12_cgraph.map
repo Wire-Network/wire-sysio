@@ -1,9 +1,0 @@
-<map id="upload.AbstractRpcServer.__init__" name="upload.AbstractRpcServer.__init__">
-<area shape="rect" id="Node000001" title=" " alt="" coords="5,71,183,111"/>
-<area shape="rect" id="Node000002" href="$classupload_1_1_abstract_rpc_server.html#ab76b7ac5a48ba517fcdd70dd3df22f1f" title=" " alt="" coords="231,5,408,46"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="166,68,231,48,233,54,167,73"/>
-<area shape="rect" id="Node000003" href="$classupload_1_1_http_rpc_server.html#ad1d7e51675af095a738ff33f8b571b00" title=" " alt="" coords="243,71,396,111"/>
-<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="183,88,227,88,227,94,183,94"/>
-<area shape="rect" id="Node000004" href="$classfc_1_1url.html#a195a2322d4ed37d3a6a8be6e5144473c" title=" " alt="" coords="276,136,363,161"/>
-<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="177,109,261,131,260,136,176,114"/>
-</map>

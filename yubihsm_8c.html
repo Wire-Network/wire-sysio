@@ -2864,12 +2864,11 @@ Here is the caller graph for this function:</div>
 <div class="line"><span class="lineno"> 3840</span>    <span class="keywordflow">return</span> <a class="code hl_enumvalue" href="yubihsm_8h.html#ae4f602d2343d01b1727dfd633169d366a731b3992b45fde61b6760d92de4dbbf5">YHR_INVALID_PARAMETERS</a>;</div>
 <div class="line"><span class="lineno"> 3841</span>  }</div>
 <div class="line"><span class="lineno"> 3842</span> </div>
-<div class="line"><span class="lineno"> 3843</span>  *<a class="code hl_variable" href="namespaceupload.html#a79aff46409a98c4e5f608c8df1fd4612">verbosity</a> = <a class="code hl_variable" href="debug__lib_8h.html#a4ba5f59460a312e3f5f14926f4b2299e">_yh_verbosity</a>;</div>
+<div class="line"><span class="lineno"> 3843</span>  *verbosity = <a class="code hl_variable" href="debug__lib_8h.html#a4ba5f59460a312e3f5f14926f4b2299e">_yh_verbosity</a>;</div>
 <div class="line"><span class="lineno"> 3844</span> </div>
 <div class="line"><span class="lineno"> 3845</span>  <span class="keywordflow">return</span> <a class="code hl_enumvalue" href="yubihsm_8h.html#ae4f602d2343d01b1727dfd633169d366a405155512dc2284dc210ed15be1d0815">YHR_SUCCESS</a>;</div>
 <div class="line"><span class="lineno"> 3846</span>}</div>
 <div class="ttc" id="adebug__lib_8h_html_a4ba5f59460a312e3f5f14926f4b2299e"><div class="ttname"><a href="debug__lib_8h.html#a4ba5f59460a312e3f5f14926f4b2299e">_yh_verbosity</a></div><div class="ttdeci">uint8_t _yh_verbosity</div><div class="ttdef"><b>Definition</b> <a href="test__usb__url_8c_source.html#l00027">test_usb_url.c:27</a></div></div>
-<div class="ttc" id="anamespaceupload_html_a79aff46409a98c4e5f608c8df1fd4612"><div class="ttname"><a href="namespaceupload.html#a79aff46409a98c4e5f608c8df1fd4612">upload.verbosity</a></div><div class="ttdeci">int verbosity</div><div class="ttdef"><b>Definition</b> <a href="googlemock_2scripts_2upload_8py_source.html#l00059">upload.py:59</a></div></div>
 </div><!-- fragment --><div class="dynheader">
 Here is the caller graph for this function:</div>
 <div class="dyncontent">
@@ -3906,7 +3905,7 @@ Here is the caller graph for this function:</div>
 <p class="definition">Definition at line <a class="el" href="yubihsm_8c_source.html#l03825">3825</a> of file <a class="el" href="yubihsm_8c_source.html">yubihsm.c</a>.</p>
 <div class="fragment"><div class="line"><span class="lineno"> 3825</span>                                                                   {</div>
 <div class="line"><span class="lineno"> 3826</span> </div>
-<div class="line"><span class="lineno"> 3827</span>  <a class="code hl_variable" href="debug__lib_8h.html#a4ba5f59460a312e3f5f14926f4b2299e">_yh_verbosity</a> = <a class="code hl_variable" href="namespaceupload.html#a79aff46409a98c4e5f608c8df1fd4612">verbosity</a>;</div>
+<div class="line"><span class="lineno"> 3827</span>  <a class="code hl_variable" href="debug__lib_8h.html#a4ba5f59460a312e3f5f14926f4b2299e">_yh_verbosity</a> = verbosity;</div>
 <div class="line"><span class="lineno"> 3828</span> </div>
 <div class="line"><span class="lineno"> 3829</span>  <span class="keywordflow">if</span> (connector != NULL &amp;&amp; connector-&gt;<a class="code hl_variable" href="structyh__connector.html#a88057cfd7ee5af648c3aa315bbff7f8e">bf</a> != NULL) {</div>
 <div class="line"><span class="lineno"> 3830</span>    <span class="comment">// TODO(adma): should we error out if NULL?</span></div>
@@ -7434,7 +7433,7 @@ Here is the caller graph for this function:</div>
 <div class="line"><span class="lineno"> 1180</span> </div>
 <div class="line"><span class="lineno"> 1181</span>  <span class="keywordflow">if</span> (response_len == <span class="keyword">sizeof</span>(response)) {</div>
 <div class="line"><span class="lineno"> 1182</span>    <span class="keywordflow">if</span> (<span class="keywordtype">object</span>) {</div>
-<div class="line"><span class="lineno"> 1183</span>      <a class="code hl_function" href="yubihsm__pkcs11_8c.html#ae785d5badbf1f08b491af31f32a135a1">memcpy</a>(object-&gt;capabilities.capabilities, response.capabilities,</div>
+<div class="line"><span class="lineno"> 1183</span>      <a class="code hl_function" href="yubihsm__pkcs11_8c.html#ae785d5badbf1f08b491af31f32a135a1">memcpy</a>(<a class="code hl_variable" href="yubihsm__pkcs11_8c.html#a85d991d90970121ba1480cd98d93aab9">object</a>-&gt;<a class="code hl_variable" href="structyh__object__descriptor.html#a94fcb9bbe5ffacadafc207c166f6239f">capabilities</a>.<a class="code hl_variable" href="structyh__capabilities.html#a5398bad7e61385aa127265ba0a053079">capabilities</a>, response.capabilities,</div>
 <div class="line"><span class="lineno"> 1184</span>             <a class="code hl_define" href="yubihsm_8h.html#ad3c904849d17cae0a6f426e8007731d7">YH_CAPABILITIES_LEN</a>);</div>
 <div class="line"><span class="lineno"> 1185</span> </div>
 <div class="line"><span class="lineno"> 1186</span>      <span class="keywordtype">object</span>-&gt;id = htons(response.id);</div>
@@ -7451,10 +7450,10 @@ Here is the caller graph for this function:</div>
 <div class="line"><span class="lineno"> 1197</span> </div>
 <div class="line"><span class="lineno"> 1198</span>      <span class="keywordtype">object</span>-&gt;origin = response.origin;</div>
 <div class="line"><span class="lineno"> 1199</span> </div>
-<div class="line"><span class="lineno"> 1200</span>      <a class="code hl_function" href="yubihsm__pkcs11_8c.html#ae785d5badbf1f08b491af31f32a135a1">memcpy</a>(object-&gt;label, response.label, <a class="code hl_define" href="yubihsm_8h.html#a431f8b753552a8b2f5f980e871b6d019">YH_OBJ_LABEL_LEN</a>);</div>
+<div class="line"><span class="lineno"> 1200</span>      <a class="code hl_function" href="yubihsm__pkcs11_8c.html#ae785d5badbf1f08b491af31f32a135a1">memcpy</a>(<a class="code hl_variable" href="yubihsm__pkcs11_8c.html#a85d991d90970121ba1480cd98d93aab9">object</a>-&gt;<a class="code hl_variable" href="structyh__object__descriptor.html#ab63cc80a958a1debc4ac0ee255810fa5">label</a>, response.label, <a class="code hl_define" href="yubihsm_8h.html#a431f8b753552a8b2f5f980e871b6d019">YH_OBJ_LABEL_LEN</a>);</div>
 <div class="line"><span class="lineno"> 1201</span>      <span class="keywordtype">object</span>-&gt;label[<a class="code hl_define" href="yubihsm_8h.html#a431f8b753552a8b2f5f980e871b6d019">YH_OBJ_LABEL_LEN</a>] = 0;</div>
 <div class="line"><span class="lineno"> 1202</span> </div>
-<div class="line"><span class="lineno"> 1203</span>      <a class="code hl_function" href="yubihsm__pkcs11_8c.html#ae785d5badbf1f08b491af31f32a135a1">memcpy</a>(object-&gt;delegated_capabilities.capabilities,</div>
+<div class="line"><span class="lineno"> 1203</span>      <a class="code hl_function" href="yubihsm__pkcs11_8c.html#ae785d5badbf1f08b491af31f32a135a1">memcpy</a>(<a class="code hl_variable" href="yubihsm__pkcs11_8c.html#a85d991d90970121ba1480cd98d93aab9">object</a>-&gt;<a class="code hl_variable" href="structyh__object__descriptor.html#a98e1c698e0d1344c4fe4a215d2d633ec">delegated_capabilities</a>.<a class="code hl_variable" href="structyh__capabilities.html#a5398bad7e61385aa127265ba0a053079">capabilities</a>,</div>
 <div class="line"><span class="lineno"> 1204</span>             response.delegated_capabilities, <a class="code hl_define" href="yubihsm_8h.html#ad3c904849d17cae0a6f426e8007731d7">YH_CAPABILITIES_LEN</a>);</div>
 <div class="line"><span class="lineno"> 1205</span>    }</div>
 <div class="line"><span class="lineno"> 1206</span>  } <span class="keywordflow">else</span> {</div>
@@ -7467,6 +7466,10 @@ Here is the caller graph for this function:</div>
 <div class="line"><span class="lineno"> 1213</span>  <span class="keywordflow">return</span> <a class="code hl_enumvalue" href="yubihsm_8h.html#ae4f602d2343d01b1727dfd633169d366a405155512dc2284dc210ed15be1d0815">YHR_SUCCESS</a>;</div>
 <div class="line"><span class="lineno"> 1214</span>}</div>
 <div class="ttc" id="astructyh__object__descriptor_html"><div class="ttname"><a href="structyh__object__descriptor.html">yh_object_descriptor</a></div><div class="ttdef"><b>Definition</b> <a href="yubihsm_8h_source.html#l00540">yubihsm.h:540</a></div></div>
+<div class="ttc" id="astructyh__object__descriptor_html_a94fcb9bbe5ffacadafc207c166f6239f"><div class="ttname"><a href="structyh__object__descriptor.html#a94fcb9bbe5ffacadafc207c166f6239f">yh_object_descriptor::capabilities</a></div><div class="ttdeci">yh_capabilities capabilities</div><div class="ttdoc">Object capabilities.</div><div class="ttdef"><b>Definition</b> <a href="yubihsm_8h_source.html#l00542">yubihsm.h:542</a></div></div>
+<div class="ttc" id="astructyh__object__descriptor_html_a98e1c698e0d1344c4fe4a215d2d633ec"><div class="ttname"><a href="structyh__object__descriptor.html#a98e1c698e0d1344c4fe4a215d2d633ec">yh_object_descriptor::delegated_capabilities</a></div><div class="ttdeci">yh_capabilities delegated_capabilities</div><div class="ttdoc">Object delegated capabilities.</div><div class="ttdef"><b>Definition</b> <a href="yubihsm_8h_source.html#l00560">yubihsm.h:560</a></div></div>
+<div class="ttc" id="astructyh__object__descriptor_html_ab63cc80a958a1debc4ac0ee255810fa5"><div class="ttname"><a href="structyh__object__descriptor.html#ab63cc80a958a1debc4ac0ee255810fa5">yh_object_descriptor::label</a></div><div class="ttdeci">char label[YH_OBJ_LABEL_LEN+1]</div><div class="ttdoc">Object label.</div><div class="ttdef"><b>Definition</b> <a href="yubihsm_8h_source.html#l00558">yubihsm.h:558</a></div></div>
+<div class="ttc" id="ayubihsm__pkcs11_8c_html_a85d991d90970121ba1480cd98d93aab9"><div class="ttname"><a href="yubihsm__pkcs11_8c.html#a85d991d90970121ba1480cd98d93aab9">object</a></div><div class="ttdeci">yh_object_descriptor object</div><div class="ttdef"><b>Definition</b> <a href="yubihsm__pkcs11_8c_source.html#l01544">yubihsm_pkcs11.c:1544</a></div></div>
 </div><!-- fragment --><div class="dynheader">
 Here is the call graph for this function:</div>
 <div class="dyncontent">

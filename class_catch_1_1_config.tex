@@ -6,7 +6,8 @@
 
 
 
-Inheritance diagram for Catch\+::Config\+:\nopagebreak
+Inheritance diagram for Catch\+::Config\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -15,7 +16,8 @@ Inheritance diagram for Catch\+::Config\+:\nopagebreak
 \end{figure}
 
 
-Collaboration diagram for Catch\+::Config\+:\nopagebreak
+Collaboration diagram for Catch\+::Config\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -135,17 +137,18 @@ Definition at line \mbox{\hyperlink{catch__config_8cpp_source_l00014}{14}} of fi
 \DoxyCodeLine{00015\ \ \ \ \ :\ \ \ m\_data(\ data\ ),}
 \DoxyCodeLine{00016\ \ \ \ \ \ \ \ \ m\_stream(\ openStream()\ )}
 \DoxyCodeLine{00017\ \ \ \ \ \{}
-\DoxyCodeLine{00018\ \ \ \ \ \ \ \ \ TestSpecParser\ \mbox{\hyperlink{namespaceupload_af9e508d19dc2dd9cdb7c642dde0bdd21}{parser}}(\mbox{\hyperlink{struct_catch_1_1_i_tag_alias_registry_a7c4bf6e2fc52de95fb2596ba19b3bf76}{ITagAliasRegistry::get}}());}
+\DoxyCodeLine{00018\ \ \ \ \ \ \ \ \ TestSpecParser\ parser(\mbox{\hyperlink{struct_catch_1_1_i_tag_alias_registry_a7c4bf6e2fc52de95fb2596ba19b3bf76}{ITagAliasRegistry::get}}());}
 \DoxyCodeLine{00019\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!data.testsOrTags.empty())\ \{}
 \DoxyCodeLine{00020\ \ \ \ \ \ \ \ \ \ \ \ \ m\_hasTestFilters\ =\ \textcolor{keyword}{true};}
 \DoxyCodeLine{00021\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}(\ \textcolor{keyword}{auto}\ \textcolor{keyword}{const}\&\ testOrTags\ :\ data.testsOrTags\ )}
-\DoxyCodeLine{00022\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespaceupload_af9e508d19dc2dd9cdb7c642dde0bdd21}{parser}}.parse(\ testOrTags\ );}
+\DoxyCodeLine{00022\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ parser.parse(\ testOrTags\ );}
 \DoxyCodeLine{00023\ \ \ \ \ \ \ \ \ \}}
-\DoxyCodeLine{00024\ \ \ \ \ \ \ \ \ m\_testSpec\ =\ \mbox{\hyperlink{namespaceupload_af9e508d19dc2dd9cdb7c642dde0bdd21}{parser}}.testSpec();}
+\DoxyCodeLine{00024\ \ \ \ \ \ \ \ \ m\_testSpec\ =\ parser.testSpec();}
 \DoxyCodeLine{00025\ \ \ \ \ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -322,7 +325,8 @@ Definition at line \mbox{\hyperlink{catch__config_8cpp_source_l00043}{43}} of fi
 \DoxyCodeLine{00043\ \{\ \textcolor{keywordflow}{return}\ m\_hasTestFilters;\ \}}
 
 \end{DoxyCode}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -427,13 +431,6 @@ Definition at line \mbox{\hyperlink{catch__config_8cpp_source_l00050}{50}} of fi
 \DoxyCodeLine{00050\ \{\ \textcolor{keywordflow}{return}\ m\_data.\mbox{\hyperlink{struct_catch_1_1_config_data_a6c62e90478bc2911d032ec54c2e9d8df}{name}}.empty()\ ?\ m\_data.\mbox{\hyperlink{struct_catch_1_1_config_data_ac181ec69c5b6c925ac9bea9eaf7039c3}{processName}}\ :\ m\_data.\mbox{\hyperlink{struct_catch_1_1_config_data_a6c62e90478bc2911d032ec54c2e9d8df}{name}};\ \}}
 
 \end{DoxyCode}
-Here is the caller graph for this function\+:\nopagebreak
-\begin{figure}[H]
-\begin{center}
-\leavevmode
-\includegraphics[width=350pt]{class_catch_1_1_config_a31a90838216993be7c9a8ce29a821293_icgraph}
-\end{center}
-\end{figure}
 \Hypertarget{class_catch_1_1_config_a4abe80a8070e3365ba1b7cd37dbf4cbe}\index{Catch::Config@{Catch::Config}!rngSeed@{rngSeed}}
 \index{rngSeed@{rngSeed}!Catch::Config@{Catch::Config}}
 \doxysubsubsection{\texorpdfstring{rngSeed()}{rngSeed()}}
@@ -582,7 +579,8 @@ Definition at line \mbox{\hyperlink{catch__config_8cpp_source_l00042}{42}} of fi
 \DoxyCodeLine{00042\ \{\ \textcolor{keywordflow}{return}\ m\_testSpec;\ \}}
 
 \end{DoxyCode}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode

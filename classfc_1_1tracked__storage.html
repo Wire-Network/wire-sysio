@@ -686,7 +686,7 @@ template&lt;typename ContainerType &gt; </div>
 <div class="line"><span class="lineno">   51</span>            <span class="keywordflow">if</span> (<a class="code hl_function" href="#a5bd678ec2e09568df574c8ecaa184962">memory_size</a>() &gt;= max_memory) {</div>
 <div class="line"><span class="lineno">   52</span>               <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
 <div class="line"><span class="lineno">   53</span>            }</div>
-<div class="line"><span class="lineno">   54</span>            <span class="keyword">typename</span> ContainerType::value_type <a class="code hl_variable" href="namespacedevelop_build.html#ade64cd34608f9442ef3049116a2da428">v</a>;</div>
+<div class="line"><span class="lineno">   54</span>            <span class="keyword">typename</span> ContainerType::value_type v;</div>
 <div class="line"><span class="lineno">   55</span>            <a class="code hl_function" href="namespacefc_1_1raw.html#a0b442d98ceb22dd5a6ae84745e43ffab">fc::raw::unpack</a>(ds, v);</div>
 <div class="line"><span class="lineno">   56</span>            <a class="code hl_function" href="#a6d24a6bf4512b48a846d88a1bf44b5b8">insert</a>(std::move(v));</div>
 <div class="line"><span class="lineno">   57</span>         }</div>
@@ -695,7 +695,6 @@ template&lt;typename ContainerType &gt; </div>
 <div class="line"><span class="lineno">   60</span>      }</div>
 <div class="ttc" id="aclassfc_1_1tracked__storage_html_a5bd678ec2e09568df574c8ecaa184962"><div class="ttname"><a href="#a5bd678ec2e09568df574c8ecaa184962">fc::tracked_storage::memory_size</a></div><div class="ttdeci">size_t memory_size() const</div><div class="ttdef"><b>Definition</b> <a href="tracked__storage_8hpp_source.html#l00116">tracked_storage.hpp:116</a></div></div>
 <div class="ttc" id="aclassfc_1_1tracked__storage_html_a6d24a6bf4512b48a846d88a1bf44b5b8"><div class="ttname"><a href="#a6d24a6bf4512b48a846d88a1bf44b5b8">fc::tracked_storage::insert</a></div><div class="ttdeci">std::pair&lt; typename primary_index_type::iterator, bool &gt; insert(typename ContainerType::value_type obj)</div><div class="ttdef"><b>Definition</b> <a href="tracked__storage_8hpp_source.html#l00072">tracked_storage.hpp:72</a></div></div>
-<div class="ttc" id="anamespacedevelop_build_html_ade64cd34608f9442ef3049116a2da428"><div class="ttname"><a href="namespacedevelop_build.html#ade64cd34608f9442ef3049116a2da428">developBuild.v</a></div><div class="ttdeci">v</div><div class="ttdef"><b>Definition</b> <a href="develop_build_8py_source.html#l00006">developBuild.py:6</a></div></div>
 <div class="ttc" id="anamespacefc_1_1raw_html_a0b442d98ceb22dd5a6ae84745e43ffab"><div class="ttname"><a href="namespacefc_1_1raw.html#a0b442d98ceb22dd5a6ae84745e43ffab">fc::raw::unpack</a></div><div class="ttdeci">void unpack(Stream &amp;s, std::deque&lt; T &gt; &amp;value)</div><div class="ttdef"><b>Definition</b> <a href="raw_8hpp_source.html#l00540">raw.hpp:540</a></div></div>
 </div><!-- fragment --><div class="dynheader">
 Here is the call graph for this function:</div>

@@ -58,7 +58,7 @@
 \DoxyCodeLine{\Hypertarget{capitalize_8cpp_source_l00054}00054\ \ \ \ \ \textcolor{comment}{//\ Prepare\ JSON\ writer\ and\ output\ stream.}}
 \DoxyCodeLine{\Hypertarget{capitalize_8cpp_source_l00055}00055\ \ \ \ \ \textcolor{keywordtype}{char}\ writeBuffer[65536];}
 \DoxyCodeLine{\Hypertarget{capitalize_8cpp_source_l00056}00056\ \ \ \ \ \mbox{\hyperlink{class_file_write_stream}{FileWriteStream}}\ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}(stdout,\ writeBuffer,\ \textcolor{keyword}{sizeof}(writeBuffer));}
-\DoxyCodeLine{\Hypertarget{capitalize_8cpp_source_l00057}00057\ \ \ \ \ \mbox{\hyperlink{class_writer}{Writer<FileWriteStream>}}\ writer(os);}
+\DoxyCodeLine{\Hypertarget{capitalize_8cpp_source_l00057}00057\ \ \ \ \ \mbox{\hyperlink{class_writer}{Writer<FileWriteStream>}}\ writer(\mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}});}
 \DoxyCodeLine{\Hypertarget{capitalize_8cpp_source_l00058}00058\ }
 \DoxyCodeLine{\Hypertarget{capitalize_8cpp_source_l00059}00059\ \ \ \ \ \textcolor{comment}{//\ JSON\ reader\ parse\ from\ the\ input\ stream\ and\ let\ writer\ generate\ the\ output.}}
 \DoxyCodeLine{\Hypertarget{capitalize_8cpp_source_l00060}00060\ \ \ \ \ \mbox{\hyperlink{struct_capitalize_filter}{CapitalizeFilter<Writer<FileWriteStream>}}\ >\ filter(writer);}

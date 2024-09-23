@@ -6,7 +6,8 @@
 
 
 
-Collaboration diagram for sysio\+::chain\+::eosvmoc\+::memory\+:\nopagebreak
+Collaboration diagram for sysio\+::chain\+::eosvmoc\+::memory\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -97,14 +98,15 @@ Definition at line \mbox{\hyperlink{runtimes_2sys-vm-oc_2memory_8cpp_source_l000
 \DoxyCodeLine{00037\ \ \ \ fullpage\_base\ =\ last\ +\ memory\_prologue\_size;}
 \DoxyCodeLine{00038\ }
 \DoxyCodeLine{00039\ \ \ \ \textcolor{comment}{//layout\ the\ intrinsic\ jump\ table}}
-\DoxyCodeLine{00040\ \ \ \ \mbox{\hyperlink{stdint_8h_a31b85deecb45924320becd11d3ee16ce}{uintptr\_t}}*\ \textcolor{keyword}{const}\ intrinsic\_jump\_table\ =\ \textcolor{keyword}{reinterpret\_cast<}\mbox{\hyperlink{stdint_8h_a31b85deecb45924320becd11d3ee16ce}{uintptr\_t}}*\ \mbox{\hyperlink{namespaceupload_a985aa9a71de3eb507344df65700c696d}{const}}\textcolor{keyword}{>}(zeropage\_base\ -\/\ \mbox{\hyperlink{classsysio_1_1chain_1_1eosvmoc_1_1memory_a3ca9186ab4cbb5e78898f09b3b4ef349}{first\_intrinsic\_offset}});}
+\DoxyCodeLine{00040\ \ \ \ \mbox{\hyperlink{stdint_8h_a31b85deecb45924320becd11d3ee16ce}{uintptr\_t}}*\ \textcolor{keyword}{const}\ intrinsic\_jump\_table\ =\ \textcolor{keyword}{reinterpret\_cast<}\mbox{\hyperlink{stdint_8h_a31b85deecb45924320becd11d3ee16ce}{uintptr\_t}}*\ const\textcolor{keyword}{>}(zeropage\_base\ -\/\ \mbox{\hyperlink{classsysio_1_1chain_1_1eosvmoc_1_1memory_a3ca9186ab4cbb5e78898f09b3b4ef349}{first\_intrinsic\_offset}});}
 \DoxyCodeLine{00041\ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{namespacesysio_1_1chain_1_1eosvmoc_af63b1d984c58d1e5445a96eae8eccb59}{intrinsic\_map\_t}}\&\ intrinsics\ =\ \mbox{\hyperlink{namespacesysio_1_1chain_1_1eosvmoc_abe43c1d3ddfb344db0cd7dd5ab25f48c}{get\_intrinsic\_map}}();}
 \DoxyCodeLine{00042\ \ \ \ \textcolor{keywordflow}{for}(\textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ intrinsic\ :\ intrinsics)}
 \DoxyCodeLine{00043\ \ \ \ \ \ \ intrinsic\_jump\_table[-\/intrinsic.second.ordinal]\ =\ (\mbox{\hyperlink{stdint_8h_a31b85deecb45924320becd11d3ee16ce}{uintptr\_t}})intrinsic.second.function\_ptr;}
 \DoxyCodeLine{00044\ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -152,7 +154,8 @@ Definition at line \mbox{\hyperlink{chain_2include_2sysio_2chain_2webassembly_2s
 \DoxyCodeLine{00034\ \{\ \textcolor{keywordflow}{return}\ fullpage\_base;\ \}}
 
 \end{DoxyCode}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -171,10 +174,11 @@ Definition at line \mbox{\hyperlink{chain_2include_2sysio_2chain_2webassembly_2s
 
 
 \begin{DoxyCode}{0}
-\DoxyCodeLine{00036\ \{\ \textcolor{keywordflow}{return}\ \textcolor{keyword}{reinterpret\_cast<}\mbox{\hyperlink{namespacesysio_1_1chain_1_1eosvmoc_a7cfa050a8e417822975ca260ac344c98}{control\_block}}*\ \mbox{\hyperlink{namespaceupload_a985aa9a71de3eb507344df65700c696d}{const}}\textcolor{keyword}{>}(zeropage\_base\ -\/\ \mbox{\hyperlink{classsysio_1_1chain_1_1eosvmoc_1_1memory_a74ea75f2c5e285a08e86d4f82bfaf3bb}{cb\_offset}});\}}
+\DoxyCodeLine{00036\ \{\ \textcolor{keywordflow}{return}\ \textcolor{keyword}{reinterpret\_cast<}\mbox{\hyperlink{namespacesysio_1_1chain_1_1eosvmoc_a7cfa050a8e417822975ca260ac344c98}{control\_block}}*\ const\textcolor{keyword}{>}(zeropage\_base\ -\/\ \mbox{\hyperlink{classsysio_1_1chain_1_1eosvmoc_1_1memory_a74ea75f2c5e285a08e86d4f82bfaf3bb}{cb\_offset}});\}}
 
 \end{DoxyCode}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -210,7 +214,8 @@ Definition at line \mbox{\hyperlink{runtimes_2sys-vm-oc_2memory_8cpp_source_l000
 \DoxyCodeLine{00054\ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -232,7 +237,8 @@ Definition at line \mbox{\hyperlink{chain_2include_2sysio_2chain_2webassembly_2s
 \DoxyCodeLine{00040\ \{\ \textcolor{keywordflow}{return}\ mapsize;\ \}}
 
 \end{DoxyCode}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -254,7 +260,8 @@ Definition at line \mbox{\hyperlink{chain_2include_2sysio_2chain_2webassembly_2s
 \DoxyCodeLine{00039\ \{\ \textcolor{keywordflow}{return}\ mapbase;\ \}}
 
 \end{DoxyCode}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -276,7 +283,8 @@ Definition at line \mbox{\hyperlink{chain_2include_2sysio_2chain_2webassembly_2s
 \DoxyCodeLine{00033\ \{\ \textcolor{keywordflow}{return}\ zeropage\_base;\ \}}
 
 \end{DoxyCode}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode

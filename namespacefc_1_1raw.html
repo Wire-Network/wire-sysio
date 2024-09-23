@@ -1300,8 +1300,9 @@ template&lt;typename <a class="el" href="classrapidjson_1_1_stream.html">Stream<
 <div class="fragment"><div class="line"><span class="lineno">  147</span>    {</div>
 <div class="line"><span class="lineno">  148</span>       <span class="keyword">static_assert</span>( <a class="code hl_variable" href="quantize_8cpp.html#ab2b6b0c222cd1ce70d6a831f57241e59">N</a> &lt;= <a class="code hl_define" href="utility_8hpp.html#ad647a8ed8233ea2357905dde291af0f6">MAX_NUM_ARRAY_ELEMENTS</a>, <span class="stringliteral">&quot;number of elements in array is too large&quot;</span> );</div>
 <div class="line"><span class="lineno">  149</span>       <span class="keywordflow">for</span> (<a class="code hl_typedef" href="stdint_8h.html#aec6fcb673ff035718c238c8c9d544c47">uint64_t</a> i = 0; i &lt; <a class="code hl_variable" href="quantize_8cpp.html#ab2b6b0c222cd1ce70d6a831f57241e59">N</a>; ++i)</div>
-<div class="line"><span class="lineno">  150</span>         <a class="code hl_function" href="#a3a18d8161aa5b4f4f02b6fcfdff5e5d1">fc::raw::pack</a>(<a class="code hl_variable" href="yubihsm__pkcs11_8c.html#a506da415c9307c897ca9be93acfe1d0f">s</a>, v.data[i]);</div>
+<div class="line"><span class="lineno">  150</span>         <a class="code hl_function" href="#a3a18d8161aa5b4f4f02b6fcfdff5e5d1">fc::raw::pack</a>(<a class="code hl_variable" href="yubihsm__pkcs11_8c.html#a506da415c9307c897ca9be93acfe1d0f">s</a>, v.<a class="code hl_variable" href="classfc_1_1array.html#ad01e4627be17148ee922c37944c48626">data</a>[i]);</div>
 <div class="line"><span class="lineno">  151</span>    }</div>
+<div class="ttc" id="aclassfc_1_1array_html_ad01e4627be17148ee922c37944c48626"><div class="ttname"><a href="classfc_1_1array.html#ad01e4627be17148ee922c37944c48626">fc::array::data</a></div><div class="ttdeci">T data[N]</div><div class="ttdef"><b>Definition</b> <a href="array_8hpp_source.html#l00037">array.hpp:37</a></div></div>
 <div class="ttc" id="aquantize_8cpp_html_ab2b6b0c222cd1ce70d6a831f57241e59"><div class="ttname"><a href="quantize_8cpp.html#ab2b6b0c222cd1ce70d6a831f57241e59">N</a></div><div class="ttdeci">const int N</div><div class="ttdef"><b>Definition</b> <a href="quantize_8cpp_source.html#l00054">quantize.cpp:54</a></div></div>
 <div class="ttc" id="astdint_8h_html_aec6fcb673ff035718c238c8c9d544c47"><div class="ttname"><a href="stdint_8h.html#aec6fcb673ff035718c238c8c9d544c47">uint64_t</a></div><div class="ttdeci">unsigned __int64 uint64_t</div><div class="ttdef"><b>Definition</b> <a href="stdint_8h_source.html#l00136">stdint.h:136</a></div></div>
 </div><!-- fragment --><div class="dynheader">
@@ -2421,18 +2422,24 @@ template&lt;typename <a class="el" href="classrapidjson_1_1_stream.html">Stream<
 
 <p class="definition">Definition at line <a class="el" href="ip_8hpp_source.html#l00099">99</a> of file <a class="el" href="ip_8hpp_source.html">ip.hpp</a>.</p>
 <div class="fragment"><div class="line"><span class="lineno">  100</span>    {</div>
-<div class="line"><span class="lineno">  101</span>       <a class="code hl_function" href="#a3a18d8161aa5b4f4f02b6fcfdff5e5d1">fc::raw::pack</a>( <a class="code hl_variable" href="yubihsm__pkcs11_8c.html#a506da415c9307c897ca9be93acfe1d0f">s</a>, v.get_address() );</div>
-<div class="line"><span class="lineno">  102</span>       <a class="code hl_function" href="#a3a18d8161aa5b4f4f02b6fcfdff5e5d1">fc::raw::pack</a>( <a class="code hl_variable" href="yubihsm__pkcs11_8c.html#a506da415c9307c897ca9be93acfe1d0f">s</a>, v.port() );</div>
+<div class="line"><span class="lineno">  101</span>       <a class="code hl_function" href="#a3a18d8161aa5b4f4f02b6fcfdff5e5d1">fc::raw::pack</a>( <a class="code hl_variable" href="yubihsm__pkcs11_8c.html#a506da415c9307c897ca9be93acfe1d0f">s</a>, v.<a class="code hl_function" href="classfc_1_1ip_1_1endpoint.html#a61b2902b0e0e02172a60f3a17469f780">get_address</a>() );</div>
+<div class="line"><span class="lineno">  102</span>       <a class="code hl_function" href="#a3a18d8161aa5b4f4f02b6fcfdff5e5d1">fc::raw::pack</a>( <a class="code hl_variable" href="yubihsm__pkcs11_8c.html#a506da415c9307c897ca9be93acfe1d0f">s</a>, v.<a class="code hl_function" href="classfc_1_1ip_1_1endpoint.html#ab243ed508cf8f9d34a32b2ece708466b">port</a>() );</div>
 <div class="line"><span class="lineno">  103</span>    }</div>
+<div class="ttc" id="aclassfc_1_1ip_1_1endpoint_html_a61b2902b0e0e02172a60f3a17469f780"><div class="ttname"><a href="classfc_1_1ip_1_1endpoint.html#a61b2902b0e0e02172a60f3a17469f780">fc::ip::endpoint::get_address</a></div><div class="ttdeci">const address &amp; get_address() const</div><div class="ttdef"><b>Definition</b> <a href="ip_8cpp_source.html#l00072">ip.cpp:72</a></div></div>
+<div class="ttc" id="aclassfc_1_1ip_1_1endpoint_html_ab243ed508cf8f9d34a32b2ece708466b"><div class="ttname"><a href="classfc_1_1ip_1_1endpoint.html#ab243ed508cf8f9d34a32b2ece708466b">fc::ip::endpoint::port</a></div><div class="ttdeci">uint16_t port() const</div><div class="ttdef"><b>Definition</b> <a href="ip_8cpp_source.html#l00071">ip.cpp:71</a></div></div>
 </div><!-- fragment --><div class="dynheader">
 Here is the call graph for this function:</div>
 <div class="dyncontent">
 <div class="center"><img src="namespacefc_1_1raw_a0fdb9c6ae378596a96db14f8c4408dee_cgraph.png" border="0" usemap="#anamespacefc_1_1raw_a0fdb9c6ae378596a96db14f8c4408dee_cgraph" alt=""/></div>
 <map name="anamespacefc_1_1raw_a0fdb9c6ae378596a96db14f8c4408dee_cgraph" id="anamespacefc_1_1raw_a0fdb9c6ae378596a96db14f8c4408dee_cgraph">
-<area shape="rect" title=" " alt="" coords="5,29,103,55"/>
-<area shape="rect" href="namespacefc_1_1raw.html#a3a18d8161aa5b4f4f02b6fcfdff5e5d1" title=" " alt="" coords="151,29,248,55"/>
-<area shape="poly" title=" " alt="" coords="103,40,135,40,135,45,103,45"/>
-<area shape="poly" title=" " alt="" coords="174,30,170,21,172,11,183,5,199,3,217,5,227,12,224,16,215,10,199,8,184,10,177,14,175,20,179,28"/>
+<area shape="rect" title=" " alt="" coords="5,94,103,120"/>
+<area shape="rect" href="classfc_1_1ip_1_1endpoint.html#a61b2902b0e0e02172a60f3a17469f780" title=" " alt="" coords="153,5,286,46"/>
+<area shape="poly" title=" " alt="" coords="79,91,149,55,159,51,161,56,152,60,82,96"/>
+<area shape="rect" href="namespacefc_1_1raw.html#a3a18d8161aa5b4f4f02b6fcfdff5e5d1" title=" " alt="" coords="171,94,268,120"/>
+<area shape="poly" title=" " alt="" coords="103,104,156,104,156,110,103,110"/>
+<area shape="rect" href="classfc_1_1ip_1_1endpoint.html#ab243ed508cf8f9d34a32b2ece708466b" title=" " alt="" coords="151,144,288,169"/>
+<area shape="poly" title=" " alt="" coords="101,118,160,136,158,141,99,123"/>
+<area shape="poly" title=" " alt="" coords="191,95,186,86,189,76,201,70,219,68,239,70,250,77,247,81,238,75,219,73,202,75,193,79,191,85,196,92"/>
 </map>
 </div>
 
@@ -2494,7 +2501,8 @@ template&lt;typename <a class="el" href="classrapidjson_1_1_stream.html">Stream<
 </div><div class="memdoc">
 
 <p class="definition">Definition at line <a class="el" href="raw_8hpp_source.html#l00255">255</a> of file <a class="el" href="raw_8hpp_source.html">raw.hpp</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">  255</span>{ <a class="code hl_function" href="#a3a18d8161aa5b4f4f02b6fcfdff5e5d1">fc::raw::pack</a>( <a class="code hl_variable" href="yubihsm__pkcs11_8c.html#a506da415c9307c897ca9be93acfe1d0f">s</a>, v.value ); }</div>
+<div class="fragment"><div class="line"><span class="lineno">  255</span>{ <a class="code hl_function" href="#a3a18d8161aa5b4f4f02b6fcfdff5e5d1">fc::raw::pack</a>( <a class="code hl_variable" href="yubihsm__pkcs11_8c.html#a506da415c9307c897ca9be93acfe1d0f">s</a>, v.<a class="code hl_variable" href="structfc_1_1safe.html#a6bb99e2058adab1fef1f6b9df91006c9">value</a> ); }</div>
+<div class="ttc" id="astructfc_1_1safe_html_a6bb99e2058adab1fef1f6b9df91006c9"><div class="ttname"><a href="structfc_1_1safe.html#a6bb99e2058adab1fef1f6b9df91006c9">fc::safe::value</a></div><div class="ttdeci">T value</div><div class="ttdef"><b>Definition</b> <a href="safe_8hpp_source.html#l00023">safe.hpp:23</a></div></div>
 </div><!-- fragment --><div class="dynheader">
 Here is the call graph for this function:</div>
 <div class="dyncontent">
@@ -2589,7 +2597,7 @@ template&lt;typename <a class="el" href="classrapidjson_1_1_stream.html">Stream<
 
 <p class="definition">Definition at line <a class="el" href="raw_8hpp_source.html#l00205">205</a> of file <a class="el" href="raw_8hpp_source.html">raw.hpp</a>.</p>
 <div class="fragment"><div class="line"><span class="lineno">  205</span>                                                                                 {</div>
-<div class="line"><span class="lineno">  206</span>      <a class="code hl_typedef" href="stdint_8h.html#a435d1572bf3f880d55459d9805097f62">uint32_t</a> val = (v.value&lt;&lt;1) ^ (v.value&gt;&gt;31);              <span class="comment">//apply zigzag encoding</span></div>
+<div class="line"><span class="lineno">  206</span>      <a class="code hl_typedef" href="stdint_8h.html#a435d1572bf3f880d55459d9805097f62">uint32_t</a> val = (v.<a class="code hl_variable" href="structfc_1_1signed__int.html#a594de3c9df8e11911cce18eb8ae15d08">value</a>&lt;&lt;1) ^ (v.<a class="code hl_variable" href="structfc_1_1signed__int.html#a594de3c9df8e11911cce18eb8ae15d08">value</a>&gt;&gt;31);              <span class="comment">//apply zigzag encoding</span></div>
 <div class="line"><span class="lineno">  207</span>      <span class="keywordflow">do</span> {</div>
 <div class="line"><span class="lineno">  208</span>        <a class="code hl_typedef" href="stdint_8h.html#aba7bc1797add20fe3efdf37ced1182c5">uint8_t</a> b = <a class="code hl_typedef" href="stdint_8h.html#aba7bc1797add20fe3efdf37ced1182c5">uint8_t</a>(val) &amp; 0x7f;</div>
 <div class="line"><span class="lineno">  209</span>        val &gt;&gt;= 7;</div>
@@ -2597,6 +2605,7 @@ template&lt;typename <a class="el" href="classrapidjson_1_1_stream.html">Stream<
 <div class="line"><span class="lineno">  211</span>        <a class="code hl_variable" href="yubihsm__pkcs11_8c.html#a506da415c9307c897ca9be93acfe1d0f">s</a>.write((<span class="keywordtype">char</span>*)&amp;b,1);<span class="comment">//.put(b);</span></div>
 <div class="line"><span class="lineno">  212</span>      } <span class="keywordflow">while</span>( val );</div>
 <div class="line"><span class="lineno">  213</span>    }</div>
+<div class="ttc" id="astructfc_1_1signed__int_html_a594de3c9df8e11911cce18eb8ae15d08"><div class="ttname"><a href="structfc_1_1signed__int.html#a594de3c9df8e11911cce18eb8ae15d08">fc::signed_int::value</a></div><div class="ttdeci">int32_t value</div><div class="ttdef"><b>Definition</b> <a href="varint_8hpp_source.html#l00049">varint.hpp:49</a></div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -3386,7 +3395,7 @@ template&lt;typename <a class="el" href="classrapidjson_1_1_stream.html">Stream<
 
 <p class="definition">Definition at line <a class="el" href="raw_8hpp_source.html#l00215">215</a> of file <a class="el" href="raw_8hpp_source.html">raw.hpp</a>.</p>
 <div class="fragment"><div class="line"><span class="lineno">  215</span>                                                                                   {</div>
-<div class="line"><span class="lineno">  216</span>      <a class="code hl_typedef" href="stdint_8h.html#aec6fcb673ff035718c238c8c9d544c47">uint64_t</a> val = v.value;</div>
+<div class="line"><span class="lineno">  216</span>      <a class="code hl_typedef" href="stdint_8h.html#aec6fcb673ff035718c238c8c9d544c47">uint64_t</a> val = v.<a class="code hl_variable" href="structfc_1_1unsigned__int.html#ac54ac972d3e38a5852616aaee955ff3f">value</a>;</div>
 <div class="line"><span class="lineno">  217</span>      <span class="keywordflow">do</span> {</div>
 <div class="line"><span class="lineno">  218</span>        <a class="code hl_typedef" href="stdint_8h.html#aba7bc1797add20fe3efdf37ced1182c5">uint8_t</a> b = <a class="code hl_typedef" href="stdint_8h.html#aba7bc1797add20fe3efdf37ced1182c5">uint8_t</a>(val) &amp; 0x7f;</div>
 <div class="line"><span class="lineno">  219</span>        val &gt;&gt;= 7;</div>
@@ -3394,6 +3403,7 @@ template&lt;typename <a class="el" href="classrapidjson_1_1_stream.html">Stream<
 <div class="line"><span class="lineno">  221</span>        <a class="code hl_variable" href="yubihsm__pkcs11_8c.html#a506da415c9307c897ca9be93acfe1d0f">s</a>.write((<span class="keywordtype">char</span>*)&amp;b,1);<span class="comment">//.put(b);</span></div>
 <div class="line"><span class="lineno">  222</span>      }<span class="keywordflow">while</span>( val );</div>
 <div class="line"><span class="lineno">  223</span>    }</div>
+<div class="ttc" id="astructfc_1_1unsigned__int_html_ac54ac972d3e38a5852616aaee955ff3f"><div class="ttname"><a href="structfc_1_1unsigned__int.html#ac54ac972d3e38a5852616aaee955ff3f">fc::unsigned_int::value</a></div><div class="ttdeci">uint32_t value</div><div class="ttdef"><b>Definition</b> <a href="varint_8hpp_source.html#l00017">varint.hpp:17</a></div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -3428,19 +3438,28 @@ template&lt;typename <a class="el" href="classrapidjson_1_1_stream.html">Stream<
 
 <p class="definition">Definition at line <a class="el" href="raw__variant_8hpp_source.html#l00054">54</a> of file <a class="el" href="raw__variant_8hpp_source.html">raw_variant.hpp</a>.</p>
 <div class="fragment"><div class="line"><span class="lineno">   55</span>    {</div>
-<div class="line"><span class="lineno">   56</span>       pack( <a class="code hl_variable" href="yubihsm__pkcs11_8c.html#a506da415c9307c897ca9be93acfe1d0f">s</a>, <a class="code hl_typedef" href="stdint_8h.html#aba7bc1797add20fe3efdf37ced1182c5">uint8_t</a>(v.get_type()) );</div>
-<div class="line"><span class="lineno">   57</span>       v.visit( <a class="code hl_class" href="classfc_1_1raw_1_1variant__packer.html">variant_packer&lt;Stream&gt;</a>(<a class="code hl_variable" href="yubihsm__pkcs11_8c.html#a506da415c9307c897ca9be93acfe1d0f">s</a>) );</div>
+<div class="line"><span class="lineno">   56</span>       pack( <a class="code hl_variable" href="yubihsm__pkcs11_8c.html#a506da415c9307c897ca9be93acfe1d0f">s</a>, <a class="code hl_typedef" href="stdint_8h.html#aba7bc1797add20fe3efdf37ced1182c5">uint8_t</a>(v.<a class="code hl_function" href="classfc_1_1variant.html#afaae1df286ff97c83301eda21dbd51ea">get_type</a>()) );</div>
+<div class="line"><span class="lineno">   57</span>       v.<a class="code hl_function" href="classfc_1_1variant.html#a327534c432bafeffa193555109c2dd6f">visit</a>( <a class="code hl_class" href="classfc_1_1raw_1_1variant__packer.html">variant_packer&lt;Stream&gt;</a>(<a class="code hl_variable" href="yubihsm__pkcs11_8c.html#a506da415c9307c897ca9be93acfe1d0f">s</a>) );</div>
 <div class="line"><span class="lineno">   58</span>    }</div>
 <div class="ttc" id="aclassfc_1_1raw_1_1variant__packer_html"><div class="ttname"><a href="classfc_1_1raw_1_1variant__packer.html">fc::raw::variant_packer</a></div><div class="ttdef"><b>Definition</b> <a href="raw__variant_8hpp_source.html#l00010">raw_variant.hpp:11</a></div></div>
+<div class="ttc" id="aclassfc_1_1variant_html_a327534c432bafeffa193555109c2dd6f"><div class="ttname"><a href="classfc_1_1variant.html#a327534c432bafeffa193555109c2dd6f">fc::variant::visit</a></div><div class="ttdeci">void visit(const visitor &amp;v) const</div><div class="ttdef"><b>Definition</b> <a href="variant_8cpp_source.html#l00268">variant.cpp:268</a></div></div>
+<div class="ttc" id="aclassfc_1_1variant_html_afaae1df286ff97c83301eda21dbd51ea"><div class="ttname"><a href="classfc_1_1variant.html#afaae1df286ff97c83301eda21dbd51ea">fc::variant::get_type</a></div><div class="ttdeci">type_id get_type() const</div><div class="ttdef"><b>Definition</b> <a href="variant_8cpp_source.html#l00304">variant.cpp:304</a></div></div>
 </div><!-- fragment --><div class="dynheader">
 Here is the call graph for this function:</div>
 <div class="dyncontent">
 <div class="center"><img src="namespacefc_1_1raw_a68cd27ab73d4d1b601b4b504e3a924bb_cgraph.png" border="0" usemap="#anamespacefc_1_1raw_a68cd27ab73d4d1b601b4b504e3a924bb_cgraph" alt=""/></div>
 <map name="anamespacefc_1_1raw_a68cd27ab73d4d1b601b4b504e3a924bb_cgraph" id="anamespacefc_1_1raw_a68cd27ab73d4d1b601b4b504e3a924bb_cgraph">
-<area shape="rect" title=" " alt="" coords="5,29,103,55"/>
-<area shape="rect" href="namespacefc_1_1raw.html#a3a18d8161aa5b4f4f02b6fcfdff5e5d1" title=" " alt="" coords="151,29,248,55"/>
-<area shape="poly" title=" " alt="" coords="103,40,135,40,135,45,103,45"/>
-<area shape="poly" title=" " alt="" coords="174,30,170,21,172,11,183,5,199,3,217,5,227,12,224,16,215,10,199,8,184,10,177,14,175,20,179,28"/>
+<area shape="rect" title=" " alt="" coords="5,51,103,77"/>
+<area shape="rect" href="classfc_1_1variant.html#afaae1df286ff97c83301eda21dbd51ea" title=" " alt="" coords="310,10,447,35"/>
+<area shape="poly" title=" " alt="" coords="73,48,108,28,150,12,186,6,224,3,295,6,294,12,224,9,187,11,151,17,110,33,76,53"/>
+<area shape="rect" href="namespacefc_1_1raw.html#a3a18d8161aa5b4f4f02b6fcfdff5e5d1" title=" " alt="" coords="158,51,255,77"/>
+<area shape="poly" title=" " alt="" coords="103,61,142,61,142,67,103,67"/>
+<area shape="rect" href="classfc_1_1variant.html#a327534c432bafeffa193555109c2dd6f" title=" " alt="" coords="151,100,262,126"/>
+<area shape="poly" title=" " alt="" coords="97,75,151,93,149,98,95,80"/>
+<area shape="poly" title=" " alt="" coords="180,52,175,42,178,33,189,27,206,24,225,27,235,34,232,38,223,32,206,30,191,32,182,36,181,42,185,49"/>
+<area shape="poly" title=" " alt="" coords="238,97,261,87,342,41,344,46,263,92,241,102"/>
+<area shape="rect" href="classfc_1_1variant_1_1visitor.html#a7916c02372821c928e8ba73e00c34a8b" title="handles null_type variants" alt="" coords="318,93,440,134"/>
+<area shape="poly" title=" " alt="" coords="262,111,302,111,302,116,262,116"/>
 </map>
 </div>
 
@@ -3477,23 +3496,32 @@ template&lt;typename <a class="el" href="classrapidjson_1_1_stream.html">Stream<
 
 <p class="definition">Definition at line <a class="el" href="raw__variant_8hpp_source.html#l00130">130</a> of file <a class="el" href="raw__variant_8hpp_source.html">raw_variant.hpp</a>.</p>
 <div class="fragment"><div class="line"><span class="lineno">  131</span>    {</div>
-<div class="line"><span class="lineno">  132</span>       <a class="code hl_struct" href="structfc_1_1unsigned__int.html">unsigned_int</a> vs = (<a class="code hl_typedef" href="stdint_8h.html#a435d1572bf3f880d55459d9805097f62">uint32_t</a>)v.size();</div>
+<div class="line"><span class="lineno">  132</span>       <a class="code hl_struct" href="structfc_1_1unsigned__int.html">unsigned_int</a> vs = (<a class="code hl_typedef" href="stdint_8h.html#a435d1572bf3f880d55459d9805097f62">uint32_t</a>)v.<a class="code hl_function" href="classfc_1_1variant__object.html#a0e523ff3ad212b0582ad2ac8a07773ae">size</a>();</div>
 <div class="line"><span class="lineno">  133</span>       pack( <a class="code hl_variable" href="yubihsm__pkcs11_8c.html#a506da415c9307c897ca9be93acfe1d0f">s</a>, vs );</div>
-<div class="line"><span class="lineno">  134</span>       <span class="keywordflow">for</span>( <span class="keyword">auto</span> itr = v.begin(); itr != v.end(); ++itr )</div>
+<div class="line"><span class="lineno">  134</span>       <span class="keywordflow">for</span>( <span class="keyword">auto</span> itr = v.<a class="code hl_function" href="classfc_1_1variant__object.html#ae0b10525c519de4e4ea077505cb09ac8">begin</a>(); itr != v.<a class="code hl_function" href="classfc_1_1variant__object.html#a804706455398e249f6272b3ff19cef5d">end</a>(); ++itr )</div>
 <div class="line"><span class="lineno">  135</span>       {</div>
 <div class="line"><span class="lineno">  136</span>          pack( <a class="code hl_variable" href="yubihsm__pkcs11_8c.html#a506da415c9307c897ca9be93acfe1d0f">s</a>, itr-&gt;key() );</div>
 <div class="line"><span class="lineno">  137</span>          pack( <a class="code hl_variable" href="yubihsm__pkcs11_8c.html#a506da415c9307c897ca9be93acfe1d0f">s</a>, itr-&gt;value() );</div>
 <div class="line"><span class="lineno">  138</span>       }</div>
 <div class="line"><span class="lineno">  139</span>    }</div>
+<div class="ttc" id="aclassfc_1_1variant__object_html_a0e523ff3ad212b0582ad2ac8a07773ae"><div class="ttname"><a href="classfc_1_1variant__object.html#a0e523ff3ad212b0582ad2ac8a07773ae">fc::variant_object::size</a></div><div class="ttdeci">size_t size() const</div><div class="ttdef"><b>Definition</b> <a href="variant__object_8cpp_source.html#l00092">variant_object.cpp:92</a></div></div>
+<div class="ttc" id="aclassfc_1_1variant__object_html_a804706455398e249f6272b3ff19cef5d"><div class="ttname"><a href="classfc_1_1variant__object.html#a804706455398e249f6272b3ff19cef5d">fc::variant_object::end</a></div><div class="ttdeci">iterator end() const</div><div class="ttdef"><b>Definition</b> <a href="variant__object_8cpp_source.html#l00058">variant_object.cpp:58</a></div></div>
+<div class="ttc" id="aclassfc_1_1variant__object_html_ae0b10525c519de4e4ea077505cb09ac8"><div class="ttname"><a href="classfc_1_1variant__object.html#ae0b10525c519de4e4ea077505cb09ac8">fc::variant_object::begin</a></div><div class="ttdeci">iterator begin() const</div><div class="ttdef"><b>Definition</b> <a href="variant__object_8cpp_source.html#l00052">variant_object.cpp:52</a></div></div>
 </div><!-- fragment --><div class="dynheader">
 Here is the call graph for this function:</div>
 <div class="dyncontent">
 <div class="center"><img src="namespacefc_1_1raw_a9330005e0cc3bd154e24eee8e48e5948_cgraph.png" border="0" usemap="#anamespacefc_1_1raw_a9330005e0cc3bd154e24eee8e48e5948_cgraph" alt=""/></div>
 <map name="anamespacefc_1_1raw_a9330005e0cc3bd154e24eee8e48e5948_cgraph" id="anamespacefc_1_1raw_a9330005e0cc3bd154e24eee8e48e5948_cgraph">
-<area shape="rect" title=" " alt="" coords="5,29,103,55"/>
-<area shape="rect" href="namespacefc_1_1raw.html#a3a18d8161aa5b4f4f02b6fcfdff5e5d1" title=" " alt="" coords="151,29,248,55"/>
-<area shape="poly" title=" " alt="" coords="103,40,135,40,135,45,103,45"/>
-<area shape="poly" title=" " alt="" coords="174,30,170,21,172,11,183,5,199,3,217,5,227,12,224,16,215,10,199,8,184,10,177,14,175,20,179,28"/>
+<area shape="rect" title=" " alt="" coords="5,108,103,133"/>
+<area shape="rect" href="classfc_1_1variant__object.html#ae0b10525c519de4e4ea077505cb09ac8" title=" " alt="" coords="165,5,286,46"/>
+<area shape="poly" title=" " alt="" coords="72,105,149,55,158,51,161,55,152,60,75,109"/>
+<area shape="rect" href="classfc_1_1variant__object.html#a804706455398e249f6272b3ff19cef5d" title=" " alt="" coords="151,70,301,96"/>
+<area shape="poly" title=" " alt="" coords="102,107,148,97,149,102,103,112"/>
+<area shape="rect" href="namespacefc_1_1raw.html#a3a18d8161aa5b4f4f02b6fcfdff5e5d1" title=" " alt="" coords="177,144,274,169"/>
+<area shape="poly" title=" " alt="" coords="103,128,163,140,162,146,102,133"/>
+<area shape="rect" href="classfc_1_1variant__object.html#a0e523ff3ad212b0582ad2ac8a07773ae" title=" " alt="" coords="165,193,286,234"/>
+<area shape="poly" title=" " alt="" coords="76,131,152,179,161,184,158,189,149,184,73,136"/>
+<area shape="poly" title=" " alt="" coords="197,145,191,135,194,125,206,119,226,117,247,119,258,126,255,131,245,124,226,122,208,124,198,129,196,134,201,142"/>
 </map>
 </div>
 
@@ -4108,7 +4136,6 @@ template&lt;typename <a class="el" href="classrapidjson_1_1_stream.html">Stream<
 <div class="line"><span class="lineno">  565</span>          <a class="code hl_function" href="#a0b442d98ceb22dd5a6ae84745e43ffab">fc::raw::unpack</a>( <a class="code hl_variable" href="yubihsm__pkcs11_8c.html#a506da415c9307c897ca9be93acfe1d0f">s</a>, i );</div>
 <div class="line"><span class="lineno">  566</span>       }</div>
 <div class="line"><span class="lineno">  567</span>    }</div>
-<div class="ttc" id="astructfc_1_1unsigned__int_html_ac54ac972d3e38a5852616aaee955ff3f"><div class="ttname"><a href="structfc_1_1unsigned__int.html#ac54ac972d3e38a5852616aaee955ff3f">fc::unsigned_int::value</a></div><div class="ttdeci">uint32_t value</div><div class="ttdef"><b>Definition</b> <a href="varint_8hpp_source.html#l00017">varint.hpp:17</a></div></div>
 </div><!-- fragment --><div class="dynheader">
 Here is the call graph for this function:</div>
 <div class="dyncontent">
@@ -4352,7 +4379,7 @@ template&lt;typename <a class="el" href="classrapidjson_1_1_stream.html">Stream<
 <div class="fragment"><div class="line"><span class="lineno">  162</span>    { <span class="keywordflow">try</span> {</div>
 <div class="line"><span class="lineno">  163</span>       <span class="keyword">static_assert</span>( <a class="code hl_variable" href="quantize_8cpp.html#ab2b6b0c222cd1ce70d6a831f57241e59">N</a> &lt;= <a class="code hl_define" href="utility_8hpp.html#ad647a8ed8233ea2357905dde291af0f6">MAX_NUM_ARRAY_ELEMENTS</a>, <span class="stringliteral">&quot;number of elements in array is too large&quot;</span> );</div>
 <div class="line"><span class="lineno">  164</span>       <span class="keywordflow">for</span> (<a class="code hl_typedef" href="stdint_8h.html#aec6fcb673ff035718c238c8c9d544c47">uint64_t</a> i = 0; i &lt; <a class="code hl_variable" href="quantize_8cpp.html#ab2b6b0c222cd1ce70d6a831f57241e59">N</a>; ++i)</div>
-<div class="line"><span class="lineno">  165</span>          <a class="code hl_function" href="#a0b442d98ceb22dd5a6ae84745e43ffab">fc::raw::unpack</a>(<a class="code hl_variable" href="yubihsm__pkcs11_8c.html#a506da415c9307c897ca9be93acfe1d0f">s</a>, v.data[i]);</div>
+<div class="line"><span class="lineno">  165</span>          <a class="code hl_function" href="#a0b442d98ceb22dd5a6ae84745e43ffab">fc::raw::unpack</a>(<a class="code hl_variable" href="yubihsm__pkcs11_8c.html#a506da415c9307c897ca9be93acfe1d0f">s</a>, v.<a class="code hl_variable" href="classfc_1_1array.html#ad01e4627be17148ee922c37944c48626">data</a>[i]);</div>
 <div class="line"><span class="lineno">  166</span>    } <a class="code hl_define" href="exception_8hpp.html#af3731d6e3beb140d9e652adf7a18113b">FC_RETHROW_EXCEPTIONS</a>( warn, <span class="stringliteral">&quot;fc::array&lt;${type},${length}&gt;&quot;</span>, (<span class="stringliteral">&quot;type&quot;</span>,<a class="code hl_struct" href="structfc_1_1get__typename.html">fc::get_typename&lt;T&gt;::name</a>())(<span class="stringliteral">&quot;length&quot;</span>,<a class="code hl_variable" href="quantize_8cpp.html#ab2b6b0c222cd1ce70d6a831f57241e59">N</a>) ) }</div>
 </div><!-- fragment --><div class="dynheader">
 Here is the call graph for this function:</div>
@@ -5097,7 +5124,7 @@ template&lt;typename <a class="el" href="classrapidjson_1_1_stream.html">Stream<
 </div><div class="memdoc">
 
 <p class="definition">Definition at line <a class="el" href="raw_8hpp_source.html#l00258">258</a> of file <a class="el" href="raw_8hpp_source.html">raw.hpp</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">  258</span>{ <a class="code hl_function" href="#a0b442d98ceb22dd5a6ae84745e43ffab">fc::raw::unpack</a>( <a class="code hl_variable" href="yubihsm__pkcs11_8c.html#a506da415c9307c897ca9be93acfe1d0f">s</a>, v.value ); }</div>
+<div class="fragment"><div class="line"><span class="lineno">  258</span>{ <a class="code hl_function" href="#a0b442d98ceb22dd5a6ae84745e43ffab">fc::raw::unpack</a>( <a class="code hl_variable" href="yubihsm__pkcs11_8c.html#a506da415c9307c897ca9be93acfe1d0f">s</a>, v.<a class="code hl_variable" href="structfc_1_1safe.html#a6bb99e2058adab1fef1f6b9df91006c9">value</a> ); }</div>
 </div><!-- fragment --><div class="dynheader">
 Here is the call graph for this function:</div>
 <div class="dyncontent">
@@ -5677,7 +5704,6 @@ template&lt;typename <a class="el" href="classrapidjson_1_1_stream.html">Stream<
 <div class="line"><span class="lineno">  231</span>      } <span class="keywordflow">while</span>( <a class="code hl_typedef" href="stdint_8h.html#aba7bc1797add20fe3efdf37ced1182c5">uint8_t</a>(b) &amp; 0x80 );</div>
 <div class="line"><span class="lineno">  232</span>      vi.<a class="code hl_variable" href="structfc_1_1signed__int.html#a594de3c9df8e11911cce18eb8ae15d08">value</a>= (v&gt;&gt;1) ^ (~(v&amp;1)+1ull);                         <span class="comment">//reverse zigzag encoding</span></div>
 <div class="line"><span class="lineno">  233</span>    }</div>
-<div class="ttc" id="astructfc_1_1signed__int_html_a594de3c9df8e11911cce18eb8ae15d08"><div class="ttname"><a href="structfc_1_1signed__int.html#a594de3c9df8e11911cce18eb8ae15d08">fc::signed_int::value</a></div><div class="ttdeci">int32_t value</div><div class="ttdef"><b>Definition</b> <a href="varint_8hpp_source.html#l00049">varint.hpp:49</a></div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -6606,35 +6632,35 @@ template&lt;typename <a class="el" href="classrapidjson_1_1_stream.html">Stream<
 <div class="line"><span class="lineno">   90</span>         {</div>
 <div class="line"><span class="lineno">   91</span>            <span class="keywordtype">bool</span> val;</div>
 <div class="line"><span class="lineno">   92</span>            raw::unpack(<a class="code hl_variable" href="yubihsm__pkcs11_8c.html#a506da415c9307c897ca9be93acfe1d0f">s</a>,val);</div>
-<div class="line"><span class="lineno">   93</span>            <a class="code hl_variable" href="namespacedevelop_build.html#ade64cd34608f9442ef3049116a2da428">v</a> = val;</div>
+<div class="line"><span class="lineno">   93</span>            v = val;</div>
 <div class="line"><span class="lineno">   94</span>            <span class="keywordflow">return</span>;</div>
 <div class="line"><span class="lineno">   95</span>         }</div>
 <div class="line"><span class="lineno">   96</span>         <span class="keywordflow">case</span> variant::string_type:</div>
 <div class="line"><span class="lineno">   97</span>         {</div>
 <div class="line"><span class="lineno">   98</span>            <a class="code hl_typedef" href="namespacefc.html#a0f3d84fe9e7adcd2d1e0bb7b60b49aa0">fc::string</a> val;</div>
 <div class="line"><span class="lineno">   99</span>            raw::unpack(<a class="code hl_variable" href="yubihsm__pkcs11_8c.html#a506da415c9307c897ca9be93acfe1d0f">s</a>,val);</div>
-<div class="line"><span class="lineno">  100</span>            <a class="code hl_variable" href="namespacedevelop_build.html#ade64cd34608f9442ef3049116a2da428">v</a> = fc::move(val);</div>
+<div class="line"><span class="lineno">  100</span>            v = fc::move(val);</div>
 <div class="line"><span class="lineno">  101</span>            <span class="keywordflow">return</span>;</div>
 <div class="line"><span class="lineno">  102</span>         }</div>
 <div class="line"><span class="lineno">  103</span>         <span class="keywordflow">case</span> variant::array_type:</div>
 <div class="line"><span class="lineno">  104</span>         {</div>
 <div class="line"><span class="lineno">  105</span>            <a class="code hl_typedef" href="namespacefc.html#a9148361f6aaa3d739990a75ac557fe59">variants</a> val;</div>
 <div class="line"><span class="lineno">  106</span>            raw::unpack(<a class="code hl_variable" href="yubihsm__pkcs11_8c.html#a506da415c9307c897ca9be93acfe1d0f">s</a>,val);</div>
-<div class="line"><span class="lineno">  107</span>            <a class="code hl_variable" href="namespacedevelop_build.html#ade64cd34608f9442ef3049116a2da428">v</a> = fc::move(val);</div>
+<div class="line"><span class="lineno">  107</span>            v = fc::move(val);</div>
 <div class="line"><span class="lineno">  108</span>            <span class="keywordflow">return</span>;</div>
 <div class="line"><span class="lineno">  109</span>         }</div>
 <div class="line"><span class="lineno">  110</span>         <span class="keywordflow">case</span> variant::object_type:</div>
 <div class="line"><span class="lineno">  111</span>         {</div>
 <div class="line"><span class="lineno">  112</span>            variant_object val; </div>
 <div class="line"><span class="lineno">  113</span>            raw::unpack(<a class="code hl_variable" href="yubihsm__pkcs11_8c.html#a506da415c9307c897ca9be93acfe1d0f">s</a>,val);</div>
-<div class="line"><span class="lineno">  114</span>            <a class="code hl_variable" href="namespacedevelop_build.html#ade64cd34608f9442ef3049116a2da428">v</a> = fc::move(val);</div>
+<div class="line"><span class="lineno">  114</span>            v = fc::move(val);</div>
 <div class="line"><span class="lineno">  115</span>            <span class="keywordflow">return</span>;</div>
 <div class="line"><span class="lineno">  116</span>         }</div>
 <div class="line"><span class="lineno">  117</span>         <span class="keywordflow">case</span> variant::blob_type:</div>
 <div class="line"><span class="lineno">  118</span>         {</div>
 <div class="line"><span class="lineno">  119</span>            blob val;</div>
 <div class="line"><span class="lineno">  120</span>            raw::unpack(<a class="code hl_variable" href="yubihsm__pkcs11_8c.html#a506da415c9307c897ca9be93acfe1d0f">s</a>,val);</div>
-<div class="line"><span class="lineno">  121</span>            <a class="code hl_variable" href="namespacedevelop_build.html#ade64cd34608f9442ef3049116a2da428">v</a> = fc::move(val);</div>
+<div class="line"><span class="lineno">  121</span>            v = fc::move(val);</div>
 <div class="line"><span class="lineno">  122</span>            <span class="keywordflow">return</span>;</div>
 <div class="line"><span class="lineno">  123</span>         }</div>
 <div class="line"><span class="lineno">  124</span>         <span class="keywordflow">default</span>:</div>
@@ -6642,7 +6668,6 @@ template&lt;typename <a class="el" href="classrapidjson_1_1_stream.html">Stream<
 <div class="line"><span class="lineno">  126</span>      }</div>
 <div class="line"><span class="lineno">  127</span>    }</div>
 <div class="ttc" id="aexception_8hpp_html_a7590ddac4f181b661c3eeaf5feccc6ac"><div class="ttname"><a href="exception_8hpp.html#a7590ddac4f181b661c3eeaf5feccc6ac">FC_THROW_EXCEPTION</a></div><div class="ttdeci">#define FC_THROW_EXCEPTION(EXCEPTION, FORMAT,...)</div><div class="ttdef"><b>Definition</b> <a href="exception_8hpp_source.html#l00395">exception.hpp:395</a></div></div>
-<div class="ttc" id="anamespacedevelop_build_html_ade64cd34608f9442ef3049116a2da428"><div class="ttname"><a href="namespacedevelop_build.html#ade64cd34608f9442ef3049116a2da428">developBuild.v</a></div><div class="ttdeci">v</div><div class="ttdef"><b>Definition</b> <a href="develop_build_8py_source.html#l00006">developBuild.py:6</a></div></div>
 <div class="ttc" id="anamespacefc_html_a9148361f6aaa3d739990a75ac557fe59"><div class="ttname"><a href="namespacefc.html#a9148361f6aaa3d739990a75ac557fe59">fc::variants</a></div><div class="ttdeci">std::vector&lt; fc::variant &gt; variants</div><div class="ttdef"><b>Definition</b> <a href="fc_2include_2fc_2variant_8hpp_source.html#l00173">variant.hpp:173</a></div></div>
 </div><!-- fragment --><div class="dynheader">
 Here is the call graph for this function:</div>
@@ -6750,7 +6775,7 @@ template&lt;typename <a class="el" href="prettywritertest_8cpp.html#a6283df8c4e3
 <p class="definition">Definition at line <a class="el" href="raw__unpack__file_8hpp_source.html#l00012">12</a> of file <a class="el" href="raw__unpack__file_8hpp_source.html">raw_unpack_file.hpp</a>.</p>
 <div class="fragment"><div class="line"><span class="lineno">   13</span>        {</div>
 <div class="line"><span class="lineno">   14</span>           <span class="keywordflow">try</span> {</div>
-<div class="line"><span class="lineno">   15</span>               <a class="code hl_class" href="classfc_1_1file__mapping.html">fc::file_mapping</a> fmap( filename.generic_string().c_str(), <a class="code hl_enumvalue" href="namespacefc.html#a3d8a2be677709cc41f09aa7925f2d55fad6bcd1364809e1b881bb22334d14cd56">fc::read_only</a>);</div>
+<div class="line"><span class="lineno">   15</span>               <a class="code hl_class" href="classfc_1_1file__mapping.html">fc::file_mapping</a> fmap( filename.<a class="code hl_function" href="classfc_1_1path.html#ab1eae2062df4ea01435348ec52fb3784">generic_string</a>().c_str(), <a class="code hl_enumvalue" href="namespacefc.html#a3d8a2be677709cc41f09aa7925f2d55fad6bcd1364809e1b881bb22334d14cd56">fc::read_only</a>);</div>
 <div class="line"><span class="lineno">   16</span>               <a class="code hl_class" href="classfc_1_1mapped__region.html">fc::mapped_region</a> mapr( fmap, <a class="code hl_enumvalue" href="namespacefc.html#a3d8a2be677709cc41f09aa7925f2d55fad6bcd1364809e1b881bb22334d14cd56">fc::read_only</a>, 0, <a class="code hl_function" href="namespacefc.html#aae3e907b120751591ca6919ac66c384b">fc::file_size</a>(filename) );</div>
 <div class="line"><span class="lineno">   17</span>               <span class="keyword">auto</span> cs  = (<span class="keyword">const</span> <span class="keywordtype">char</span>*)mapr.get_address();</div>
 <div class="line"><span class="lineno">   18</span> </div>
@@ -6767,16 +6792,18 @@ Here is the call graph for this function:</div>
 <div class="dyncontent">
 <div class="center"><img src="namespacefc_1_1raw_a6de96d3d5084498058deb1cef4139ebe_cgraph.png" border="0" usemap="#anamespacefc_1_1raw_a6de96d3d5084498058deb1cef4139ebe_cgraph" alt=""/></div>
 <map name="anamespacefc_1_1raw_a6de96d3d5084498058deb1cef4139ebe_cgraph" id="anamespacefc_1_1raw_a6de96d3d5084498058deb1cef4139ebe_cgraph">
-<area shape="rect" title=" " alt="" coords="5,96,141,122"/>
-<area shape="rect" href="namespacefc.html#aae3e907b120751591ca6919ac66c384b" title=" " alt="" coords="213,5,301,31"/>
-<area shape="poly" title=" " alt="" coords="94,93,187,41,202,35,204,40,190,46,97,98"/>
-<area shape="rect" href="classfc_1_1mapped__region.html#ae4c454063de929a27170d91e8c332ac6" title=" " alt="" coords="189,55,325,96"/>
-<area shape="poly" title=" " alt="" coords="141,94,173,88,174,93,142,99"/>
-<area shape="rect" href="classfc_1_1mapped__region.html#acecc565e9417b87b1ad8577b02b428cc" title=" " alt="" coords="189,120,325,161"/>
-<area shape="poly" title=" " alt="" coords="142,118,174,124,173,129,141,123"/>
-<area shape="rect" href="namespacefc_1_1raw.html#a0b442d98ceb22dd5a6ae84745e43ffab" title=" " alt="" coords="201,209,312,235"/>
-<area shape="poly" title=" " alt="" coords="97,120,223,199,220,203,94,125"/>
-<area shape="poly" title=" " alt="" coords="226,210,220,201,223,191,236,185,257,183,279,185,291,192,288,196,277,190,257,188,238,190,227,195,225,200,230,207"/>
+<area shape="rect" title=" " alt="" coords="5,112,141,138"/>
+<area shape="rect" href="namespacefc.html#aae3e907b120751591ca6919ac66c384b" title=" " alt="" coords="222,5,310,31"/>
+<area shape="poly" title=" " alt="" coords="88,109,131,75,187,40,206,32,208,37,190,45,134,79,91,113"/>
+<area shape="rect" href="classfc_1_1path.html#ab1eae2062df4ea01435348ec52fb3784" title=" " alt="" coords="189,55,343,80"/>
+<area shape="poly" title=" " alt="" coords="118,109,205,83,206,88,120,114"/>
+<area shape="rect" href="classfc_1_1mapped__region.html#ae4c454063de929a27170d91e8c332ac6" title=" " alt="" coords="198,104,334,145"/>
+<area shape="poly" title=" " alt="" coords="141,122,182,122,182,128,141,128"/>
+<area shape="rect" href="classfc_1_1mapped__region.html#acecc565e9417b87b1ad8577b02b428cc" title=" " alt="" coords="198,170,334,210"/>
+<area shape="poly" title=" " alt="" coords="114,136,190,162,188,167,112,141"/>
+<area shape="rect" href="namespacefc_1_1raw.html#a0b442d98ceb22dd5a6ae84745e43ffab" title=" " alt="" coords="210,259,322,284"/>
+<area shape="poly" title=" " alt="" coords="90,136,134,175,190,220,231,248,228,252,187,224,131,179,87,140"/>
+<area shape="poly" title=" " alt="" coords="233,260,227,250,231,240,244,234,266,232,290,235,302,242,299,246,288,240,266,237,246,239,235,244,232,249,238,257"/>
 </map>
 </div>
 

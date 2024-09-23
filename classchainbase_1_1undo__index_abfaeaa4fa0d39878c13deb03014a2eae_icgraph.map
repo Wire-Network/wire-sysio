@@ -1,5 +1,6 @@
 <map id="chainbase::undo_index::project" name="chainbase::undo_index::project">
-<area shape="rect" id="Node000001" title=" " alt="" coords="237,5,391,46"/>
-<area shape="rect" id="Node000002" href="$classrelease__docs_1_1_wiki_brancher.html#a75323b0481ab3e9c81b2286a5d731041" title=" " alt="" coords="5,5,189,46"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="221,28,189,28,189,23,221,23"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="250,29,404,70"/>
+<area shape="poly" id="edge2_Node000001_Node000001" title=" " alt="" coords="363,16,350,10,327,8,306,10,293,15,288,21,290,28,285,29,283,19,290,10,304,5,327,3,351,5,365,11"/>
+<area shape="rect" id="Node000002" href="$undo__index_8cpp.html#ad2c851d4d6932a1b1e4686add49993b0" title=" " alt="" coords="5,37,202,62"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="235,52,202,52,202,47,235,47"/>
 </map>

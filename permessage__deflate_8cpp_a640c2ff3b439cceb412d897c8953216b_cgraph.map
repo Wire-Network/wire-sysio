@@ -1,0 +1,7 @@
+<map id="BOOST_AUTO_TEST_CASE" name="BOOST_AUTO_TEST_CASE">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,60,202,86"/>
+<area shape="rect" id="Node000002" href="$classwebsocketpp_1_1extensions_1_1permessage__deflate_1_1enabled.html#a55efd7772443eaf07435042a146cc5f7" title="Decompress bytes." alt="" coords="250,5,419,61"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="181,57,234,48,235,53,182,62"/>
+<area shape="rect" id="Node000003" href="$classwebsocketpp_1_1extensions_1_1permessage__deflate_1_1enabled.html#a0d842cb0cd2add8016e739dfcd675ba0" title="Initialize zlib state." alt="" coords="250,85,419,141"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="182,84,235,93,234,99,181,89"/>
+</map>

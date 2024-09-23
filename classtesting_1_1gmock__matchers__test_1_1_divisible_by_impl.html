@@ -110,9 +110,9 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a2621df4b34315b327e20b6f4d901417d" id="r_a2621df4b34315b327e20b6f4d901417d"><td class="memTemplParams" colspan="2">template&lt;typename <a class="el" href="prettywritertest_8cpp.html#a6283df8c4e365cc8a01727e2d7ad44bf">T</a> &gt; </td></tr>
 <tr class="memitem:a2621df4b34315b327e20b6f4d901417d"><td class="memTemplItemLeft" align="right" valign="top">bool&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="#a2621df4b34315b327e20b6f4d901417d">MatchAndExplain</a> (const <a class="el" href="prettywritertest_8cpp.html#a6283df8c4e365cc8a01727e2d7ad44bf">T</a> &amp;n, <a class="el" href="classtesting_1_1_match_result_listener.html">MatchResultListener</a> *listener) const</td></tr>
 <tr class="separator:a2621df4b34315b327e20b6f4d901417d"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aabd14d5f96ef6851141d9ed9fbee3f86" id="r_aabd14d5f96ef6851141d9ed9fbee3f86"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aabd14d5f96ef6851141d9ed9fbee3f86">DescribeTo</a> (ostream *os) const</td></tr>
+<tr class="memitem:aabd14d5f96ef6851141d9ed9fbee3f86" id="r_aabd14d5f96ef6851141d9ed9fbee3f86"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aabd14d5f96ef6851141d9ed9fbee3f86">DescribeTo</a> (ostream *<a class="el" href="environment_8hpp.html#a3951483d0b31c29ca95336206cd35238">os</a>) const</td></tr>
 <tr class="separator:aabd14d5f96ef6851141d9ed9fbee3f86"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a9c061ef411c126c604d4c33d92911d50" id="r_a9c061ef411c126c604d4c33d92911d50"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a9c061ef411c126c604d4c33d92911d50">DescribeNegationTo</a> (ostream *os) const</td></tr>
+<tr class="memitem:a9c061ef411c126c604d4c33d92911d50" id="r_a9c061ef411c126c604d4c33d92911d50"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a9c061ef411c126c604d4c33d92911d50">DescribeNegationTo</a> (ostream *<a class="el" href="environment_8hpp.html#a3951483d0b31c29ca95336206cd35238">os</a>) const</td></tr>
 <tr class="separator:a9c061ef411c126c604d4c33d92911d50"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a86c8787ab835bc84a9ad7e3931d644cc" id="r_a86c8787ab835bc84a9ad7e3931d644cc"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a86c8787ab835bc84a9ad7e3931d644cc">set_divider</a> (int a_divider)</td></tr>
 <tr class="separator:a86c8787ab835bc84a9ad7e3931d644cc"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -177,8 +177,9 @@ Public Member Functions</h2></td></tr>
 
 <p class="definition">Definition at line <a class="el" href="gmock-matchers__test_8cc_source.html#l04628">4628</a> of file <a class="el" href="gmock-matchers__test_8cc_source.html">gmock-matchers_test.cc</a>.</p>
 <div class="fragment"><div class="line"><span class="lineno"> 4628</span>                                             {</div>
-<div class="line"><span class="lineno"> 4629</span>    *os &lt;&lt; <span class="stringliteral">&quot;is not divisible by &quot;</span> &lt;&lt; divider_;</div>
+<div class="line"><span class="lineno"> 4629</span>    *<a class="code hl_variable" href="environment_8hpp.html#a3951483d0b31c29ca95336206cd35238">os</a> &lt;&lt; <span class="stringliteral">&quot;is not divisible by &quot;</span> &lt;&lt; divider_;</div>
 <div class="line"><span class="lineno"> 4630</span>  }</div>
+<div class="ttc" id="aenvironment_8hpp_html_a3951483d0b31c29ca95336206cd35238"><div class="ttname"><a href="environment_8hpp.html#a3951483d0b31c29ca95336206cd35238">os</a></div><div class="ttdeci">os_t os</div><div class="ttdef"><b>Definition</b> <a href="environment_8hpp_source.html#l00023">environment.hpp:23</a></div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -207,7 +208,7 @@ Public Member Functions</h2></td></tr>
 
 <p class="definition">Definition at line <a class="el" href="gmock-matchers__test_8cc_source.html#l04624">4624</a> of file <a class="el" href="gmock-matchers__test_8cc_source.html">gmock-matchers_test.cc</a>.</p>
 <div class="fragment"><div class="line"><span class="lineno"> 4624</span>                                     {</div>
-<div class="line"><span class="lineno"> 4625</span>    *os &lt;&lt; <span class="stringliteral">&quot;is divisible by &quot;</span> &lt;&lt; divider_;</div>
+<div class="line"><span class="lineno"> 4625</span>    *<a class="code hl_variable" href="environment_8hpp.html#a3951483d0b31c29ca95336206cd35238">os</a> &lt;&lt; <span class="stringliteral">&quot;is divisible by &quot;</span> &lt;&lt; divider_;</div>
 <div class="line"><span class="lineno"> 4626</span>  }</div>
 </div><!-- fragment -->
 </div>

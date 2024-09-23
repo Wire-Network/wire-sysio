@@ -44,10 +44,10 @@
 \DoxyCodeLine{\Hypertarget{compress__cmd_8cpp_source_l00040}00040\ \ \ \ \ \ \ \ \ \ \ \ \ output\_path\ =\ (bfs::path(output\_path)\ /\ bfs::path(input\_path).filename()).replace\_extension(}
 \DoxyCodeLine{\Hypertarget{compress__cmd_8cpp_source_l00041}00041\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ default\_output\_extension).generic\_string();}
 \DoxyCodeLine{\Hypertarget{compress__cmd_8cpp_source_l00042}00042\ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
-\DoxyCodeLine{\Hypertarget{compress__cmd_8cpp_source_l00043}00043\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ \mbox{\hyperlink{namespaceversiongenerate_aab714e0aa9036025ba7c83eb7422c567}{output\_dir}}\ =\ bfs::path(output\_path).parent\_path();}
-\DoxyCodeLine{\Hypertarget{compress__cmd_8cpp_source_l00044}00044\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!\mbox{\hyperlink{namespaceversiongenerate_aab714e0aa9036025ba7c83eb7422c567}{output\_dir}}.empty()\ \&\&\ !bfs::exists(output\_dir))\ \{}
+\DoxyCodeLine{\Hypertarget{compress__cmd_8cpp_source_l00043}00043\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ output\_dir\ =\ bfs::path(output\_path).parent\_path();}
+\DoxyCodeLine{\Hypertarget{compress__cmd_8cpp_source_l00044}00044\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!output\_dir.empty()\ \&\&\ !bfs::exists(output\_dir))\ \{}
 \DoxyCodeLine{\Hypertarget{compress__cmd_8cpp_source_l00045}00045\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ std::logic\_error(}
-\DoxyCodeLine{\Hypertarget{compress__cmd_8cpp_source_l00046}00046\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ std::string(\textcolor{stringliteral}{"{}Output\ file\ parent\ directory:\ "{}}\ +\ \mbox{\hyperlink{namespaceversiongenerate_aab714e0aa9036025ba7c83eb7422c567}{output\_dir}}.generic\_string()\ +\ \textcolor{stringliteral}{"{}\ does\ not\ exist"{}}));}
+\DoxyCodeLine{\Hypertarget{compress__cmd_8cpp_source_l00046}00046\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ std::string(\textcolor{stringliteral}{"{}Output\ file\ parent\ directory:\ "{}}\ +\ output\_dir.generic\_string()\ +\ \textcolor{stringliteral}{"{}\ does\ not\ exist"{}}));}
 \DoxyCodeLine{\Hypertarget{compress__cmd_8cpp_source_l00047}00047\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
 \DoxyCodeLine{\Hypertarget{compress__cmd_8cpp_source_l00048}00048\ \ \ \ \ \ \ \ \ \ \}}
 \DoxyCodeLine{\Hypertarget{compress__cmd_8cpp_source_l00049}00049\ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
@@ -62,8 +62,8 @@
 \DoxyCodeLine{\Hypertarget{compress__cmd_8cpp_source_l00058}00058\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ output\_path;}
 \DoxyCodeLine{\Hypertarget{compress__cmd_8cpp_source_l00059}00059\ \ \ \ \}}
 \DoxyCodeLine{\Hypertarget{compress__cmd_8cpp_source_l00060}00060\ }
-\DoxyCodeLine{\Hypertarget{compress__cmd_8cpp_source_l00061}00061\ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespacesysio_1_1client_1_1help_a5990309d6951c912f658bdc05d4369d8}{print\_help\_text}}(std::ostream\&\ os,\ \textcolor{keyword}{const}\ bpo::options\_description\&\ opts)\ \{}
-\DoxyCodeLine{\Hypertarget{compress__cmd_8cpp_source_l00062}00062\ \ \ \ \ \ \ os\ <<}
+\DoxyCodeLine{\Hypertarget{compress__cmd_8cpp_source_l00061}00061\ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespacesysio_1_1client_1_1help_a5990309d6951c912f658bdc05d4369d8}{print\_help\_text}}(std::ostream\&\ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}},\ \textcolor{keyword}{const}\ bpo::options\_description\&\ opts)\ \{}
+\DoxyCodeLine{\Hypertarget{compress__cmd_8cpp_source_l00062}00062\ \ \ \ \ \ \ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}\ <<}
 \DoxyCodeLine{\Hypertarget{compress__cmd_8cpp_source_l00063}00063\ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}Usage:\ trace\_api\_util\ compress\ <options>\ input-\/path\ [output-\/path]\(\backslash\)n"{}}}
 \DoxyCodeLine{\Hypertarget{compress__cmd_8cpp_source_l00064}00064\ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}\(\backslash\)n"{}}}
 \DoxyCodeLine{\Hypertarget{compress__cmd_8cpp_source_l00065}00065\ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}Compress\ a\ trace\ file\ to\ into\ the\ \(\backslash\)"{}clog\(\backslash\)"{}\ format.\ \ By\ default\ the\ name\ of\ the\(\backslash\)n"{}}}
@@ -74,7 +74,7 @@
 \DoxyCodeLine{\Hypertarget{compress__cmd_8cpp_source_l00070}00070\ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}\ \ input-\/path\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ path\ to\ the\ file\ to\ compress\(\backslash\)n"{}}}
 \DoxyCodeLine{\Hypertarget{compress__cmd_8cpp_source_l00071}00071\ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}\ \ output-\/path\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ [Optional]\ output\ file\ or\ directory\ path.\(\backslash\)n"{}}}
 \DoxyCodeLine{\Hypertarget{compress__cmd_8cpp_source_l00072}00072\ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}\(\backslash\)n"{}};}
-\DoxyCodeLine{\Hypertarget{compress__cmd_8cpp_source_l00073}00073\ \ \ \ \ \ \ os\ <<\ opts\ <<\ \textcolor{stringliteral}{"{}\(\backslash\)n"{}};}
+\DoxyCodeLine{\Hypertarget{compress__cmd_8cpp_source_l00073}00073\ \ \ \ \ \ \ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}\ <<\ opts\ <<\ \textcolor{stringliteral}{"{}\(\backslash\)n"{}};}
 \DoxyCodeLine{\Hypertarget{compress__cmd_8cpp_source_l00074}00074\ \ \ \ \}}
 \DoxyCodeLine{\Hypertarget{compress__cmd_8cpp_source_l00075}00075\ }
 \DoxyCodeLine{\Hypertarget{compress__cmd_8cpp_source_l00076}00076\ \ \ \ \textcolor{keywordtype}{int}\ do\_compress(\textcolor{keyword}{const}\ bpo::variables\_map\&\ global\_args,\ \textcolor{keyword}{const}\ std::vector<std::string>\&\ args)\ \{}
@@ -104,7 +104,7 @@
 \DoxyCodeLine{\Hypertarget{compress__cmd_8cpp_source_l00100}00100\ }
 \DoxyCodeLine{\Hypertarget{compress__cmd_8cpp_source_l00101}00101\ \ \ \ \ \ \ bpo::variables\_map\ vmap;}
 \DoxyCodeLine{\Hypertarget{compress__cmd_8cpp_source_l00102}00102\ \ \ \ \ \ \ \textcolor{keywordflow}{try}\ \{}
-\DoxyCodeLine{\Hypertarget{compress__cmd_8cpp_source_l00103}00103\ \ \ \ \ \ \ \ \ \ bpo::store(bpo::command\_line\_parser(args).\mbox{\hyperlink{namespacebenchmark_compile_acf738bbf3b8391aa78929ceeceb8a03b}{options}}(cmdline\_options).positional(pos\_desc).run(),\ vmap);}
+\DoxyCodeLine{\Hypertarget{compress__cmd_8cpp_source_l00103}00103\ \ \ \ \ \ \ \ \ \ bpo::store(bpo::command\_line\_parser(args).options(cmdline\_options).positional(pos\_desc).run(),\ vmap);}
 \DoxyCodeLine{\Hypertarget{compress__cmd_8cpp_source_l00104}00104\ \ \ \ \ \ \ \ \ \ bpo::notify(vmap);}
 \DoxyCodeLine{\Hypertarget{compress__cmd_8cpp_source_l00105}00105\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (global\_args.count(\textcolor{stringliteral}{"{}help"{}})\ ==\ 0)\ \{}
 \DoxyCodeLine{\Hypertarget{compress__cmd_8cpp_source_l00106}00106\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ input\_path\ =\ validate\_input\_path(vmap);}

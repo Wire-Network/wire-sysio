@@ -187,8 +187,7 @@ Public Attributes</h2></td></tr>
 </div><div class="memdoc">
 
 <p class="definition">Definition at line <a class="el" href="trace__api__plugin_8cpp_source.html#l00359">359</a> of file <a class="el" href="trace__api__plugin_8cpp_source.html">trace_api_plugin.cpp</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">  360</span>   :<a class="code hl_variable" href="#a94dff82a41c2e70619f2de3c74957cb5">common</a>(<a class="code hl_namespace" href="namespacecommon.html">common</a>) {}</div>
-<div class="ttc" id="anamespacecommon_html"><div class="ttname"><a href="namespacecommon.html">common</a></div><div class="ttdef"><b>Definition</b> <a href="common_8py_source.html#l00001">common.py:1</a></div></div>
+<div class="fragment"><div class="line"><span class="lineno">  360</span>   :<a class="code hl_variable" href="#a94dff82a41c2e70619f2de3c74957cb5">common</a>(<a class="code hl_variable" href="#a94dff82a41c2e70619f2de3c74957cb5">common</a>) {}</div>
 <div class="ttc" id="astructsysio_1_1trace__api__plugin__impl_html_a94dff82a41c2e70619f2de3c74957cb5"><div class="ttname"><a href="#a94dff82a41c2e70619f2de3c74957cb5">sysio::trace_api_plugin_impl::common</a></div><div class="ttdeci">std::shared_ptr&lt; trace_api_common_impl &gt; common</div><div class="ttdef"><b>Definition</b> <a href="trace__api__plugin_8cpp_source.html#l00414">trace_api_plugin.cpp:414</a></div></div>
 </div><!-- fragment -->
 </div>
@@ -225,7 +224,7 @@ Public Attributes</h2></td></tr>
 <div class="line"><span class="lineno">  369</span>         <a class="code hl_function" href="namespaceappbase.html#a99374dc23934f008a09f2f79be9eae40">app</a>().<a class="code hl_function" href="classappbase_1_1application.html#a81aa58d3f94570b7976145039155fc46">quit</a>();</div>
 <div class="line"><span class="lineno">  370</span>         <span class="keywordflow">throw</span> <a class="code hl_class" href="classsysio_1_1trace__api_1_1yield__exception.html">yield_exception</a>(<span class="stringliteral">&quot;shutting down&quot;</span>);</div>
 <div class="line"><span class="lineno">  371</span>      };</div>
-<div class="line"><span class="lineno">  372</span>      <a class="code hl_variable" href="#af15f7caebc11ee0520b7e19de6f25b7c">extraction</a> = std::make_shared&lt;chain_extraction_t&gt;(shared_store_provider&lt;store_provider&gt;(<a class="code hl_namespace" href="namespacecommon.html">common</a>-&gt;store), log_exceptions_and_shutdown);</div>
+<div class="line"><span class="lineno">  372</span>      <a class="code hl_variable" href="#af15f7caebc11ee0520b7e19de6f25b7c">extraction</a> = std::make_shared&lt;chain_extraction_t&gt;(shared_store_provider&lt;store_provider&gt;(<a class="code hl_variable" href="#a94dff82a41c2e70619f2de3c74957cb5">common</a>-&gt;store), log_exceptions_and_shutdown);</div>
 <div class="line"><span class="lineno">  373</span> </div>
 <div class="line"><span class="lineno">  374</span>      <span class="keyword">auto</span>&amp; chain = <a class="code hl_function" href="namespaceappbase.html#a99374dc23934f008a09f2f79be9eae40">app</a>().<a class="code hl_function" href="classappbase_1_1application.html#a1d2c585f90007be342c9c64ee9cc0f7c">find_plugin</a>&lt;<a class="code hl_class" href="classchain__plugin.html">chain_plugin</a>&gt;()-&gt;chain();</div>
 <div class="line"><span class="lineno">  375</span> </div>
@@ -318,7 +317,7 @@ Here is the call graph for this function:</div>
 
 <p class="definition">Definition at line <a class="el" href="trace__api__plugin_8cpp_source.html#l00410">410</a> of file <a class="el" href="trace__api__plugin_8cpp_source.html">trace_api_plugin.cpp</a>.</p>
 <div class="fragment"><div class="line"><span class="lineno">  410</span>                          {</div>
-<div class="line"><span class="lineno">  411</span>      <a class="code hl_namespace" href="namespacecommon.html">common</a>-&gt;plugin_shutdown();</div>
+<div class="line"><span class="lineno">  411</span>      <a class="code hl_variable" href="#a94dff82a41c2e70619f2de3c74957cb5">common</a>-&gt;plugin_shutdown();</div>
 <div class="line"><span class="lineno">  412</span>   }</div>
 </div><!-- fragment -->
 </div>
@@ -348,7 +347,7 @@ Here is the call graph for this function:</div>
 
 <p class="definition">Definition at line <a class="el" href="trace__api__plugin_8cpp_source.html#l00406">406</a> of file <a class="el" href="trace__api__plugin_8cpp_source.html">trace_api_plugin.cpp</a>.</p>
 <div class="fragment"><div class="line"><span class="lineno">  406</span>                         {</div>
-<div class="line"><span class="lineno">  407</span>      <a class="code hl_namespace" href="namespacecommon.html">common</a>-&gt;plugin_startup();</div>
+<div class="line"><span class="lineno">  407</span>      <a class="code hl_variable" href="#a94dff82a41c2e70619f2de3c74957cb5">common</a>-&gt;plugin_startup();</div>
 <div class="line"><span class="lineno">  408</span>   }</div>
 </div><!-- fragment -->
 </div>

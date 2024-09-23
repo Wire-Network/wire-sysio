@@ -1,13 +1,10 @@
 <map id="sysio::chain::impl::abi_traverse_context::is_logging" name="sysio::chain::impl::abi_traverse_context::is_logging">
-<area shape="rect" id="Node000001" title=" " alt="" coords="596,25,747,81"/>
-<area shape="rect" id="Node000002" href="$structsysio_1_1chain_1_1impl_1_1abi__to__variant.html#afe08f52a52afe264632fefb686c6cebf" title=" " alt="" coords="222,33,361,73"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="581,23,548,16,479,8,410,16,342,35,341,29,408,10,479,3,549,10,582,18"/>
-<area shape="rect" id="Node000004" href="$structsysio_1_1chain_1_1impl_1_1abi__to__variant.html#a0092202221bfbf9ab05dffe09089619c" title=" " alt="" coords="222,98,361,139"/>
-<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="582,87,549,95,451,111,362,118,361,113,451,105,548,90,581,82"/>
-<area shape="rect" id="Node000005" href="$structsysio_1_1chain_1_1impl_1_1abi__to__variant.html#a86ea9f13b7f078019b19cf04a979be0c" title=" " alt="" coords="409,25,548,81"/>
-<area shape="poly" id="edge5_Node000001_Node000005" title=" " alt="" coords="581,56,549,56,549,50,581,50"/>
-<area shape="rect" id="Node000003" href="$classvalidate__reflection_1_1_empty_scope.html#a1fb4f76506790294268dc078986d7430" title=" " alt="" coords="5,66,174,107"/>
-<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="207,69,175,75,174,70,206,64"/>
-<area shape="poly" id="edge4_Node000004_Node000003" title=" " alt="" coords="206,107,174,102,175,97,207,102"/>
-<area shape="poly" id="edge6_Node000005_Node000002" title=" " alt="" coords="394,56,361,56,361,50,394,50"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="380,17,530,72"/>
+<area shape="rect" id="Node000002" href="$structsysio_1_1chain_1_1impl_1_1abi__to__variant.html#afe08f52a52afe264632fefb686c6cebf" title=" " alt="" coords="5,32,145,73"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="364,21,332,15,262,8,193,15,126,34,124,29,192,10,262,3,332,10,365,16"/>
+<area shape="rect" id="Node000003" href="$structsysio_1_1chain_1_1impl_1_1abi__to__variant.html#a0092202221bfbf9ab05dffe09089619c" title=" " alt="" coords="193,24,332,65"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="365,47,332,47,332,42,365,42"/>
+<area shape="rect" id="Node000004" href="$structsysio_1_1chain_1_1impl_1_1abi__to__variant.html#a86ea9f13b7f078019b19cf04a979be0c" title=" " alt="" coords="193,89,332,144"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="367,80,333,93,331,88,365,75"/>
+<area shape="poly" id="edge4_Node000004_Node000002" title=" " alt="" coords="177,90,136,76,138,71,179,85"/>
 </map>

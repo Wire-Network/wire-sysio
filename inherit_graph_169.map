@@ -1,11 +1,5 @@
 <map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
-<area shape="rect" id="Node000000" href="$struct_catch_1_1_i_generator_tracker.html" title=" " alt="" coords="224,13,394,38"/>
-<area shape="rect" id="Node000001" href="$struct_catch_1_1_generators_1_1_generator_tracker.html" title=" " alt="" coords="459,5,595,46"/>
-<area shape="poly" id="edge135_Node000000_Node000001" title=" " alt="" coords="409,23,458,23,458,28,409,28"/>
-<area shape="rect" id="Node000004" href="$struct_catch_1_1_test_case_tracking_1_1_i_tracker.html" title=" " alt="" coords="5,67,176,107"/>
-<area shape="rect" id="Node000002" href="$class_catch_1_1_test_case_tracking_1_1_tracker_base.html" title=" " alt="" coords="224,67,394,107"/>
-<area shape="poly" id="edge136_Node000004_Node000002" title=" " alt="" coords="191,84,223,84,223,90,191,90"/>
-<area shape="poly" id="edge137_Node000002_Node000001" title=" " alt="" coords="397,59,458,42,459,47,399,65"/>
-<area shape="rect" id="Node000003" href="$class_catch_1_1_test_case_tracking_1_1_section_tracker.html" title=" " alt="" coords="442,71,612,111"/>
-<area shape="poly" id="edge138_Node000002_Node000003" title=" " alt="" coords="409,86,441,87,441,92,409,92"/>
+<area shape="rect" id="Node000000" href="$struct_catch_1_1_i_mutable_enum_values_registry.html" title=" " alt="" coords="5,5,193,46"/>
+<area shape="rect" id="Node000001" href="$class_catch_1_1_detail_1_1_enum_values_registry.html" title=" " alt="" coords="241,5,420,46"/>
+<area shape="poly" id="edge139_Node000000_Node000001" title=" " alt="" coords="208,23,240,23,240,28,208,28"/>
 </map>

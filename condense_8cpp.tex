@@ -5,7 +5,8 @@
 {\ttfamily \#include "{}rapidjson/filereadstream.\+h"{}}\newline
 {\ttfamily \#include "{}rapidjson/filewritestream.\+h"{}}\newline
 {\ttfamily \#include "{}rapidjson/error/en.\+h"{}}\newline
-Include dependency graph for condense.\+cpp\+:\nopagebreak
+Include dependency graph for condense.\+cpp\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -41,7 +42,7 @@ Definition at line \mbox{\hyperlink{condense_8cpp_source_l00014}{14}} of file \m
 \DoxyCodeLine{00020\ \ \ \ \ \textcolor{comment}{//\ Prepare\ JSON\ writer\ and\ output\ stream.}}
 \DoxyCodeLine{00021\ \ \ \ \ \textcolor{keywordtype}{char}\ writeBuffer[65536];}
 \DoxyCodeLine{00022\ \ \ \ \ \mbox{\hyperlink{class_file_write_stream}{FileWriteStream}}\ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}(stdout,\ writeBuffer,\ \textcolor{keyword}{sizeof}(writeBuffer));}
-\DoxyCodeLine{00023\ \ \ \ \ \mbox{\hyperlink{class_writer}{Writer<FileWriteStream>}}\ writer(os);}
+\DoxyCodeLine{00023\ \ \ \ \ \mbox{\hyperlink{class_writer}{Writer<FileWriteStream>}}\ writer(\mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}});}
 \DoxyCodeLine{00024\ }
 \DoxyCodeLine{00025\ \ \ \ \ \textcolor{comment}{//\ JSON\ reader\ parse\ from\ the\ input\ stream\ and\ let\ writer\ generate\ the\ output.}}
 \DoxyCodeLine{00026\ \ \ \ \ \textcolor{keywordflow}{if}\ (!reader.\mbox{\hyperlink{class_generic_reader_a0c450620d14ff1824e58bb7bd9b42099}{Parse}}(is,\ writer))\ \{}
@@ -53,7 +54,8 @@ Definition at line \mbox{\hyperlink{condense_8cpp_source_l00014}{14}} of file \m
 \DoxyCodeLine{00032\ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode

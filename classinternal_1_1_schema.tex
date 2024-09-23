@@ -244,17 +244,17 @@ Definition at line \mbox{\hyperlink{schema_8h_source_l00409}{409}} of file \mbox
 \DoxyCodeLine{00452\ }
 \DoxyCodeLine{00453\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\textcolor{keyword}{const}\ \mbox{\hyperlink{classinternal_1_1_schema_a2a5fe5fcb1b3987afc624a286243ceeb}{ValueType}}*\ v\ =\ GetMember(\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}},\ GetTypeString()))\ \{}
 \DoxyCodeLine{00454\ \ \ \ \ \ \ \ \ \ \ \ \ type\_\ =\ 0;}
-\DoxyCodeLine{00455\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}-\/>IsString())}
+\DoxyCodeLine{00455\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (v-\/>IsString())}
 \DoxyCodeLine{00456\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ AddType(*v);}
-\DoxyCodeLine{00457\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}-\/>IsArray())}
-\DoxyCodeLine{00458\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (ConstValueIterator\ itr\ =\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}-\/>Begin();\ itr\ !=\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}-\/>End();\ ++itr)}
+\DoxyCodeLine{00457\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}\ (v-\/>IsArray())}
+\DoxyCodeLine{00458\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (ConstValueIterator\ itr\ =\ v-\/>Begin();\ itr\ !=\ v-\/>End();\ ++itr)}
 \DoxyCodeLine{00459\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ AddType(*itr);}
 \DoxyCodeLine{00460\ \ \ \ \ \ \ \ \ \}}
 \DoxyCodeLine{00461\ }
 \DoxyCodeLine{00462\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\textcolor{keyword}{const}\ \mbox{\hyperlink{classinternal_1_1_schema_a2a5fe5fcb1b3987afc624a286243ceeb}{ValueType}}*\ v\ =\ GetMember(\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}},\ GetEnumString()))}
-\DoxyCodeLine{00463\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}-\/>IsArray()\ \&\&\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}-\/>Size()\ >\ 0)\ \{}
-\DoxyCodeLine{00464\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ enum\_\ =\ \textcolor{keyword}{static\_cast<}\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}*\textcolor{keyword}{>}(allocator\_-\/>Malloc(\textcolor{keyword}{sizeof}(\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}})\ *\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}-\/>Size()));}
-\DoxyCodeLine{00465\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (ConstValueIterator\ itr\ =\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}-\/>Begin();\ itr\ !=\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}-\/>End();\ ++itr)\ \{}
+\DoxyCodeLine{00463\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (v-\/>IsArray()\ \&\&\ v-\/>Size()\ >\ 0)\ \{}
+\DoxyCodeLine{00464\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ enum\_\ =\ \textcolor{keyword}{static\_cast<}\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}*\textcolor{keyword}{>}(allocator\_-\/>Malloc(\textcolor{keyword}{sizeof}(\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}})\ *\ v-\/>Size()));}
+\DoxyCodeLine{00465\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (ConstValueIterator\ itr\ =\ v-\/>Begin();\ itr\ !=\ v-\/>End();\ ++itr)\ \{}
 \DoxyCodeLine{00466\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{typedef}\ Hasher<EncodingType,\ MemoryPoolAllocator<>\ >\ EnumHasherType;}
 \DoxyCodeLine{00467\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{char}\ buffer[256u\ +\ 24];}
 \DoxyCodeLine{00468\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_memory_pool_allocator}{MemoryPoolAllocator<>}}\ hasherAllocator(buffer,\ \textcolor{keyword}{sizeof}(buffer));}
@@ -325,10 +325,10 @@ Definition at line \mbox{\hyperlink{schema_8h_source_l00409}{409}} of file \mbox
 \DoxyCodeLine{00533\ }
 \DoxyCodeLine{00534\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\textcolor{keyword}{const}\ \mbox{\hyperlink{classinternal_1_1_schema_a2a5fe5fcb1b3987afc624a286243ceeb}{ValueType}}*\ v\ =\ GetMember(\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}},\ GetPatternPropertiesString()))\ \{}
 \DoxyCodeLine{00535\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classinternal_1_1_schema_a1a81f639262150869088070b6e8afe5e}{PointerType}}\ q\ =\ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}.Append(GetPatternPropertiesString(),\ allocator\_);}
-\DoxyCodeLine{00536\ \ \ \ \ \ \ \ \ \ \ \ \ patternProperties\_\ =\ \textcolor{keyword}{static\_cast<}PatternProperty*\textcolor{keyword}{>}(allocator\_-\/>Malloc(\textcolor{keyword}{sizeof}(PatternProperty)\ *\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}-\/>MemberCount()));}
+\DoxyCodeLine{00536\ \ \ \ \ \ \ \ \ \ \ \ \ patternProperties\_\ =\ \textcolor{keyword}{static\_cast<}PatternProperty*\textcolor{keyword}{>}(allocator\_-\/>Malloc(\textcolor{keyword}{sizeof}(PatternProperty)\ *\ v-\/>MemberCount()));}
 \DoxyCodeLine{00537\ \ \ \ \ \ \ \ \ \ \ \ \ patternPropertyCount\_\ =\ 0;}
 \DoxyCodeLine{00538\ }
-\DoxyCodeLine{00539\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (ConstMemberIterator\ itr\ =\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}-\/>MemberBegin();\ itr\ !=\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}-\/>MemberEnd();\ ++itr)\ \{}
+\DoxyCodeLine{00539\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (ConstMemberIterator\ itr\ =\ v-\/>MemberBegin();\ itr\ !=\ v-\/>MemberEnd();\ ++itr)\ \{}
 \DoxyCodeLine{00540\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{new}\ (\&patternProperties\_[patternPropertyCount\_])\ PatternProperty();}
 \DoxyCodeLine{00541\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ patternProperties\_[patternPropertyCount\_].pattern\ =\ CreatePattern(itr-\/>name);}
 \DoxyCodeLine{00542\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ schemaDocument-\/>CreateSchema(\&patternProperties\_[patternPropertyCount\_].schema,\ q.Append(itr-\/>name,\ allocator\_),\ itr-\/>value,\ document);}
@@ -372,9 +372,9 @@ Definition at line \mbox{\hyperlink{schema_8h_source_l00409}{409}} of file \mbox
 \DoxyCodeLine{00580\ \ \ \ \ \ \ \ \ \}}
 \DoxyCodeLine{00581\ }
 \DoxyCodeLine{00582\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\textcolor{keyword}{const}\ \mbox{\hyperlink{classinternal_1_1_schema_a2a5fe5fcb1b3987afc624a286243ceeb}{ValueType}}*\ v\ =\ GetMember(\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}},\ GetAdditionalPropertiesString()))\ \{}
-\DoxyCodeLine{00583\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}-\/>IsBool())}
-\DoxyCodeLine{00584\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ additionalProperties\_\ =\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}-\/>GetBool();}
-\DoxyCodeLine{00585\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}-\/>IsObject())}
+\DoxyCodeLine{00583\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (v-\/>IsBool())}
+\DoxyCodeLine{00584\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ additionalProperties\_\ =\ v-\/>GetBool();}
+\DoxyCodeLine{00585\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}\ (v-\/>IsObject())}
 \DoxyCodeLine{00586\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ schemaDocument-\/>CreateSchema(\&additionalPropertiesSchema\_,\ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}.Append(GetAdditionalPropertiesString(),\ allocator\_),\ *v,\ document);}
 \DoxyCodeLine{00587\ \ \ \ \ \ \ \ \ \}}
 \DoxyCodeLine{00588\ }
@@ -384,12 +384,12 @@ Definition at line \mbox{\hyperlink{schema_8h_source_l00409}{409}} of file \mbox
 \DoxyCodeLine{00592\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Array}}
 \DoxyCodeLine{00593\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\textcolor{keyword}{const}\ \mbox{\hyperlink{classinternal_1_1_schema_a2a5fe5fcb1b3987afc624a286243ceeb}{ValueType}}*\ v\ =\ GetMember(\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}},\ GetItemsString()))\ \{}
 \DoxyCodeLine{00594\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classinternal_1_1_schema_a1a81f639262150869088070b6e8afe5e}{PointerType}}\ q\ =\ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}.Append(GetItemsString(),\ allocator\_);}
-\DoxyCodeLine{00595\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}-\/>IsObject())\ \textcolor{comment}{//\ List\ validation}}
+\DoxyCodeLine{00595\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (v-\/>IsObject())\ \textcolor{comment}{//\ List\ validation}}
 \DoxyCodeLine{00596\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ schemaDocument-\/>CreateSchema(\&itemsList\_,\ q,\ *v,\ document);}
-\DoxyCodeLine{00597\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}-\/>IsArray())\ \{\ \textcolor{comment}{//\ Tuple\ validation}}
-\DoxyCodeLine{00598\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ itemsTuple\_\ =\ \textcolor{keyword}{static\_cast<}\textcolor{keyword}{const\ }\mbox{\hyperlink{class_schema}{Schema}}**\textcolor{keyword}{>}(allocator\_-\/>Malloc(\textcolor{keyword}{sizeof}(\textcolor{keyword}{const}\ \mbox{\hyperlink{class_schema}{Schema}}*)\ *\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}-\/>Size()));}
+\DoxyCodeLine{00597\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}\ (v-\/>IsArray())\ \{\ \textcolor{comment}{//\ Tuple\ validation}}
+\DoxyCodeLine{00598\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ itemsTuple\_\ =\ \textcolor{keyword}{static\_cast<}\textcolor{keyword}{const\ }\mbox{\hyperlink{class_schema}{Schema}}**\textcolor{keyword}{>}(allocator\_-\/>Malloc(\textcolor{keyword}{sizeof}(\textcolor{keyword}{const}\ \mbox{\hyperlink{class_schema}{Schema}}*)\ *\ v-\/>Size()));}
 \DoxyCodeLine{00599\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{rapidjson_8h_a5ed6e6e67250fadbd041127e6386dcb5}{SizeType}}\ index\ =\ 0;}
-\DoxyCodeLine{00600\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (ConstValueIterator\ itr\ =\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}-\/>Begin();\ itr\ !=\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}-\/>End();\ ++itr,\ index++)}
+\DoxyCodeLine{00600\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (ConstValueIterator\ itr\ =\ v-\/>Begin();\ itr\ !=\ v-\/>End();\ ++itr,\ index++)}
 \DoxyCodeLine{00601\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ schemaDocument-\/>CreateSchema(\&itemsTuple\_[itemsTupleCount\_++],\ q.Append(index,\ allocator\_),\ *itr,\ document);}
 \DoxyCodeLine{00602\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
 \DoxyCodeLine{00603\ \ \ \ \ \ \ \ \ \}}
@@ -398,9 +398,9 @@ Definition at line \mbox{\hyperlink{schema_8h_source_l00409}{409}} of file \mbox
 \DoxyCodeLine{00606\ \ \ \ \ \ \ \ \ AssignIfExist(maxItems\_,\ \mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}},\ GetMaxItemsString());}
 \DoxyCodeLine{00607\ }
 \DoxyCodeLine{00608\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\textcolor{keyword}{const}\ \mbox{\hyperlink{classinternal_1_1_schema_a2a5fe5fcb1b3987afc624a286243ceeb}{ValueType}}*\ v\ =\ GetMember(\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}},\ GetAdditionalItemsString()))\ \{}
-\DoxyCodeLine{00609\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}-\/>IsBool())}
-\DoxyCodeLine{00610\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ additionalItems\_\ =\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}-\/>GetBool();}
-\DoxyCodeLine{00611\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}-\/>IsObject())}
+\DoxyCodeLine{00609\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (v-\/>IsBool())}
+\DoxyCodeLine{00610\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ additionalItems\_\ =\ v-\/>GetBool();}
+\DoxyCodeLine{00611\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}\ (v-\/>IsObject())}
 \DoxyCodeLine{00612\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ schemaDocument-\/>CreateSchema(\&additionalItemsSchema\_,\ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}.Append(GetAdditionalItemsString(),\ allocator\_),\ *v,\ document);}
 \DoxyCodeLine{00613\ \ \ \ \ \ \ \ \ \}}
 \DoxyCodeLine{00614\ }
@@ -415,29 +415,30 @@ Definition at line \mbox{\hyperlink{schema_8h_source_l00409}{409}} of file \mbox
 \DoxyCodeLine{00623\ }
 \DoxyCodeLine{00624\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Number}}
 \DoxyCodeLine{00625\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\textcolor{keyword}{const}\ \mbox{\hyperlink{classinternal_1_1_schema_a2a5fe5fcb1b3987afc624a286243ceeb}{ValueType}}*\ v\ =\ GetMember(\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}},\ GetMinimumString()))}
-\DoxyCodeLine{00626\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}-\/>IsNumber())}
+\DoxyCodeLine{00626\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (v-\/>IsNumber())}
 \DoxyCodeLine{00627\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ minimum\_.CopyFrom(*v,\ *allocator\_);}
 \DoxyCodeLine{00628\ }
 \DoxyCodeLine{00629\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\textcolor{keyword}{const}\ \mbox{\hyperlink{classinternal_1_1_schema_a2a5fe5fcb1b3987afc624a286243ceeb}{ValueType}}*\ v\ =\ GetMember(\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}},\ GetMaximumString()))}
-\DoxyCodeLine{00630\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}-\/>IsNumber())}
+\DoxyCodeLine{00630\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (v-\/>IsNumber())}
 \DoxyCodeLine{00631\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ maximum\_.CopyFrom(*v,\ *allocator\_);}
 \DoxyCodeLine{00632\ }
 \DoxyCodeLine{00633\ \ \ \ \ \ \ \ \ AssignIfExist(exclusiveMinimum\_,\ \mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}},\ GetExclusiveMinimumString());}
 \DoxyCodeLine{00634\ \ \ \ \ \ \ \ \ AssignIfExist(exclusiveMaximum\_,\ \mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}},\ GetExclusiveMaximumString());}
 \DoxyCodeLine{00635\ }
 \DoxyCodeLine{00636\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\textcolor{keyword}{const}\ \mbox{\hyperlink{classinternal_1_1_schema_a2a5fe5fcb1b3987afc624a286243ceeb}{ValueType}}*\ v\ =\ GetMember(\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}},\ GetMultipleOfString()))}
-\DoxyCodeLine{00637\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}-\/>IsNumber()\ \&\&\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}-\/>GetDouble()\ >\ 0.0)}
+\DoxyCodeLine{00637\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (v-\/>IsNumber()\ \&\&\ v-\/>GetDouble()\ >\ 0.0)}
 \DoxyCodeLine{00638\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ multipleOf\_.CopyFrom(*v,\ *allocator\_);}
 \DoxyCodeLine{00639\ }
 \DoxyCodeLine{00640\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Default}}
 \DoxyCodeLine{00641\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\textcolor{keyword}{const}\ \mbox{\hyperlink{classinternal_1_1_schema_a2a5fe5fcb1b3987afc624a286243ceeb}{ValueType}}*\ v\ =\ GetMember(\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}},\ GetDefaultValueString()))}
-\DoxyCodeLine{00642\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}-\/>IsString())}
-\DoxyCodeLine{00643\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ defaultValueLength\_\ =\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}-\/>GetStringLength();}
+\DoxyCodeLine{00642\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (v-\/>IsString())}
+\DoxyCodeLine{00643\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ defaultValueLength\_\ =\ v-\/>GetStringLength();}
 \DoxyCodeLine{00644\ }
 \DoxyCodeLine{00645\ \ \ \ \ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -668,7 +669,8 @@ Definition at line \mbox{\hyperlink{schema_8h_source_l00941}{941}} of file \mbox
 \DoxyCodeLine{00986\ \ \ \ \ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -771,7 +773,8 @@ Definition at line \mbox{\hyperlink{schema_8h_source_l00703}{703}} of file \mbox
 \DoxyCodeLine{00783\ \ \ \ \ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -1042,7 +1045,8 @@ Definition at line \mbox{\hyperlink{schema_8h_source_l00843}{843}} of file \mbox
 \DoxyCodeLine{00869\ \ \ \ \ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode

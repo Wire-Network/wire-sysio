@@ -1,23 +1,19 @@
 <map id="EncodedStreamTest::ReadFile" name="EncodedStreamTest::ReadFile">
-<area shape="rect" id="Node000001" title=" " alt="" coords="481,169,628,210"/>
-<area shape="rect" id="Node000002" href="$class_encoded_stream_test.html#a1db7e5969dec8780a8e641876befc272" title=" " alt="" coords="269,5,416,46"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="528,158,486,109,460,83,432,61,409,49,412,44,434,57,463,79,490,105,532,155"/>
-<area shape="rect" id="Node000005" href="$class_encoded_stream_test.html#a0d45e4d5f8a44d23903dc6a0dee7eaa5" title=" " alt="" coords="269,71,416,111"/>
-<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="504,164,432,127,402,114,404,109,434,122,507,159"/>
-<area shape="rect" id="Node000006" href="$classupload_1_1_subversion_v_c_s.html#af842b536e7d9aad2be83562c01c03d12" title=" " alt="" coords="252,136,433,177"/>
-<area shape="poly" id="edge7_Node000001_Node000006" title=" " alt="" coords="465,178,433,173,434,168,466,173"/>
-<area shape="rect" id="Node000008" href="$class_encoded_stream_test.html#a6391699c63484acc7a12e3b32634e2f7" title=" " alt="" coords="269,201,416,242"/>
-<area shape="poly" id="edge9_Node000001_Node000008" title=" " alt="" coords="466,206,417,213,416,208,465,200"/>
-<area shape="rect" id="Node000009" href="$class_encoded_stream_test.html#a981d5de5d0aefd288c4a97d9dc6590f7" title=" " alt="" coords="257,267,428,307"/>
-<area shape="poly" id="edge10_Node000001_Node000009" title=" " alt="" coords="505,220,434,256,404,268,402,264,432,251,502,216"/>
-<area shape="rect" id="Node000010" href="$class_encoded_stream_test.html#ad9c567df62408555b30f49bdbb606fc3" title=" " alt="" coords="258,332,426,373"/>
-<area shape="poly" id="edge11_Node000001_Node000010" title=" " alt="" coords="532,224,490,274,463,299,434,321,412,334,409,329,432,317,460,295,486,270,528,221"/>
-<area shape="rect" id="Node000003" href="$class_encoded_stream_test.html#a246bc170b7a10468b5da7eb7dfeba46c" title=" " alt="" coords="14,71,195,111"/>
-<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="255,52,182,73,181,67,253,47"/>
-<area shape="rect" id="Node000004" href="$class_encoded_stream_test.html#a43892c37663f564147577e286d60937a" title=" " alt="" coords="15,5,194,46"/>
-<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="253,28,194,28,194,23,253,23"/>
-<area shape="poly" id="edge5_Node000005_Node000003" title=" " alt="" coords="254,94,195,94,195,88,254,88"/>
-<area shape="poly" id="edge6_Node000005_Node000004" title=" " alt="" coords="253,69,181,49,182,44,255,64"/>
-<area shape="rect" id="Node000007" href="$classupload_1_1_version_control_system.html#a426cb9d4ad9f94754c9122653e3aa24f" title=" " alt="" coords="5,136,204,177"/>
-<area shape="poly" id="edge8_Node000006_Node000007" title=" " alt="" coords="236,159,204,159,204,154,236,154"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="452,136,599,177"/>
+<area shape="rect" id="Node000002" href="$class_encoded_stream_test.html#a1db7e5969dec8780a8e641876befc272" title=" " alt="" coords="245,71,392,111"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="444,133,385,115,387,109,445,128"/>
+<area shape="rect" id="Node000005" href="$class_encoded_stream_test.html#a0d45e4d5f8a44d23903dc6a0dee7eaa5" title=" " alt="" coords="245,5,392,46"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="490,127,450,93,403,61,378,49,381,44,405,57,453,89,493,123"/>
+<area shape="rect" id="Node000006" href="$class_encoded_stream_test.html#a6391699c63484acc7a12e3b32634e2f7" title=" " alt="" coords="245,136,392,177"/>
+<area shape="poly" id="edge7_Node000001_Node000006" title=" " alt="" coords="437,159,393,159,393,154,437,154"/>
+<area shape="rect" id="Node000007" href="$class_encoded_stream_test.html#a981d5de5d0aefd288c4a97d9dc6590f7" title=" " alt="" coords="234,201,404,242"/>
+<area shape="poly" id="edge8_Node000001_Node000007" title=" " alt="" coords="445,184,387,203,385,198,444,179"/>
+<area shape="rect" id="Node000008" href="$class_encoded_stream_test.html#ad9c567df62408555b30f49bdbb606fc3" title=" " alt="" coords="235,267,403,307"/>
+<area shape="poly" id="edge9_Node000001_Node000008" title=" " alt="" coords="493,189,453,223,405,256,381,268,378,264,403,251,450,219,490,185"/>
+<area shape="rect" id="Node000003" href="$class_encoded_stream_test.html#a246bc170b7a10468b5da7eb7dfeba46c" title=" " alt="" coords="5,5,186,46"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="232,68,167,49,168,44,233,63"/>
+<area shape="rect" id="Node000004" href="$class_encoded_stream_test.html#a43892c37663f564147577e286d60937a" title=" " alt="" coords="6,71,185,111"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="230,94,185,94,185,88,230,88"/>
+<area shape="poly" id="edge5_Node000005_Node000003" title=" " alt="" coords="229,28,186,28,186,23,229,23"/>
+<area shape="poly" id="edge6_Node000005_Node000004" title=" " alt="" coords="233,53,168,73,167,67,232,48"/>
 </map>

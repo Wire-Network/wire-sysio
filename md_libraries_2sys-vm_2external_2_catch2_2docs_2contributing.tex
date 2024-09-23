@@ -46,7 +46,7 @@ This means 2 things
  If you added new tests, approval tests are very likely to fail. If they do not, it means that your changes weren\textquotesingle{}t run as part of them. This {\itshape might} be intentional, but usually is not.
 \end{DoxyItemize}
 
-The approval tests compare current output of the Self\+Test binary in various configurations against known good outputs. The reason it fails is, {\itshape usually}, that you\textquotesingle{}ve added new tests but have not yet approved the changes they introduce. This is done with the {\ttfamily \doxylink{approve_8py}{scripts/approve.\+py}} script, but before you do so, you need to check that the introduced changes are indeed intentional.
+The approval tests compare current output of the Self\+Test binary in various configurations against known good outputs. The reason it fails is, {\itshape usually}, that you\textquotesingle{}ve added new tests but have not yet approved the changes they introduce. This is done with the {\ttfamily scripts/approve.\+py} script, but before you do so, you need to check that the introduced changes are indeed intentional.
 
 \doxysubsection*{\doxylink{struct_code}{Code} constructs to watch out for}
 

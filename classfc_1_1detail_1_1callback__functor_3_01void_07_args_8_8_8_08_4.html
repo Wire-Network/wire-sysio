@@ -246,9 +246,8 @@ template&lt;typename... Args&gt; </div>
 <div class="line"><span class="lineno">  504</span>             <span class="comment">// TODO:  make new exception type for this instead of recycling eof_exception</span></div>
 <div class="line"><span class="lineno">  505</span>             <span class="keywordflow">if</span>( !locked )</div>
 <div class="line"><span class="lineno">  506</span>                <span class="keywordflow">throw</span> fc::eof_exception();</div>
-<div class="line"><span class="lineno">  507</span>             locked-&gt;send_notice( _callback_id, <a class="code hl_typedef" href="namespacefc.html#a9148361f6aaa3d739990a75ac557fe59">fc::variants</a>{ <a class="code hl_variable" href="namespacebenchmark_compile.html#ad0ed96ae1454e4347ca61ac3887c379e">args</a>... } );</div>
+<div class="line"><span class="lineno">  507</span>             locked-&gt;send_notice( _callback_id, <a class="code hl_typedef" href="namespacefc.html#a9148361f6aaa3d739990a75ac557fe59">fc::variants</a>{ args... } );</div>
 <div class="line"><span class="lineno">  508</span>          }</div>
-<div class="ttc" id="anamespacebenchmark_compile_html_ad0ed96ae1454e4347ca61ac3887c379e"><div class="ttname"><a href="namespacebenchmark_compile.html#ad0ed96ae1454e4347ca61ac3887c379e">benchmarkCompile.args</a></div><div class="ttdeci">args</div><div class="ttdef"><b>Definition</b> <a href="benchmark_compile_8py_source.html#l00122">benchmarkCompile.py:122</a></div></div>
 <div class="ttc" id="anamespacefc_html_a9148361f6aaa3d739990a75ac557fe59"><div class="ttname"><a href="namespacefc.html#a9148361f6aaa3d739990a75ac557fe59">fc::variants</a></div><div class="ttdeci">std::vector&lt; fc::variant &gt; variants</div><div class="ttdef"><b>Definition</b> <a href="fc_2include_2fc_2variant_8hpp_source.html#l00173">variant.hpp:173</a></div></div>
 </div><!-- fragment -->
 </div>
@@ -284,7 +283,7 @@ template&lt;typename... Args&gt; </div>
 <div class="line"><span class="lineno">  518</span>             <span class="comment">// TODO:  make new exception type for this instead of recycling eof_exception</span></div>
 <div class="line"><span class="lineno">  519</span>             <span class="keywordflow">if</span>( !locked )</div>
 <div class="line"><span class="lineno">  520</span>                <span class="keywordflow">throw</span> fc::eof_exception();</div>
-<div class="line"><span class="lineno">  521</span>             locked-&gt;send_notice( _callback_id, <a class="code hl_typedef" href="namespacefc.html#a9148361f6aaa3d739990a75ac557fe59">fc::variants</a>{ <a class="code hl_variable" href="namespacebenchmark_compile.html#ad0ed96ae1454e4347ca61ac3887c379e">args</a>... } );</div>
+<div class="line"><span class="lineno">  521</span>             locked-&gt;send_notice( _callback_id, <a class="code hl_typedef" href="namespacefc.html#a9148361f6aaa3d739990a75ac557fe59">fc::variants</a>{ args... } );</div>
 <div class="line"><span class="lineno">  522</span>          }</div>
 </div><!-- fragment -->
 </div>

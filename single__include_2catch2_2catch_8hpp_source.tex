@@ -425,7 +425,7 @@
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l00435}00435\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacestd}{std}}::\textcolor{keywordtype}{size\_t}\ \mbox{\hyperlink{struct_catch_1_1_source_line_info_a841e5d696c7b9cde24e45e61dd979c77}{line}};}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l00436}00436\ \ \ \ \ \};}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l00437}00437\ }
-\DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l00438}00438\ \ \ \ \ \mbox{\hyperlink{namespacestd}{std}}::ostream\&\ operator\ <<\ (\ \mbox{\hyperlink{namespacestd}{std}}::ostream\&\ os,\ \mbox{\hyperlink{struct_catch_1_1_source_line_info}{SourceLineInfo}}\ const\&\ info\ );}
+\DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l00438}00438\ \ \ \ \ \mbox{\hyperlink{namespacestd}{std}}::ostream\&\ operator\ <<\ (\ \mbox{\hyperlink{namespacestd}{std}}::ostream\&\ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}},\ \mbox{\hyperlink{struct_catch_1_1_source_line_info}{SourceLineInfo}}\ const\&\ info\ );}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l00439}00439\ }
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l00440}00440\ \ \ \ \ \textcolor{comment}{//\ Bring\ in\ operator<<\ from\ global\ namespace\ into\ Catch\ namespace}}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l00441}00441\ \ \ \ \ \textcolor{comment}{//\ This\ is\ necessary\ because\ the\ overload\ of\ operator<<\ above\ makes}}
@@ -598,7 +598,7 @@
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l00615}00615\ \ \ \ \ auto\ operator\ +\ (\ \textcolor{keywordtype}{char}\ const*\ lhs,\ \mbox{\hyperlink{class_catch_1_1_string_ref}{StringRef}}\ const\&\ rhs\ )\ -\/>\ \mbox{\hyperlink{namespacestd}{std}}::\textcolor{keywordtype}{string};}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l00616}00616\ }
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l00617}00617\ \ \ \ \ auto\ operator\ +=\ (\ \mbox{\hyperlink{namespacestd}{std}}::\textcolor{keywordtype}{string}\&\ lhs,\ \mbox{\hyperlink{class_catch_1_1_string_ref}{StringRef}}\ const\&\ sr\ )\ -\/>\ \mbox{\hyperlink{namespacestd}{std}}::\textcolor{keywordtype}{string}\&;}
-\DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l00618}00618\ \ \ \ \ auto\ operator\ <<\ (\ \mbox{\hyperlink{namespacestd}{std}}::ostream\&\ os,\ \mbox{\hyperlink{class_catch_1_1_string_ref}{StringRef}}\ const\&\ sr\ )\ -\/>\ \mbox{\hyperlink{namespacestd}{std}}::ostream\&;}
+\DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l00618}00618\ \ \ \ \ auto\ operator\ <<\ (\ \mbox{\hyperlink{namespacestd}{std}}::ostream\&\ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}},\ \mbox{\hyperlink{class_catch_1_1_string_ref}{StringRef}}\ const\&\ sr\ )\ -\/>\ \mbox{\hyperlink{namespacestd}{std}}::ostream\&;}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l00619}00619\ }
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l00620}00620\ \ \ \ \ inline\ auto\ operator\ "{}"{}\ \_sr(\ \textcolor{keywordtype}{char}\ const*\ rawChars,\ \mbox{\hyperlink{namespacestd}{std}}::\textcolor{keywordtype}{size\_t}\ \mbox{\hyperlink{class_catch_1_1_string_ref_ae084d72cb2952cee61a63ef36611d0ad}{size}}\ )\ noexcept\ -\/>\ \mbox{\hyperlink{class_catch_1_1_string_ref}{StringRef}}\ \{}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l00621}00621\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{class_catch_1_1_string_ref_a94319c75df6542327c93a312c6a80754}{StringRef}}(\ rawChars,\ \mbox{\hyperlink{class_catch_1_1_string_ref_ae084d72cb2952cee61a63ef36611d0ad}{size}}\ );}
@@ -1566,10 +1566,10 @@
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l01590}01590\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{bool}\ =\ (N\ <\ std::tuple\_size<Tuple>::value)}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l01591}01591\ \ \ \ \ \ \ \ \ \ \ \ \ >}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l01592}01592\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{struct}\ TupleElementPrinter\ \{}
-\DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l01593}01593\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{210-_evt-_event_listeners_8cpp_a91b9457094088a57b7ba14d485a8771e}{print}}(\textcolor{keyword}{const}\ Tuple\&\ tuple,\ std::ostream\&\ os)\ \{}
-\DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l01594}01594\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ os\ <<\ (\mbox{\hyperlink{quantize_8cpp_ab2b6b0c222cd1ce70d6a831f57241e59}{N}}\ ?\ \textcolor{stringliteral}{"{},\ "{}}\ :\ \textcolor{stringliteral}{"{}\ "{}})}
+\DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l01593}01593\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{210-_evt-_event_listeners_8cpp_a91b9457094088a57b7ba14d485a8771e}{print}}(\textcolor{keyword}{const}\ Tuple\&\ tuple,\ std::ostream\&\ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}})\ \{}
+\DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l01594}01594\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}\ <<\ (\mbox{\hyperlink{quantize_8cpp_ab2b6b0c222cd1ce70d6a831f57241e59}{N}}\ ?\ \textcolor{stringliteral}{"{},\ "{}}\ :\ \textcolor{stringliteral}{"{}\ "{}})}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l01595}01595\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ <<\ \mbox{\hyperlink{namespace_catch_1_1_detail_af0ad48344ffd3f92f3568465248a9880}{::Catch::Detail::stringify}}(std::get<N>(tuple));}
-\DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l01596}01596\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ TupleElementPrinter<Tuple,\ N\ +\ 1>::print(tuple,\ os);}
+\DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l01596}01596\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ TupleElementPrinter<Tuple,\ N\ +\ 1>::print(tuple,\ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}});}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l01597}01597\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l01598}01598\ \ \ \ \ \ \ \ \ \};}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l01599}01599\ }
@@ -1822,7 +1822,7 @@
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l01848}\mbox{\hyperlink{struct_catch_1_1_i_transient_expression}{01848}}\ \ \ \ \ \textcolor{keyword}{struct\ }\mbox{\hyperlink{struct_catch_1_1_i_transient_expression}{ITransientExpression}}\ \{}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l01849}\mbox{\hyperlink{struct_catch_1_1_i_transient_expression_a3b436e13a0a6d3522bbf70d4e31deb22}{01849}}\ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ \mbox{\hyperlink{struct_catch_1_1_i_transient_expression_a3b436e13a0a6d3522bbf70d4e31deb22}{isBinaryExpression}}()\ const\ -\/>\ \textcolor{keywordtype}{bool}\ \{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{struct_catch_1_1_i_transient_expression_a75ce48da824d514d08152d396abb28d8}{m\_isBinaryExpression}};\ \}}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l01850}\mbox{\hyperlink{struct_catch_1_1_i_transient_expression_a101c7db86c87eff93a8ff496720e6320}{01850}}\ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ \mbox{\hyperlink{struct_catch_1_1_i_transient_expression_a101c7db86c87eff93a8ff496720e6320}{getResult}}()\ const\ -\/>\ \textcolor{keywordtype}{bool}\ \{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{struct_catch_1_1_i_transient_expression_a4646e2b5e0156e913653ec3b9b60c942}{m\_result}};\ \}}
-\DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l01851}\mbox{\hyperlink{struct_catch_1_1_i_transient_expression_aabe1889df9c6e639a24afb08d8a0fe9e}{01851}}\ \ \ \ \ \ \ \ \ \textcolor{keyword}{virtual}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{struct_catch_1_1_i_transient_expression_aabe1889df9c6e639a24afb08d8a0fe9e}{streamReconstructedExpression}}(\ std::ostream\ \&os\ )\ \textcolor{keyword}{const}\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l01851}\mbox{\hyperlink{struct_catch_1_1_i_transient_expression_aabe1889df9c6e639a24afb08d8a0fe9e}{01851}}\ \ \ \ \ \ \ \ \ \textcolor{keyword}{virtual}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{struct_catch_1_1_i_transient_expression_aabe1889df9c6e639a24afb08d8a0fe9e}{streamReconstructedExpression}}(\ std::ostream\ \&\mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}\ )\ \textcolor{keyword}{const}\ =\ 0;}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l01852}01852\ }
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l01853}\mbox{\hyperlink{struct_catch_1_1_i_transient_expression_aafe69572b7ed884e63ec81f58d4afd8c}{01853}}\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_catch_1_1_i_transient_expression_aafe69572b7ed884e63ec81f58d4afd8c}{ITransientExpression}}(\ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{struct_catch_1_1_i_transient_expression_a3b436e13a0a6d3522bbf70d4e31deb22}{isBinaryExpression}},\ \textcolor{keywordtype}{bool}\ result\ )}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l01854}01854\ \ \ \ \ \ \ \ \ :\ \ \ \mbox{\hyperlink{struct_catch_1_1_i_transient_expression_a75ce48da824d514d08152d396abb28d8}{m\_isBinaryExpression}}(\ \mbox{\hyperlink{struct_catch_1_1_i_transient_expression_a3b436e13a0a6d3522bbf70d4e31deb22}{isBinaryExpression}}\ ),}
@@ -1838,7 +1838,7 @@
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l01864}01864\ }
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l01865}01865\ \ \ \ \ \};}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l01866}01866\ }
-\DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l01867}01867\ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespace_catch_a520110c31f26cf9892595772ab814fc0}{formatReconstructedExpression}}(\ std::ostream\ \&os,\ std::string\ \textcolor{keyword}{const}\&\ lhs,\ \mbox{\hyperlink{class_catch_1_1_string_ref}{StringRef}}\ \mbox{\hyperlink{unionop}{op}},\ std::string\ \textcolor{keyword}{const}\&\ rhs\ );}
+\DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l01867}01867\ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespace_catch_a520110c31f26cf9892595772ab814fc0}{formatReconstructedExpression}}(\ std::ostream\ \&\mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}},\ std::string\ \textcolor{keyword}{const}\&\ lhs,\ \mbox{\hyperlink{class_catch_1_1_string_ref}{StringRef}}\ \mbox{\hyperlink{unionop}{op}},\ std::string\ \textcolor{keyword}{const}\&\ rhs\ );}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l01868}01868\ }
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l01869}01869\ \ \ \ \ \textcolor{keyword}{template}<\textcolor{keyword}{typename}\ LhsT,\ \textcolor{keyword}{typename}\ RhsT>}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l01870}\mbox{\hyperlink{class_catch_1_1_binary_expr}{01870}}\ \ \ \ \ \textcolor{keyword}{class\ }\mbox{\hyperlink{class_catch_1_1_binary_expr}{BinaryExpr}}\ \ :\ \textcolor{keyword}{public}\ \mbox{\hyperlink{struct_catch_1_1_i_transient_expression}{ITransientExpression}}\ \{}
@@ -1846,9 +1846,9 @@
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l01872}01872\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_catch_1_1_string_ref}{StringRef}}\ m\_op;}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l01873}01873\ \ \ \ \ \ \ \ \ RhsT\ m\_rhs;}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l01874}01874\ }
-\DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l01875}01875\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ streamReconstructedExpression(\ std::ostream\ \&os\ )\textcolor{keyword}{\ const\ override\ }\{}
+\DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l01875}01875\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ streamReconstructedExpression(\ std::ostream\ \&\mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}\ )\textcolor{keyword}{\ const\ override\ }\{}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l01876}01876\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_catch_a520110c31f26cf9892595772ab814fc0}{formatReconstructedExpression}}}
-\DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l01877}01877\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (\ os,\ \mbox{\hyperlink{namespace_catch_1_1_detail_af0ad48344ffd3f92f3568465248a9880}{Catch::Detail::stringify}}(\ m\_lhs\ ),\ m\_op,\ \mbox{\hyperlink{namespace_catch_1_1_detail_af0ad48344ffd3f92f3568465248a9880}{Catch::Detail::stringify}}(\ m\_rhs\ )\ );}
+\DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l01877}01877\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (\ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}},\ \mbox{\hyperlink{namespace_catch_1_1_detail_af0ad48344ffd3f92f3568465248a9880}{Catch::Detail::stringify}}(\ m\_lhs\ ),\ m\_op,\ \mbox{\hyperlink{namespace_catch_1_1_detail_af0ad48344ffd3f92f3568465248a9880}{Catch::Detail::stringify}}(\ m\_rhs\ )\ );}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l01878}01878\ \ \ \ \ \ \ \ \ \}}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l01879}01879\ }
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l01880}01880\ \ \ \ \ \textcolor{keyword}{public}:}
@@ -1920,8 +1920,8 @@
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l01946}\mbox{\hyperlink{class_catch_1_1_unary_expr}{01946}}\ \ \ \ \ \textcolor{keyword}{class\ }\mbox{\hyperlink{class_catch_1_1_unary_expr}{UnaryExpr}}\ :\ \textcolor{keyword}{public}\ \mbox{\hyperlink{struct_catch_1_1_i_transient_expression}{ITransientExpression}}\ \{}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l01947}01947\ \ \ \ \ \ \ \ \ LhsT\ m\_lhs;}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l01948}01948\ }
-\DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l01949}01949\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ streamReconstructedExpression(\ std::ostream\ \&os\ )\textcolor{keyword}{\ const\ override\ }\{}
-\DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l01950}01950\ \ \ \ \ \ \ \ \ \ \ \ \ os\ <<\ \mbox{\hyperlink{namespace_catch_1_1_detail_af0ad48344ffd3f92f3568465248a9880}{Catch::Detail::stringify}}(\ m\_lhs\ );}
+\DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l01949}01949\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ streamReconstructedExpression(\ std::ostream\ \&\mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}\ )\textcolor{keyword}{\ const\ override\ }\{}
+\DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l01950}01950\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}\ <<\ \mbox{\hyperlink{namespace_catch_1_1_detail_af0ad48344ffd3f92f3568465248a9880}{Catch::Detail::stringify}}(\ m\_lhs\ );}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l01951}01951\ \ \ \ \ \ \ \ \ \}}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l01952}01952\ }
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l01953}01953\ \ \ \ \ \textcolor{keyword}{public}:}
@@ -1935,24 +1935,24 @@
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l01961}01961\ \ \ \ \ \textcolor{keyword}{template}<\textcolor{keyword}{typename}\ LhsT,\ \textcolor{keyword}{typename}\ RhsT>}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l01962}01962\ \ \ \ \ \textcolor{keyword}{auto}\ \mbox{\hyperlink{namespace_catch_af89b8df30cfaf09abd048c6ff67359ee}{compareEqual}}(\ LhsT\ \textcolor{keyword}{const}\&\ lhs,\ RhsT\ \textcolor{keyword}{const}\&\ rhs\ )\ -\/>\ \textcolor{keywordtype}{bool}\ \{\ \textcolor{keywordflow}{return}\ \textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{bool}\textcolor{keyword}{>}(lhs\ ==\ rhs);\ \}}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l01963}01963\ \ \ \ \ \textcolor{keyword}{template}<\textcolor{keyword}{typename}\ T>}
-\DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l01964}01964\ \ \ \ \ \textcolor{keyword}{auto}\ \mbox{\hyperlink{namespace_catch_af89b8df30cfaf09abd048c6ff67359ee}{compareEqual}}(\ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}*\ \textcolor{keyword}{const}\&\ lhs,\ \textcolor{keywordtype}{int}\ rhs\ )\ -\/>\ \textcolor{keywordtype}{bool}\ \{\ \textcolor{keywordflow}{return}\ lhs\ ==\ \textcolor{keyword}{reinterpret\_cast<}\textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespaceupload_a985aa9a71de3eb507344df65700c696d}{const}}*\textcolor{keyword}{>}(\ rhs\ );\ \}}
+\DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l01964}01964\ \ \ \ \ \textcolor{keyword}{auto}\ \mbox{\hyperlink{namespace_catch_af89b8df30cfaf09abd048c6ff67359ee}{compareEqual}}(\ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}*\ \textcolor{keyword}{const}\&\ lhs,\ \textcolor{keywordtype}{int}\ rhs\ )\ -\/>\ \textcolor{keywordtype}{bool}\ \{\ \textcolor{keywordflow}{return}\ lhs\ ==\ \textcolor{keyword}{reinterpret\_cast<}\textcolor{keywordtype}{void}\ const*\textcolor{keyword}{>}(\ rhs\ );\ \}}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l01965}01965\ \ \ \ \ \textcolor{keyword}{template}<\textcolor{keyword}{typename}\ T>}
-\DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l01966}01966\ \ \ \ \ \textcolor{keyword}{auto}\ \mbox{\hyperlink{namespace_catch_af89b8df30cfaf09abd048c6ff67359ee}{compareEqual}}(\ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}*\ \textcolor{keyword}{const}\&\ lhs,\ \textcolor{keywordtype}{long}\ rhs\ )\ -\/>\ \textcolor{keywordtype}{bool}\ \{\ \textcolor{keywordflow}{return}\ lhs\ ==\ \textcolor{keyword}{reinterpret\_cast<}\textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespaceupload_a985aa9a71de3eb507344df65700c696d}{const}}*\textcolor{keyword}{>}(\ rhs\ );\ \}}
+\DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l01966}01966\ \ \ \ \ \textcolor{keyword}{auto}\ \mbox{\hyperlink{namespace_catch_af89b8df30cfaf09abd048c6ff67359ee}{compareEqual}}(\ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}*\ \textcolor{keyword}{const}\&\ lhs,\ \textcolor{keywordtype}{long}\ rhs\ )\ -\/>\ \textcolor{keywordtype}{bool}\ \{\ \textcolor{keywordflow}{return}\ lhs\ ==\ \textcolor{keyword}{reinterpret\_cast<}\textcolor{keywordtype}{void}\ const*\textcolor{keyword}{>}(\ rhs\ );\ \}}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l01967}01967\ \ \ \ \ \textcolor{keyword}{template}<\textcolor{keyword}{typename}\ T>}
-\DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l01968}01968\ \ \ \ \ \textcolor{keyword}{auto}\ \mbox{\hyperlink{namespace_catch_af89b8df30cfaf09abd048c6ff67359ee}{compareEqual}}(\ \textcolor{keywordtype}{int}\ lhs,\ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}*\ \textcolor{keyword}{const}\&\ rhs\ )\ -\/>\ \textcolor{keywordtype}{bool}\ \{\ \textcolor{keywordflow}{return}\ \textcolor{keyword}{reinterpret\_cast<}\textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespaceupload_a985aa9a71de3eb507344df65700c696d}{const}}*\textcolor{keyword}{>}(\ lhs\ )\ ==\ rhs;\ \}}
+\DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l01968}01968\ \ \ \ \ \textcolor{keyword}{auto}\ \mbox{\hyperlink{namespace_catch_af89b8df30cfaf09abd048c6ff67359ee}{compareEqual}}(\ \textcolor{keywordtype}{int}\ lhs,\ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}*\ \textcolor{keyword}{const}\&\ rhs\ )\ -\/>\ \textcolor{keywordtype}{bool}\ \{\ \textcolor{keywordflow}{return}\ \textcolor{keyword}{reinterpret\_cast<}\textcolor{keywordtype}{void}\ const*\textcolor{keyword}{>}(\ lhs\ )\ ==\ rhs;\ \}}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l01969}01969\ \ \ \ \ \textcolor{keyword}{template}<\textcolor{keyword}{typename}\ T>}
-\DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l01970}01970\ \ \ \ \ \textcolor{keyword}{auto}\ \mbox{\hyperlink{namespace_catch_af89b8df30cfaf09abd048c6ff67359ee}{compareEqual}}(\ \textcolor{keywordtype}{long}\ lhs,\ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}*\ \textcolor{keyword}{const}\&\ rhs\ )\ -\/>\ \textcolor{keywordtype}{bool}\ \{\ \textcolor{keywordflow}{return}\ \textcolor{keyword}{reinterpret\_cast<}\textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespaceupload_a985aa9a71de3eb507344df65700c696d}{const}}*\textcolor{keyword}{>}(\ lhs\ )\ ==\ rhs;\ \}}
+\DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l01970}01970\ \ \ \ \ \textcolor{keyword}{auto}\ \mbox{\hyperlink{namespace_catch_af89b8df30cfaf09abd048c6ff67359ee}{compareEqual}}(\ \textcolor{keywordtype}{long}\ lhs,\ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}*\ \textcolor{keyword}{const}\&\ rhs\ )\ -\/>\ \textcolor{keywordtype}{bool}\ \{\ \textcolor{keywordflow}{return}\ \textcolor{keyword}{reinterpret\_cast<}\textcolor{keywordtype}{void}\ const*\textcolor{keyword}{>}(\ lhs\ )\ ==\ rhs;\ \}}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l01971}01971\ }
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l01972}01972\ \ \ \ \ \textcolor{keyword}{template}<\textcolor{keyword}{typename}\ LhsT,\ \textcolor{keyword}{typename}\ RhsT>}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l01973}01973\ \ \ \ \ \textcolor{keyword}{auto}\ \mbox{\hyperlink{namespace_catch_a8bec217f5ef5f09c17074c311c958f3c}{compareNotEqual}}(\ LhsT\ \textcolor{keyword}{const}\&\ lhs,\ RhsT\&\&\ rhs\ )\ -\/>\ \textcolor{keywordtype}{bool}\ \{\ \textcolor{keywordflow}{return}\ \textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{bool}\textcolor{keyword}{>}(lhs\ !=\ rhs);\ \}}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l01974}01974\ \ \ \ \ \textcolor{keyword}{template}<\textcolor{keyword}{typename}\ T>}
-\DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l01975}01975\ \ \ \ \ \textcolor{keyword}{auto}\ \mbox{\hyperlink{namespace_catch_a8bec217f5ef5f09c17074c311c958f3c}{compareNotEqual}}(\ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}*\ \textcolor{keyword}{const}\&\ lhs,\ \textcolor{keywordtype}{int}\ rhs\ )\ -\/>\ \textcolor{keywordtype}{bool}\ \{\ \textcolor{keywordflow}{return}\ lhs\ !=\ \textcolor{keyword}{reinterpret\_cast<}\textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespaceupload_a985aa9a71de3eb507344df65700c696d}{const}}*\textcolor{keyword}{>}(\ rhs\ );\ \}}
+\DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l01975}01975\ \ \ \ \ \textcolor{keyword}{auto}\ \mbox{\hyperlink{namespace_catch_a8bec217f5ef5f09c17074c311c958f3c}{compareNotEqual}}(\ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}*\ \textcolor{keyword}{const}\&\ lhs,\ \textcolor{keywordtype}{int}\ rhs\ )\ -\/>\ \textcolor{keywordtype}{bool}\ \{\ \textcolor{keywordflow}{return}\ lhs\ !=\ \textcolor{keyword}{reinterpret\_cast<}\textcolor{keywordtype}{void}\ const*\textcolor{keyword}{>}(\ rhs\ );\ \}}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l01976}01976\ \ \ \ \ \textcolor{keyword}{template}<\textcolor{keyword}{typename}\ T>}
-\DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l01977}01977\ \ \ \ \ \textcolor{keyword}{auto}\ \mbox{\hyperlink{namespace_catch_a8bec217f5ef5f09c17074c311c958f3c}{compareNotEqual}}(\ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}*\ \textcolor{keyword}{const}\&\ lhs,\ \textcolor{keywordtype}{long}\ rhs\ )\ -\/>\ \textcolor{keywordtype}{bool}\ \{\ \textcolor{keywordflow}{return}\ lhs\ !=\ \textcolor{keyword}{reinterpret\_cast<}\textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespaceupload_a985aa9a71de3eb507344df65700c696d}{const}}*\textcolor{keyword}{>}(\ rhs\ );\ \}}
+\DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l01977}01977\ \ \ \ \ \textcolor{keyword}{auto}\ \mbox{\hyperlink{namespace_catch_a8bec217f5ef5f09c17074c311c958f3c}{compareNotEqual}}(\ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}*\ \textcolor{keyword}{const}\&\ lhs,\ \textcolor{keywordtype}{long}\ rhs\ )\ -\/>\ \textcolor{keywordtype}{bool}\ \{\ \textcolor{keywordflow}{return}\ lhs\ !=\ \textcolor{keyword}{reinterpret\_cast<}\textcolor{keywordtype}{void}\ const*\textcolor{keyword}{>}(\ rhs\ );\ \}}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l01978}01978\ \ \ \ \ \textcolor{keyword}{template}<\textcolor{keyword}{typename}\ T>}
-\DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l01979}01979\ \ \ \ \ \textcolor{keyword}{auto}\ \mbox{\hyperlink{namespace_catch_a8bec217f5ef5f09c17074c311c958f3c}{compareNotEqual}}(\ \textcolor{keywordtype}{int}\ lhs,\ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}*\ \textcolor{keyword}{const}\&\ rhs\ )\ -\/>\ \textcolor{keywordtype}{bool}\ \{\ \textcolor{keywordflow}{return}\ \textcolor{keyword}{reinterpret\_cast<}\textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespaceupload_a985aa9a71de3eb507344df65700c696d}{const}}*\textcolor{keyword}{>}(\ lhs\ )\ !=\ rhs;\ \}}
+\DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l01979}01979\ \ \ \ \ \textcolor{keyword}{auto}\ \mbox{\hyperlink{namespace_catch_a8bec217f5ef5f09c17074c311c958f3c}{compareNotEqual}}(\ \textcolor{keywordtype}{int}\ lhs,\ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}*\ \textcolor{keyword}{const}\&\ rhs\ )\ -\/>\ \textcolor{keywordtype}{bool}\ \{\ \textcolor{keywordflow}{return}\ \textcolor{keyword}{reinterpret\_cast<}\textcolor{keywordtype}{void}\ const*\textcolor{keyword}{>}(\ lhs\ )\ !=\ rhs;\ \}}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l01980}01980\ \ \ \ \ \textcolor{keyword}{template}<\textcolor{keyword}{typename}\ T>}
-\DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l01981}01981\ \ \ \ \ \textcolor{keyword}{auto}\ \mbox{\hyperlink{namespace_catch_a8bec217f5ef5f09c17074c311c958f3c}{compareNotEqual}}(\ \textcolor{keywordtype}{long}\ lhs,\ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}*\ \textcolor{keyword}{const}\&\ rhs\ )\ -\/>\ \textcolor{keywordtype}{bool}\ \{\ \textcolor{keywordflow}{return}\ \textcolor{keyword}{reinterpret\_cast<}\textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespaceupload_a985aa9a71de3eb507344df65700c696d}{const}}*\textcolor{keyword}{>}(\ lhs\ )\ !=\ rhs;\ \}}
+\DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l01981}01981\ \ \ \ \ \textcolor{keyword}{auto}\ \mbox{\hyperlink{namespace_catch_a8bec217f5ef5f09c17074c311c958f3c}{compareNotEqual}}(\ \textcolor{keywordtype}{long}\ lhs,\ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}*\ \textcolor{keyword}{const}\&\ rhs\ )\ -\/>\ \textcolor{keywordtype}{bool}\ \{\ \textcolor{keywordflow}{return}\ \textcolor{keyword}{reinterpret\_cast<}\textcolor{keywordtype}{void}\ const*\textcolor{keyword}{>}(\ lhs\ )\ !=\ rhs;\ \}}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l01982}01982\ }
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l01983}01983\ \ \ \ \ \textcolor{keyword}{template}<\textcolor{keyword}{typename}\ LhsT>}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l01984}\mbox{\hyperlink{class_catch_1_1_expr_lhs}{01984}}\ \ \ \ \ \textcolor{keyword}{class\ }\mbox{\hyperlink{class_catch_1_1_expr_lhs}{ExprLhs}}\ \{}
@@ -2136,7 +2136,7 @@
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l02162}02162\ }
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l02163}\mbox{\hyperlink{class_catch_1_1_lazy_expression_acdb846cb230cecfc6aca7a925b31fbca}{02163}}\ \ \ \ \ \ \ \ \ \textcolor{keyword}{explicit}\ \textcolor{keyword}{operator}\ bool()\ \textcolor{keyword}{const};}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l02164}02164\ }
-\DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l02165}02165\ \ \ \ \ \ \ \ \ \textcolor{keyword}{friend}\ \textcolor{keyword}{auto}\ \mbox{\hyperlink{class_catch_1_1_lazy_expression_aa01086581cab2fcd2d4580b8fa787dfc}{operator\ <<\ }}(\ std::ostream\&\ os,\ \mbox{\hyperlink{class_catch_1_1_lazy_expression}{LazyExpression}}\ \textcolor{keyword}{const}\&\ lazyExpr\ )\ -\/>\ std::ostream\&;}
+\DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l02165}02165\ \ \ \ \ \ \ \ \ \textcolor{keyword}{friend}\ \textcolor{keyword}{auto}\ \mbox{\hyperlink{class_catch_1_1_lazy_expression_aa01086581cab2fcd2d4580b8fa787dfc}{operator\ <<\ }}(\ std::ostream\&\ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}},\ \mbox{\hyperlink{class_catch_1_1_lazy_expression}{LazyExpression}}\ \textcolor{keyword}{const}\&\ lazyExpr\ )\ -\/>\ std::ostream\&;}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l02166}02166\ \ \ \ \ \};}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l02167}02167\ }
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l02168}\mbox{\hyperlink{struct_catch_1_1_assertion_reaction}{02168}}\ \ \ \ \ \textcolor{keyword}{struct\ }\mbox{\hyperlink{struct_catch_1_1_assertion_reaction}{AssertionReaction}}\ \{}
@@ -2831,7 +2831,7 @@
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l02870}\mbox{\hyperlink{struct_catch_1_1pluralise}{02870}}\ \ \ \ \ \textcolor{keyword}{struct\ }\mbox{\hyperlink{struct_catch_1_1pluralise}{pluralise}}\ \{}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l02871}\mbox{\hyperlink{struct_catch_1_1pluralise_a5c55e22de2416cfe416edf715c6b9234}{02871}}\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_catch_1_1pluralise_a5c55e22de2416cfe416edf715c6b9234}{pluralise}}(\ std::size\_t\ \mbox{\hyperlink{gmock__stress__test_8cc_afd9db40e3361ae09188795e8cbe19752}{count}},\ std::string\ \textcolor{keyword}{const}\&\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a22f45a3cb4f074e609f58ebaeef0ecf9}{label}}\ );}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l02872}02872\ }
-\DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l02873}02873\ \ \ \ \ \ \ \ \ \textcolor{keyword}{friend}\ std::ostream\&\ \mbox{\hyperlink{database__utils_8hpp_a9c651062fd345156256e69573165086c}{operator\ <<\ }}(\ std::ostream\&\ os,\ \mbox{\hyperlink{struct_catch_1_1pluralise}{pluralise}}\ \textcolor{keyword}{const}\&\ pluraliser\ );}
+\DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l02873}02873\ \ \ \ \ \ \ \ \ \textcolor{keyword}{friend}\ std::ostream\&\ \mbox{\hyperlink{database__utils_8hpp_a9c651062fd345156256e69573165086c}{operator\ <<\ }}(\ std::ostream\&\ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}},\ \mbox{\hyperlink{struct_catch_1_1pluralise}{pluralise}}\ \textcolor{keyword}{const}\&\ pluraliser\ );}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l02874}02874\ }
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l02875}02875\ \ \ \ \ \ \ \ \ std::size\_t\ m\_count;}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l02876}02876\ \ \ \ \ \ \ \ \ std::string\ m\_label;}
@@ -3340,13 +3340,13 @@
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l03379}03379\ \ \ \ \ \ \ \ \ \ \ \ \ m\_matcherString(\ matcherString\ )}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l03380}03380\ \ \ \ \ \ \ \ \ \{\}}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l03381}03381\ }
-\DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l03382}\mbox{\hyperlink{class_catch_1_1_match_expr_ad3e41adb597750b2219bb37e51185629}{03382}}\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{class_catch_1_1_match_expr_ad3e41adb597750b2219bb37e51185629}{streamReconstructedExpression}}(\ std::ostream\ \&os\ )\textcolor{keyword}{\ const\ override\ }\{}
+\DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l03382}\mbox{\hyperlink{class_catch_1_1_match_expr_ad3e41adb597750b2219bb37e51185629}{03382}}\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{class_catch_1_1_match_expr_ad3e41adb597750b2219bb37e51185629}{streamReconstructedExpression}}(\ std::ostream\ \&\mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}\ )\textcolor{keyword}{\ const\ override\ }\{}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l03383}03383\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ matcherAsString\ =\ m\_matcher.toString();}
-\DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l03384}03384\ \ \ \ \ \ \ \ \ \ \ \ \ os\ <<\ \mbox{\hyperlink{namespace_catch_1_1_detail_af0ad48344ffd3f92f3568465248a9880}{Catch::Detail::stringify}}(\ m\_arg\ )\ <<\ \textcolor{charliteral}{'\ '};}
+\DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l03384}03384\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}\ <<\ \mbox{\hyperlink{namespace_catch_1_1_detail_af0ad48344ffd3f92f3568465248a9880}{Catch::Detail::stringify}}(\ m\_arg\ )\ <<\ \textcolor{charliteral}{'\ '};}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l03385}03385\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ matcherAsString\ ==\ Detail::unprintableString\ )}
-\DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l03386}03386\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ os\ <<\ m\_matcherString;}
+\DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l03386}03386\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}\ <<\ m\_matcherString;}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l03387}03387\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}}
-\DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l03388}03388\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ os\ <<\ matcherAsString;}
+\DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l03388}03388\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}\ <<\ matcherAsString;}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l03389}03389\ \ \ \ \ \ \ \ \ \}}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l03390}03390\ \ \ \ \ \};}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l03391}03391\ }
@@ -3635,7 +3635,7 @@
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l03676}03676\ \ \ \ \ \ \ \ \ \ \ \ \ tracker.setGenerator(pf::make\_unique<Generators<UnderlyingType>>(generatorExpression()));}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l03677}03677\ \ \ \ \ \ \ \ \ \}}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l03678}03678\ }
-\DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l03679}03679\ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ \textcolor{keyword}{const}\&\ generator\ =\ \textcolor{keyword}{static\_cast<}IGenerator<UnderlyingType>\ \mbox{\hyperlink{namespaceupload_a985aa9a71de3eb507344df65700c696d}{const}}\&\textcolor{keyword}{>}(\ *tracker.getGenerator()\ );}
+\DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l03679}03679\ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ \textcolor{keyword}{const}\&\ generator\ =\ \textcolor{keyword}{static\_cast<}IGenerator<UnderlyingType>\ const\&\textcolor{keyword}{>}(\ *tracker.getGenerator()\ );}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l03680}03680\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ generator.get();}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l03681}03681\ \ \ \ \ \}}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l03682}03682\ }
@@ -4643,7 +4643,7 @@
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l04686}04686\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{namespace_catch_acf5ea05e942d2d7fe79111e12754ed76}{rngSeed}}\ =\ 0;}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l04687}04687\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ benchmarkResolutionMultiple\ =\ 100;}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l04688}04688\ }
-\DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l04689}04689\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_catch_af85c0d46dfe687d923a157362fd07737}{Verbosity}}\ \mbox{\hyperlink{namespaceupload_a79aff46409a98c4e5f608c8df1fd4612}{verbosity}}\ =\ Verbosity::Normal;}
+\DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l04689}04689\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_catch_af85c0d46dfe687d923a157362fd07737}{Verbosity}}\ verbosity\ =\ Verbosity::Normal;}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l04690}04690\ \ \ \ \ \ \ \ \ WarnAbout::What\ warnings\ =\ WarnAbout::Nothing;}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l04691}04691\ \ \ \ \ \ \ \ \ ShowDurations::OrNot\ showDurations\ =\ ShowDurations::DefaultForReporter;}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l04692}04692\ \ \ \ \ \ \ \ \ RunTests::InWhatOrder\ runOrder\ =\ RunTests::InDeclarationOrder;}
@@ -4703,7 +4703,7 @@
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l04746}04746\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{bool}\ shouldDebugBreak()\ \textcolor{keyword}{const\ override};}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l04747}04747\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ abortAfter()\ \textcolor{keyword}{const\ override};}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l04748}04748\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{bool}\ showInvisibles()\ \textcolor{keyword}{const\ override};}
-\DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l04749}04749\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_catch_af85c0d46dfe687d923a157362fd07737}{Verbosity}}\ \mbox{\hyperlink{namespaceupload_a79aff46409a98c4e5f608c8df1fd4612}{verbosity}}()\ \textcolor{keyword}{const\ override};}
+\DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l04749}04749\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_catch_af85c0d46dfe687d923a157362fd07737}{Verbosity}}\ verbosity()\ \textcolor{keyword}{const\ override};}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l04750}04750\ }
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l04751}04751\ \ \ \ \ \textcolor{keyword}{private}:}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l04752}04752\ }
@@ -5285,12 +5285,12 @@
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l05328}05328\ }
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l05329}05329\ \ \ \ \ \textcolor{keyword}{template}<\textcolor{keywordtype}{char}\ C>}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l05330}05330\ \ \ \ \ \textcolor{keywordtype}{char}\ \textcolor{keyword}{const}*\ \mbox{\hyperlink{namespace_catch_a15ae9a6c9d9d1a1987a08adac734134e}{getLineOfChars}}()\ \{}
-\DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l05331}05331\ \ \ \ \ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keywordtype}{char}\ \mbox{\hyperlink{namespacevalidate__reflection_a54d4e98ade8417b88a7e3859a693630a}{line}}[CATCH\_CONFIG\_CONSOLE\_WIDTH]\ =\ \{0\};}
+\DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l05331}05331\ \ \ \ \ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keywordtype}{char}\ line[CATCH\_CONFIG\_CONSOLE\_WIDTH]\ =\ \{0\};}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l05332}05332\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ !*line\ )\ \{}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l05333}05333\ \ \ \ \ \ \ \ \ \ \ \ \ std::memset(\ line,\ C,\ \mbox{\hyperlink{catch__config_8hpp_a6776b7d6e3810ce1414fe9bd8c305e5b}{CATCH\_CONFIG\_CONSOLE\_WIDTH}}-\/1\ );}
-\DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l05334}05334\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacevalidate__reflection_a54d4e98ade8417b88a7e3859a693630a}{line}}[CATCH\_CONFIG\_CONSOLE\_WIDTH-\/1]\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l05334}05334\ \ \ \ \ \ \ \ \ \ \ \ \ line[CATCH\_CONFIG\_CONSOLE\_WIDTH-\/1]\ =\ 0;}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l05335}05335\ \ \ \ \ \ \ \ \ \}}
-\DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l05336}05336\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespacevalidate__reflection_a54d4e98ade8417b88a7e3859a693630a}{line}};}
+\DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l05336}05336\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ line;}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l05337}05337\ \ \ \ \ \}}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l05338}05338\ }
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l05339}05339\ \ \ \ \ \textcolor{keyword}{struct\ }TestEventListenerBase\ :\ StreamingReporterBase<TestEventListenerBase>\ \{}
@@ -5359,7 +5359,7 @@
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l05402}05402\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{bool}\ m\_moved\ =\ \textcolor{keyword}{false};}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l05403}05403\ \ \ \ \ \};}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l05404}05404\ }
-\DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l05405}05405\ \ \ \ \ std::ostream\&\ \mbox{\hyperlink{database__utils_8hpp_a9c651062fd345156256e69573165086c}{operator\ <<\ }}(\ std::ostream\&\ os,\ Colour\ \textcolor{keyword}{const}\&\ );}
+\DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l05405}05405\ \ \ \ \ std::ostream\&\ \mbox{\hyperlink{database__utils_8hpp_a9c651062fd345156256e69573165086c}{operator\ <<\ }}(\ std::ostream\&\ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}},\ Colour\ \textcolor{keyword}{const}\&\ );}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l05406}05406\ }
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l05407}05407\ \}\ \textcolor{comment}{//\ end\ namespace\ Catch}}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l05408}05408\ }
@@ -5545,9 +5545,9 @@
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l05588}05588\ }
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l05589}05589\ \ \ \ \ \ \ \ \ XmlEncode(\ std::string\ \textcolor{keyword}{const}\&\ str,\ ForWhat\ forWhat\ =\ ForTextNodes\ );}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l05590}05590\ }
-\DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l05591}05591\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ encodeTo(\ std::ostream\&\ os\ )\ \textcolor{keyword}{const};}
+\DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l05591}05591\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ encodeTo(\ std::ostream\&\ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}\ )\ \textcolor{keyword}{const};}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l05592}05592\ }
-\DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l05593}05593\ \ \ \ \ \ \ \ \ \textcolor{keyword}{friend}\ std::ostream\&\ \mbox{\hyperlink{database__utils_8hpp_a9c651062fd345156256e69573165086c}{operator\ <<\ }}(\ std::ostream\&\ os,\ XmlEncode\ \textcolor{keyword}{const}\&\ xmlEncode\ );}
+\DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l05593}05593\ \ \ \ \ \ \ \ \ \textcolor{keyword}{friend}\ std::ostream\&\ \mbox{\hyperlink{database__utils_8hpp_a9c651062fd345156256e69573165086c}{operator\ <<\ }}(\ std::ostream\&\ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}},\ XmlEncode\ \textcolor{keyword}{const}\&\ xmlEncode\ );}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l05594}05594\ }
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l05595}05595\ \ \ \ \ \textcolor{keyword}{private}:}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l05596}05596\ \ \ \ \ \ \ \ \ std::string\ m\_str;}
@@ -5578,7 +5578,7 @@
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l05621}05621\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{mutable}\ XmlWriter*\ m\_writer\ =\ \textcolor{keyword}{nullptr};}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l05622}05622\ \ \ \ \ \ \ \ \ \};}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l05623}05623\ }
-\DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l05624}05624\ \ \ \ \ \ \ \ \ XmlWriter(\ std::ostream\&\ os\ =\ \mbox{\hyperlink{namespace_catch_a0179d453617ba2296f2baa99a49e7264}{Catch::cout}}()\ );}
+\DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l05624}05624\ \ \ \ \ \ \ \ \ XmlWriter(\ std::ostream\&\ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}\ =\ \mbox{\hyperlink{namespace_catch_a0179d453617ba2296f2baa99a49e7264}{Catch::cout}}()\ );}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l05625}05625\ \ \ \ \ \ \ \ \ \string~XmlWriter();}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l05626}05626\ }
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l05627}05627\ \ \ \ \ \ \ \ \ XmlWriter(\ XmlWriter\ \textcolor{keyword}{const}\&\ )\ =\ \textcolor{keyword}{delete};}
@@ -6227,8 +6227,8 @@
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l06271}06271\ namespace\ \mbox{\hyperlink{namespace_catch}{Catch}}\ \{}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l06272}06272\ }
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l06273}06273\ \ \ \ \ \textcolor{keyword}{namespace\ }\{}
-\DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l06274}06274\ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ \mbox{\hyperlink{namespace_catch_abf821d46e662c8d93d80a98d79a10314}{operator\ <<}}(\ std::ostream\&\ os,\ ITransientExpression\ \textcolor{keyword}{const}\&\ expr\ )\ -\/>\ std::ostream\&\ \{}
-\DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l06275}06275\ \ \ \ \ \ \ \ \ \ \ \ \ expr.streamReconstructedExpression(\ os\ );}
+\DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l06274}06274\ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ \mbox{\hyperlink{namespace_catch_abf821d46e662c8d93d80a98d79a10314}{operator\ <<}}(\ std::ostream\&\ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}},\ ITransientExpression\ \textcolor{keyword}{const}\&\ expr\ )\ -\/>\ std::ostream\&\ \{}
+\DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l06275}06275\ \ \ \ \ \ \ \ \ \ \ \ \ expr.streamReconstructedExpression(\ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}\ );}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l06276}06276\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}};}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l06277}06277\ \ \ \ \ \ \ \ \ \}}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l06278}06278\ \ \ \ \ \}}
@@ -6243,18 +6243,18 @@
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l06287}06287\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ m\_transientExpression\ !=\ \textcolor{keyword}{nullptr};}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l06288}06288\ \ \ \ \ \}}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l06289}06289\ }
-\DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l06290}06290\ \ \ \ \ \textcolor{keyword}{auto}\ \mbox{\hyperlink{namespace_catch_abf821d46e662c8d93d80a98d79a10314}{operator\ <<\ }}(\ std::ostream\&\ os,\ LazyExpression\ \textcolor{keyword}{const}\&\ lazyExpr\ )\ -\/>\ std::ostream\&\ \{}
+\DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l06290}06290\ \ \ \ \ \textcolor{keyword}{auto}\ \mbox{\hyperlink{namespace_catch_abf821d46e662c8d93d80a98d79a10314}{operator\ <<\ }}(\ std::ostream\&\ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}},\ LazyExpression\ \textcolor{keyword}{const}\&\ lazyExpr\ )\ -\/>\ std::ostream\&\ \{}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l06291}06291\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ lazyExpr.m\_isNegated\ )}
-\DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l06292}06292\ \ \ \ \ \ \ \ \ \ \ \ \ os\ <<\ \textcolor{stringliteral}{"{}!"{}};}
+\DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l06292}06292\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}\ <<\ \textcolor{stringliteral}{"{}!"{}};}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l06293}06293\ }
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l06294}06294\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ lazyExpr\ )\ \{}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l06295}06295\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ lazyExpr.m\_isNegated\ \&\&\ lazyExpr.m\_transientExpression-\/>isBinaryExpression()\ )}
-\DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l06296}06296\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ os\ <<\ \textcolor{stringliteral}{"{}("{}}\ <<\ *lazyExpr.m\_transientExpression\ <<\ \textcolor{stringliteral}{"{})"{}};}
+\DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l06296}06296\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}\ <<\ \textcolor{stringliteral}{"{}("{}}\ <<\ *lazyExpr.m\_transientExpression\ <<\ \textcolor{stringliteral}{"{})"{}};}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l06297}06297\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}}
-\DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l06298}06298\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ os\ <<\ *lazyExpr.m\_transientExpression;}
+\DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l06298}06298\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}\ <<\ *lazyExpr.m\_transientExpression;}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l06299}06299\ \ \ \ \ \ \ \ \ \}}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l06300}06300\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}\ \{}
-\DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l06301}06301\ \ \ \ \ \ \ \ \ \ \ \ \ os\ <<\ \textcolor{stringliteral}{"{}\{**\ error\ -\/\ unchecked\ empty\ expression\ requested\ **\}"{}};}
+\DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l06301}06301\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}\ <<\ \textcolor{stringliteral}{"{}\{**\ error\ -\/\ unchecked\ empty\ expression\ requested\ **\}"{}};}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l06302}06302\ \ \ \ \ \ \ \ \ \}}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l06303}06303\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}};}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l06304}06304\ \ \ \ \ \}}
@@ -6698,14 +6698,14 @@
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l06742}06742\ \ \ \ \ \textcolor{keyword}{auto}\ \mbox{\hyperlink{class_catch_1_1clara_1_1_text_flow_1_1_column_aa6e4910dc69a3f0b6de21c36b69a41c4}{begin}}()\ const\ -\/>\ iterator\ \{\ \textcolor{keywordflow}{return}\ iterator(*\textcolor{keyword}{this});\ \}}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l06743}06743\ \ \ \ \ \textcolor{keyword}{auto}\ \mbox{\hyperlink{class_catch_1_1clara_1_1_text_flow_1_1_column_ab39e9f084e231e521ceef731706cfaff}{end}}()\ const\ -\/>\ iterator\ \{\ \textcolor{keywordflow}{return}\ \{\ *\textcolor{keyword}{this},\ m\_strings.size()\ \};\ \}}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l06744}06744\ }
-\DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l06745}06745\ \ \ \ \ \textcolor{keyword}{inline}\ \textcolor{keyword}{friend}\ std::ostream\&\ \mbox{\hyperlink{class_catch_1_1clara_1_1_text_flow_1_1_column_adf5f75953d889485742ede619047a00b}{operator\ <<\ }}(std::ostream\&\ os,\ \mbox{\hyperlink{class_catch_1_1clara_1_1_text_flow_1_1_column_a7283f8db02c5e75a9625710d171d8c21}{Column}}\ \textcolor{keyword}{const}\&\ col)\ \{}
+\DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l06745}06745\ \ \ \ \ \textcolor{keyword}{inline}\ \textcolor{keyword}{friend}\ std::ostream\&\ \mbox{\hyperlink{class_catch_1_1clara_1_1_text_flow_1_1_column_adf5f75953d889485742ede619047a00b}{operator\ <<\ }}(std::ostream\&\ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}},\ \mbox{\hyperlink{class_catch_1_1clara_1_1_text_flow_1_1_column_a7283f8db02c5e75a9625710d171d8c21}{Column}}\ \textcolor{keyword}{const}\&\ col)\ \{}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l06746}06746\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{bool}\ first\ =\ \textcolor{keyword}{true};}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l06747}06747\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keyword}{auto}\ line\ :\ col)\ \{}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l06748}06748\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (first)}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l06749}06749\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ first\ =\ \textcolor{keyword}{false};}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l06750}06750\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}}
-\DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l06751}06751\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ os\ <<\ \textcolor{stringliteral}{"{}\(\backslash\)n"{}};}
-\DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l06752}06752\ \ \ \ \ \ \ \ \ \ \ \ \ os\ <<\ \mbox{\hyperlink{namespacevalidate__reflection_a54d4e98ade8417b88a7e3859a693630a}{line}};}
+\DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l06751}06751\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}\ <<\ \textcolor{stringliteral}{"{}\(\backslash\)n"{}};}
+\DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l06752}06752\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}\ <<\ line;}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l06753}06753\ \ \ \ \ \ \ \ \ \}}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l06754}06754\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}};}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l06755}06755\ \ \ \ \ \}}
@@ -6817,15 +6817,15 @@
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l06861}06861\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ combined;}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l06862}06862\ \ \ \ \ \}}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l06863}06863\ }
-\DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l06864}06864\ \ \ \ \ \textcolor{keyword}{inline}\ \textcolor{keyword}{friend}\ std::ostream\&\ \mbox{\hyperlink{namespace_catch_abf821d46e662c8d93d80a98d79a10314}{operator\ <<\ }}(std::ostream\&\ os,\ Columns\ \textcolor{keyword}{const}\&\ cols)\ \{}
+\DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l06864}06864\ \ \ \ \ \textcolor{keyword}{inline}\ \textcolor{keyword}{friend}\ std::ostream\&\ \mbox{\hyperlink{namespace_catch_abf821d46e662c8d93d80a98d79a10314}{operator\ <<\ }}(std::ostream\&\ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}},\ Columns\ \textcolor{keyword}{const}\&\ cols)\ \{}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l06865}06865\ }
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l06866}06866\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{bool}\ first\ =\ \textcolor{keyword}{true};}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l06867}06867\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keyword}{auto}\ line\ :\ cols)\ \{}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l06868}06868\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (first)}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l06869}06869\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ first\ =\ \textcolor{keyword}{false};}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l06870}06870\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}}
-\DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l06871}06871\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ os\ <<\ \textcolor{stringliteral}{"{}\(\backslash\)n"{}};}
-\DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l06872}06872\ \ \ \ \ \ \ \ \ \ \ \ \ os\ <<\ \mbox{\hyperlink{namespacevalidate__reflection_a54d4e98ade8417b88a7e3859a693630a}{line}};}
+\DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l06871}06871\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}\ <<\ \textcolor{stringliteral}{"{}\(\backslash\)n"{}};}
+\DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l06872}06872\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}\ <<\ line;}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l06873}06873\ \ \ \ \ \ \ \ \ \}}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l06874}06874\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}};}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l06875}06875\ \ \ \ \ \}}
@@ -6869,12 +6869,12 @@
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l06913}06913\ \ \ \ \ \textcolor{keyword}{struct\ }UnaryLambdaTraits\ :\ UnaryLambdaTraits<decltype(\ \&L::operator()\ )>\ \{\};}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l06914}06914\ }
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l06915}06915\ \ \ \ \ \textcolor{keyword}{template}<\textcolor{keyword}{typename}\ ClassT,\ \textcolor{keyword}{typename}\ ReturnT,\ \textcolor{keyword}{typename}...\ Args>}
-\DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l06916}06916\ \ \ \ \ \textcolor{keyword}{struct\ }UnaryLambdaTraits<ReturnT(\ ClassT::*\ )(\ Args...\ )\ \mbox{\hyperlink{namespaceupload_a985aa9a71de3eb507344df65700c696d}{const}}>\ \{}
+\DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l06916}06916\ \ \ \ \ \textcolor{keyword}{struct\ }UnaryLambdaTraits<ReturnT(\ ClassT::*\ )(\ Args...\ )\ const>\ \{}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l06917}06917\ \ \ \ \ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{bool}\ isValid\ =\ \textcolor{keyword}{false};}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l06918}06918\ \ \ \ \ \};}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l06919}06919\ }
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l06920}06920\ \ \ \ \ \textcolor{keyword}{template}<\textcolor{keyword}{typename}\ ClassT,\ \textcolor{keyword}{typename}\ ReturnT,\ \textcolor{keyword}{typename}\ ArgT>}
-\DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l06921}06921\ \ \ \ \ \textcolor{keyword}{struct\ }UnaryLambdaTraits<ReturnT(\ ClassT::*\ )(\ ArgT\ )\ \mbox{\hyperlink{namespaceupload_a985aa9a71de3eb507344df65700c696d}{const}}>\ \{}
+\DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l06921}06921\ \ \ \ \ \textcolor{keyword}{struct\ }UnaryLambdaTraits<ReturnT(\ ClassT::*\ )(\ ArgT\ )\ const>\ \{}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l06922}06922\ \ \ \ \ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{bool}\ isValid\ =\ \textcolor{keyword}{true};}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l06923}06923\ \ \ \ \ \ \ \ \ \textcolor{keyword}{using\ }ArgType\ =\ \textcolor{keyword}{typename}\ std::remove\_const<typename\ std::remove\_reference<ArgT>::type>\mbox{\hyperlink{yubihsm_8h_a1d127017fb298b889f4ba24752d08b8e}{::type}};}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l06924}06924\ \ \ \ \ \ \ \ \ \textcolor{keyword}{using\ }ReturnType\ =\ ReturnT;}
@@ -6894,8 +6894,8 @@
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l06938}06938\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ m\_args(\mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}}\ +\ 1,\ \mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}}\ +\ argc)\ \{\}}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l06939}06939\ }
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l06940}06940\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_catch_1_1clara_1_1detail_1_1_args_a0e59873d7db240217ffef0cf073785fd}{Args}}(\ std::initializer\_list<std::string>\ args\ )}
-\DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l06941}06941\ \ \ \ \ \ \ \ \ :\ \ \ m\_exeName(\ *\mbox{\hyperlink{namespacebenchmark_compile_ad0ed96ae1454e4347ca61ac3887c379e}{args}}.begin()\ ),}
-\DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l06942}06942\ \ \ \ \ \ \ \ \ \ \ \ \ m\_args(\ \mbox{\hyperlink{namespacebenchmark_compile_ad0ed96ae1454e4347ca61ac3887c379e}{args}}.begin()+1,\ \mbox{\hyperlink{namespacebenchmark_compile_ad0ed96ae1454e4347ca61ac3887c379e}{args}}.end()\ )}
+\DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l06941}06941\ \ \ \ \ \ \ \ \ :\ \ \ m\_exeName(\ *args.begin()\ ),}
+\DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l06942}06942\ \ \ \ \ \ \ \ \ \ \ \ \ m\_args(\ args.begin()+1,\ args.end()\ )}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l06943}06943\ \ \ \ \ \ \ \ \ \{\}}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l06944}06944\ }
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l06945}06945\ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ \mbox{\hyperlink{class_catch_1_1clara_1_1detail_1_1_args_a7e1bb59b9b8de8bbfcf8049d899b8e16}{exeName}}()\ const\ -\/>\ \mbox{\hyperlink{namespacestd}{std}}::\textcolor{keywordtype}{string}\ \{}
@@ -6936,31 +6936,31 @@
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l06980}06980\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ++it;}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l06981}06981\ }
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l06982}06982\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ it\ !=\ itEnd\ )\ \{}
-\DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l06983}06983\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ \textcolor{keyword}{const}\ \&\mbox{\hyperlink{namespacecpp_1_1ast_a25b104cfd21fb8487a07063b6ce62062}{next}}\ =\ *it;}
+\DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l06983}06983\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ \textcolor{keyword}{const}\ \&\mbox{\hyperlink{namespaceutf8_afc093dfde66a6f52cb4a5caefe0e580d}{next}}\ =\ *it;}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l06984}06984\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ \mbox{\hyperlink{namespace_catch_1_1clara_1_1detail_ade90925f151418737b527b00fdc04060}{isOptPrefix}}(\ next[0]\ )\ )\ \{}
-\DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l06985}06985\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ delimiterPos\ =\ \mbox{\hyperlink{namespacecpp_1_1ast_a25b104cfd21fb8487a07063b6ce62062}{next}}.find\_first\_of(\ \textcolor{stringliteral}{"{}\ :="{}}\ );}
+\DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l06985}06985\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ delimiterPos\ =\ \mbox{\hyperlink{namespaceutf8_afc093dfde66a6f52cb4a5caefe0e580d}{next}}.find\_first\_of(\ \textcolor{stringliteral}{"{}\ :="{}}\ );}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l06986}06986\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ delimiterPos\ !=\ std::string::npos\ )\ \{}
-\DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l06987}06987\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ m\_tokenBuffer.push\_back(\ \{\ \mbox{\hyperlink{namespace_catch_1_1clara_1_1detail_a437f089d309df2e967ebed3b873f0bf9a054b4f3ea543c990f6b125f41af6ebf7}{TokenType::Option}},\ \mbox{\hyperlink{namespacecpp_1_1ast_a25b104cfd21fb8487a07063b6ce62062}{next}}.substr(\ 0,\ delimiterPos\ )\ \}\ );}
-\DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l06988}06988\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ m\_tokenBuffer.push\_back(\ \{\ \mbox{\hyperlink{namespace_catch_1_1clara_1_1detail_a437f089d309df2e967ebed3b873f0bf9a1853680a6d666b9fea2d789dd00bc7eb}{TokenType::Argument}},\ \mbox{\hyperlink{namespacecpp_1_1ast_a25b104cfd21fb8487a07063b6ce62062}{next}}.substr(\ delimiterPos\ +\ 1\ )\ \}\ );}
+\DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l06987}06987\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ m\_tokenBuffer.push\_back(\ \{\ \mbox{\hyperlink{namespace_catch_1_1clara_1_1detail_a437f089d309df2e967ebed3b873f0bf9a054b4f3ea543c990f6b125f41af6ebf7}{TokenType::Option}},\ \mbox{\hyperlink{namespaceutf8_afc093dfde66a6f52cb4a5caefe0e580d}{next}}.substr(\ 0,\ delimiterPos\ )\ \}\ );}
+\DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l06988}06988\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ m\_tokenBuffer.push\_back(\ \{\ \mbox{\hyperlink{namespace_catch_1_1clara_1_1detail_a437f089d309df2e967ebed3b873f0bf9a1853680a6d666b9fea2d789dd00bc7eb}{TokenType::Argument}},\ \mbox{\hyperlink{namespaceutf8_afc093dfde66a6f52cb4a5caefe0e580d}{next}}.substr(\ delimiterPos\ +\ 1\ )\ \}\ );}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l06989}06989\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
-\DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l06990}06990\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ next[1]\ !=\ \textcolor{charliteral}{'-\/'}\ \&\&\ \mbox{\hyperlink{namespacecpp_1_1ast_a25b104cfd21fb8487a07063b6ce62062}{next}}.size()\ >\ 2\ )\ \{}
+\DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l06990}06990\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ next[1]\ !=\ \textcolor{charliteral}{'-\/'}\ \&\&\ \mbox{\hyperlink{namespaceutf8_afc093dfde66a6f52cb4a5caefe0e580d}{next}}.size()\ >\ 2\ )\ \{}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l06991}06991\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ std::string\ opt\ =\ \textcolor{stringliteral}{"{}-\/\ "{}};}
-\DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l06992}06992\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}(\ \textcolor{keywordtype}{size\_t}\ i\ =\ 1;\ i\ <\ \mbox{\hyperlink{namespacecpp_1_1ast_a25b104cfd21fb8487a07063b6ce62062}{next}}.size();\ ++i\ )\ \{}
-\DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l06993}06993\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ opt[1]\ =\ \mbox{\hyperlink{namespacecpp_1_1ast_a25b104cfd21fb8487a07063b6ce62062}{next}}[i];}
+\DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l06992}06992\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}(\ \textcolor{keywordtype}{size\_t}\ i\ =\ 1;\ i\ <\ \mbox{\hyperlink{namespaceutf8_afc093dfde66a6f52cb4a5caefe0e580d}{next}}.size();\ ++i\ )\ \{}
+\DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l06993}06993\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ opt[1]\ =\ \mbox{\hyperlink{namespaceutf8_afc093dfde66a6f52cb4a5caefe0e580d}{next}}[i];}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l06994}06994\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ m\_tokenBuffer.push\_back(\ \{\ \mbox{\hyperlink{namespace_catch_1_1clara_1_1detail_a437f089d309df2e967ebed3b873f0bf9a054b4f3ea543c990f6b125f41af6ebf7}{TokenType::Option}},\ opt\ \}\ );}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l06995}06995\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l06996}06996\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
-\DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l06997}06997\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ m\_tokenBuffer.push\_back(\ \{\ \mbox{\hyperlink{namespace_catch_1_1clara_1_1detail_a437f089d309df2e967ebed3b873f0bf9a054b4f3ea543c990f6b125f41af6ebf7}{TokenType::Option}},\ \mbox{\hyperlink{namespacecpp_1_1ast_a25b104cfd21fb8487a07063b6ce62062}{next}}\ \}\ );}
+\DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l06997}06997\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ m\_tokenBuffer.push\_back(\ \{\ \mbox{\hyperlink{namespace_catch_1_1clara_1_1detail_a437f089d309df2e967ebed3b873f0bf9a054b4f3ea543c990f6b125f41af6ebf7}{TokenType::Option}},\ \mbox{\hyperlink{namespaceutf8_afc093dfde66a6f52cb4a5caefe0e580d}{next}}\ \}\ );}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l06998}06998\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l06999}06999\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l07000}07000\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
-\DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l07001}07001\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ m\_tokenBuffer.push\_back(\ \{\ \mbox{\hyperlink{namespace_catch_1_1clara_1_1detail_a437f089d309df2e967ebed3b873f0bf9a1853680a6d666b9fea2d789dd00bc7eb}{TokenType::Argument}},\ \mbox{\hyperlink{namespacecpp_1_1ast_a25b104cfd21fb8487a07063b6ce62062}{next}}\ \}\ );}
+\DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l07001}07001\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ m\_tokenBuffer.push\_back(\ \{\ \mbox{\hyperlink{namespace_catch_1_1clara_1_1detail_a437f089d309df2e967ebed3b873f0bf9a1853680a6d666b9fea2d789dd00bc7eb}{TokenType::Argument}},\ \mbox{\hyperlink{namespaceutf8_afc093dfde66a6f52cb4a5caefe0e580d}{next}}\ \}\ );}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l07002}07002\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l07003}07003\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l07004}07004\ \ \ \ \ \ \ \ \ \}}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l07005}07005\ }
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l07006}07006\ \ \ \ \ \textcolor{keyword}{public}:}
-\DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l07007}07007\ \ \ \ \ \ \ \ \ \textcolor{keyword}{explicit}\ TokenStream(\ Args\ \textcolor{keyword}{const}\ \&args\ )\ :\ TokenStream(\ \mbox{\hyperlink{namespacebenchmark_compile_ad0ed96ae1454e4347ca61ac3887c379e}{args}}.m\_args.begin(),\ \mbox{\hyperlink{namespacebenchmark_compile_ad0ed96ae1454e4347ca61ac3887c379e}{args}}.m\_args.end()\ )\ \{\}}
+\DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l07007}07007\ \ \ \ \ \ \ \ \ \textcolor{keyword}{explicit}\ TokenStream(\ Args\ \textcolor{keyword}{const}\ \&args\ )\ :\ TokenStream(\ args.m\_args.begin(),\ args.m\_args.end()\ )\ \{\}}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l07008}07008\ }
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l07009}07009\ \ \ \ \ \ \ \ \ TokenStream(\ Iterator\ it,\ Iterator\ itEnd\ )\ :\ it(\ it\ ),\ itEnd(\ itEnd\ )\ \{}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l07010}07010\ \ \ \ \ \ \ \ \ \ \ \ \ loadBuffer();}
@@ -7290,7 +7290,7 @@
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l07334}07334\ \ \ \ \ \ \ \ \ \textcolor{keyword}{virtual}\ \textcolor{keyword}{auto}\ cardinality()\ const\ -\/>\ \textcolor{keywordtype}{size\_t}\ \{\ \textcolor{keywordflow}{return}\ 1;\ \}}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l07335}07335\ }
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l07336}07336\ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ parse(\ Args\ \textcolor{keyword}{const}\ \&args\ )\ \textcolor{keyword}{const}\ -\/>\ \mbox{\hyperlink{namespace_catch_1_1clara_1_1detail_a439ec6956020b8db640a48f119f215c4}{InternalParseResult}}\ \{}
-\DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l07337}07337\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ parse(\ \mbox{\hyperlink{namespacebenchmark_compile_ad0ed96ae1454e4347ca61ac3887c379e}{args}}.exeName(),\ TokenStream(\ args\ )\ );}
+\DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l07337}07337\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ parse(\ args.exeName(),\ TokenStream(\ args\ )\ );}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l07338}07338\ \ \ \ \ \ \ \ \ \}}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l07339}07339\ \ \ \ \ \};}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l07340}07340\ }
@@ -7387,11 +7387,11 @@
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l07431}07431\ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a893468abdce45d586a5b659094a25e6c}{set}}(\ std::string\ \textcolor{keyword}{const}\&\ newName\ )\ -\/>\ \mbox{\hyperlink{namespace_catch_1_1clara_1_1detail_a92e52debe5d00758310cce02b6c4c2ee}{ParserResult}}\ \{}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l07432}07432\ }
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l07433}07433\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ lastSlash\ =\ newName.find\_last\_of(\ \textcolor{stringliteral}{"{}\(\backslash\)\(\backslash\)/"{}}\ );}
-\DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l07434}07434\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ \mbox{\hyperlink{namespaceembed_clara_a1e1bd594f85f58f5dca6c41c0ac720fb}{filename}}\ =\ (\ lastSlash\ ==\ std::string::npos\ )}
+\DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l07434}07434\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ filename\ =\ (\ lastSlash\ ==\ std::string::npos\ )}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l07435}07435\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ?\ newName}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l07436}07436\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ :\ newName.substr(\ lastSlash+1\ );}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l07437}07437\ }
-\DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l07438}07438\ \ \ \ \ \ \ \ \ \ \ \ \ *m\_name\ =\ \mbox{\hyperlink{namespaceembed_clara_a1e1bd594f85f58f5dca6c41c0ac720fb}{filename}};}
+\DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l07438}07438\ \ \ \ \ \ \ \ \ \ \ \ \ *m\_name\ =\ filename;}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l07439}07439\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ m\_ref\ )}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l07440}07440\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ m\_ref-\/>setValue(\ filename\ );}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l07441}07441\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}}
@@ -7595,28 +7595,28 @@
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l07639}07639\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ cols;}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l07640}07640\ \ \ \ \ \ \ \ \ \}}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l07641}07641\ }
-\DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l07642}07642\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{struct_catch_1_1clara_1_1detail_1_1_parser_a3acf7729747e79def4078c3fb70bed9a}{writeToStream}}(\ std::ostream\ \&os\ )\textcolor{keyword}{\ const\ }\{}
+\DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l07642}07642\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{struct_catch_1_1clara_1_1detail_1_1_parser_a3acf7729747e79def4078c3fb70bed9a}{writeToStream}}(\ std::ostream\ \&\mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}\ )\textcolor{keyword}{\ const\ }\{}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l07643}07643\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!\mbox{\hyperlink{struct_catch_1_1clara_1_1detail_1_1_parser_a4a8a9cfc82677872cf95e0bf20d7b70e}{m\_exeName}}.\mbox{\hyperlink{class_catch_1_1clara_1_1detail_1_1_exe_name_a50a38d7b4fbc1d69b85d11df0a3f0a1a}{name}}().empty())\ \{}
-\DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l07644}07644\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ os\ <<\ \textcolor{stringliteral}{"{}usage:\(\backslash\)n"{}}\ <<\ \textcolor{stringliteral}{"{}\ \ "{}}\ <<\ \mbox{\hyperlink{struct_catch_1_1clara_1_1detail_1_1_parser_a4a8a9cfc82677872cf95e0bf20d7b70e}{m\_exeName}}.\mbox{\hyperlink{class_catch_1_1clara_1_1detail_1_1_exe_name_a50a38d7b4fbc1d69b85d11df0a3f0a1a}{name}}()\ <<\ \textcolor{stringliteral}{"{}\ "{}};}
+\DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l07644}07644\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}\ <<\ \textcolor{stringliteral}{"{}usage:\(\backslash\)n"{}}\ <<\ \textcolor{stringliteral}{"{}\ \ "{}}\ <<\ \mbox{\hyperlink{struct_catch_1_1clara_1_1detail_1_1_parser_a4a8a9cfc82677872cf95e0bf20d7b70e}{m\_exeName}}.\mbox{\hyperlink{class_catch_1_1clara_1_1detail_1_1_exe_name_a50a38d7b4fbc1d69b85d11df0a3f0a1a}{name}}()\ <<\ \textcolor{stringliteral}{"{}\ "{}};}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l07645}07645\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{bool}\ required\ =\ \textcolor{keyword}{true},\ first\ =\ \textcolor{keyword}{true};}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l07646}07646\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}(\ \textcolor{keyword}{auto}\ \textcolor{keyword}{const}\ \&arg\ :\ \mbox{\hyperlink{struct_catch_1_1clara_1_1detail_1_1_parser_a59585556bb23670b15e066b9ad221b9f}{m\_args}}\ )\ \{}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l07647}07647\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (first)}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l07648}07648\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ first\ =\ \textcolor{keyword}{false};}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l07649}07649\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}}
-\DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l07650}07650\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ os\ <<\ \textcolor{stringliteral}{"{}\ "{}};}
+\DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l07650}07650\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}\ <<\ \textcolor{stringliteral}{"{}\ "{}};}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l07651}07651\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ arg.isOptional()\ \&\&\ required\ )\ \{}
-\DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l07652}07652\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ os\ <<\ \textcolor{stringliteral}{"{}["{}};}
+\DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l07652}07652\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}\ <<\ \textcolor{stringliteral}{"{}["{}};}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l07653}07653\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ required\ =\ \textcolor{keyword}{false};}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l07654}07654\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
-\DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l07655}07655\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ os\ <<\ \textcolor{stringliteral}{"{}<"{}}\ <<\ arg.hint()\ <<\ \textcolor{stringliteral}{"{}>"{}};}
+\DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l07655}07655\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}\ <<\ \textcolor{stringliteral}{"{}<"{}}\ <<\ arg.hint()\ <<\ \textcolor{stringliteral}{"{}>"{}};}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l07656}07656\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ arg.cardinality()\ ==\ 0\ )}
-\DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l07657}07657\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ os\ <<\ \textcolor{stringliteral}{"{}\ ...\ "{}};}
+\DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l07657}07657\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}\ <<\ \textcolor{stringliteral}{"{}\ ...\ "{}};}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l07658}07658\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l07659}07659\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ !required\ )}
-\DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l07660}07660\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ os\ <<\ \textcolor{stringliteral}{"{}]"{}};}
+\DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l07660}07660\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}\ <<\ \textcolor{stringliteral}{"{}]"{}};}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l07661}07661\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ !\mbox{\hyperlink{struct_catch_1_1clara_1_1detail_1_1_parser_a102cea640ead23ac5fcc4ce2ded7a7ea}{m\_options}}.empty()\ )}
-\DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l07662}07662\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ os\ <<\ \textcolor{stringliteral}{"{}\ options"{}};}
-\DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l07663}07663\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ os\ <<\ \textcolor{stringliteral}{"{}\(\backslash\)n\(\backslash\)nwhere\ options\ are:"{}}\ <<\ std::endl;}
+\DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l07662}07662\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}\ <<\ \textcolor{stringliteral}{"{}\ options"{}};}
+\DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l07663}07663\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}\ <<\ \textcolor{stringliteral}{"{}\(\backslash\)n\(\backslash\)nwhere\ options\ are:"{}}\ <<\ std::endl;}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l07664}07664\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l07665}07665\ }
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l07666}07666\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ rows\ =\ \mbox{\hyperlink{struct_catch_1_1clara_1_1detail_1_1_parser_ae2acb1a5cb838d723852d7f67d0bdf6a}{getHelpColumns}}();}
@@ -7632,12 +7632,12 @@
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l07676}07676\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ TextFlow::Column(\ cols.left\ ).width(\ optWidth\ ).indent(\ 2\ )\ +}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l07677}07677\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ TextFlow::Spacer(4)\ +}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l07678}07678\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ TextFlow::Column(\ cols.right\ ).width(\ consoleWidth\ -\/\ 7\ -\/\ optWidth\ );}
-\DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l07679}07679\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ os\ <<\ row\ <<\ std::endl;}
+\DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l07679}07679\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}\ <<\ row\ <<\ std::endl;}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l07680}07680\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l07681}07681\ \ \ \ \ \ \ \ \ \}}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l07682}07682\ }
-\DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l07683}07683\ \ \ \ \ \ \ \ \ \textcolor{keyword}{friend}\ \textcolor{keyword}{auto}\ \mbox{\hyperlink{struct_catch_1_1clara_1_1detail_1_1_parser_a4356adbe31ad7e63bde83df60d685fab}{operator<<}}(\ std::ostream\ \&os,\ \mbox{\hyperlink{struct_parser}{Parser}}\ \textcolor{keyword}{const}\ \&parser\ )\ -\/>\ std::ostream\&\ \{}
-\DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l07684}07684\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespaceupload_af9e508d19dc2dd9cdb7c642dde0bdd21}{parser}}.writeToStream(\ os\ );}
+\DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l07683}07683\ \ \ \ \ \ \ \ \ \textcolor{keyword}{friend}\ \textcolor{keyword}{auto}\ \mbox{\hyperlink{struct_catch_1_1clara_1_1detail_1_1_parser_a4356adbe31ad7e63bde83df60d685fab}{operator<<}}(\ std::ostream\ \&\mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}},\ \mbox{\hyperlink{struct_parser}{Parser}}\ \textcolor{keyword}{const}\ \&parser\ )\ -\/>\ std::ostream\&\ \{}
+\DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l07684}07684\ \ \ \ \ \ \ \ \ \ \ \ \ parser.writeToStream(\ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}\ );}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l07685}07685\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}};}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l07686}07686\ \ \ \ \ \ \ \ \ \}}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l07687}07687\ }
@@ -7660,7 +7660,7 @@
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l07704}07704\ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ \mbox{\hyperlink{struct_catch_1_1clara_1_1detail_1_1_parser_ac5acd3e8bbd2445ac48b1d12b67a78f1}{parse}}(\ std::string\ \textcolor{keyword}{const}\&\ exeName,\ TokenStream\ \textcolor{keyword}{const}\ \&tokens\ )\ \textcolor{keyword}{const}\ -\/>\ \mbox{\hyperlink{namespace_catch_1_1clara_1_1detail_a439ec6956020b8db640a48f119f215c4}{InternalParseResult}}\ \textcolor{keyword}{override}\ \{}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l07705}07705\ }
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l07706}07706\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{struct\ }ParserInfo\ \{}
-\DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l07707}07707\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ParserBase\ \textcolor{keyword}{const}*\ \mbox{\hyperlink{namespaceupload_af9e508d19dc2dd9cdb7c642dde0bdd21}{parser}}\ =\ \textcolor{keyword}{nullptr};}
+\DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l07707}07707\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ParserBase\ \textcolor{keyword}{const}*\ parser\ =\ \textcolor{keyword}{nullptr};}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l07708}07708\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{size\_t}\ \mbox{\hyperlink{gmock__stress__test_8cc_afd9db40e3361ae09188795e8cbe19752}{count}}\ =\ 0;}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l07709}07709\ \ \ \ \ \ \ \ \ \ \ \ \ \};}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l07710}07710\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{size\_t}\ totalParsers\ =\ \mbox{\hyperlink{struct_catch_1_1clara_1_1detail_1_1_parser_a102cea640ead23ac5fcc4ce2ded7a7ea}{m\_options}}.size()\ +\ \mbox{\hyperlink{struct_catch_1_1clara_1_1detail_1_1_parser_a59585556bb23670b15e066b9ad221b9f}{m\_args}}.size();}
@@ -7781,17 +7781,17 @@
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l07825}07825\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classconfig}{config}}.warnings\ =\ \textcolor{keyword}{static\_cast<}\mbox{\hyperlink{struct_catch_1_1_warn_about_ae3dde70ef78d700ea896eb29314e0fa3}{WarnAbout::What}}\textcolor{keyword}{>}(\ \mbox{\hyperlink{classconfig}{config}}.warnings\ |\ warningSet\ );}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l07826}07826\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{class_catch_1_1clara_1_1detail_1_1_basic_result_ac48a1cb282f89218d149c021cbd32eb6}{ParserResult::ok}}(\ ParseResultType::Matched\ );}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l07827}07827\ \ \ \ \ \ \ \ \ \ \ \ \ \};}
-\DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l07828}07828\ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ \textcolor{keyword}{const}\ loadTestNamesFromFile\ =\ [\&](\ std::string\ \textcolor{keyword}{const}\&\ \mbox{\hyperlink{namespaceembed_clara_a1e1bd594f85f58f5dca6c41c0ac720fb}{filename}}\ )\ \{}
-\DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l07829}07829\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ std::ifstream\ \mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}}(\ \mbox{\hyperlink{namespaceembed_clara_a1e1bd594f85f58f5dca6c41c0ac720fb}{filename}}.c\_str()\ );}
+\DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l07828}07828\ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ \textcolor{keyword}{const}\ loadTestNamesFromFile\ =\ [\&](\ std::string\ \textcolor{keyword}{const}\&\ filename\ )\ \{}
+\DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l07829}07829\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ std::ifstream\ \mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}}(\ filename.c\_str()\ );}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l07830}07830\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ !\mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}}.is\_open()\ )}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l07831}07831\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{class_catch_1_1clara_1_1detail_1_1_basic_result_a8beb3ea9d8153ee786cb1f5578f938a8}{ParserResult::runtimeError}}(\ \textcolor{stringliteral}{"{}Unable\ to\ load\ input\ file:\ '"{}}\ +\ filename\ +\ \textcolor{stringliteral}{"{}'"{}}\ );}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l07832}07832\ }
-\DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l07833}07833\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ std::string\ \mbox{\hyperlink{namespacevalidate__reflection_a54d4e98ade8417b88a7e3859a693630a}{line}};}
+\DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l07833}07833\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ std::string\ line;}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l07834}07834\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{while}(\ std::getline(\ \mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}},\ line\ )\ )\ \{}
-\DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l07835}07835\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacevalidate__reflection_a54d4e98ade8417b88a7e3859a693630a}{line}}\ =\ \mbox{\hyperlink{namespace_catch_a084108b47f37d8bfd5db51c50c7451b3}{trim}}(line);}
-\DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l07836}07836\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ !\mbox{\hyperlink{namespacevalidate__reflection_a54d4e98ade8417b88a7e3859a693630a}{line}}.empty()\ \&\&\ !\mbox{\hyperlink{namespace_catch_a695f62327be0676e046291eeaae15110}{startsWith}}(\ line,\ \textcolor{charliteral}{'\#'}\ )\ )\ \{}
+\DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l07835}07835\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ line\ =\ \mbox{\hyperlink{namespace_catch_a084108b47f37d8bfd5db51c50c7451b3}{trim}}(line);}
+\DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l07836}07836\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ !line.empty()\ \&\&\ !\mbox{\hyperlink{namespace_catch_a695f62327be0676e046291eeaae15110}{startsWith}}(\ line,\ \textcolor{charliteral}{'\#'}\ )\ )\ \{}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l07837}07837\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ !\mbox{\hyperlink{namespace_catch_a695f62327be0676e046291eeaae15110}{startsWith}}(\ line,\ \textcolor{charliteral}{'"{}'}\ )\ )}
-\DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l07838}07838\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacevalidate__reflection_a54d4e98ade8417b88a7e3859a693630a}{line}}\ =\ \textcolor{charliteral}{'"{}'}\ +\ \mbox{\hyperlink{namespacevalidate__reflection_a54d4e98ade8417b88a7e3859a693630a}{line}}\ +\ '"{}';}
+\DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l07838}07838\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ line\ =\ \textcolor{charliteral}{'"{}'}\ +\ line\ +\ '"{}';}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l07839}07839\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classconfig}{config}}.testsOrTags.push\_back(\ line\ +\ \textcolor{charliteral}{','}\ );}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l07840}07840\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l07841}07841\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
@@ -7839,7 +7839,7 @@
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l07883}07883\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{class_catch_1_1clara_1_1detail_1_1_basic_result_a8beb3ea9d8153ee786cb1f5578f938a8}{ParserResult::runtimeError}}(\ \textcolor{stringliteral}{"{}keypress\ argument\ must\ be\ one\ of:\ start,\ exit\ or\ both.\ '"{}}\ +\ keypress\ +\ \textcolor{stringliteral}{"{}'\ not\ recognised"{}}\ );}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l07884}07884\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{class_catch_1_1clara_1_1detail_1_1_basic_result_ac48a1cb282f89218d149c021cbd32eb6}{ParserResult::ok}}(\ ParseResultType::Matched\ );}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l07885}07885\ \ \ \ \ \ \ \ \ \ \ \ \ \};}
-\DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l07886}07886\ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ \textcolor{keyword}{const}\ setVerbosity\ =\ [\&](\ std::string\ \textcolor{keyword}{const}\&\ \mbox{\hyperlink{namespaceupload_a79aff46409a98c4e5f608c8df1fd4612}{verbosity}}\ )\ \{}
+\DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l07886}07886\ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ \textcolor{keyword}{const}\ setVerbosity\ =\ [\&](\ std::string\ \textcolor{keyword}{const}\&\ verbosity\ )\ \{}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l07887}07887\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ lcVerbosity\ =\ \mbox{\hyperlink{namespace_catch_ac036a17412d318598ffda8e1fe7a1177}{toLower}}(\ verbosity\ );}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l07888}07888\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ lcVerbosity\ ==\ \textcolor{stringliteral}{"{}quiet"{}}\ )}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l07889}07889\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classconfig}{config}}.verbosity\ =\ \mbox{\hyperlink{namespace_catch_af85c0d46dfe687d923a157362fd07737a098753f8980036f4b936e3d4b6997111}{Verbosity::Quiet}};}
@@ -7962,19 +7962,19 @@
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l08006}08006\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ file[0]\ ==\ \textcolor{charliteral}{'\(\backslash\)0'};}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l08007}08007\ \ \ \ \ \}}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l08008}08008\ \ \ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{struct_catch_1_1_source_line_info_af07e4fdeddf8409b91e4f842f6264cf8}{SourceLineInfo::operator\ ==\ }}(\ SourceLineInfo\ \textcolor{keyword}{const}\&\ other\ )\ \textcolor{keyword}{const}\ \textcolor{keyword}{noexcept}\ \{}
-\DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l08009}08009\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespacevalidate__reflection_a54d4e98ade8417b88a7e3859a693630a}{line}}\ ==\ \mbox{\hyperlink{namespace_c_l_i_1_1detail_ad707439590ee4ceafd3f41e0b5390617a795f3202b17cb6bc3d4b771d8c6c9eaf}{other}}.line\ \&\&\ (file\ ==\ \mbox{\hyperlink{namespace_c_l_i_1_1detail_ad707439590ee4ceafd3f41e0b5390617a795f3202b17cb6bc3d4b771d8c6c9eaf}{other}}.file\ ||\ std::strcmp(file,\ \mbox{\hyperlink{namespace_c_l_i_1_1detail_ad707439590ee4ceafd3f41e0b5390617a795f3202b17cb6bc3d4b771d8c6c9eaf}{other}}.file)\ ==\ 0);}
+\DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l08009}08009\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ line\ ==\ \mbox{\hyperlink{namespace_c_l_i_1_1detail_ad707439590ee4ceafd3f41e0b5390617a795f3202b17cb6bc3d4b771d8c6c9eaf}{other}}.line\ \&\&\ (file\ ==\ \mbox{\hyperlink{namespace_c_l_i_1_1detail_ad707439590ee4ceafd3f41e0b5390617a795f3202b17cb6bc3d4b771d8c6c9eaf}{other}}.file\ ||\ std::strcmp(file,\ \mbox{\hyperlink{namespace_c_l_i_1_1detail_ad707439590ee4ceafd3f41e0b5390617a795f3202b17cb6bc3d4b771d8c6c9eaf}{other}}.file)\ ==\ 0);}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l08010}08010\ \ \ \ \ \}}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l08011}08011\ \ \ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{struct_catch_1_1_source_line_info_af77415416919d2d6030b4be085b92f7a}{SourceLineInfo::operator\ <\ }}(\ SourceLineInfo\ \textcolor{keyword}{const}\&\ other\ )\ \textcolor{keyword}{const}\ \textcolor{keyword}{noexcept}\ \{}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l08012}08012\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ We\ can\ assume\ that\ the\ same\ file\ will\ usually\ have\ the\ same\ pointer.}}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l08013}08013\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Thus,\ if\ the\ pointers\ are\ the\ same,\ there\ is\ no\ point\ in\ calling\ the\ strcmp}}
-\DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l08014}08014\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespacevalidate__reflection_a54d4e98ade8417b88a7e3859a693630a}{line}}\ <\ \mbox{\hyperlink{namespace_c_l_i_1_1detail_ad707439590ee4ceafd3f41e0b5390617a795f3202b17cb6bc3d4b771d8c6c9eaf}{other}}.line\ ||\ (\ \mbox{\hyperlink{namespacevalidate__reflection_a54d4e98ade8417b88a7e3859a693630a}{line}}\ ==\ \mbox{\hyperlink{namespace_c_l_i_1_1detail_ad707439590ee4ceafd3f41e0b5390617a795f3202b17cb6bc3d4b771d8c6c9eaf}{other}}.line\ \&\&\ file\ !=\ \mbox{\hyperlink{namespace_c_l_i_1_1detail_ad707439590ee4ceafd3f41e0b5390617a795f3202b17cb6bc3d4b771d8c6c9eaf}{other}}.file\ \&\&\ (std::strcmp(file,\ \mbox{\hyperlink{namespace_c_l_i_1_1detail_ad707439590ee4ceafd3f41e0b5390617a795f3202b17cb6bc3d4b771d8c6c9eaf}{other}}.file)\ <\ 0));}
+\DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l08014}08014\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ line\ <\ \mbox{\hyperlink{namespace_c_l_i_1_1detail_ad707439590ee4ceafd3f41e0b5390617a795f3202b17cb6bc3d4b771d8c6c9eaf}{other}}.line\ ||\ (\ line\ ==\ \mbox{\hyperlink{namespace_c_l_i_1_1detail_ad707439590ee4ceafd3f41e0b5390617a795f3202b17cb6bc3d4b771d8c6c9eaf}{other}}.line\ \&\&\ file\ !=\ \mbox{\hyperlink{namespace_c_l_i_1_1detail_ad707439590ee4ceafd3f41e0b5390617a795f3202b17cb6bc3d4b771d8c6c9eaf}{other}}.file\ \&\&\ (std::strcmp(file,\ \mbox{\hyperlink{namespace_c_l_i_1_1detail_ad707439590ee4ceafd3f41e0b5390617a795f3202b17cb6bc3d4b771d8c6c9eaf}{other}}.file)\ <\ 0));}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l08015}08015\ \ \ \ \ \}}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l08016}08016\ }
-\DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l08017}08017\ \ \ \ \ std::ostream\&\ \mbox{\hyperlink{namespace_catch_abf821d46e662c8d93d80a98d79a10314}{operator\ <<\ }}(\ std::ostream\&\ os,\ SourceLineInfo\ \textcolor{keyword}{const}\&\ info\ )\ \{}
+\DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l08017}08017\ \ \ \ \ std::ostream\&\ \mbox{\hyperlink{namespace_catch_abf821d46e662c8d93d80a98d79a10314}{operator\ <<\ }}(\ std::ostream\&\ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}},\ SourceLineInfo\ \textcolor{keyword}{const}\&\ info\ )\ \{}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l08018}08018\ \textcolor{preprocessor}{\#ifndef\ \_\_GNUG\_\_}}
-\DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l08019}08019\ \ \ \ \ \ \ \ \ os\ <<\ info.file\ <<\ \textcolor{charliteral}{'('}\ <<\ info.line\ <<\ \textcolor{charliteral}{')'};}
+\DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l08019}08019\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}\ <<\ info.file\ <<\ \textcolor{charliteral}{'('}\ <<\ info.line\ <<\ \textcolor{charliteral}{')'};}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l08020}08020\ \textcolor{preprocessor}{\#else}}
-\DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l08021}08021\ \ \ \ \ \ \ \ \ os\ <<\ info.file\ <<\ \textcolor{charliteral}{':'}\ <<\ info.line;}
+\DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l08021}08021\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}\ <<\ info.file\ <<\ \textcolor{charliteral}{':'}\ <<\ info.line;}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l08022}08022\ \textcolor{preprocessor}{\#endif}}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l08023}08023\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}};}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l08024}08024\ \ \ \ \ \}}
@@ -7996,13 +7996,13 @@
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l08040}08040\ \ \ \ \ :\ \ \ m\_data(\ data\ ),}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l08041}08041\ \ \ \ \ \ \ \ \ m\_stream(\ openStream()\ )}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l08042}08042\ \ \ \ \ \{}
-\DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l08043}08043\ \ \ \ \ \ \ \ \ TestSpecParser\ \mbox{\hyperlink{namespaceupload_af9e508d19dc2dd9cdb7c642dde0bdd21}{parser}}(\mbox{\hyperlink{struct_catch_1_1_i_tag_alias_registry_a7c4bf6e2fc52de95fb2596ba19b3bf76}{ITagAliasRegistry::get}}());}
+\DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l08043}08043\ \ \ \ \ \ \ \ \ TestSpecParser\ parser(\mbox{\hyperlink{struct_catch_1_1_i_tag_alias_registry_a7c4bf6e2fc52de95fb2596ba19b3bf76}{ITagAliasRegistry::get}}());}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l08044}08044\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!data.testsOrTags.empty())\ \{}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l08045}08045\ \ \ \ \ \ \ \ \ \ \ \ \ m\_hasTestFilters\ =\ \textcolor{keyword}{true};}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l08046}08046\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}(\ \textcolor{keyword}{auto}\ \textcolor{keyword}{const}\&\ testOrTags\ :\ data.testsOrTags\ )}
-\DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l08047}08047\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespaceupload_af9e508d19dc2dd9cdb7c642dde0bdd21}{parser}}.parse(\ testOrTags\ );}
+\DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l08047}08047\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ parser.parse(\ testOrTags\ );}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l08048}08048\ \ \ \ \ \ \ \ \ \}}
-\DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l08049}08049\ \ \ \ \ \ \ \ \ m\_testSpec\ =\ \mbox{\hyperlink{namespaceupload_af9e508d19dc2dd9cdb7c642dde0bdd21}{parser}}.testSpec();}
+\DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l08049}08049\ \ \ \ \ \ \ \ \ m\_testSpec\ =\ parser.testSpec();}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l08050}08050\ \ \ \ \ \}}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l08051}08051\ }
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l08052}08052\ \ \ \ \ std::string\ \textcolor{keyword}{const}\&\ \mbox{\hyperlink{class_catch_1_1_config_a7ab6757592ffc73a7ceabd11e4a3ef15}{Config::getFilename}}()\textcolor{keyword}{\ const\ }\{}
@@ -8271,7 +8271,7 @@
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l08315}08315\ \ \ \ \ \ \ \ \ impl-\/>use(\ \_colourCode\ );}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l08316}08316\ \ \ \ \ \}}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l08317}08317\ }
-\DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l08318}08318\ \ \ \ \ std::ostream\&\ \mbox{\hyperlink{namespace_catch_abf821d46e662c8d93d80a98d79a10314}{operator\ <<\ }}(\ std::ostream\&\ os,\ Colour\ \textcolor{keyword}{const}\&\ )\ \{}
+\DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l08318}08318\ \ \ \ \ std::ostream\&\ \mbox{\hyperlink{namespace_catch_abf821d46e662c8d93d80a98d79a10314}{operator\ <<\ }}(\ std::ostream\&\ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}},\ Colour\ \textcolor{keyword}{const}\&\ )\ \{}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l08319}08319\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}};}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l08320}08320\ \ \ \ \ \}}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l08321}08321\ }
@@ -8448,11 +8448,11 @@
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l08492}08492\ \ \ \ \ \ \ \ \ \ \ \ \ std::ifstream\ in(\textcolor{stringliteral}{"{}/proc/self/status"{}});}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l08493}08493\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}(\ std::string\ line;\ std::getline(in,\ line);\ )\ \{}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l08494}08494\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{int}\ PREFIX\_LEN\ =\ 11;}
-\DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l08495}08495\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ \mbox{\hyperlink{namespacevalidate__reflection_a54d4e98ade8417b88a7e3859a693630a}{line}}.compare(0,\ PREFIX\_LEN,\ \textcolor{stringliteral}{"{}TracerPid:\(\backslash\)t"{}})\ ==\ 0\ )\ \{}
+\DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l08495}08495\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ line.compare(0,\ PREFIX\_LEN,\ \textcolor{stringliteral}{"{}TracerPid:\(\backslash\)t"{}})\ ==\ 0\ )\ \{}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l08496}08496\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ We're\ traced\ if\ the\ PID\ is\ not\ 0\ and\ no\ other\ PID\ starts}}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l08497}08497\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ with\ 0\ digit,\ so\ it's\ enough\ to\ check\ for\ just\ a\ single}}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l08498}08498\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ character.}}
-\DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l08499}08499\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespacevalidate__reflection_a54d4e98ade8417b88a7e3859a693630a}{line}}.length()\ >\ PREFIX\_LEN\ \&\&\ \mbox{\hyperlink{namespacevalidate__reflection_a54d4e98ade8417b88a7e3859a693630a}{line}}[PREFIX\_LEN]\ !=\ \textcolor{charliteral}{'0'};}
+\DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l08499}08499\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ line.length()\ >\ PREFIX\_LEN\ \&\&\ line[PREFIX\_LEN]\ !=\ \textcolor{charliteral}{'0'};}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l08500}08500\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l08501}08501\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l08502}08502\ }
@@ -8485,13 +8485,13 @@
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l08529}08529\ }
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l08530}08530\ \ \ \ \ \mbox{\hyperlink{struct_catch_1_1_i_transient_expression_a0307b7838f04923c3325e33ce569097c}{ITransientExpression::\string~ITransientExpression}}()\ =\ \textcolor{keywordflow}{default};}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l08531}08531\ }
-\DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l08532}08532\ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespace_catch_a520110c31f26cf9892595772ab814fc0}{formatReconstructedExpression}}(\ std::ostream\ \&os,\ std::string\ \textcolor{keyword}{const}\&\ lhs,\ \mbox{\hyperlink{document_8h_aa6b9fd9f6aa49405a574c362ba9af6b5}{StringRef}}\ \mbox{\hyperlink{unionop}{op}},\ std::string\ \textcolor{keyword}{const}\&\ rhs\ )\ \{}
+\DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l08532}08532\ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespace_catch_a520110c31f26cf9892595772ab814fc0}{formatReconstructedExpression}}(\ std::ostream\ \&\mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}},\ std::string\ \textcolor{keyword}{const}\&\ lhs,\ \mbox{\hyperlink{document_8h_aa6b9fd9f6aa49405a574c362ba9af6b5}{StringRef}}\ \mbox{\hyperlink{unionop}{op}},\ std::string\ \textcolor{keyword}{const}\&\ rhs\ )\ \{}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l08533}08533\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ lhs.size()\ +\ rhs.size()\ <\ 40\ \&\&}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l08534}08534\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ lhs.find(\textcolor{charliteral}{'\(\backslash\)n'})\ ==\ std::string::npos\ \&\&}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l08535}08535\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ rhs.find(\textcolor{charliteral}{'\(\backslash\)n'})\ ==\ std::string::npos\ )}
-\DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l08536}08536\ \ \ \ \ \ \ \ \ \ \ \ \ os\ <<\ lhs\ <<\ \textcolor{stringliteral}{"{}\ "{}}\ <<\ \mbox{\hyperlink{unionop}{op}}\ <<\ \textcolor{stringliteral}{"{}\ "{}}\ <<\ rhs;}
+\DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l08536}08536\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}\ <<\ lhs\ <<\ \textcolor{stringliteral}{"{}\ "{}}\ <<\ \mbox{\hyperlink{unionop}{op}}\ <<\ \textcolor{stringliteral}{"{}\ "{}}\ <<\ rhs;}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l08537}08537\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}}
-\DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l08538}08538\ \ \ \ \ \ \ \ \ \ \ \ \ os\ <<\ lhs\ <<\ \textcolor{stringliteral}{"{}\(\backslash\)n"{}}\ <<\ \mbox{\hyperlink{unionop}{op}}\ <<\ \textcolor{stringliteral}{"{}\(\backslash\)n"{}}\ <<\ rhs;}
+\DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l08538}08538\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}\ <<\ lhs\ <<\ \textcolor{stringliteral}{"{}\(\backslash\)n"{}}\ <<\ \mbox{\hyperlink{unionop}{op}}\ <<\ \textcolor{stringliteral}{"{}\(\backslash\)n"{}}\ <<\ rhs;}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l08539}08539\ \ \ \ \ \}}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l08540}08540\ \}}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l08541}08541\ \textcolor{comment}{//\ end\ catch\_decomposer.cpp}}
@@ -9933,7 +9933,7 @@
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l09979}09979\ }
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l09980}09980\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespace_catch}{Catch}}\ \{}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l09981}09981\ }
-\DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l09982}09982\ \ \ \ \ \textcolor{keyword}{class\ }\mbox{\hyperlink{namespacegmock__test__utils_a959c5af591e4d49b6d35745205b64509}{TestCase}};}
+\DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l09982}09982\ \ \ \ \ \textcolor{keyword}{class\ }TestCase;}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l09983}09983\ \ \ \ \ \textcolor{keyword}{struct\ }IConfig;}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l09984}09984\ }
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l09985}09985\ \ \ \ \ std::vector<TestCase>\ \mbox{\hyperlink{namespace_catch_aa94535d4e961ebfefc7f95cf25f949c4}{sortTests}}(\ IConfig\ \textcolor{keyword}{const}\&\ \mbox{\hyperlink{classconfig}{config}},\ std::vector<TestCase>\ \textcolor{keyword}{const}\&\ unsortedTestCases\ );}
@@ -10823,7 +10823,7 @@
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l10871}10871\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{char}\ \textcolor{keyword}{const}\ *\ \textcolor{keyword}{const}\ \mbox{\hyperlink{struct_catch_1_1_version_a27f53638ae6af8cd9b5aba3cc2dca11f}{branchName}};}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l10872}10872\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{int}\ \textcolor{keyword}{const}\ \mbox{\hyperlink{struct_catch_1_1_version_a15facd4f9ac18f5ff2540bc798885c39}{buildNumber}};}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l10873}10873\ }
-\DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l10874}10874\ \ \ \ \ \ \ \ \ \textcolor{keyword}{friend}\ std::ostream\&\ \mbox{\hyperlink{struct_catch_1_1_version_a6730b4be4f5fa640b39de13d8ffe1dce}{operator\ <<\ }}(\ std::ostream\&\ os,\ \mbox{\hyperlink{struct_catch_1_1_version_af5b9719c18f99ed86d9250ad83673dee}{Version}}\ \textcolor{keyword}{const}\&\ version\ );}
+\DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l10874}10874\ \ \ \ \ \ \ \ \ \textcolor{keyword}{friend}\ std::ostream\&\ \mbox{\hyperlink{struct_catch_1_1_version_a6730b4be4f5fa640b39de13d8ffe1dce}{operator\ <<\ }}(\ std::ostream\&\ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}},\ \mbox{\hyperlink{struct_catch_1_1_version_af5b9719c18f99ed86d9250ad83673dee}{Version}}\ \textcolor{keyword}{const}\&\ version\ );}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l10875}10875\ \ \ \ \ \};}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l10876}10876\ }
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l10877}10877\ \ \ \ \ Version\ \textcolor{keyword}{const}\&\ \mbox{\hyperlink{namespace_catch_a35e54475ed669ef7f7ac00b858e91b2a}{libraryVersion}}();}
@@ -10910,16 +10910,16 @@
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l10958}10958\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keyword}{auto}\&\ testCase\ :\ tests)\ \{}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l10959}10959\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ tags\ =\ testCase.tags;}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l10960}10960\ }
-\DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l10961}10961\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ std::string\ \mbox{\hyperlink{namespaceembed_clara_a1e1bd594f85f58f5dca6c41c0ac720fb}{filename}}\ =\ testCase.lineInfo.file;}
-\DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l10962}10962\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ lastSlash\ =\ \mbox{\hyperlink{namespaceembed_clara_a1e1bd594f85f58f5dca6c41c0ac720fb}{filename}}.find\_last\_of(\textcolor{stringliteral}{"{}\(\backslash\)\(\backslash\)/"{}});}
+\DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l10961}10961\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ std::string\ filename\ =\ testCase.lineInfo.file;}
+\DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l10962}10962\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ lastSlash\ =\ filename.find\_last\_of(\textcolor{stringliteral}{"{}\(\backslash\)\(\backslash\)/"{}});}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l10963}10963\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (lastSlash\ !=\ std::string::npos)\ \{}
-\DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l10964}10964\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespaceembed_clara_a1e1bd594f85f58f5dca6c41c0ac720fb}{filename}}.erase(0,\ lastSlash);}
-\DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l10965}10965\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespaceembed_clara_a1e1bd594f85f58f5dca6c41c0ac720fb}{filename}}[0]\ =\ \textcolor{charliteral}{'\#'};}
+\DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l10964}10964\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ filename.erase(0,\ lastSlash);}
+\DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l10965}10965\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ filename[0]\ =\ \textcolor{charliteral}{'\#'};}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l10966}10966\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l10967}10967\ }
-\DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l10968}10968\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ lastDot\ =\ \mbox{\hyperlink{namespaceembed_clara_a1e1bd594f85f58f5dca6c41c0ac720fb}{filename}}.find\_last\_of(\textcolor{charliteral}{'.'});}
+\DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l10968}10968\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ lastDot\ =\ filename.find\_last\_of(\textcolor{charliteral}{'.'});}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l10969}10969\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (lastDot\ !=\ std::string::npos)\ \{}
-\DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l10970}10970\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespaceembed_clara_a1e1bd594f85f58f5dca6c41c0ac720fb}{filename}}.erase(lastDot);}
+\DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l10970}10970\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ filename.erase(lastDot);}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l10971}10971\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l10972}10972\ }
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l10973}10973\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ tags.push\_back(std::move(filename));}
@@ -11204,7 +11204,7 @@
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l11254}11254\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{mutable}\ std::ofstream\ m\_ofs;}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l11255}11255\ \ \ \ \ \ \ \ \ \textcolor{keyword}{public}:}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l11256}11256\ \ \ \ \ \ \ \ \ \ \ \ \ FileStream(\ \mbox{\hyperlink{document_8h_aa6b9fd9f6aa49405a574c362ba9af6b5}{StringRef}}\ filename\ )\ \{}
-\DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l11257}11257\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ m\_ofs.open(\ \mbox{\hyperlink{namespaceembed_clara_a1e1bd594f85f58f5dca6c41c0ac720fb}{filename}}.c\_str()\ );}
+\DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l11257}11257\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ m\_ofs.open(\ filename.c\_str()\ );}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l11258}11258\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{catch__enforce_8h_aa4c5f453d4352f75712de56e5892849f}{CATCH\_ENFORCE}}(\ !m\_ofs.fail(),\ \textcolor{stringliteral}{"{}Unable\ to\ open\ file:\ '"{}}\ <<\ filename\ <<\ \textcolor{stringliteral}{"{}'"{}}\ );}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l11259}11259\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l11260}11260\ \ \ \ \ \ \ \ \ \ \ \ \ \string~FileStream()\ \textcolor{keyword}{override}\ =\ \textcolor{keywordflow}{default};}
@@ -11247,7 +11247,7 @@
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l11299}11299\ }
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l11301}11301\ }
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l11302}11302\ \ \ \ \ \textcolor{keyword}{auto}\ \mbox{\hyperlink{namespace_catch_af6d27462573d60c30c51acf1c980e3ff}{makeStream}}(\ \mbox{\hyperlink{document_8h_aa6b9fd9f6aa49405a574c362ba9af6b5}{StringRef}}\ \textcolor{keyword}{const}\ \&filename\ )\ -\/>\ IStream\ \textcolor{keyword}{const}*\ \{}
-\DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l11303}11303\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ \mbox{\hyperlink{namespaceembed_clara_a1e1bd594f85f58f5dca6c41c0ac720fb}{filename}}.empty()\ )}
+\DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l11303}11303\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ filename.empty()\ )}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l11304}11304\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{new}\ detail::CoutStream();}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l11305}11305\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}(\ filename[0]\ ==\ \textcolor{charliteral}{'\%'}\ )\ \{}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l11306}11306\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ filename\ ==\ \textcolor{stringliteral}{"{}\%debug"{}}\ )}
@@ -11371,10 +11371,10 @@
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l11425}11425\ \ \ \ \ \ \ \ \ m\_label(\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a22f45a3cb4f074e609f58ebaeef0ecf9}{label}}\ )}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l11426}11426\ \ \ \ \ \{\}}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l11427}11427\ }
-\DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l11428}11428\ \ \ \ \ std::ostream\&\ \mbox{\hyperlink{namespace_catch_abf821d46e662c8d93d80a98d79a10314}{operator\ <<\ }}(\ std::ostream\&\ os,\ pluralise\ \textcolor{keyword}{const}\&\ pluraliser\ )\ \{}
-\DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l11429}11429\ \ \ \ \ \ \ \ \ os\ <<\ pluraliser.m\_count\ <<\ \textcolor{charliteral}{'\ '}\ <<\ pluraliser.m\_label;}
+\DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l11428}11428\ \ \ \ \ std::ostream\&\ \mbox{\hyperlink{namespace_catch_abf821d46e662c8d93d80a98d79a10314}{operator\ <<\ }}(\ std::ostream\&\ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}},\ pluralise\ \textcolor{keyword}{const}\&\ pluraliser\ )\ \{}
+\DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l11429}11429\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}\ <<\ pluraliser.m\_count\ <<\ \textcolor{charliteral}{'\ '}\ <<\ pluraliser.m\_label;}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l11430}11430\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ pluraliser.m\_count\ !=\ 1\ )}
-\DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l11431}11431\ \ \ \ \ \ \ \ \ \ \ \ \ os\ <<\ \textcolor{charliteral}{'s'};}
+\DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l11431}11431\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}\ <<\ \textcolor{charliteral}{'s'};}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l11432}11432\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}};}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l11433}11433\ \ \ \ \ \}}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l11434}11434\ }
@@ -11485,8 +11485,8 @@
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l11539}11539\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ std::string(\ lhs\ )\ +\ \mbox{\hyperlink{namespacestd}{std}}::string(\ rhs\ );}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l11540}11540\ \ \ \ \ \}}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l11541}11541\ }
-\DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l11542}11542\ \ \ \ \ \textcolor{keyword}{auto}\ \mbox{\hyperlink{single__include_2catch2_2catch_8hpp_aae0cdd5d2f0ac242b9ab18b0f66ba26e}{operator\ <<\ }}(\ std::ostream\&\ os,\ \mbox{\hyperlink{document_8h_aa6b9fd9f6aa49405a574c362ba9af6b5}{StringRef}}\ \textcolor{keyword}{const}\&\ str\ )\ -\/>\ std::ostream\&\ \{}
-\DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l11543}11543\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ os.write(\mbox{\hyperlink{namespace_c_l_i_1_1detail_ab4542375c903302c3876ce0403d55596}{str}}.currentData(),\ \mbox{\hyperlink{namespace_c_l_i_1_1detail_ab4542375c903302c3876ce0403d55596}{str}}.size());}
+\DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l11542}11542\ \ \ \ \ \textcolor{keyword}{auto}\ \mbox{\hyperlink{single__include_2catch2_2catch_8hpp_aae0cdd5d2f0ac242b9ab18b0f66ba26e}{operator\ <<\ }}(\ std::ostream\&\ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}},\ \mbox{\hyperlink{document_8h_aa6b9fd9f6aa49405a574c362ba9af6b5}{StringRef}}\ \textcolor{keyword}{const}\&\ str\ )\ -\/>\ std::ostream\&\ \{}
+\DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l11543}11543\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}.write(\mbox{\hyperlink{namespace_c_l_i_1_1detail_ab4542375c903302c3876ce0403d55596}{str}}.currentData(),\ \mbox{\hyperlink{namespace_c_l_i_1_1detail_ab4542375c903302c3876ce0403d55596}{str}}.size());}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l11544}11544\ \ \ \ \ \}}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l11545}11545\ }
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l11546}11546\ \ \ \ \ \textcolor{keyword}{auto}\ \mbox{\hyperlink{namespace_catch_a7209c96e886c406e1fcaff562c20311b}{operator+=}}(\ std::string\&\ lhs,\ \mbox{\hyperlink{document_8h_aa6b9fd9f6aa49405a574c362ba9af6b5}{StringRef}}\ \textcolor{keyword}{const}\&\ rhs\ )\ -\/>\ std::string\&\ \{}
@@ -11606,7 +11606,7 @@
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l11660}11660\ \ \ \ \ \ \ \ \ \}}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l11661}11661\ \ \ \ \ \}}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l11662}11662\ }
-\DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l11663}11663\ \ \ \ \ \mbox{\hyperlink{namespacegmock__test__utils_a959c5af591e4d49b6d35745205b64509}{TestCase}}\ \mbox{\hyperlink{namespace_catch_a0d7fc9d074bde40c74ce4ffd27fe72b2}{makeTestCase}}(\ \ ITestInvoker*\ \_testCase,}
+\DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l11663}11663\ \ \ \ \ TestCase\ \mbox{\hyperlink{namespace_catch_a0d7fc9d074bde40c74ce4ffd27fe72b2}{makeTestCase}}(\ \ ITestInvoker*\ \_testCase,}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l11664}11664\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ std::string\ \textcolor{keyword}{const}\&\ \_className,}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l11665}11665\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ NameAndTags\ \textcolor{keyword}{const}\&\ nameAndTags,}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l11666}11666\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ SourceLineInfo\ \textcolor{keyword}{const}\&\ \_lineInfo\ )}
@@ -11652,7 +11652,7 @@
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l11706}11706\ \ \ \ \ \ \ \ \ \}}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l11707}11707\ }
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l11708}11708\ \ \ \ \ \ \ \ \ TestCaseInfo\ info(\ nameAndTags.name,\ \_className,\ desc,\ tags,\ \_lineInfo\ );}
-\DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l11709}11709\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespacegmock__test__utils_a959c5af591e4d49b6d35745205b64509}{TestCase}}(\ \_testCase,\ std::move(info)\ );}
+\DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l11709}11709\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ TestCase(\ \_testCase,\ std::move(info)\ );}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l11710}11710\ \ \ \ \ \}}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l11711}11711\ }
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l11712}11712\ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespace_catch_a1ef5335bb0779f7b8425b32686959768}{setTags}}(\ TestCaseInfo\&\ testCaseInfo,\ std::vector<std::string>\ tags\ )\ \{}
@@ -11714,7 +11714,7 @@
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l11768}11768\ }
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l11769}11769\ \ \ \ \ \mbox{\hyperlink{class_catch_1_1_test_case_aae5709fc1cb68e19ab0ac27e1ffd6a76}{TestCase::TestCase}}(\ ITestInvoker*\ testCase,\ TestCaseInfo\&\&\ info\ )\ :\ TestCaseInfo(\ \mbox{\hyperlink{namespacestd}{std}}::move(info)\ ),\ \mbox{\hyperlink{namespacewebsocketpp_1_1error_a0558d884e44e79146ad4947aea63f68daee5b74d2be31ca48e104578d6c2b7425}{test}}(\ testCase\ )\ \{\}}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l11770}11770\ }
-\DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l11771}11771\ \ \ \ \ \mbox{\hyperlink{namespacegmock__test__utils_a959c5af591e4d49b6d35745205b64509}{TestCase}}\ \mbox{\hyperlink{class_catch_1_1_test_case_a0812e8a216d09b087d5874687009f0d6}{TestCase::withName}}(\ std::string\ \textcolor{keyword}{const}\&\ \_newName\ )\textcolor{keyword}{\ const\ }\{}
+\DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l11771}11771\ \ \ \ \ TestCase\ \mbox{\hyperlink{class_catch_1_1_test_case_a0812e8a216d09b087d5874687009f0d6}{TestCase::withName}}(\ std::string\ \textcolor{keyword}{const}\&\ \_newName\ )\textcolor{keyword}{\ const\ }\{}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l11772}11772\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_catch_1_1_test_case_aae5709fc1cb68e19ab0ac27e1ffd6a76}{TestCase}}\ \mbox{\hyperlink{namespace_c_l_i_1_1detail_ad707439590ee4ceafd3f41e0b5390617a795f3202b17cb6bc3d4b771d8c6c9eaf}{other}}(\ *\textcolor{keyword}{this}\ );}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l11773}11773\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_c_l_i_1_1detail_ad707439590ee4ceafd3f41e0b5390617a795f3202b17cb6bc3d4b771d8c6c9eaf}{other}}.name\ =\ \_newName;}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l11774}11774\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespace_c_l_i_1_1detail_ad707439590ee4ceafd3f41e0b5390617a795f3202b17cb6bc3d4b771d8c6c9eaf}{other}};}
@@ -12629,13 +12629,13 @@
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l12686}12686\ \ \ \ \ \ \ \ \ buildNumber(\ \_buildNumber\ )}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l12687}12687\ \ \ \ \ \{\}}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l12688}12688\ }
-\DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l12689}12689\ \ \ \ \ std::ostream\&\ \mbox{\hyperlink{namespace_catch_abf821d46e662c8d93d80a98d79a10314}{operator\ <<\ }}(\ std::ostream\&\ os,\ Version\ \textcolor{keyword}{const}\&\ version\ )\ \{}
-\DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l12690}12690\ \ \ \ \ \ \ \ \ os\ \ <<\ \mbox{\hyperlink{namespacewebsocketpp_1_1http_1_1parser_1_1state_a12f378e0c6dbf373781e7988ee4a0853a08c88a938bc459c7997b48f74248752f}{version}}.majorVersion\ <<\ \textcolor{charliteral}{'.'}}
+\DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l12689}12689\ \ \ \ \ std::ostream\&\ \mbox{\hyperlink{namespace_catch_abf821d46e662c8d93d80a98d79a10314}{operator\ <<\ }}(\ std::ostream\&\ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}},\ Version\ \textcolor{keyword}{const}\&\ version\ )\ \{}
+\DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l12690}12690\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}\ \ <<\ \mbox{\hyperlink{namespacewebsocketpp_1_1http_1_1parser_1_1state_a12f378e0c6dbf373781e7988ee4a0853a08c88a938bc459c7997b48f74248752f}{version}}.majorVersion\ <<\ \textcolor{charliteral}{'.'}}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l12691}12691\ \ \ \ \ \ \ \ \ \ \ \ \ <<\ \mbox{\hyperlink{namespacewebsocketpp_1_1http_1_1parser_1_1state_a12f378e0c6dbf373781e7988ee4a0853a08c88a938bc459c7997b48f74248752f}{version}}.minorVersion\ <<\ \textcolor{charliteral}{'.'}}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l12692}12692\ \ \ \ \ \ \ \ \ \ \ \ \ <<\ \mbox{\hyperlink{namespacewebsocketpp_1_1http_1_1parser_1_1state_a12f378e0c6dbf373781e7988ee4a0853a08c88a938bc459c7997b48f74248752f}{version}}.patchNumber;}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l12693}12693\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ branchName\ is\ never\ null\ -\/>\ 0th\ char\ is\ \(\backslash\)0\ if\ it\ is\ empty}}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l12694}12694\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{namespacewebsocketpp_1_1http_1_1parser_1_1state_a12f378e0c6dbf373781e7988ee4a0853a08c88a938bc459c7997b48f74248752f}{version}}.branchName[0])\ \{}
-\DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l12695}12695\ \ \ \ \ \ \ \ \ \ \ \ \ os\ <<\ \textcolor{charliteral}{'-\/'}\ <<\ \mbox{\hyperlink{namespacewebsocketpp_1_1http_1_1parser_1_1state_a12f378e0c6dbf373781e7988ee4a0853a08c88a938bc459c7997b48f74248752f}{version}}.branchName}
+\DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l12695}12695\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}\ <<\ \textcolor{charliteral}{'-\/'}\ <<\ \mbox{\hyperlink{namespacewebsocketpp_1_1http_1_1parser_1_1state_a12f378e0c6dbf373781e7988ee4a0853a08c88a938bc459c7997b48f74248752f}{version}}.branchName}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l12696}12696\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ <<\ \textcolor{charliteral}{'.'}\ <<\ \mbox{\hyperlink{namespacewebsocketpp_1_1http_1_1parser_1_1state_a12f378e0c6dbf373781e7988ee4a0853a08c88a938bc459c7997b48f74248752f}{version}}.buildNumber;}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l12697}12697\ \ \ \ \ \ \ \ \ \}}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l12698}12698\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}};}
@@ -12725,12 +12725,12 @@
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l12782}12782\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{catch__enforce_8h_a05b6c8a530fa2e5b397add8966522777}{CATCH\_INTERNAL\_ERROR}}(\textcolor{stringliteral}{"{}Invalid\ multibyte\ utf-\/8\ start\ byte\ encountered"{}});}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l12783}12783\ \ \ \ \ \}}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l12784}12784\ }
-\DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l12785}12785\ \ \ \ \ \textcolor{keywordtype}{void}\ hexEscapeChar(std::ostream\&\ os,\ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}\ c)\ \{}
-\DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l12786}12786\ \ \ \ \ \ \ \ \ std::ios\_base::fmtflags\ \mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}}(os.flags());}
-\DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l12787}12787\ \ \ \ \ \ \ \ \ os\ <<\ \textcolor{stringliteral}{"{}\(\backslash\)\(\backslash\)x"{}}}
+\DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l12785}12785\ \ \ \ \ \textcolor{keywordtype}{void}\ hexEscapeChar(std::ostream\&\ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}},\ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}\ c)\ \{}
+\DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l12786}12786\ \ \ \ \ \ \ \ \ std::ios\_base::fmtflags\ \mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}}(\mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}.flags());}
+\DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l12787}12787\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}\ <<\ \textcolor{stringliteral}{"{}\(\backslash\)\(\backslash\)x"{}}}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l12788}12788\ \ \ \ \ \ \ \ \ \ \ \ \ <<\ std::uppercase\ <<\ std::hex\ <<\ std::setfill(\textcolor{charliteral}{'0'})\ <<\ std::setw(2)}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l12789}12789\ \ \ \ \ \ \ \ \ \ \ \ \ <<\ \textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{int}\textcolor{keyword}{>}(c);}
-\DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l12790}12790\ \ \ \ \ \ \ \ \ os.flags(\mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}});}
+\DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l12790}12790\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}.flags(\mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}});}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l12791}12791\ \ \ \ \ \}}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l12792}12792\ }
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l12793}12793\ \}\ \textcolor{comment}{//\ anonymous\ namespace}}
@@ -12740,29 +12740,29 @@
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l12797}12797\ \ \ \ \ \ \ \ \ m\_forWhat(\ forWhat\ )}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l12798}12798\ \ \ \ \ \{\}}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l12799}12799\ }
-\DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l12800}12800\ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{class_catch_1_1_xml_encode_a030fe9de7193fcdbdc06ade38f0113ce}{XmlEncode::encodeTo}}(\ std::ostream\&\ os\ )\textcolor{keyword}{\ const\ }\{}
+\DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l12800}12800\ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{class_catch_1_1_xml_encode_a030fe9de7193fcdbdc06ade38f0113ce}{XmlEncode::encodeTo}}(\ std::ostream\&\ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}\ )\textcolor{keyword}{\ const\ }\{}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l12801}12801\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Apostrophe\ escaping\ not\ necessary\ if\ we\ always\ use\ "{}\ to\ write\ attributes}}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l12802}12802\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ (see:\ http://www.w3.org/TR/xml/\#syntax)}}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l12803}12803\ }
-\DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l12804}12804\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}(\ std::size\_t\ idx\ =\ 0;\ \mbox{\hyperlink{namespacehost__functions__tests__1_a8496a24b5236a2dc07bb4f2930d88342}{idx}}\ <\ m\_str.size();\ ++\ \mbox{\hyperlink{namespacehost__functions__tests__1_a8496a24b5236a2dc07bb4f2930d88342}{idx}}\ )\ \{}
+\DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l12804}12804\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}(\ std::size\_t\ idx\ =\ 0;\ idx\ <\ m\_str.size();\ ++\ idx\ )\ \{}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l12805}12805\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{include_2internal_2catch__xmlwriter_8cpp_ae48ac2456c5ad6c956fef86e7bef3a21}{uchar}}\ c\ =\ m\_str[idx];}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l12806}12806\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{switch}\ (c)\ \{}
-\DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l12807}12807\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'<'}:\ \ \ os\ <<\ \textcolor{stringliteral}{"{}\&lt;"{}};\ \textcolor{keywordflow}{break};}
-\DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l12808}12808\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'\&'}:\ \ \ os\ <<\ \textcolor{stringliteral}{"{}\&amp;"{}};\ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l12807}12807\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'<'}:\ \ \ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}\ <<\ \textcolor{stringliteral}{"{}\&lt;"{}};\ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l12808}12808\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'\&'}:\ \ \ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}\ <<\ \textcolor{stringliteral}{"{}\&amp;"{}};\ \textcolor{keywordflow}{break};}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l12809}12809\ }
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l12810}12810\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'>'}:}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l12811}12811\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ See:\ http://www.w3.org/TR/xml/\#syntax}}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l12812}12812\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (idx\ >\ 2\ \&\&\ m\_str[idx\ -\/\ 1]\ ==\ \textcolor{charliteral}{']'}\ \&\&\ m\_str[idx\ -\/\ 2]\ ==\ \textcolor{charliteral}{']'})}
-\DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l12813}12813\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ os\ <<\ \textcolor{stringliteral}{"{}\&gt;"{}};}
+\DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l12813}12813\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}\ <<\ \textcolor{stringliteral}{"{}\&gt;"{}};}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l12814}12814\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}}
-\DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l12815}12815\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ os\ <<\ c;}
+\DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l12815}12815\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}\ <<\ c;}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l12816}12816\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l12817}12817\ }
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l12818}12818\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'\(\backslash\)"{}'}:}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l12819}12819\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (m\_forWhat\ ==\ \mbox{\hyperlink{class_catch_1_1_xml_encode_a81ed50fe458d1aae3481781b4d599b7aa3cdd995cc66ae405a4793a98db186005}{ForAttributes}})}
-\DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l12820}12820\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ os\ <<\ \textcolor{stringliteral}{"{}\&quot;"{}};}
+\DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l12820}12820\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}\ <<\ \textcolor{stringliteral}{"{}\&quot;"{}};}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l12821}12821\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}}
-\DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l12822}12822\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ os\ <<\ c;}
+\DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l12822}12822\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}\ <<\ c;}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l12823}12823\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l12824}12824\ }
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l12825}12825\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{default}:}
@@ -12771,13 +12771,13 @@
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l12828}12828\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Escape\ control\ characters\ in\ standard\ ascii}}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l12829}12829\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ see\ http://stackoverflow.com/questions/404107/why-\/are-\/control-\/characters-\/illegal-\/in-\/xml-\/1-\/0}}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l12830}12830\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (c\ <\ 0x09\ ||\ (c\ >\ 0x0D\ \&\&\ c\ <\ 0x20)\ ||\ c\ ==\ 0x7F)\ \{}
-\DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l12831}12831\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ hexEscapeChar(os,\ c);}
+\DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l12831}12831\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ hexEscapeChar(\mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}},\ c);}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l12832}12832\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l12833}12833\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l12834}12834\ }
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l12835}12835\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Plain\ ASCII:\ Write\ it\ to\ stream}}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l12836}12836\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (c\ <\ 0x7F)\ \{}
-\DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l12837}12837\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ os\ <<\ c;}
+\DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l12837}12837\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}\ <<\ c;}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l12838}12838\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l12839}12839\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l12840}12840\ }
@@ -12789,14 +12789,14 @@
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l12846}12846\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Or\ as\ 10XX\ XXXX}}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l12847}12847\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (c\ <\ \ 0xC0\ ||}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l12848}12848\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ c\ >=\ 0xF8)\ \{}
-\DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l12849}12849\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ hexEscapeChar(os,\ c);}
+\DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l12849}12849\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ hexEscapeChar(\mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}},\ c);}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l12850}12850\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l12851}12851\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l12852}12852\ }
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l12853}12853\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ encBytes\ =\ trailingBytes(c);}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l12854}12854\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Are\ there\ enough\ bytes\ left\ to\ avoid\ accessing\ out-\/of-\/bounds\ memory?}}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l12855}12855\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (idx\ +\ encBytes\ -\/\ 1\ >=\ m\_str.size())\ \{}
-\DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l12856}12856\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ hexEscapeChar(os,\ c);}
+\DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l12856}12856\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ hexEscapeChar(\mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}},\ c);}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l12857}12857\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l12858}12858\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l12859}12859\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ The\ header\ is\ valid,\ check\ data}}
@@ -12820,22 +12820,22 @@
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l12877}12877\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Encoded\ value\ out\ of\ range}}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l12878}12878\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}}\ >=\ 0x110000)}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l12879}12879\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ )\ \{}
-\DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l12880}12880\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ hexEscapeChar(os,\ c);}
+\DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l12880}12880\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ hexEscapeChar(\mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}},\ c);}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l12881}12881\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l12882}12882\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l12883}12883\ }
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l12884}12884\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ If\ we\ got\ here,\ this\ is\ in\ fact\ a\ valid(ish)\ utf-\/8\ sequence}}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l12885}12885\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (std::size\_t\ n\ =\ 0;\ n\ <\ encBytes;\ ++n)\ \{}
-\DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l12886}12886\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ os\ <<\ m\_str[idx\ +\ n];}
+\DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l12886}12886\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}\ <<\ m\_str[idx\ +\ n];}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l12887}12887\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
-\DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l12888}12888\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacehost__functions__tests__1_a8496a24b5236a2dc07bb4f2930d88342}{idx}}\ +=\ encBytes\ -\/\ 1;}
+\DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l12888}12888\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ idx\ +=\ encBytes\ -\/\ 1;}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l12889}12889\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l12890}12890\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l12891}12891\ \ \ \ \ \ \ \ \ \}}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l12892}12892\ \ \ \ \ \}}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l12893}12893\ }
-\DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l12894}12894\ \ \ \ \ std::ostream\&\ \mbox{\hyperlink{single__include_2catch2_2catch_8hpp_aae0cdd5d2f0ac242b9ab18b0f66ba26e}{operator\ <<\ }}(\ std::ostream\&\ os,\ XmlEncode\ \textcolor{keyword}{const}\&\ xmlEncode\ )\ \{}
-\DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l12895}12895\ \ \ \ \ \ \ \ \ xmlEncode.encodeTo(\ os\ );}
+\DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l12894}12894\ \ \ \ \ std::ostream\&\ \mbox{\hyperlink{single__include_2catch2_2catch_8hpp_aae0cdd5d2f0ac242b9ab18b0f66ba26e}{operator\ <<\ }}(\ std::ostream\&\ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}},\ XmlEncode\ \textcolor{keyword}{const}\&\ xmlEncode\ )\ \{}
+\DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l12895}12895\ \ \ \ \ \ \ \ \ xmlEncode.encodeTo(\ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}\ );}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l12896}12896\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}};}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l12897}12897\ \ \ \ \ \}}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l12898}12898\ }
@@ -12866,7 +12866,7 @@
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l12923}12923\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ *\textcolor{keyword}{this};}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l12924}12924\ \ \ \ \ \}}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l12925}12925\ }
-\DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l12926}12926\ \ \ \ \ \mbox{\hyperlink{class_catch_1_1_xml_writer_a2a225ace22c50f160f57f026b68f949e}{XmlWriter::XmlWriter}}(\ std::ostream\&\ os\ )\ :\ m\_os(\ os\ )}
+\DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l12926}12926\ \ \ \ \ \mbox{\hyperlink{class_catch_1_1_xml_writer_a2a225ace22c50f160f57f026b68f949e}{XmlWriter::XmlWriter}}(\ std::ostream\&\ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}\ )\ :\ m\_os(\ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}\ )}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l12927}12927\ \ \ \ \ \{}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l12928}12928\ \ \ \ \ \ \ \ \ writeDeclaration();}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l12929}12929\ \ \ \ \ \}}
@@ -13188,7 +13188,7 @@
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l13245}13245\ \ \ \ \ \}}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l13246}13246\ }
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l13247}13247\ \ \ \ \ \textcolor{keywordtype}{void}\ printIssue(std::string\ \textcolor{keyword}{const}\&\ issue)\textcolor{keyword}{\ const\ }\{}
-\DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l13248}13248\ \ \ \ \ \ \ \ \ stream\ <<\ \textcolor{charliteral}{'\ '}\ <<\ \mbox{\hyperlink{namespacerelease_notes_a5a6bc84216487df99969536c45395339}{issue}};}
+\DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l13248}13248\ \ \ \ \ \ \ \ \ stream\ <<\ \textcolor{charliteral}{'\ '}\ <<\ issue;}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l13249}13249\ \ \ \ \ \}}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l13250}13250\ }
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l13251}13251\ \ \ \ \ \textcolor{keywordtype}{void}\ printExpressionWas()\ \{}
@@ -13555,8 +13555,8 @@
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l13612}13612\ \ \ \ \ \ \ \ \ \}}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l13613}13613\ }
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l13614}13614\ \ \ \ \ \}}
-\DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l13615}13615\ \ \ \ \ \textcolor{keyword}{friend}\ \textcolor{keyword}{auto}\ \mbox{\hyperlink{namespace_catch_abf821d46e662c8d93d80a98d79a10314}{operator\ <<\ }}(std::ostream\&\ os,\ Duration\ \textcolor{keyword}{const}\&\ duration)\ -\/>\ std::ostream\&\ \{}
-\DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l13616}13616\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ os\ <<\ duration.value()\ <<\ \textcolor{stringliteral}{"{}\ "{}}\ <<\ duration.unitsAsString();}
+\DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l13615}13615\ \ \ \ \ \textcolor{keyword}{friend}\ \textcolor{keyword}{auto}\ \mbox{\hyperlink{namespace_catch_abf821d46e662c8d93d80a98d79a10314}{operator\ <<\ }}(std::ostream\&\ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}},\ Duration\ \textcolor{keyword}{const}\&\ duration)\ -\/>\ std::ostream\&\ \{}
+\DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l13616}13616\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}\ <<\ duration.value()\ <<\ \textcolor{stringliteral}{"{}\ "{}}\ <<\ duration.unitsAsString();}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l13617}13617\ \ \ \ \ \}}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l13618}13618\ \};}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l13619}13619\ \}\ \textcolor{comment}{//\ end\ anon\ namespace}}
@@ -13569,8 +13569,8 @@
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l13626}13626\ \ \ \ \ \textcolor{keywordtype}{bool}\ m\_isOpen\ =\ \textcolor{keyword}{false};}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l13627}13627\ }
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l13628}13628\ \textcolor{keyword}{public}:}
-\DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l13629}13629\ \ \ \ \ TablePrinter(\ std::ostream\&\ os,\ std::vector<ColumnInfo>\ columnInfos\ )}
-\DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l13630}13630\ \ \ \ \ :\ \ \ m\_os(\ os\ ),}
+\DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l13629}13629\ \ \ \ \ TablePrinter(\ std::ostream\&\ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}},\ std::vector<ColumnInfo>\ columnInfos\ )}
+\DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l13630}13630\ \ \ \ \ :\ \ \ m\_os(\ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}\ ),}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l13631}13631\ \ \ \ \ \ \ \ \ m\_columnInfos(\ \mbox{\hyperlink{namespacestd}{std}}::move(\ columnInfos\ )\ )\ \{\}}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l13632}13632\ }
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l13633}13633\ \ \ \ \ \textcolor{keyword}{auto}\ columnInfos()\ const\ -\/>\ \mbox{\hyperlink{namespacestd}{std}}::vector<ColumnInfo>\ const\&\ \{}
@@ -13707,7 +13707,7 @@
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l13764}13764\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l13765}13765\ \ \ \ \ \ \ \ \ \ \ \ \ firstLine\ =\ \textcolor{keyword}{false};}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l13766}13766\ }
-\DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l13767}13767\ \ \ \ \ \ \ \ \ (*m\_tablePrinter)\ <<\ \mbox{\hyperlink{namespacevalidate__reflection_a54d4e98ade8417b88a7e3859a693630a}{line}}\ <<\ ColumnBreak();}
+\DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l13767}13767\ \ \ \ \ \ \ \ \ (*m\_tablePrinter)\ <<\ line\ <<\ ColumnBreak();}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l13768}13768\ \ \ \ \ \}}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l13769}13769\ \}}
 \DoxyCodeLine{\Hypertarget{single__include_2catch2_2catch_8hpp_source_l13770}13770\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{struct_catch_1_1_console_reporter_af97510a0cfbd0ac07161c9642b996315}{ConsoleReporter::benchmarkEnded}}(BenchmarkStats\ \textcolor{keyword}{const}\&\ stats)\ \{}

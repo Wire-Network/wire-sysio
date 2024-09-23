@@ -57,9 +57,9 @@ The main use is for creating JSON string values without copying the source strin
 
 {\bfseries{Example}} 
 \begin{DoxyCode}{0}
-\DoxyCodeLine{\mbox{\hyperlink{class_generic_value}{Value}}\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}(\textcolor{stringliteral}{"{}foo"{}});\ \ \ \textcolor{comment}{//\ ok,\ no\ need\ to\ copy\ \&\ calculate\ length}}
+\DoxyCodeLine{\mbox{\hyperlink{class_generic_value}{Value}}\ v(\textcolor{stringliteral}{"{}foo"{}});\ \ \ \textcolor{comment}{//\ ok,\ no\ need\ to\ copy\ \&\ calculate\ length}}
 \DoxyCodeLine{\textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ \mbox{\hyperlink{namespacefoo}{foo}}[]\ =\ \textcolor{stringliteral}{"{}foo"{}};}
-\DoxyCodeLine{\mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.SetString(\mbox{\hyperlink{namespacefoo}{foo}});\ \textcolor{comment}{//\ ok}}
+\DoxyCodeLine{v.SetString(\mbox{\hyperlink{namespacefoo}{foo}});\ \textcolor{comment}{//\ ok}}
 \DoxyCodeLine{}
 \DoxyCodeLine{\textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ \mbox{\hyperlink{namespacebar}{bar}}\ =\ \mbox{\hyperlink{namespacefoo}{foo}};}
 \DoxyCodeLine{\textcolor{comment}{//\ Value\ x(bar);\ //\ not\ ok,\ can't\ rely\ on\ bar's\ lifetime}}

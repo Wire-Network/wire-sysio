@@ -141,9 +141,9 @@ Public Types</h2></td></tr>
 Public Member Functions</h2></td></tr>
 <tr class="memitem:aa5279c8598ec8982546350fb442223f3" id="r_aa5279c8598ec8982546350fb442223f3"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aa5279c8598ec8982546350fb442223f3">Impl</a> (const SizeMatcher &amp;size_matcher)</td></tr>
 <tr class="separator:aa5279c8598ec8982546350fb442223f3"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a6b2524886e5fa751e96495a74d75b7cd" id="r_a6b2524886e5fa751e96495a74d75b7cd"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a6b2524886e5fa751e96495a74d75b7cd">DescribeTo</a> (::std::ostream *os) const</td></tr>
+<tr class="memitem:a6b2524886e5fa751e96495a74d75b7cd" id="r_a6b2524886e5fa751e96495a74d75b7cd"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a6b2524886e5fa751e96495a74d75b7cd">DescribeTo</a> (::std::ostream *<a class="el" href="environment_8hpp.html#a3951483d0b31c29ca95336206cd35238">os</a>) const</td></tr>
 <tr class="separator:a6b2524886e5fa751e96495a74d75b7cd"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a24b76fc2ac7b8d58cb5c7a3c5d5d35ab" id="r_a24b76fc2ac7b8d58cb5c7a3c5d5d35ab"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a24b76fc2ac7b8d58cb5c7a3c5d5d35ab">DescribeNegationTo</a> (::std::ostream *os) const</td></tr>
+<tr class="memitem:a24b76fc2ac7b8d58cb5c7a3c5d5d35ab" id="r_a24b76fc2ac7b8d58cb5c7a3c5d5d35ab"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a24b76fc2ac7b8d58cb5c7a3c5d5d35ab">DescribeNegationTo</a> (::std::ostream *<a class="el" href="environment_8hpp.html#a3951483d0b31c29ca95336206cd35238">os</a>) const</td></tr>
 <tr class="separator:a24b76fc2ac7b8d58cb5c7a3c5d5d35ab"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a5180472f5a18b8c0314ed835c52e09d4" id="r_a5180472f5a18b8c0314ed835c52e09d4"><td class="memItemLeft" align="right" valign="top">virtual bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a5180472f5a18b8c0314ed835c52e09d4">MatchAndExplain</a> (Container container, <a class="el" href="classtesting_1_1_match_result_listener.html">MatchResultListener</a> *listener) const</td></tr>
 <tr class="separator:a5180472f5a18b8c0314ed835c52e09d4"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -263,10 +263,11 @@ template&lt;typename Container &gt; </div>
 
 <p class="definition">Definition at line <a class="el" href="gmock-matchers_8h_source.html#l02718">2718</a> of file <a class="el" href="gmock-matchers_8h_source.html">gmock-matchers.h</a>.</p>
 <div class="fragment"><div class="line"><span class="lineno"> 2718</span>                                                          {</div>
-<div class="line"><span class="lineno"> 2719</span>      *os &lt;&lt; <span class="stringliteral">&quot;size &quot;</span>;</div>
-<div class="line"><span class="lineno"> 2720</span>      size_matcher_.<a class="code hl_function" href="classtesting_1_1internal_1_1_matcher_base.html#ac1089d49b6b8a381900618985cd69b7f">DescribeNegationTo</a>(os);</div>
+<div class="line"><span class="lineno"> 2719</span>      *<a class="code hl_variable" href="environment_8hpp.html#a3951483d0b31c29ca95336206cd35238">os</a> &lt;&lt; <span class="stringliteral">&quot;size &quot;</span>;</div>
+<div class="line"><span class="lineno"> 2720</span>      size_matcher_.<a class="code hl_function" href="classtesting_1_1internal_1_1_matcher_base.html#ac1089d49b6b8a381900618985cd69b7f">DescribeNegationTo</a>(<a class="code hl_variable" href="environment_8hpp.html#a3951483d0b31c29ca95336206cd35238">os</a>);</div>
 <div class="line"><span class="lineno"> 2721</span>    }</div>
 <div class="ttc" id="aclasstesting_1_1internal_1_1_matcher_base_html_ac1089d49b6b8a381900618985cd69b7f"><div class="ttname"><a href="classtesting_1_1internal_1_1_matcher_base.html#ac1089d49b6b8a381900618985cd69b7f">testing::internal::MatcherBase::DescribeNegationTo</a></div><div class="ttdeci">void DescribeNegationTo(::std::ostream *os) const</div><div class="ttdef"><b>Definition</b> <a href="gmock-matchers_8h_source.html#l00299">gmock-matchers.h:299</a></div></div>
+<div class="ttc" id="aenvironment_8hpp_html_a3951483d0b31c29ca95336206cd35238"><div class="ttname"><a href="environment_8hpp.html#a3951483d0b31c29ca95336206cd35238">os</a></div><div class="ttdeci">os_t os</div><div class="ttdef"><b>Definition</b> <a href="environment_8hpp_source.html#l00023">environment.hpp:23</a></div></div>
 </div><!-- fragment --><div class="dynheader">
 Here is the call graph for this function:</div>
 <div class="dyncontent">
@@ -311,8 +312,8 @@ template&lt;typename Container &gt; </div>
 
 <p class="definition">Definition at line <a class="el" href="gmock-matchers_8h_source.html#l02714">2714</a> of file <a class="el" href="gmock-matchers_8h_source.html">gmock-matchers.h</a>.</p>
 <div class="fragment"><div class="line"><span class="lineno"> 2714</span>                                                  {</div>
-<div class="line"><span class="lineno"> 2715</span>      *os &lt;&lt; <span class="stringliteral">&quot;size &quot;</span>;</div>
-<div class="line"><span class="lineno"> 2716</span>      size_matcher_.<a class="code hl_function" href="classtesting_1_1internal_1_1_matcher_base.html#a7e0c883c7745e0d646463077ef1c1267">DescribeTo</a>(os);</div>
+<div class="line"><span class="lineno"> 2715</span>      *<a class="code hl_variable" href="environment_8hpp.html#a3951483d0b31c29ca95336206cd35238">os</a> &lt;&lt; <span class="stringliteral">&quot;size &quot;</span>;</div>
+<div class="line"><span class="lineno"> 2716</span>      size_matcher_.<a class="code hl_function" href="classtesting_1_1internal_1_1_matcher_base.html#a7e0c883c7745e0d646463077ef1c1267">DescribeTo</a>(<a class="code hl_variable" href="environment_8hpp.html#a3951483d0b31c29ca95336206cd35238">os</a>);</div>
 <div class="line"><span class="lineno"> 2717</span>    }</div>
 <div class="ttc" id="aclasstesting_1_1internal_1_1_matcher_base_html_a7e0c883c7745e0d646463077ef1c1267"><div class="ttname"><a href="classtesting_1_1internal_1_1_matcher_base.html#a7e0c883c7745e0d646463077ef1c1267">testing::internal::MatcherBase::DescribeTo</a></div><div class="ttdeci">void DescribeTo(::std::ostream *os) const</div><div class="ttdef"><b>Definition</b> <a href="gmock-matchers_8h_source.html#l00296">gmock-matchers.h:296</a></div></div>
 </div><!-- fragment --><div class="dynheader">

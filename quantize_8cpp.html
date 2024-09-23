@@ -279,7 +279,7 @@ Variables</h2></td></tr>
 <div class="line"><span class="lineno">  188</span> </div>
 <div class="line"><span class="lineno">  189</span>    <span class="keywordflow">try</span> {</div>
 <div class="line"><span class="lineno">  190</span>        <a class="code hl_typedef" href="#adc6d195cb6337a3d1d86db3f0947a3b8">uint32</a> src[<a class="code hl_variable" href="#ab2b6b0c222cd1ce70d6a831f57241e59">N</a>];</div>
-<div class="line"><span class="lineno">  191</span>        <a class="code hl_typedef" href="#adc6d195cb6337a3d1d86db3f0947a3b8">uint32</a> <a class="code hl_variable" href="namespaceupload.html#a770d9c7b49b1fede80de6078d5e49af7">dest</a>[<a class="code hl_variable" href="#ab2b6b0c222cd1ce70d6a831f57241e59">N</a>];</div>
+<div class="line"><span class="lineno">  191</span>        <a class="code hl_typedef" href="#adc6d195cb6337a3d1d86db3f0947a3b8">uint32</a> dest[<a class="code hl_variable" href="#ab2b6b0c222cd1ce70d6a831f57241e59">N</a>];</div>
 <div class="line"><span class="lineno">  192</span>        <a class="code hl_typedef" href="#adc6d195cb6337a3d1d86db3f0947a3b8">uint32</a> dest2[<a class="code hl_variable" href="#ab2b6b0c222cd1ce70d6a831f57241e59">N</a>];</div>
 <div class="line"><span class="lineno">  193</span>        <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i = 0; i &lt; <a class="code hl_variable" href="#ab2b6b0c222cd1ce70d6a831f57241e59">N</a>; i++) {</div>
 <div class="line"><span class="lineno">  194</span>            src[i] = rand() % 2048;</div>
@@ -321,7 +321,6 @@ Variables</h2></td></tr>
 <div class="ttc" id="agmock__stress__test_8cc_html_afd9db40e3361ae09188795e8cbe19752"><div class="ttname"><a href="gmock__stress__test_8cc.html#afd9db40e3361ae09188795e8cbe19752">count</a></div><div class="ttdeci">int * count</div><div class="ttdef"><b>Definition</b> <a href="gmock__stress__test_8cc_source.html#l00177">gmock_stress_test.cc:177</a></div></div>
 <div class="ttc" id="ahello__driver_8cpp_html_af2efa898e9eed6fe6715279cb1ec35b0"><div class="ttname"><a href="hello__driver_8cpp.html#af2efa898e9eed6fe6715279cb1ec35b0">argv</a></div><div class="ttdeci">char ** argv</div><div class="ttdef"><b>Definition</b> <a href="hello__driver_8cpp_source.html#l00052">hello_driver.cpp:52</a></div></div>
 <div class="ttc" id="anamespace_log_html_a83926634a3916d0927abca4aca58a60a"><div class="ttname"><a href="namespace_log.html#a83926634a3916d0927abca4aca58a60a">Log::printf</a></div><div class="ttdeci">LOGGING_API void printf(Category category, const char *format,...)</div><div class="ttdef"><b>Definition</b> <a href="_logging_8cpp_source.html#l00030">Logging.cpp:30</a></div></div>
-<div class="ttc" id="anamespaceupload_html_a770d9c7b49b1fede80de6078d5e49af7"><div class="ttname"><a href="namespaceupload.html#a770d9c7b49b1fede80de6078d5e49af7">upload.dest</a></div><div class="ttdeci">dest</div><div class="ttdef"><b>Definition</b> <a href="googlemock_2scripts_2upload_8py_source.html#l00394">upload.py:394</a></div></div>
 <div class="ttc" id="aquantize_8cpp_html_a94a8660c2acc75eab65b9b8ee501901c"><div class="ttname"><a href="#a94a8660c2acc75eab65b9b8ee501901c">quantize</a></div><div class="ttdeci">void quantize(uint32 dest[64], const uint32 src[64], const uint32 qTbl[64])</div><div class="ttdef"><b>Definition</b> <a href="quantize_8cpp_source.html#l00146">quantize.cpp:146</a></div></div>
 <div class="ttc" id="aquantize_8cpp_html_ab2b6b0c222cd1ce70d6a831f57241e59"><div class="ttname"><a href="#ab2b6b0c222cd1ce70d6a831f57241e59">N</a></div><div class="ttdeci">const int N</div><div class="ttdef"><b>Definition</b> <a href="quantize_8cpp_source.html#l00054">quantize.cpp:54</a></div></div>
 <div class="ttc" id="aquantize_8cpp_html_adc6d195cb6337a3d1d86db3f0947a3b8"><div class="ttname"><a href="#adc6d195cb6337a3d1d86db3f0947a3b8">uint32</a></div><div class="ttdeci">Xbyak::uint32 uint32</div><div class="ttdef"><b>Definition</b> <a href="quantize_8cpp_source.html#l00052">quantize.cpp:52</a></div></div>
@@ -367,7 +366,7 @@ Here is the call graph for this function:</div>
 <p class="definition">Definition at line <a class="el" href="quantize_8cpp_source.html#l00146">146</a> of file <a class="el" href="quantize_8cpp_source.html">quantize.cpp</a>.</p>
 <div class="fragment"><div class="line"><span class="lineno">  147</span>{</div>
 <div class="line"><span class="lineno">  148</span>    <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i = 0; i &lt; <a class="code hl_variable" href="#ab2b6b0c222cd1ce70d6a831f57241e59">N</a>; i++) {</div>
-<div class="line"><span class="lineno">  149</span>        <a class="code hl_variable" href="namespaceupload.html#a770d9c7b49b1fede80de6078d5e49af7">dest</a>[i] = src[i] / qTbl[i];</div>
+<div class="line"><span class="lineno">  149</span>        dest[i] = src[i] / qTbl[i];</div>
 <div class="line"><span class="lineno">  150</span>    }</div>
 <div class="line"><span class="lineno">  151</span>}</div>
 </div><!-- fragment --><div class="dynheader">

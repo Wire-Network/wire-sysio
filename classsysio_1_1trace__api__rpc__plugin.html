@@ -301,13 +301,12 @@ Here is the call graph for this function:</div>
 
 <p class="definition">Definition at line <a class="el" href="trace__api__plugin_8cpp_source.html#l00476">476</a> of file <a class="el" href="trace__api__plugin_8cpp_source.html">trace_api_plugin.cpp</a>.</p>
 <div class="fragment"><div class="line"><span class="lineno">  476</span>                                                                                {</div>
-<div class="line"><span class="lineno">  477</span>   <span class="keyword">auto</span> <a class="code hl_namespace" href="namespacecommon.html">common</a> = std::make_shared&lt;trace_api_common_impl&gt;();</div>
-<div class="line"><span class="lineno">  478</span>   <a class="code hl_namespace" href="namespacecommon.html">common</a>-&gt;plugin_initialize(options);</div>
+<div class="line"><span class="lineno">  477</span>   <span class="keyword">auto</span> common = std::make_shared&lt;trace_api_common_impl&gt;();</div>
+<div class="line"><span class="lineno">  478</span>   common-&gt;plugin_initialize(options);</div>
 <div class="line"><span class="lineno">  479</span> </div>
-<div class="line"><span class="lineno">  480</span>   rpc = std::make_shared&lt;trace_api_rpc_plugin_impl&gt;(<a class="code hl_namespace" href="namespacecommon.html">common</a>);</div>
+<div class="line"><span class="lineno">  480</span>   rpc = std::make_shared&lt;trace_api_rpc_plugin_impl&gt;(common);</div>
 <div class="line"><span class="lineno">  481</span>   rpc-&gt;plugin_initialize(options);</div>
 <div class="line"><span class="lineno">  482</span>}</div>
-<div class="ttc" id="anamespacecommon_html"><div class="ttname"><a href="namespacecommon.html">common</a></div><div class="ttdef"><b>Definition</b> <a href="common_8py_source.html#l00001">common.py:1</a></div></div>
 </div><!-- fragment -->
 </div>
 </div>

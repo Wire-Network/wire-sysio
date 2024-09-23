@@ -243,9 +243,9 @@ Definition at line \mbox{\hyperlink{apply__context_8hpp_source_l00401}{401}} of 
 \DoxyCodeLine{00404\ }
 \DoxyCodeLine{00405\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ table\_end\_itr\ =\ itr\_cache.cache\_table(\ *tab\ );}
 \DoxyCodeLine{00406\ }
-\DoxyCodeLine{00407\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ \mbox{\hyperlink{namespacehost__functions__tests__1_a8496a24b5236a2dc07bb4f2930d88342}{idx}}\ =\ \mbox{\hyperlink{structcontext}{context}}.db.get\_index<\textcolor{keyword}{typename}\ \mbox{\hyperlink{structchainbase_1_1get__index__type}{chainbase::get\_index\_type<ObjectType>::type}},\ by\_primary>();}
-\DoxyCodeLine{00408\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ itr\ =\ \mbox{\hyperlink{namespacehost__functions__tests__1_a8496a24b5236a2dc07bb4f2930d88342}{idx}}.lower\_bound(boost::make\_tuple(tab-\/>id,\ primary));}
-\DoxyCodeLine{00409\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (itr\ ==\ \mbox{\hyperlink{namespacehost__functions__tests__1_a8496a24b5236a2dc07bb4f2930d88342}{idx}}.end())\ \textcolor{keywordflow}{return}\ table\_end\_itr;}
+\DoxyCodeLine{00407\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ idx\ =\ \mbox{\hyperlink{structcontext}{context}}.db.get\_index<\textcolor{keyword}{typename}\ \mbox{\hyperlink{structchainbase_1_1get__index__type}{chainbase::get\_index\_type<ObjectType>::type}},\ by\_primary>();}
+\DoxyCodeLine{00408\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ itr\ =\ idx.lower\_bound(boost::make\_tuple(tab-\/>id,\ primary));}
+\DoxyCodeLine{00409\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (itr\ ==\ idx.end())\ \textcolor{keywordflow}{return}\ table\_end\_itr;}
 \DoxyCodeLine{00410\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (itr-\/>t\_id\ !=\ tab-\/>id)\ \textcolor{keywordflow}{return}\ table\_end\_itr;}
 \DoxyCodeLine{00411\ }
 \DoxyCodeLine{00412\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ itr\_cache.add(*itr);}
@@ -271,9 +271,9 @@ Definition at line \mbox{\hyperlink{apply__context_8hpp_source_l00300}{300}} of 
 \DoxyCodeLine{00303\ }
 \DoxyCodeLine{00304\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ table\_end\_itr\ =\ itr\_cache.cache\_table(\ *tab\ );}
 \DoxyCodeLine{00305\ }
-\DoxyCodeLine{00306\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ \mbox{\hyperlink{namespacehost__functions__tests__1_a8496a24b5236a2dc07bb4f2930d88342}{idx}}\ =\ \mbox{\hyperlink{structcontext}{context}}.db.get\_index<\ \textcolor{keyword}{typename}\ \mbox{\hyperlink{structchainbase_1_1get__index__type}{chainbase::get\_index\_type<ObjectType>::type}},\ \mbox{\hyperlink{structby__secondary}{by\_secondary}}\ >();}
-\DoxyCodeLine{00307\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ itr\ =\ \mbox{\hyperlink{namespacehost__functions__tests__1_a8496a24b5236a2dc07bb4f2930d88342}{idx}}.lower\_bound(\ secondary\_key\_helper\_t::create\_tuple(\ *tab,\ secondary\ )\ );}
-\DoxyCodeLine{00308\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ itr\ ==\ \mbox{\hyperlink{namespacehost__functions__tests__1_a8496a24b5236a2dc07bb4f2930d88342}{idx}}.end()\ )\ \textcolor{keywordflow}{return}\ table\_end\_itr;}
+\DoxyCodeLine{00306\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ idx\ =\ \mbox{\hyperlink{structcontext}{context}}.db.get\_index<\ \textcolor{keyword}{typename}\ \mbox{\hyperlink{structchainbase_1_1get__index__type}{chainbase::get\_index\_type<ObjectType>::type}},\ \mbox{\hyperlink{structby__secondary}{by\_secondary}}\ >();}
+\DoxyCodeLine{00307\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ itr\ =\ idx.lower\_bound(\ secondary\_key\_helper\_t::create\_tuple(\ *tab,\ secondary\ )\ );}
+\DoxyCodeLine{00308\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ itr\ ==\ idx.end()\ )\ \textcolor{keywordflow}{return}\ table\_end\_itr;}
 \DoxyCodeLine{00309\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ itr-\/>t\_id\ !=\ tab-\/>id\ )\ \textcolor{keywordflow}{return}\ table\_end\_itr;}
 \DoxyCodeLine{00310\ }
 \DoxyCodeLine{00311\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ primary\ =\ itr-\/>primary\_key;}
@@ -300,12 +300,12 @@ Definition at line \mbox{\hyperlink{apply__context_8hpp_source_l00430}{430}} of 
 \DoxyCodeLine{00431\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ iterator\ <\ -\/1\ )\ \textcolor{keywordflow}{return}\ -\/1;\ \textcolor{comment}{//\ cannot\ increment\ past\ end\ iterator\ of\ table}}
 \DoxyCodeLine{00432\ }
 \DoxyCodeLine{00433\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ obj\ =\ itr\_cache.get(iterator);\ \textcolor{comment}{//\ Check\ for\ iterator\ !=\ -\/1\ happens\ in\ this\ call}}
-\DoxyCodeLine{00434\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ \mbox{\hyperlink{namespacehost__functions__tests__1_a8496a24b5236a2dc07bb4f2930d88342}{idx}}\ =\ \mbox{\hyperlink{structcontext}{context}}.db.get\_index<\textcolor{keyword}{typename}\ \mbox{\hyperlink{structchainbase_1_1get__index__type}{chainbase::get\_index\_type<ObjectType>::type}},\ by\_primary>();}
+\DoxyCodeLine{00434\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ idx\ =\ \mbox{\hyperlink{structcontext}{context}}.db.get\_index<\textcolor{keyword}{typename}\ \mbox{\hyperlink{structchainbase_1_1get__index__type}{chainbase::get\_index\_type<ObjectType>::type}},\ by\_primary>();}
 \DoxyCodeLine{00435\ }
-\DoxyCodeLine{00436\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ itr\ =\ \mbox{\hyperlink{namespacehost__functions__tests__1_a8496a24b5236a2dc07bb4f2930d88342}{idx}}.iterator\_to(obj);}
+\DoxyCodeLine{00436\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ itr\ =\ idx.iterator\_to(obj);}
 \DoxyCodeLine{00437\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ++itr;}
 \DoxyCodeLine{00438\ }
-\DoxyCodeLine{00439\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ itr\ ==\ \mbox{\hyperlink{namespacehost__functions__tests__1_a8496a24b5236a2dc07bb4f2930d88342}{idx}}.end()\ ||\ itr-\/>t\_id\ !=\ obj.t\_id\ )\ \textcolor{keywordflow}{return}\ itr\_cache.get\_end\_iterator\_by\_table\_id(obj.t\_id);}
+\DoxyCodeLine{00439\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ itr\ ==\ idx.end()\ ||\ itr-\/>t\_id\ !=\ obj.t\_id\ )\ \textcolor{keywordflow}{return}\ itr\_cache.get\_end\_iterator\_by\_table\_id(obj.t\_id);}
 \DoxyCodeLine{00440\ }
 \DoxyCodeLine{00441\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ primary\ =\ itr-\/>primary\_key;}
 \DoxyCodeLine{00442\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ itr\_cache.add(*itr);}
@@ -329,12 +329,12 @@ Definition at line \mbox{\hyperlink{apply__context_8hpp_source_l00341}{341}} of 
 \DoxyCodeLine{00342\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ iterator\ <\ -\/1\ )\ \textcolor{keywordflow}{return}\ -\/1;\ \textcolor{comment}{//\ cannot\ increment\ past\ end\ iterator\ of\ index}}
 \DoxyCodeLine{00343\ }
 \DoxyCodeLine{00344\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ obj\ =\ itr\_cache.get(iterator);\ \textcolor{comment}{//\ Check\ for\ iterator\ !=\ -\/1\ happens\ in\ this\ call}}
-\DoxyCodeLine{00345\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ \mbox{\hyperlink{namespacehost__functions__tests__1_a8496a24b5236a2dc07bb4f2930d88342}{idx}}\ =\ \mbox{\hyperlink{structcontext}{context}}.db.get\_index<\textcolor{keyword}{typename}\ \mbox{\hyperlink{structchainbase_1_1get__index__type}{chainbase::get\_index\_type<ObjectType>::type}},\ \mbox{\hyperlink{structby__secondary}{by\_secondary}}>();}
+\DoxyCodeLine{00345\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ idx\ =\ \mbox{\hyperlink{structcontext}{context}}.db.get\_index<\textcolor{keyword}{typename}\ \mbox{\hyperlink{structchainbase_1_1get__index__type}{chainbase::get\_index\_type<ObjectType>::type}},\ \mbox{\hyperlink{structby__secondary}{by\_secondary}}>();}
 \DoxyCodeLine{00346\ }
-\DoxyCodeLine{00347\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ itr\ =\ \mbox{\hyperlink{namespacehost__functions__tests__1_a8496a24b5236a2dc07bb4f2930d88342}{idx}}.iterator\_to(obj);}
+\DoxyCodeLine{00347\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ itr\ =\ idx.iterator\_to(obj);}
 \DoxyCodeLine{00348\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ++itr;}
 \DoxyCodeLine{00349\ }
-\DoxyCodeLine{00350\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ itr\ ==\ \mbox{\hyperlink{namespacehost__functions__tests__1_a8496a24b5236a2dc07bb4f2930d88342}{idx}}.end()\ ||\ itr-\/>t\_id\ !=\ obj.t\_id\ )\ \textcolor{keywordflow}{return}\ itr\_cache.get\_end\_iterator\_by\_table\_id(obj.t\_id);}
+\DoxyCodeLine{00350\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ itr\ ==\ idx.end()\ ||\ itr-\/>t\_id\ !=\ obj.t\_id\ )\ \textcolor{keywordflow}{return}\ itr\_cache.get\_end\_iterator\_by\_table\_id(obj.t\_id);}
 \DoxyCodeLine{00351\ }
 \DoxyCodeLine{00352\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ primary\ =\ itr-\/>primary\_key;}
 \DoxyCodeLine{00353\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ itr\_cache.add(*itr);}
@@ -355,15 +355,15 @@ Definition at line \mbox{\hyperlink{apply__context_8hpp_source_l00445}{445}} of 
 
 \begin{DoxyCode}{0}
 \DoxyCodeLine{00445\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
-\DoxyCodeLine{00446\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ \mbox{\hyperlink{namespacehost__functions__tests__1_a8496a24b5236a2dc07bb4f2930d88342}{idx}}\ =\ \mbox{\hyperlink{structcontext}{context}}.db.get\_index<\textcolor{keyword}{typename}\ \mbox{\hyperlink{structchainbase_1_1get__index__type}{chainbase::get\_index\_type<ObjectType>::type}},\ by\_primary>();}
+\DoxyCodeLine{00446\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ idx\ =\ \mbox{\hyperlink{structcontext}{context}}.db.get\_index<\textcolor{keyword}{typename}\ \mbox{\hyperlink{structchainbase_1_1get__index__type}{chainbase::get\_index\_type<ObjectType>::type}},\ by\_primary>();}
 \DoxyCodeLine{00447\ }
 \DoxyCodeLine{00448\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ iterator\ <\ -\/1\ )\ \textcolor{comment}{//\ is\ end\ iterator}}
 \DoxyCodeLine{00449\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
 \DoxyCodeLine{00450\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ tab\ =\ itr\_cache.find\_table\_by\_end\_iterator(iterator);}
 \DoxyCodeLine{00451\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp_a40c2826a6fba35c1ffbf912bdf559792}{SYS\_ASSERT}}(\ tab,\ invalid\_table\_iterator,\ \textcolor{stringliteral}{"{}not\ a\ valid\ end\ iterator"{}}\ );}
 \DoxyCodeLine{00452\ }
-\DoxyCodeLine{00453\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ itr\ =\ \mbox{\hyperlink{namespacehost__functions__tests__1_a8496a24b5236a2dc07bb4f2930d88342}{idx}}.upper\_bound(tab-\/>id);}
-\DoxyCodeLine{00454\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ \mbox{\hyperlink{namespacehost__functions__tests__1_a8496a24b5236a2dc07bb4f2930d88342}{idx}}.begin()\ ==\ \mbox{\hyperlink{namespacehost__functions__tests__1_a8496a24b5236a2dc07bb4f2930d88342}{idx}}.end()\ ||\ itr\ ==\ \mbox{\hyperlink{namespacehost__functions__tests__1_a8496a24b5236a2dc07bb4f2930d88342}{idx}}.begin()\ )\ \textcolor{keywordflow}{return}\ -\/1;\ \textcolor{comment}{//\ Empty\ table}}
+\DoxyCodeLine{00453\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ itr\ =\ idx.upper\_bound(tab-\/>id);}
+\DoxyCodeLine{00454\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ idx.begin()\ ==\ idx.end()\ ||\ itr\ ==\ idx.begin()\ )\ \textcolor{keywordflow}{return}\ -\/1;\ \textcolor{comment}{//\ Empty\ table}}
 \DoxyCodeLine{00455\ }
 \DoxyCodeLine{00456\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ -\/-\/itr;}
 \DoxyCodeLine{00457\ }
@@ -375,8 +375,8 @@ Definition at line \mbox{\hyperlink{apply__context_8hpp_source_l00445}{445}} of 
 \DoxyCodeLine{00463\ }
 \DoxyCodeLine{00464\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ obj\ =\ itr\_cache.get(iterator);\ \textcolor{comment}{//\ Check\ for\ iterator\ !=\ -\/1\ happens\ in\ this\ call}}
 \DoxyCodeLine{00465\ }
-\DoxyCodeLine{00466\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ itr\ =\ \mbox{\hyperlink{namespacehost__functions__tests__1_a8496a24b5236a2dc07bb4f2930d88342}{idx}}.iterator\_to(obj);}
-\DoxyCodeLine{00467\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ itr\ ==\ \mbox{\hyperlink{namespacehost__functions__tests__1_a8496a24b5236a2dc07bb4f2930d88342}{idx}}.begin()\ )\ \textcolor{keywordflow}{return}\ -\/1;\ \textcolor{comment}{//\ cannot\ decrement\ past\ beginning\ iterator\ of\ table}}
+\DoxyCodeLine{00466\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ itr\ =\ idx.iterator\_to(obj);}
+\DoxyCodeLine{00467\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ itr\ ==\ idx.begin()\ )\ \textcolor{keywordflow}{return}\ -\/1;\ \textcolor{comment}{//\ cannot\ decrement\ past\ beginning\ iterator\ of\ table}}
 \DoxyCodeLine{00468\ }
 \DoxyCodeLine{00469\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ -\/-\/itr;}
 \DoxyCodeLine{00470\ }
@@ -401,15 +401,15 @@ Definition at line \mbox{\hyperlink{apply__context_8hpp_source_l00356}{356}} of 
 
 \begin{DoxyCode}{0}
 \DoxyCodeLine{00356\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
-\DoxyCodeLine{00357\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ \mbox{\hyperlink{namespacehost__functions__tests__1_a8496a24b5236a2dc07bb4f2930d88342}{idx}}\ =\ \mbox{\hyperlink{structcontext}{context}}.db.get\_index<\textcolor{keyword}{typename}\ \mbox{\hyperlink{structchainbase_1_1get__index__type}{chainbase::get\_index\_type<ObjectType>::type}},\ \mbox{\hyperlink{structby__secondary}{by\_secondary}}>();}
+\DoxyCodeLine{00357\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ idx\ =\ \mbox{\hyperlink{structcontext}{context}}.db.get\_index<\textcolor{keyword}{typename}\ \mbox{\hyperlink{structchainbase_1_1get__index__type}{chainbase::get\_index\_type<ObjectType>::type}},\ \mbox{\hyperlink{structby__secondary}{by\_secondary}}>();}
 \DoxyCodeLine{00358\ }
 \DoxyCodeLine{00359\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ iterator\ <\ -\/1\ )\ \textcolor{comment}{//\ is\ end\ iterator}}
 \DoxyCodeLine{00360\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
 \DoxyCodeLine{00361\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ tab\ =\ itr\_cache.find\_table\_by\_end\_iterator(iterator);}
 \DoxyCodeLine{00362\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp_a40c2826a6fba35c1ffbf912bdf559792}{SYS\_ASSERT}}(\ tab,\ invalid\_table\_iterator,\ \textcolor{stringliteral}{"{}not\ a\ valid\ end\ iterator"{}}\ );}
 \DoxyCodeLine{00363\ }
-\DoxyCodeLine{00364\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ itr\ =\ \mbox{\hyperlink{namespacehost__functions__tests__1_a8496a24b5236a2dc07bb4f2930d88342}{idx}}.upper\_bound(tab-\/>id);}
-\DoxyCodeLine{00365\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ \mbox{\hyperlink{namespacehost__functions__tests__1_a8496a24b5236a2dc07bb4f2930d88342}{idx}}.begin()\ ==\ \mbox{\hyperlink{namespacehost__functions__tests__1_a8496a24b5236a2dc07bb4f2930d88342}{idx}}.end()\ ||\ itr\ ==\ \mbox{\hyperlink{namespacehost__functions__tests__1_a8496a24b5236a2dc07bb4f2930d88342}{idx}}.begin()\ )\ \textcolor{keywordflow}{return}\ -\/1;\ \textcolor{comment}{//\ Empty\ index}}
+\DoxyCodeLine{00364\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ itr\ =\ idx.upper\_bound(tab-\/>id);}
+\DoxyCodeLine{00365\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ idx.begin()\ ==\ idx.end()\ ||\ itr\ ==\ idx.begin()\ )\ \textcolor{keywordflow}{return}\ -\/1;\ \textcolor{comment}{//\ Empty\ index}}
 \DoxyCodeLine{00366\ }
 \DoxyCodeLine{00367\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ -\/-\/itr;}
 \DoxyCodeLine{00368\ }
@@ -421,8 +421,8 @@ Definition at line \mbox{\hyperlink{apply__context_8hpp_source_l00356}{356}} of 
 \DoxyCodeLine{00374\ }
 \DoxyCodeLine{00375\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ obj\ =\ itr\_cache.get(iterator);\ \textcolor{comment}{//\ Check\ for\ iterator\ !=\ -\/1\ happens\ in\ this\ call}}
 \DoxyCodeLine{00376\ }
-\DoxyCodeLine{00377\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ itr\ =\ \mbox{\hyperlink{namespacehost__functions__tests__1_a8496a24b5236a2dc07bb4f2930d88342}{idx}}.iterator\_to(obj);}
-\DoxyCodeLine{00378\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ itr\ ==\ \mbox{\hyperlink{namespacehost__functions__tests__1_a8496a24b5236a2dc07bb4f2930d88342}{idx}}.begin()\ )\ \textcolor{keywordflow}{return}\ -\/1;\ \textcolor{comment}{//\ cannot\ decrement\ past\ beginning\ iterator\ of\ index}}
+\DoxyCodeLine{00377\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ itr\ =\ idx.iterator\_to(obj);}
+\DoxyCodeLine{00378\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ itr\ ==\ idx.begin()\ )\ \textcolor{keywordflow}{return}\ -\/1;\ \textcolor{comment}{//\ cannot\ decrement\ past\ beginning\ iterator\ of\ index}}
 \DoxyCodeLine{00379\ }
 \DoxyCodeLine{00380\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ -\/-\/itr;}
 \DoxyCodeLine{00381\ }
@@ -601,9 +601,9 @@ Definition at line \mbox{\hyperlink{apply__context_8hpp_source_l00415}{415}} of 
 \DoxyCodeLine{00418\ }
 \DoxyCodeLine{00419\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ table\_end\_itr\ =\ itr\_cache.cache\_table(\ *tab\ );}
 \DoxyCodeLine{00420\ }
-\DoxyCodeLine{00421\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ \mbox{\hyperlink{namespacehost__functions__tests__1_a8496a24b5236a2dc07bb4f2930d88342}{idx}}\ =\ \mbox{\hyperlink{structcontext}{context}}.db.get\_index<\textcolor{keyword}{typename}\ \mbox{\hyperlink{structchainbase_1_1get__index__type}{chainbase::get\_index\_type<ObjectType>::type}},\ by\_primary>();}
-\DoxyCodeLine{00422\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ itr\ =\ \mbox{\hyperlink{namespacehost__functions__tests__1_a8496a24b5236a2dc07bb4f2930d88342}{idx}}.upper\_bound(boost::make\_tuple(tab-\/>id,\ primary));}
-\DoxyCodeLine{00423\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (itr\ ==\ \mbox{\hyperlink{namespacehost__functions__tests__1_a8496a24b5236a2dc07bb4f2930d88342}{idx}}.end())\ \textcolor{keywordflow}{return}\ table\_end\_itr;}
+\DoxyCodeLine{00421\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ idx\ =\ \mbox{\hyperlink{structcontext}{context}}.db.get\_index<\textcolor{keyword}{typename}\ \mbox{\hyperlink{structchainbase_1_1get__index__type}{chainbase::get\_index\_type<ObjectType>::type}},\ by\_primary>();}
+\DoxyCodeLine{00422\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ itr\ =\ idx.upper\_bound(boost::make\_tuple(tab-\/>id,\ primary));}
+\DoxyCodeLine{00423\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (itr\ ==\ idx.end())\ \textcolor{keywordflow}{return}\ table\_end\_itr;}
 \DoxyCodeLine{00424\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (itr-\/>t\_id\ !=\ tab-\/>id)\ \textcolor{keywordflow}{return}\ table\_end\_itr;}
 \DoxyCodeLine{00425\ }
 \DoxyCodeLine{00426\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ itr\_cache.cache\_table(*tab);}
@@ -630,9 +630,9 @@ Definition at line \mbox{\hyperlink{apply__context_8hpp_source_l00317}{317}} of 
 \DoxyCodeLine{00320\ }
 \DoxyCodeLine{00321\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ table\_end\_itr\ =\ itr\_cache.cache\_table(\ *tab\ );}
 \DoxyCodeLine{00322\ }
-\DoxyCodeLine{00323\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ \mbox{\hyperlink{namespacehost__functions__tests__1_a8496a24b5236a2dc07bb4f2930d88342}{idx}}\ =\ \mbox{\hyperlink{structcontext}{context}}.db.get\_index<\ \textcolor{keyword}{typename}\ \mbox{\hyperlink{structchainbase_1_1get__index__type}{chainbase::get\_index\_type<ObjectType>::type}},\ \mbox{\hyperlink{structby__secondary}{by\_secondary}}\ >();}
-\DoxyCodeLine{00324\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ itr\ =\ \mbox{\hyperlink{namespacehost__functions__tests__1_a8496a24b5236a2dc07bb4f2930d88342}{idx}}.upper\_bound(\ secondary\_key\_helper\_t::create\_tuple(\ *tab,\ secondary\ )\ );}
-\DoxyCodeLine{00325\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ itr\ ==\ \mbox{\hyperlink{namespacehost__functions__tests__1_a8496a24b5236a2dc07bb4f2930d88342}{idx}}.end()\ )\ \textcolor{keywordflow}{return}\ table\_end\_itr;}
+\DoxyCodeLine{00323\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ idx\ =\ \mbox{\hyperlink{structcontext}{context}}.db.get\_index<\ \textcolor{keyword}{typename}\ \mbox{\hyperlink{structchainbase_1_1get__index__type}{chainbase::get\_index\_type<ObjectType>::type}},\ \mbox{\hyperlink{structby__secondary}{by\_secondary}}\ >();}
+\DoxyCodeLine{00324\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ itr\ =\ idx.upper\_bound(\ secondary\_key\_helper\_t::create\_tuple(\ *tab,\ secondary\ )\ );}
+\DoxyCodeLine{00325\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ itr\ ==\ idx.end()\ )\ \textcolor{keywordflow}{return}\ table\_end\_itr;}
 \DoxyCodeLine{00326\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ itr-\/>t\_id\ !=\ tab-\/>id\ )\ \textcolor{keywordflow}{return}\ table\_end\_itr;}
 \DoxyCodeLine{00327\ }
 \DoxyCodeLine{00328\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ primary\ =\ itr-\/>primary\_key;}

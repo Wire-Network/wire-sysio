@@ -1,17 +1,13 @@
 <map id="fc::path::string" name="fc::path::string">
-<area shape="rect" id="Node000001" title=" " alt="" coords="321,137,426,163"/>
-<area shape="rect" id="Node000002" href="$classpump_1_1_output.html#ab7872ff730c785cedfe8101f8f3b2cc5" title=" " alt="" coords="116,5,260,31"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="353,126,318,84,296,63,272,44,250,34,252,29,274,40,300,58,322,80,357,123"/>
-<area shape="rect" id="Node000003" href="$classfc_1_1process.html#aa663b2fe8d58228224d0c1a954554a46" title=" " alt="" coords="127,55,249,80"/>
-<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="339,131,272,94,243,83,244,78,274,89,342,126"/>
-<area shape="rect" id="Node000004" href="$classpump_1_1_output.html#a9c9c1a8e6a2fcdd8d3a895254aa88843" title=" " alt="" coords="103,104,273,130"/>
-<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="305,141,263,133,264,128,306,135"/>
-<area shape="rect" id="Node000005" href="$classsysio_1_1chain_1_1detail_1_1index__writer.html#ade0ac8ad46ae1d6a4632f4d31d4e7227" title=" " alt="" coords="119,154,257,210"/>
-<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="306,164,258,173,257,168,305,159"/>
-<area shape="rect" id="Node000006" href="$classsysio_1_1resource__monitor__plugin__impl.html#a8f86e65106c603d0afa743a2114d96ef" title=" " alt="" coords="108,234,268,290"/>
-<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="346,175,274,224,253,236,251,231,272,220,343,171"/>
-<area shape="rect" id="Node000007" href="$programs_2sysio-blocklog_2main_8cpp.html#a37fad1474c0a90433ca0152870e1da72" title=" " alt="" coords="143,315,232,340"/>
-<area shape="poly" id="edge6_Node000001_Node000007" title=" " alt="" coords="364,178,330,242,305,275,275,304,255,316,234,323,232,318,253,311,271,300,301,272,326,239,359,176"/>
-<area shape="rect" id="Node000008" href="$programs_2sysio-blocklog_2main_8cpp.html#a3c04138a5bfe5d72780bb7e82a18e627" title=" " alt="" coords="5,315,55,340"/>
-<area shape="poly" id="edge7_Node000007_Node000008" title=" " alt="" coords="128,330,55,330,55,325,128,325"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="311,111,416,136"/>
+<area shape="rect" id="Node000002" href="$classfc_1_1process.html#aa663b2fe8d58228224d0c1a954554a46" title=" " alt="" coords="122,5,244,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="337,102,303,73,262,46,234,34,236,29,264,41,306,69,340,98"/>
+<area shape="rect" id="Node000003" href="$classsysio_1_1chain_1_1detail_1_1index__writer.html#ade0ac8ad46ae1d6a4632f4d31d4e7227" title=" " alt="" coords="114,56,252,111"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="296,111,252,101,253,96,297,106"/>
+<area shape="rect" id="Node000004" href="$classsysio_1_1resource__monitor__plugin__impl.html#a8f86e65106c603d0afa743a2114d96ef" title=" " alt="" coords="103,136,263,191"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="297,141,264,148,263,143,296,136"/>
+<area shape="rect" id="Node000005" href="$programs_2sysio-blocklog_2main_8cpp.html#a37fad1474c0a90433ca0152870e1da72" title=" " alt="" coords="138,216,228,242"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="340,149,306,178,264,206,229,220,227,215,262,201,303,174,337,145"/>
+<area shape="rect" id="Node000006" href="$programs_2sysio-blocklog_2main_8cpp.html#a3c04138a5bfe5d72780bb7e82a18e627" title=" " alt="" coords="5,216,55,242"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="123,232,55,232,55,226,123,226"/>
 </map>

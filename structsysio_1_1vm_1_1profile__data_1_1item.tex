@@ -6,7 +6,8 @@
 
 
 
-Collaboration diagram for sysio\+::vm\+::profile\+\_\+data\+::item\+:\nopagebreak
+Collaboration diagram for sysio\+::vm\+::profile\+\_\+data\+::item\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -65,7 +66,7 @@ Definition at line \mbox{\hyperlink{sysio_2vm_2profile_8hpp_source_l00112}{112}}
 \DoxyCodeLine{00117\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{static\_assert}(offsetof(item,\ \mbox{\hyperlink{structsysio_1_1vm_1_1profile__data_1_1item_a77551f3615d720208c0e93790ab09055}{len}})\ \%\ 8\ ==\ 0);}
 \DoxyCodeLine{00118\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{constexpr}\ std::uint64\_t\ \mbox{\hyperlink{xbyak__mnemonic_8h_a03724df049ae719e015d50f3716f83e7}{mul}}\ =\ 0xc6a4a7935bd1e995ull;}
 \DoxyCodeLine{00119\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{constexpr}\ std::uint64\_t\ seed\ =\ 0xbadd00d00ull;}
-\DoxyCodeLine{00120\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{constexpr}\ \textcolor{keyword}{auto}\ shift\_mix\ =\ [](std::uint64\_t\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}})\ \{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}\ \string^\ (\mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}\ >>\ 47);\ \};}
+\DoxyCodeLine{00120\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{constexpr}\ \textcolor{keyword}{auto}\ shift\_mix\ =\ [](std::uint64\_t\ v)\ \{\ \textcolor{keywordflow}{return}\ v\ \string^\ (v\ >>\ 47);\ \};}
 \DoxyCodeLine{00121\ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ word\_len\ =\ \mbox{\hyperlink{structsysio_1_1vm_1_1profile__data_1_1item_a77551f3615d720208c0e93790ab09055}{len}}/2+1;\ \textcolor{comment}{//\ if\ len\ is\ even,\ add\ an\ extra\ 0\ word.}}
 \DoxyCodeLine{00122\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ hash\ =\ seed\ \string^\ (word\_len\ *\ 8\ *\ \mbox{\hyperlink{xbyak__mnemonic_8h_a03724df049ae719e015d50f3716f83e7}{mul}});}
 \DoxyCodeLine{00123\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ base\_addr\ =\ \textcolor{keyword}{reinterpret\_cast<}\textcolor{keyword}{const\ }\textcolor{keywordtype}{char}*\textcolor{keyword}{>}(\&\mbox{\hyperlink{structsysio_1_1vm_1_1profile__data_1_1item_a77551f3615d720208c0e93790ab09055}{len}});}
@@ -78,14 +79,16 @@ Definition at line \mbox{\hyperlink{sysio_2vm_2profile_8hpp_source_l00112}{112}}
 \DoxyCodeLine{00130\ \ \ \ \ \ \ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
 \includegraphics[width=261pt]{structsysio_1_1vm_1_1profile__data_1_1item_aa96f10dec62734b1a598330f9458b7b7_cgraph}
 \end{center}
 \end{figure}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -112,7 +115,7 @@ Definition at line \mbox{\hyperlink{vm_2profile_8hpp_source_l00112}{112}} of fil
 \DoxyCodeLine{00117\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{static\_assert}(offsetof(item,\ \mbox{\hyperlink{structsysio_1_1vm_1_1profile__data_1_1item_a77551f3615d720208c0e93790ab09055}{len}})\ \%\ 8\ ==\ 0);}
 \DoxyCodeLine{00118\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{constexpr}\ std::uint64\_t\ \mbox{\hyperlink{xbyak__mnemonic_8h_a03724df049ae719e015d50f3716f83e7}{mul}}\ =\ 0xc6a4a7935bd1e995ull;}
 \DoxyCodeLine{00119\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{constexpr}\ std::uint64\_t\ seed\ =\ 0xbadd00d00ull;}
-\DoxyCodeLine{00120\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{constexpr}\ \textcolor{keyword}{auto}\ shift\_mix\ =\ [](std::uint64\_t\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}})\ \{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}\ \string^\ (\mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}\ >>\ 47);\ \};}
+\DoxyCodeLine{00120\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{constexpr}\ \textcolor{keyword}{auto}\ shift\_mix\ =\ [](std::uint64\_t\ v)\ \{\ \textcolor{keywordflow}{return}\ v\ \string^\ (v\ >>\ 47);\ \};}
 \DoxyCodeLine{00121\ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ word\_len\ =\ \mbox{\hyperlink{structsysio_1_1vm_1_1profile__data_1_1item_a77551f3615d720208c0e93790ab09055}{len}}/2+1;\ \textcolor{comment}{//\ if\ len\ is\ even,\ add\ an\ extra\ 0\ word.}}
 \DoxyCodeLine{00122\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ hash\ =\ seed\ \string^\ (word\_len\ *\ 8\ *\ \mbox{\hyperlink{xbyak__mnemonic_8h_a03724df049ae719e015d50f3716f83e7}{mul}});}
 \DoxyCodeLine{00123\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ base\_addr\ =\ \textcolor{keyword}{reinterpret\_cast<}\textcolor{keyword}{const\ }\textcolor{keywordtype}{char}*\textcolor{keyword}{>}(\&\mbox{\hyperlink{structsysio_1_1vm_1_1profile__data_1_1item_a77551f3615d720208c0e93790ab09055}{len}});}
@@ -125,7 +128,8 @@ Definition at line \mbox{\hyperlink{vm_2profile_8hpp_source_l00112}{112}} of fil
 \DoxyCodeLine{00130\ \ \ \ \ \ \ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode

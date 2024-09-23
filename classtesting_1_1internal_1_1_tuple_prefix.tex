@@ -9,7 +9,7 @@
 \item 
 {\footnotesize template$<$typename \mbox{\hyperlink{structtesting_1_1internal_1_1_matcher_tuple}{Matcher\+Tuple}} , typename Value\+Tuple $>$ }\\static bool \mbox{\hyperlink{classtesting_1_1internal_1_1_tuple_prefix_ada24ceee73c02e3bb7f8264143170f7a}{Matches}} (const \mbox{\hyperlink{structtesting_1_1internal_1_1_matcher_tuple}{Matcher\+Tuple}} \&matcher\+\_\+tuple, const Value\+Tuple \&value\+\_\+tuple)
 \item 
-{\footnotesize template$<$typename \mbox{\hyperlink{structtesting_1_1internal_1_1_matcher_tuple}{Matcher\+Tuple}} , typename Value\+Tuple $>$ }\\static void \mbox{\hyperlink{classtesting_1_1internal_1_1_tuple_prefix_a0ffd38ce90ae6da645a5655aefac5bb7}{Explain\+Match\+Failures\+To}} (const \mbox{\hyperlink{structtesting_1_1internal_1_1_matcher_tuple}{Matcher\+Tuple}} \&matchers, const Value\+Tuple \&values, \+::std\+::ostream \texorpdfstring{$\ast$}{*}os)
+{\footnotesize template$<$typename \mbox{\hyperlink{structtesting_1_1internal_1_1_matcher_tuple}{Matcher\+Tuple}} , typename Value\+Tuple $>$ }\\static void \mbox{\hyperlink{classtesting_1_1internal_1_1_tuple_prefix_a0ffd38ce90ae6da645a5655aefac5bb7}{Explain\+Match\+Failures\+To}} (const \mbox{\hyperlink{structtesting_1_1internal_1_1_matcher_tuple}{Matcher\+Tuple}} \&matchers, const Value\+Tuple \&values, \+::std\+::ostream \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}})
 \end{DoxyCompactItemize}
 
 
@@ -39,7 +39,7 @@ Definition at line \mbox{\hyperlink{gmock-matchers_8h_source_l00910}{910}} of fi
 \begin{DoxyCode}{0}
 \DoxyCodeLine{00912\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
 \DoxyCodeLine{00913\ \ \ \ \ \textcolor{comment}{//\ First,\ describes\ failures\ in\ the\ first\ N\ -\/\ 1\ fields.}}
-\DoxyCodeLine{00914\ \ \ \ \ \mbox{\hyperlink{classtesting_1_1internal_1_1_tuple_prefix_a0ffd38ce90ae6da645a5655aefac5bb7}{TuplePrefix<N\ -\/\ 1>::ExplainMatchFailuresTo}}(matchers,\ values,\ os);}
+\DoxyCodeLine{00914\ \ \ \ \ \mbox{\hyperlink{classtesting_1_1internal_1_1_tuple_prefix_a0ffd38ce90ae6da645a5655aefac5bb7}{TuplePrefix<N\ -\/\ 1>::ExplainMatchFailuresTo}}(matchers,\ values,\ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}});}
 \DoxyCodeLine{00915\ }
 \DoxyCodeLine{00916\ \ \ \ \ \textcolor{comment}{//\ Then\ describes\ the\ failure\ (if\ any)\ in\ the\ (N\ -\/\ 1)-\/th\ (0-\/based)}}
 \DoxyCodeLine{00917\ \ \ \ \ \textcolor{comment}{//\ field.}}
@@ -51,29 +51,31 @@ Definition at line \mbox{\hyperlink{gmock-matchers_8h_source_l00910}{910}} of fi
 \DoxyCodeLine{00923\ \ \ \ \ \textcolor{keywordflow}{if}\ (!matcher.MatchAndExplain(\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}},\ \&listener))\ \{}
 \DoxyCodeLine{00924\ \ \ \ \ \ \ \textcolor{comment}{//\ TODO(wan):\ include\ in\ the\ message\ the\ name\ of\ the\ parameter}}
 \DoxyCodeLine{00925\ \ \ \ \ \ \ \textcolor{comment}{//\ as\ used\ in\ MOCK\_METHOD*()\ when\ possible.}}
-\DoxyCodeLine{00926\ \ \ \ \ \ \ *os\ <<\ \textcolor{stringliteral}{"{}\ \ Expected\ arg\ \#"{}}\ <<\ \mbox{\hyperlink{quantize_8cpp_ab2b6b0c222cd1ce70d6a831f57241e59}{N}}\ -\/\ 1\ <<\ \textcolor{stringliteral}{"{}:\ "{}};}
-\DoxyCodeLine{00927\ \ \ \ \ \ \ get<\mbox{\hyperlink{quantize_8cpp_ab2b6b0c222cd1ce70d6a831f57241e59}{N}}\ -\/\ 1>(matchers).DescribeTo(os);}
-\DoxyCodeLine{00928\ \ \ \ \ \ \ *os\ <<\ \textcolor{stringliteral}{"{}\(\backslash\)n\ \ \ \ \ \ \ \ \ \ \ Actual:\ "{}};}
+\DoxyCodeLine{00926\ \ \ \ \ \ \ *\mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}\ <<\ \textcolor{stringliteral}{"{}\ \ Expected\ arg\ \#"{}}\ <<\ \mbox{\hyperlink{quantize_8cpp_ab2b6b0c222cd1ce70d6a831f57241e59}{N}}\ -\/\ 1\ <<\ \textcolor{stringliteral}{"{}:\ "{}};}
+\DoxyCodeLine{00927\ \ \ \ \ \ \ get<\mbox{\hyperlink{quantize_8cpp_ab2b6b0c222cd1ce70d6a831f57241e59}{N}}\ -\/\ 1>(matchers).DescribeTo(\mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}});}
+\DoxyCodeLine{00928\ \ \ \ \ \ \ *\mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}\ <<\ \textcolor{stringliteral}{"{}\(\backslash\)n\ \ \ \ \ \ \ \ \ \ \ Actual:\ "{}};}
 \DoxyCodeLine{00929\ \ \ \ \ \ \ \textcolor{comment}{//\ We\ remove\ the\ reference\ in\ type\ Value\ to\ prevent\ the}}
 \DoxyCodeLine{00930\ \ \ \ \ \ \ \textcolor{comment}{//\ universal\ printer\ from\ printing\ the\ address\ of\ value,\ which}}
 \DoxyCodeLine{00931\ \ \ \ \ \ \ \textcolor{comment}{//\ isn't\ interesting\ to\ the\ user\ most\ of\ the\ time.\ \ The}}
 \DoxyCodeLine{00932\ \ \ \ \ \ \ \textcolor{comment}{//\ matcher's\ MatchAndExplain()\ method\ handles\ the\ case\ when}}
 \DoxyCodeLine{00933\ \ \ \ \ \ \ \textcolor{comment}{//\ the\ address\ is\ interesting.}}
-\DoxyCodeLine{00934\ \ \ \ \ \ \ \mbox{\hyperlink{namespacetesting_1_1internal_a30708fa2bacf11895b03bdb21eb72309}{internal::UniversalPrint}}(\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}},\ os);}
-\DoxyCodeLine{00935\ \ \ \ \ \ \ \mbox{\hyperlink{namespacetesting_1_1internal_ad609eb8bac84ab487464a3449c57640a}{PrintIfNotEmpty}}(listener.str(),\ os);}
-\DoxyCodeLine{00936\ \ \ \ \ \ \ *os\ <<\ \textcolor{stringliteral}{"{}\(\backslash\)n"{}};}
+\DoxyCodeLine{00934\ \ \ \ \ \ \ \mbox{\hyperlink{namespacetesting_1_1internal_a30708fa2bacf11895b03bdb21eb72309}{internal::UniversalPrint}}(\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}},\ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}});}
+\DoxyCodeLine{00935\ \ \ \ \ \ \ \mbox{\hyperlink{namespacetesting_1_1internal_ad609eb8bac84ab487464a3449c57640a}{PrintIfNotEmpty}}(listener.str(),\ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}});}
+\DoxyCodeLine{00936\ \ \ \ \ \ \ *\mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}\ <<\ \textcolor{stringliteral}{"{}\(\backslash\)n"{}};}
 \DoxyCodeLine{00937\ \ \ \ \ \}}
 \DoxyCodeLine{00938\ \ \ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
 \includegraphics[width=350pt]{classtesting_1_1internal_1_1_tuple_prefix_a0ffd38ce90ae6da645a5655aefac5bb7_cgraph}
 \end{center}
 \end{figure}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -100,14 +102,16 @@ Definition at line \mbox{\hyperlink{gmock-matchers_8h_source_l00899}{899}} of fi
 \DoxyCodeLine{00903\ \ \ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
 \includegraphics[width=189pt]{classtesting_1_1internal_1_1_tuple_prefix_ada24ceee73c02e3bb7f8264143170f7a_cgraph}
 \end{center}
 \end{figure}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode

@@ -7,7 +7,7 @@
 \doxysubsubsection*{Static Public Member Functions}
 \begin{DoxyCompactItemize}
 \item 
-static void \mbox{\hyperlink{classtesting_1_1internal_1_1_universal_printer_3_01_t_01_6_01_4_a923a694be8aa66117848c1c5f57ede35}{Print}} (const \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \&\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}}, \+::std\+::ostream \texorpdfstring{$\ast$}{*}os)
+static void \mbox{\hyperlink{classtesting_1_1internal_1_1_universal_printer_3_01_t_01_6_01_4_a923a694be8aa66117848c1c5f57ede35}{Print}} (const \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \&\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}}, \+::std\+::ostream \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}})
 \end{DoxyCompactItemize}
 
 
@@ -37,14 +37,15 @@ Definition at line \mbox{\hyperlink{gtest-printers_8h_source_l00843}{843}} of fi
 \DoxyCodeLine{00843\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
 \DoxyCodeLine{00844\ \ \ \ \ \textcolor{comment}{//\ Prints\ the\ address\ of\ the\ value.\ \ We\ use\ reinterpret\_cast\ here}}
 \DoxyCodeLine{00845\ \ \ \ \ \textcolor{comment}{//\ as\ static\_cast\ doesn't\ compile\ when\ T\ is\ a\ function\ type.}}
-\DoxyCodeLine{00846\ \ \ \ \ *os\ <<\ \textcolor{stringliteral}{"{}@"{}}\ <<\ \textcolor{keyword}{reinterpret\_cast<}\textcolor{keyword}{const\ }\textcolor{keywordtype}{void}*\textcolor{keyword}{>}(\&\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}})\ <<\ \textcolor{stringliteral}{"{}\ "{}};}
+\DoxyCodeLine{00846\ \ \ \ \ *\mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}\ <<\ \textcolor{stringliteral}{"{}@"{}}\ <<\ \textcolor{keyword}{reinterpret\_cast<}\textcolor{keyword}{const\ }\textcolor{keywordtype}{void}*\textcolor{keyword}{>}(\&\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}})\ <<\ \textcolor{stringliteral}{"{}\ "{}};}
 \DoxyCodeLine{00847\ }
 \DoxyCodeLine{00848\ \ \ \ \ \textcolor{comment}{//\ Then\ prints\ the\ value\ itself.}}
-\DoxyCodeLine{00849\ \ \ \ \ \mbox{\hyperlink{namespacetesting_1_1internal_a30708fa2bacf11895b03bdb21eb72309}{UniversalPrint}}(\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}},\ os);}
+\DoxyCodeLine{00849\ \ \ \ \ \mbox{\hyperlink{namespacetesting_1_1internal_a30708fa2bacf11895b03bdb21eb72309}{UniversalPrint}}(\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}},\ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}});}
 \DoxyCodeLine{00850\ \ \ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode

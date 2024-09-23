@@ -259,11 +259,11 @@
 \DoxyCodeLine{\Hypertarget{vm_2host__function_8hpp_source_l00255}00255\ \ \ \ \ \ \ \textcolor{keyword}{inline}\ \textcolor{keyword}{constexpr}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespacesysio_1_1vm_1_1detail_a9d6b630794608691f1cb5d2861810b82}{invoke\_on\_impl}}(F\&\&\ fn,\ \textcolor{keyword}{const}\ Arg\&\ arg,\ \textcolor{keyword}{const}\ Args\&...\ args)\ \{}
 \DoxyCodeLine{\Hypertarget{vm_2host__function_8hpp_source_l00256}00256\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ \textcolor{keyword}{constexpr}\ (Once)\ \{}
 \DoxyCodeLine{\Hypertarget{vm_2host__function_8hpp_source_l00257}00257\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ \textcolor{keyword}{constexpr}\ (Cnt\ ==\ 0)}
-\DoxyCodeLine{\Hypertarget{vm_2host__function_8hpp_source_l00258}00258\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ std::invoke(fn,\ arg,\ \mbox{\hyperlink{namespacebenchmark_compile_ad0ed96ae1454e4347ca61ac3887c379e}{args}}...);}
+\DoxyCodeLine{\Hypertarget{vm_2host__function_8hpp_source_l00258}00258\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ std::invoke(fn,\ arg,\ args...);}
 \DoxyCodeLine{\Hypertarget{vm_2host__function_8hpp_source_l00259}00259\ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
 \DoxyCodeLine{\Hypertarget{vm_2host__function_8hpp_source_l00260}00260\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ \textcolor{keyword}{constexpr}\ (std::is\_same\_v<T,\ Arg>\ ||\ std::is\_same\_v<T,\ invoke\_on\_all\_t>)}
-\DoxyCodeLine{\Hypertarget{vm_2host__function_8hpp_source_l00261}00261\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ std::invoke(fn,\ arg,\ \mbox{\hyperlink{namespacebenchmark_compile_ad0ed96ae1454e4347ca61ac3887c379e}{args}}...);}
-\DoxyCodeLine{\Hypertarget{vm_2host__function_8hpp_source_l00262}00262\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacesysio_1_1vm_1_1detail_a9d6b630794608691f1cb5d2861810b82}{invoke\_on\_impl<Once,\ Cnt+1,\ T>}}(std::forward<F>(fn),\ \mbox{\hyperlink{namespacebenchmark_compile_ad0ed96ae1454e4347ca61ac3887c379e}{args}}...);}
+\DoxyCodeLine{\Hypertarget{vm_2host__function_8hpp_source_l00261}00261\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ std::invoke(fn,\ arg,\ args...);}
+\DoxyCodeLine{\Hypertarget{vm_2host__function_8hpp_source_l00262}00262\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacesysio_1_1vm_1_1detail_a9d6b630794608691f1cb5d2861810b82}{invoke\_on\_impl<Once,\ Cnt+1,\ T>}}(std::forward<F>(fn),\ args...);}
 \DoxyCodeLine{\Hypertarget{vm_2host__function_8hpp_source_l00263}00263\ \ \ \ \ \ \ \ \ \ \}}
 \DoxyCodeLine{\Hypertarget{vm_2host__function_8hpp_source_l00264}00264\ \ \ \ \ \ \ \}}
 \DoxyCodeLine{\Hypertarget{vm_2host__function_8hpp_source_l00265}00265\ }
@@ -277,7 +277,7 @@
 \DoxyCodeLine{\Hypertarget{vm_2host__function_8hpp_source_l00273}00273\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{constexpr}\ std::size\_t\ args\_size\ =\ std::tuple\_size\_v<Args>;}
 \DoxyCodeLine{\Hypertarget{vm_2host__function_8hpp_source_l00274}00274\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{constexpr}\ std::size\_t\ preconds\_size\ =\ std::tuple\_size\_v<Preconditions>;}
 \DoxyCodeLine{\Hypertarget{vm_2host__function_8hpp_source_l00275}00275\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ \textcolor{keyword}{constexpr}\ (I\ <\ preconds\_size)\ \{}
-\DoxyCodeLine{\Hypertarget{vm_2host__function_8hpp_source_l00276}00276\ \ \ \ \ \ \ \ \ \ \ \ \ precondition\_runner<std::tuple\_element\_t<I,\ Preconditions>>(ctx,\ \mbox{\hyperlink{namespacebenchmark_compile_ad0ed96ae1454e4347ca61ac3887c379e}{args}},\ std::make\_index\_sequence<args\_size>\{\});}
+\DoxyCodeLine{\Hypertarget{vm_2host__function_8hpp_source_l00276}00276\ \ \ \ \ \ \ \ \ \ \ \ \ precondition\_runner<std::tuple\_element\_t<I,\ Preconditions>>(ctx,\ args,\ std::make\_index\_sequence<args\_size>\{\});}
 \DoxyCodeLine{\Hypertarget{vm_2host__function_8hpp_source_l00277}00277\ \ \ \ \ \ \ \ \ \ \ \ \ preconditions\_runner<I+1,\ Preconditions>(ctx,\ args);}
 \DoxyCodeLine{\Hypertarget{vm_2host__function_8hpp_source_l00278}00278\ \ \ \ \ \ \ \ \ \ \}}
 \DoxyCodeLine{\Hypertarget{vm_2host__function_8hpp_source_l00279}00279\ \ \ \ \ \ \ \}}
@@ -285,7 +285,7 @@
 \DoxyCodeLine{\Hypertarget{vm_2host__function_8hpp_source_l00281}00281\ }
 \DoxyCodeLine{\Hypertarget{vm_2host__function_8hpp_source_l00282}00282\ \ \ \ \textcolor{keyword}{template}\ <\textcolor{keywordtype}{bool}\ Once,\ \textcolor{keyword}{typename}\ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}},\ \textcolor{keyword}{typename}\ F,\ \textcolor{keyword}{typename}...\ Args>}
 \DoxyCodeLine{\Hypertarget{vm_2host__function_8hpp_source_l00283}00283\ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespacesysio_1_1vm_aed9320a398dcef98dbf672e5a58afb73}{invoke\_on}}(F\&\&\ \mbox{\hyperlink{namespacesysio_1_1vm_aea2b0c85e98f4073b07115a97b46ae55a6b56c53a1b24e55124ff7f71bb9817d2}{func}},\ \textcolor{keyword}{const}\ Args\&...\ args)\ \{}
-\DoxyCodeLine{\Hypertarget{vm_2host__function_8hpp_source_l00284}00284\ \ \ \ \ \ \ \mbox{\hyperlink{namespacesysio_1_1vm_1_1detail_a9d6b630794608691f1cb5d2861810b82}{detail::invoke\_on\_impl<Once,\ 0,\ T>}}(\textcolor{keyword}{static\_cast<}F\&\&\textcolor{keyword}{>}(\mbox{\hyperlink{namespacesysio_1_1vm_aea2b0c85e98f4073b07115a97b46ae55a6b56c53a1b24e55124ff7f71bb9817d2}{func}}),\ \mbox{\hyperlink{namespacebenchmark_compile_ad0ed96ae1454e4347ca61ac3887c379e}{args}}...);}
+\DoxyCodeLine{\Hypertarget{vm_2host__function_8hpp_source_l00284}00284\ \ \ \ \ \ \ \mbox{\hyperlink{namespacesysio_1_1vm_1_1detail_a9d6b630794608691f1cb5d2861810b82}{detail::invoke\_on\_impl<Once,\ 0,\ T>}}(\textcolor{keyword}{static\_cast<}F\&\&\textcolor{keyword}{>}(\mbox{\hyperlink{namespacesysio_1_1vm_aea2b0c85e98f4073b07115a97b46ae55a6b56c53a1b24e55124ff7f71bb9817d2}{func}}),\ args...);}
 \DoxyCodeLine{\Hypertarget{vm_2host__function_8hpp_source_l00285}00285\ \ \ \ \}}
 \DoxyCodeLine{\Hypertarget{vm_2host__function_8hpp_source_l00286}00286\ }
 \DoxyCodeLine{\Hypertarget{vm_2host__function_8hpp_source_l00287}\mbox{\hyperlink{vm_2host__function_8hpp_a576aca63e32e4cbf42537c5876c0d95b}{00287}}\ \textcolor{preprocessor}{\#define\ SYS\_VM\_INVOKE\_ON(TYPE,\ CONDITION)\ \(\backslash\)}}

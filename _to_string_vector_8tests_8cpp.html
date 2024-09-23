@@ -203,13 +203,12 @@ Here is the call graph for this function:</div>
 <div class="fragment"><div class="line"><span class="lineno">   60</span>                                                                                  {</div>
 <div class="line"><span class="lineno">   61</span>    <span class="keyword">using </span>inner = std::vector&lt;std::string, minimal_allocator&lt;std::string&gt;&gt;;</div>
 <div class="line"><span class="lineno">   62</span>    <span class="keyword">using </span>vector = std::vector&lt;inner&gt;;</div>
-<div class="line"><span class="lineno">   63</span>    vector <a class="code hl_variable" href="namespacedevelop_build.html#ade64cd34608f9442ef3049116a2da428">v</a>;</div>
+<div class="line"><span class="lineno">   63</span>    vector v;</div>
 <div class="line"><span class="lineno">   64</span>    <a class="code hl_define" href="include_2catch_8hpp.html#ad57835ba8f1bb419a865ada6bd011a85">REQUIRE</a>( <a class="code hl_function" href="namespace_catch_1_1_detail.html#af0ad48344ffd3f92f3568465248a9880">::Catch::Detail::stringify</a>(v) == <span class="stringliteral">&quot;{  }&quot;</span> );</div>
-<div class="line"><span class="lineno">   65</span>    <a class="code hl_variable" href="namespacedevelop_build.html#ade64cd34608f9442ef3049116a2da428">v</a>.push_back( inner { <span class="stringliteral">&quot;hello&quot;</span> } );</div>
-<div class="line"><span class="lineno">   66</span>    <a class="code hl_variable" href="namespacedevelop_build.html#ade64cd34608f9442ef3049116a2da428">v</a>.push_back( inner { <span class="stringliteral">&quot;world&quot;</span> } );</div>
+<div class="line"><span class="lineno">   65</span>    v.push_back( inner { <span class="stringliteral">&quot;hello&quot;</span> } );</div>
+<div class="line"><span class="lineno">   66</span>    v.push_back( inner { <span class="stringliteral">&quot;world&quot;</span> } );</div>
 <div class="line"><span class="lineno">   67</span>    <a class="code hl_define" href="include_2catch_8hpp.html#ad57835ba8f1bb419a865ada6bd011a85">REQUIRE</a>( <a class="code hl_function" href="namespace_catch_1_1_detail.html#af0ad48344ffd3f92f3568465248a9880">::Catch::Detail::stringify</a>(v) == <span class="stringliteral">&quot;{ { \&quot;hello\&quot; }, { \&quot;world\&quot; } }&quot;</span> );</div>
 <div class="line"><span class="lineno">   68</span>}</div>
-<div class="ttc" id="anamespacedevelop_build_html_ade64cd34608f9442ef3049116a2da428"><div class="ttname"><a href="namespacedevelop_build.html#ade64cd34608f9442ef3049116a2da428">developBuild.v</a></div><div class="ttdeci">v</div><div class="ttdef"><b>Definition</b> <a href="develop_build_8py_source.html#l00006">developBuild.py:6</a></div></div>
 </div><!-- fragment --><div class="dynheader">
 Here is the call graph for this function:</div>
 <div class="dyncontent">

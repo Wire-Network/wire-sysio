@@ -6,7 +6,8 @@
 {\ttfamily \#include $<$sysio/vm/watchdog.\+hpp$>$}\newline
 {\ttfamily \#include "{}utils.\+hpp"{}}\newline
 {\ttfamily \#include $<$catch2/catch.\+hpp$>$}\newline
-Include dependency graph for instantiation\+\_\+tests.\+cpp\+:\nopagebreak
+Include dependency graph for instantiation\+\_\+tests.\+cpp\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -77,13 +78,14 @@ Definition at line \mbox{\hyperlink{instantiation__tests_8cpp_source_l00015}{15}
 \DoxyCodeLine{00057\ \ \ \ \};}
 \DoxyCodeLine{00058\ }
 \DoxyCodeLine{00059\ \ \ \ \textcolor{keyword}{using\ }\mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend\_t}}\ =\ \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend<registered\_host\_functions<standalone\_function\_t>}},\ TestType>;}
-\DoxyCodeLine{00060\ \ \ \ std::list<backend\_t>\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}};}
+\DoxyCodeLine{00060\ \ \ \ std::list<backend\_t>\ v;}
 \DoxyCodeLine{00061\ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{int}\ i=0;\ i\ <\ 8193;\ i++)}
-\DoxyCodeLine{00062\ \ \ \ \ \ \ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.emplace\_back(test\_wasm,\ \mbox{\hyperlink{sys-vm_2tests_2utils_8hpp_a4c503c4f3ca9f4afce322078d5a33f3e}{get\_wasm\_allocator}}());}
+\DoxyCodeLine{00062\ \ \ \ \ \ \ v.emplace\_back(test\_wasm,\ \mbox{\hyperlink{sys-vm_2tests_2utils_8hpp_a4c503c4f3ca9f4afce322078d5a33f3e}{get\_wasm\_allocator}}());}
 \DoxyCodeLine{00063\ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode

@@ -6,7 +6,8 @@
 
 
 
-Inheritance diagram for fc\+::optional\+\_\+delegate\texorpdfstring{$<$}{<} R(Args...)\texorpdfstring{$>$}{>}\+:\nopagebreak
+Inheritance diagram for fc\+::optional\+\_\+delegate\texorpdfstring{$<$}{<} R(Args...)\texorpdfstring{$>$}{>}\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -15,7 +16,8 @@ Inheritance diagram for fc\+::optional\+\_\+delegate\texorpdfstring{$<$}{<} R(Ar
 \end{figure}
 
 
-Collaboration diagram for fc\+::optional\+\_\+delegate\texorpdfstring{$<$}{<} R(Args...)\texorpdfstring{$>$}{>}\+:\nopagebreak
+Collaboration diagram for fc\+::optional\+\_\+delegate\texorpdfstring{$<$}{<} R(Args...)\texorpdfstring{$>$}{>}\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -57,7 +59,7 @@ Definition at line \mbox{\hyperlink{utility_8hpp_source_l00190}{190}} of file \m
 \DoxyCodeLine{00192\ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ \textcolor{keyword}{constexpr}(\ std::is\_move\_constructible\_v<R>\ )\ \{}
 \DoxyCodeLine{00193\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ std::function<\mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2parser_8hpp_a5c71a5e59a53413cd6c270266d63b031}{R}}(Args...)>::operator()(std::move(args)...);}
 \DoxyCodeLine{00194\ \ \ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
-\DoxyCodeLine{00195\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ std::function<\mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2parser_8hpp_a5c71a5e59a53413cd6c270266d63b031}{R}}(Args...)>::operator()(\mbox{\hyperlink{namespacebenchmark_compile_ad0ed96ae1454e4347ca61ac3887c379e}{args}}...);}
+\DoxyCodeLine{00195\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ std::function<\mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2parser_8hpp_a5c71a5e59a53413cd6c270266d63b031}{R}}(Args...)>::operator()(args...);}
 \DoxyCodeLine{00196\ \ \ \ \ \ \ \ \ \ \ \ \}}
 \DoxyCodeLine{00197\ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
 \DoxyCodeLine{00198\ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ \textcolor{keyword}{constexpr}(\ !std::is\_void\_v<R>\ )\ \{}

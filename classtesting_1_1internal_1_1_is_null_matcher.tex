@@ -9,9 +9,9 @@
 \item 
 {\footnotesize template$<$typename \mbox{\hyperlink{fwd_8h_a0e5c49dba7ec654cdda5735347c00397}{Pointer}} $>$ }\\bool \mbox{\hyperlink{classtesting_1_1internal_1_1_is_null_matcher_ab8a96a4389c9c352e367ba2edff6e87d}{Match\+And\+Explain}} (const \mbox{\hyperlink{fwd_8h_a0e5c49dba7ec654cdda5735347c00397}{Pointer}} \&\mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}, \mbox{\hyperlink{classtesting_1_1_match_result_listener}{Match\+Result\+Listener}} \texorpdfstring{$\ast$}{*}) const
 \item 
-void \mbox{\hyperlink{classtesting_1_1internal_1_1_is_null_matcher_a81c0b31d64bc65b5573bb56bbc3f4af8}{Describe\+To}} (\+::std\+::ostream \texorpdfstring{$\ast$}{*}os) const
+void \mbox{\hyperlink{classtesting_1_1internal_1_1_is_null_matcher_a81c0b31d64bc65b5573bb56bbc3f4af8}{Describe\+To}} (\+::std\+::ostream \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}) const
 \item 
-void \mbox{\hyperlink{classtesting_1_1internal_1_1_is_null_matcher_a8349e2d6cef08303be7f2471f330a7c0}{Describe\+Negation\+To}} (\+::std\+::ostream \texorpdfstring{$\ast$}{*}os) const
+void \mbox{\hyperlink{classtesting_1_1internal_1_1_is_null_matcher_a8349e2d6cef08303be7f2471f330a7c0}{Describe\+Negation\+To}} (\+::std\+::ostream \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}) const
 \end{DoxyCompactItemize}
 
 
@@ -36,7 +36,7 @@ Definition at line \mbox{\hyperlink{gmock-matchers_8h_source_l01159}{1159}} of f
 
 \begin{DoxyCode}{0}
 \DoxyCodeLine{01159\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
-\DoxyCodeLine{01160\ \ \ \ \ *os\ <<\ \textcolor{stringliteral}{"{}isn't\ NULL"{}};}
+\DoxyCodeLine{01160\ \ \ \ \ *\mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}\ <<\ \textcolor{stringliteral}{"{}isn't\ NULL"{}};}
 \DoxyCodeLine{01161\ \ \ \}}
 
 \end{DoxyCode}
@@ -52,7 +52,7 @@ Definition at line \mbox{\hyperlink{gmock-matchers_8h_source_l01158}{1158}} of f
 
 
 \begin{DoxyCode}{0}
-\DoxyCodeLine{01158\ \{\ *os\ <<\ \textcolor{stringliteral}{"{}is\ NULL"{}};\ \}}
+\DoxyCodeLine{01158\ \{\ *\mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}\ <<\ \textcolor{stringliteral}{"{}is\ NULL"{}};\ \}}
 
 \end{DoxyCode}
 \Hypertarget{classtesting_1_1internal_1_1_is_null_matcher_ab8a96a4389c9c352e367ba2edff6e87d}\index{testing::internal::IsNullMatcher@{testing::internal::IsNullMatcher}!MatchAndExplain@{MatchAndExplain}}
@@ -77,7 +77,8 @@ Definition at line \mbox{\hyperlink{gmock-matchers_8h_source_l01149}{1149}} of f
 \DoxyCodeLine{01156\ \ \ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode

@@ -11,9 +11,9 @@
 \item 
 {\footnotesize template$<$typename Variant $>$ }\\bool \mbox{\hyperlink{classtesting_1_1internal_1_1variant__matcher_1_1_variant_matcher_aa01aea191f2d02e81b0e653c46e73e3a}{Match\+And\+Explain}} (const Variant \&\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}}, \mbox{\hyperlink{classtesting_1_1_match_result_listener}{\+::testing\+::\+Match\+Result\+Listener}} \texorpdfstring{$\ast$}{*}listener) const
 \item 
-void \mbox{\hyperlink{classtesting_1_1internal_1_1variant__matcher_1_1_variant_matcher_a77eb4d1355f774bd8934a30bcc6b29d5}{Describe\+To}} (std\+::ostream \texorpdfstring{$\ast$}{*}os) const
+void \mbox{\hyperlink{classtesting_1_1internal_1_1variant__matcher_1_1_variant_matcher_a77eb4d1355f774bd8934a30bcc6b29d5}{Describe\+To}} (std\+::ostream \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}) const
 \item 
-void \mbox{\hyperlink{classtesting_1_1internal_1_1variant__matcher_1_1_variant_matcher_abbb15a8956731aa0227707c4b5eab9db}{Describe\+Negation\+To}} (std\+::ostream \texorpdfstring{$\ast$}{*}os) const
+void \mbox{\hyperlink{classtesting_1_1internal_1_1variant__matcher_1_1_variant_matcher_abbb15a8956731aa0227707c4b5eab9db}{Describe\+Negation\+To}} (std\+::ostream \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}) const
 \end{DoxyCompactItemize}
 
 
@@ -60,13 +60,14 @@ Definition at line \mbox{\hyperlink{gmock-matchers_8h_source_l04095}{4095}} of f
 
 \begin{DoxyCode}{0}
 \DoxyCodeLine{04095\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
-\DoxyCodeLine{04096\ \ \ \ \ *os\ <<\ \textcolor{stringliteral}{"{}is\ a\ variant<>\ with\ value\ of\ type\ other\ than\ '"{}}\ <<\ GetTypeName()}
+\DoxyCodeLine{04096\ \ \ \ \ *\mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}\ <<\ \textcolor{stringliteral}{"{}is\ a\ variant<>\ with\ value\ of\ type\ other\ than\ '"{}}\ <<\ GetTypeName()}
 \DoxyCodeLine{04097\ \ \ \ \ \ \ \ \ <<\ \textcolor{stringliteral}{"{}'\ or\ the\ value\ "{}};}
-\DoxyCodeLine{04098\ \ \ \ \ matcher\_.\mbox{\hyperlink{classtesting_1_1internal_1_1_matcher_base_ac1089d49b6b8a381900618985cd69b7f}{DescribeNegationTo}}(os);}
+\DoxyCodeLine{04098\ \ \ \ \ matcher\_.\mbox{\hyperlink{classtesting_1_1internal_1_1_matcher_base_ac1089d49b6b8a381900618985cd69b7f}{DescribeNegationTo}}(\mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}});}
 \DoxyCodeLine{04099\ \ \ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -87,13 +88,14 @@ Definition at line \mbox{\hyperlink{gmock-matchers_8h_source_l04089}{4089}} of f
 
 \begin{DoxyCode}{0}
 \DoxyCodeLine{04089\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
-\DoxyCodeLine{04090\ \ \ \ \ *os\ <<\ \textcolor{stringliteral}{"{}is\ a\ variant<>\ with\ value\ of\ type\ '"{}}\ <<\ GetTypeName()}
+\DoxyCodeLine{04090\ \ \ \ \ *\mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}\ <<\ \textcolor{stringliteral}{"{}is\ a\ variant<>\ with\ value\ of\ type\ '"{}}\ <<\ GetTypeName()}
 \DoxyCodeLine{04091\ \ \ \ \ \ \ \ \ <<\ \textcolor{stringliteral}{"{}'\ and\ the\ value\ "{}};}
-\DoxyCodeLine{04092\ \ \ \ \ matcher\_.\mbox{\hyperlink{classtesting_1_1internal_1_1_matcher_base_a7e0c883c7745e0d646463077ef1c1267}{DescribeTo}}(os);}
+\DoxyCodeLine{04092\ \ \ \ \ matcher\_.\mbox{\hyperlink{classtesting_1_1internal_1_1_matcher_base_a7e0c883c7745e0d646463077ef1c1267}{DescribeTo}}(\mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}});}
 \DoxyCodeLine{04093\ \ \ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -134,7 +136,8 @@ Definition at line \mbox{\hyperlink{gmock-matchers_8h_source_l04069}{4069}} of f
 \DoxyCodeLine{04087\ \ \ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode

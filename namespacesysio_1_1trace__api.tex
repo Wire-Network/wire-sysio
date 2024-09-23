@@ -116,9 +116,9 @@ bool \mbox{\hyperlink{namespacesysio_1_1trace__api_a4f19c3c336fe462488f3ea933ce4
 \item 
 bool \mbox{\hyperlink{namespacesysio_1_1trace__api_a93bc5783c2f167f60e3426ab0a6542a0}{operator==}} (const \mbox{\hyperlink{structsysio_1_1trace__api_1_1block__trace__v2}{block\+\_\+trace\+\_\+v2}} \&lhs, const \mbox{\hyperlink{structsysio_1_1trace__api_1_1block__trace__v2}{block\+\_\+trace\+\_\+v2}} \&rhs)
 \item 
-std\+::ostream \& \mbox{\hyperlink{namespacesysio_1_1trace__api_a23357afd33f30f9f6095faa502ad8371}{operator$<$$<$}} (std\+::ostream \&os, const \mbox{\hyperlink{structsysio_1_1trace__api_1_1block__trace__v0}{block\+\_\+trace\+\_\+v0}} \&\mbox{\hyperlink{xbyak__mnemonic_8h_a9be923ac9afe48bc98bd22e398415272}{bt}})
+std\+::ostream \& \mbox{\hyperlink{namespacesysio_1_1trace__api_a23357afd33f30f9f6095faa502ad8371}{operator$<$$<$}} (std\+::ostream \&\mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}, const \mbox{\hyperlink{structsysio_1_1trace__api_1_1block__trace__v0}{block\+\_\+trace\+\_\+v0}} \&\mbox{\hyperlink{xbyak__mnemonic_8h_a9be923ac9afe48bc98bd22e398415272}{bt}})
 \item 
-std\+::ostream \& \mbox{\hyperlink{namespacesysio_1_1trace__api_aa1d12728fe1fd05adbe74ff28f4d18cf}{operator$<$$<$}} (std\+::ostream \&os, const \mbox{\hyperlink{structsysio_1_1trace__api_1_1block__trace__v2}{block\+\_\+trace\+\_\+v2}} \&\mbox{\hyperlink{xbyak__mnemonic_8h_a9be923ac9afe48bc98bd22e398415272}{bt}})
+std\+::ostream \& \mbox{\hyperlink{namespacesysio_1_1trace__api_aa1d12728fe1fd05adbe74ff28f4d18cf}{operator$<$$<$}} (std\+::ostream \&\mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}, const \mbox{\hyperlink{structsysio_1_1trace__api_1_1block__trace__v2}{block\+\_\+trace\+\_\+v2}} \&\mbox{\hyperlink{xbyak__mnemonic_8h_a9be923ac9afe48bc98bd22e398415272}{bt}})
 \item 
 bool \mbox{\hyperlink{namespacesysio_1_1trace__api_a24fca9598292e7c24eec3aacf15f4947}{operator==}} (const \mbox{\hyperlink{structsysio_1_1trace__api_1_1block__entry__v0}{block\+\_\+entry\+\_\+v0}} \&lhs, const \mbox{\hyperlink{structsysio_1_1trace__api_1_1block__entry__v0}{block\+\_\+entry\+\_\+v0}} \&rhs)
 \item 
@@ -128,9 +128,9 @@ bool \mbox{\hyperlink{namespacesysio_1_1trace__api_ac081c198d190dab889e960c41e97
 \item 
 bool \mbox{\hyperlink{namespacesysio_1_1trace__api_abdc8a5cb5e34c90e257ab6cf10137de4}{operator!=}} (const \mbox{\hyperlink{structsysio_1_1trace__api_1_1lib__entry__v0}{lib\+\_\+entry\+\_\+v0}} \&lhs, const \mbox{\hyperlink{structsysio_1_1trace__api_1_1lib__entry__v0}{lib\+\_\+entry\+\_\+v0}} \&rhs)
 \item 
-std\+::ostream \& \mbox{\hyperlink{namespacesysio_1_1trace__api_a9a1a60194ac5aa7b88659609bccb90b8}{operator$<$$<$}} (std\+::ostream \&os, const \mbox{\hyperlink{structsysio_1_1trace__api_1_1block__entry__v0}{block\+\_\+entry\+\_\+v0}} \&be)
+std\+::ostream \& \mbox{\hyperlink{namespacesysio_1_1trace__api_a9a1a60194ac5aa7b88659609bccb90b8}{operator$<$$<$}} (std\+::ostream \&\mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}, const \mbox{\hyperlink{structsysio_1_1trace__api_1_1block__entry__v0}{block\+\_\+entry\+\_\+v0}} \&be)
 \item 
-std\+::ostream \& \mbox{\hyperlink{namespacesysio_1_1trace__api_aaed7f2467b3bb0832c319fc6de35c32f}{operator$<$$<$}} (std\+::ostream \&os, const \mbox{\hyperlink{structsysio_1_1trace__api_1_1lib__entry__v0}{lib\+\_\+entry\+\_\+v0}} \&le)
+std\+::ostream \& \mbox{\hyperlink{namespacesysio_1_1trace__api_aaed7f2467b3bb0832c319fc6de35c32f}{operator$<$$<$}} (std\+::ostream \&\mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}, const \mbox{\hyperlink{structsysio_1_1trace__api_1_1lib__entry__v0}{lib\+\_\+entry\+\_\+v0}} \&le)
 \end{DoxyCompactItemize}
 
 
@@ -334,12 +334,13 @@ Definition at line \mbox{\hyperlink{test__common_8hpp_source_l00236}{236}} of fi
 
 \begin{DoxyCode}{0}
 \DoxyCodeLine{00236\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
-\DoxyCodeLine{00237\ \ \ \ \ \ \ os\ <<\ \mbox{\hyperlink{classfc_1_1json_aa6541960d7f05567559b866cfaf88dfa}{fc::json::to\_string}}(be,\ \mbox{\hyperlink{classfc_1_1time__point_aeccf1b70aa34b132c5269313b8a50573}{fc::time\_point::maximum}}());}
+\DoxyCodeLine{00237\ \ \ \ \ \ \ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}\ <<\ \mbox{\hyperlink{classfc_1_1json_aa6541960d7f05567559b866cfaf88dfa}{fc::json::to\_string}}(be,\ \mbox{\hyperlink{classfc_1_1time__point_aeccf1b70aa34b132c5269313b8a50573}{fc::time\_point::maximum}}());}
 \DoxyCodeLine{00238\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}};}
 \DoxyCodeLine{00239\ \ \ \ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -359,12 +360,13 @@ Definition at line \mbox{\hyperlink{test__common_8hpp_source_l00206}{206}} of fi
 
 \begin{DoxyCode}{0}
 \DoxyCodeLine{00206\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
-\DoxyCodeLine{00207\ \ \ \ \ \ \ os\ <<\ \mbox{\hyperlink{classfc_1_1json_aa6541960d7f05567559b866cfaf88dfa}{fc::json::to\_string}}(\ \mbox{\hyperlink{xbyak__mnemonic_8h_a9be923ac9afe48bc98bd22e398415272}{bt}},\ \mbox{\hyperlink{classfc_1_1time__point_aeccf1b70aa34b132c5269313b8a50573}{fc::time\_point::maximum}}()\ );}
+\DoxyCodeLine{00207\ \ \ \ \ \ \ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}\ <<\ \mbox{\hyperlink{classfc_1_1json_aa6541960d7f05567559b866cfaf88dfa}{fc::json::to\_string}}(\ \mbox{\hyperlink{xbyak__mnemonic_8h_a9be923ac9afe48bc98bd22e398415272}{bt}},\ \mbox{\hyperlink{classfc_1_1time__point_aeccf1b70aa34b132c5269313b8a50573}{fc::time\_point::maximum}}()\ );}
 \DoxyCodeLine{00208\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}};}
 \DoxyCodeLine{00209\ \ \ \ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -384,12 +386,13 @@ Definition at line \mbox{\hyperlink{test__common_8hpp_source_l00211}{211}} of fi
 
 \begin{DoxyCode}{0}
 \DoxyCodeLine{00211\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
-\DoxyCodeLine{00212\ \ \ \ \ \ \ os\ <<\ \mbox{\hyperlink{classfc_1_1json_aa6541960d7f05567559b866cfaf88dfa}{fc::json::to\_string}}(\ \mbox{\hyperlink{xbyak__mnemonic_8h_a9be923ac9afe48bc98bd22e398415272}{bt}},\ \mbox{\hyperlink{classfc_1_1time__point_aeccf1b70aa34b132c5269313b8a50573}{fc::time\_point::maximum}}()\ );}
+\DoxyCodeLine{00212\ \ \ \ \ \ \ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}\ <<\ \mbox{\hyperlink{classfc_1_1json_aa6541960d7f05567559b866cfaf88dfa}{fc::json::to\_string}}(\ \mbox{\hyperlink{xbyak__mnemonic_8h_a9be923ac9afe48bc98bd22e398415272}{bt}},\ \mbox{\hyperlink{classfc_1_1time__point_aeccf1b70aa34b132c5269313b8a50573}{fc::time\_point::maximum}}()\ );}
 \DoxyCodeLine{00213\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}};}
 \DoxyCodeLine{00214\ \ \ \ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -409,12 +412,13 @@ Definition at line \mbox{\hyperlink{test__common_8hpp_source_l00241}{241}} of fi
 
 \begin{DoxyCode}{0}
 \DoxyCodeLine{00241\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
-\DoxyCodeLine{00242\ \ \ \ \ \ \ os\ <<\ \mbox{\hyperlink{classfc_1_1json_aa6541960d7f05567559b866cfaf88dfa}{fc::json::to\_string}}(le,\ \mbox{\hyperlink{classfc_1_1time__point_aeccf1b70aa34b132c5269313b8a50573}{fc::time\_point::maximum}}());}
+\DoxyCodeLine{00242\ \ \ \ \ \ \ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}\ <<\ \mbox{\hyperlink{classfc_1_1json_aa6541960d7f05567559b866cfaf88dfa}{fc::json::to\_string}}(le,\ \mbox{\hyperlink{classfc_1_1time__point_aeccf1b70aa34b132c5269313b8a50573}{fc::time\_point::maximum}}());}
 \DoxyCodeLine{00243\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}};}
 \DoxyCodeLine{00244\ \ \ \ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -631,7 +635,8 @@ Definition at line \mbox{\hyperlink{extract__util_8hpp_source_l00010}{10}} of fi
 \DoxyCodeLine{00027\ \}}
 
 \end{DoxyCode}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -688,7 +693,8 @@ Definition at line \mbox{\hyperlink{extract__util_8hpp_source_l00030}{30}} of fi
 \DoxyCodeLine{00064\ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode

@@ -149,14 +149,37 @@ template&lt;typename <a class="el" href="prettywritertest_8cpp.html#a6283df8c4e3
 
 <p class="definition">Definition at line <a class="el" href="fc_2include_2fc_2reflect_2variant_8hpp_source.html#l00087">87</a> of file <a class="el" href="fc_2include_2fc_2reflect_2variant_8hpp_source.html">variant.hpp</a>.</p>
 <div class="fragment"><div class="line"><span class="lineno">   88</span>       { </div>
-<div class="line"><span class="lineno">   89</span>           <span class="keywordflow">if</span>( <a class="code hl_variable" href="namespacedevelop_build.html#ade64cd34608f9442ef3049116a2da428">v</a>.is_string() )</div>
-<div class="line"><span class="lineno">   90</span>              o = <a class="code hl_struct" href="structfc_1_1reflector.html">fc::reflector&lt;T&gt;::from_string</a>( <a class="code hl_variable" href="namespacedevelop_build.html#ade64cd34608f9442ef3049116a2da428">v</a>.get_string().c_str() );</div>
+<div class="line"><span class="lineno">   89</span>           <span class="keywordflow">if</span>( v.<a class="code hl_function" href="classfc_1_1variant.html#ac51c0354c1fcef2cc5ce43a5062e8de6">is_string</a>() )</div>
+<div class="line"><span class="lineno">   90</span>              o = <a class="code hl_struct" href="structfc_1_1reflector.html">fc::reflector&lt;T&gt;::from_string</a>( v.<a class="code hl_function" href="classfc_1_1variant.html#a2ca9f4d2feb8c9743da4128b18bfa886">get_string</a>().c_str() );</div>
 <div class="line"><span class="lineno">   91</span>           <span class="keywordflow">else</span></div>
-<div class="line"><span class="lineno">   92</span>              o = <a class="code hl_struct" href="structfc_1_1reflector.html">fc::reflector&lt;T&gt;::from_int</a>( <a class="code hl_variable" href="namespacedevelop_build.html#ade64cd34608f9442ef3049116a2da428">v</a>.as_int64() );</div>
+<div class="line"><span class="lineno">   92</span>              o = <a class="code hl_struct" href="structfc_1_1reflector.html">fc::reflector&lt;T&gt;::from_int</a>( v.<a class="code hl_function" href="classfc_1_1variant.html#ab5d7877d2c19dbd6ac9eac7a1205dbeb">as_int64</a>() );</div>
 <div class="line"><span class="lineno">   93</span>       }</div>
-<div class="ttc" id="anamespacedevelop_build_html_ade64cd34608f9442ef3049116a2da428"><div class="ttname"><a href="namespacedevelop_build.html#ade64cd34608f9442ef3049116a2da428">developBuild.v</a></div><div class="ttdeci">v</div><div class="ttdef"><b>Definition</b> <a href="develop_build_8py_source.html#l00006">developBuild.py:6</a></div></div>
+<div class="ttc" id="aclassfc_1_1variant_html_a2ca9f4d2feb8c9743da4128b18bfa886"><div class="ttname"><a href="classfc_1_1variant.html#a2ca9f4d2feb8c9743da4128b18bfa886">fc::variant::get_string</a></div><div class="ttdeci">const string &amp; get_string() const</div><div class="ttdef"><b>Definition</b> <a href="variant_8cpp_source.html#l00606">variant.cpp:606</a></div></div>
+<div class="ttc" id="aclassfc_1_1variant_html_ab5d7877d2c19dbd6ac9eac7a1205dbeb"><div class="ttname"><a href="classfc_1_1variant.html#ab5d7877d2c19dbd6ac9eac7a1205dbeb">fc::variant::as_int64</a></div><div class="ttdeci">int64_t as_int64() const</div><div class="ttdef"><b>Definition</b> <a href="variant_8cpp_source.html#l00377">variant.cpp:377</a></div></div>
+<div class="ttc" id="aclassfc_1_1variant_html_ac51c0354c1fcef2cc5ce43a5062e8de6"><div class="ttname"><a href="classfc_1_1variant.html#ac51c0354c1fcef2cc5ce43a5062e8de6">fc::variant::is_string</a></div><div class="ttdeci">bool is_string() const</div><div class="ttdef"><b>Definition</b> <a href="variant_8cpp_source.html#l00314">variant.cpp:314</a></div></div>
 <div class="ttc" id="astructfc_1_1reflector_html"><div class="ttname"><a href="structfc_1_1reflector.html">fc::reflector</a></div><div class="ttdoc">defines visit functions for T Unless this is specialized, visit() will not be defined for T.</div><div class="ttdef"><b>Definition</b> <a href="reflect_8hpp_source.html#l00033">reflect.hpp:33</a></div></div>
-</div><!-- fragment -->
+</div><!-- fragment --><div class="dynheader">
+Here is the call graph for this function:</div>
+<div class="dyncontent">
+<div class="center"><img src="structfc_1_1if__enum_3_01fc_1_1true__type_01_4_a4d28193c3ee53bef7021897448489ba2_cgraph.png" border="0" usemap="#astructfc_1_1if__enum_3_01fc_1_1true__type_01_4_a4d28193c3ee53bef7021897448489ba2_cgraph" alt=""/></div>
+<map name="astructfc_1_1if__enum_3_01fc_1_1true__type_01_4_a4d28193c3ee53bef7021897448489ba2_cgraph" id="astructfc_1_1if__enum_3_01fc_1_1true__type_01_4_a4d28193c3ee53bef7021897448489ba2_cgraph">
+<area shape="rect" title=" " alt="" coords="5,47,151,88"/>
+<area shape="rect" href="classfc_1_1variant.html#ab5d7877d2c19dbd6ac9eac7a1205dbeb" title=" " alt="" coords="203,104,339,130"/>
+<area shape="poly" title=" " alt="" coords="152,84,204,97,203,102,151,89"/>
+<area shape="rect" href="classfc_1_1variant.html#a2ca9f4d2feb8c9743da4128b18bfa886" title=" " alt="" coords="199,5,343,31"/>
+<area shape="poly" title=" " alt="" coords="151,46,203,33,204,38,152,51"/>
+<area shape="rect" href="classfc_1_1variant.html#ac51c0354c1fcef2cc5ce43a5062e8de6" title=" " alt="" coords="203,55,339,80"/>
+<area shape="poly" title=" " alt="" coords="151,65,187,65,187,70,151,70"/>
+<area shape="rect" href="classfc_1_1variant.html#afaae1df286ff97c83301eda21dbd51ea" title=" " alt="" coords="391,43,528,68"/>
+<area shape="poly" title=" " alt="" coords="312,101,402,71,404,76,314,106"/>
+<area shape="rect" href="namespacefc.html#afe327b84123fcbda675ea00418471c9a" title=" " alt="" coords="416,116,503,142"/>
+<area shape="poly" title=" " alt="" coords="340,119,401,122,401,128,339,124"/>
+<area shape="poly" title=" " alt="" coords="428,117,422,107,425,98,438,92,460,89,482,92,494,98,492,103,481,97,460,95,440,97,429,101,427,107,432,114"/>
+<area shape="poly" title=" " alt="" coords="340,29,377,36,376,42,339,34"/>
+<area shape="poly" title=" " alt="" coords="339,61,375,58,376,64,340,66"/>
+</map>
+</div>
+
 </div>
 </div>
 <a id="a11eac43004dde4068db8314f3dc2650d" name="a11eac43004dde4068db8314f3dc2650d"></a>
@@ -190,7 +213,7 @@ template&lt;typename <a class="el" href="prettywritertest_8cpp.html#a6283df8c4e3
 
 <p class="definition">Definition at line <a class="el" href="fc_2include_2fc_2reflect_2variant_8hpp_source.html#l00082">82</a> of file <a class="el" href="fc_2include_2fc_2reflect_2variant_8hpp_source.html">variant.hpp</a>.</p>
 <div class="fragment"><div class="line"><span class="lineno">   83</span>       { </div>
-<div class="line"><span class="lineno">   84</span>           <a class="code hl_variable" href="namespacedevelop_build.html#ade64cd34608f9442ef3049116a2da428">v</a> = <a class="code hl_struct" href="structfc_1_1reflector.html">fc::reflector&lt;T&gt;::to_fc_string</a>(o);</div>
+<div class="line"><span class="lineno">   84</span>           v = <a class="code hl_struct" href="structfc_1_1reflector.html">fc::reflector&lt;T&gt;::to_fc_string</a>(o);</div>
 <div class="line"><span class="lineno">   85</span>       }</div>
 </div><!-- fragment -->
 </div>

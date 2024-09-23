@@ -160,7 +160,7 @@ Definition at line \mbox{\hyperlink{elliptic__r1_8cpp_source_l00391}{391}} of fi
 \DoxyCodeLine{00403\ \textcolor{preprocessor}{\#if\ 0}}
 \DoxyCodeLine{00404\ \ \ \ \ \ \ \ \ \ \ =\ bigint(\ EC\_KEY\_get0\_private\_key(\ k\ );}
 \DoxyCodeLine{00405\ \ \ \ \ \ \ \ EC\_POINT*\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3037ff69dd24c6e34aee6fdd45269f13}{pub}}\ \ \ =\ EC\_KEY\_get0\_public\_key(\ k\ );}
-\DoxyCodeLine{00406\ \ \ \ \ \ \ \ EC\_GROUP*\ \mbox{\hyperlink{namespaceupload_a9d33d66de17175dced88ffe95f079226}{group}}\ =\ EC\_KEY\_get0\_group(\ k\ );}
+\DoxyCodeLine{00406\ \ \ \ \ \ \ \ EC\_GROUP*\ group\ =\ EC\_KEY\_get0\_group(\ k\ );}
 \DoxyCodeLine{00407\ }
 \DoxyCodeLine{00408\ \ \ \ \ \ \ \ EC\_POINT\_get\_affine\_coordinates\_GFp(\ group,\ pub,\ \mbox{\hyperlink{namespacesysio_a5c18cd9d34b8c5d3af8e2de75577673fa1f42b089b0bc1105b38f19140a65cc2a}{self}}.my-\/>\_pub\_x.get(),\ \mbox{\hyperlink{namespacesysio_a5c18cd9d34b8c5d3af8e2de75577673fa1f42b089b0bc1105b38f19140a65cc2a}{self}}.my-\/>\_pub\_y.get(),\ \textcolor{keyword}{nullptr}\textcolor{comment}{/*ctx*/}\ );}
 \DoxyCodeLine{00409\ }
@@ -171,7 +171,8 @@ Definition at line \mbox{\hyperlink{elliptic__r1_8cpp_source_l00391}{391}} of fi
 \DoxyCodeLine{00414\ \ \ \ \ \}}
 
 \end{DoxyCode}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -194,7 +195,7 @@ Definition at line \mbox{\hyperlink{elliptic__r1_8cpp_source_l00334}{334}} of fi
 \DoxyCodeLine{00336\ \ \ \ \ \ \ \ \ ssl\_bignum\ z;}
 \DoxyCodeLine{00337\ \ \ \ \ \ \ \ \ BN\_bin2bn((\textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}*)\&offset,\ \textcolor{keyword}{sizeof}(offset),\ z);}
 \DoxyCodeLine{00338\ }
-\DoxyCodeLine{00339\ \ \ \ \ \ \ \ \ ec\_group\ \mbox{\hyperlink{namespaceupload_a9d33d66de17175dced88ffe95f079226}{group}}(EC\_GROUP\_new\_by\_curve\_name(NID\_X9\_62\_prime256v1));}
+\DoxyCodeLine{00339\ \ \ \ \ \ \ \ \ ec\_group\ group(EC\_GROUP\_new\_by\_curve\_name(NID\_X9\_62\_prime256v1));}
 \DoxyCodeLine{00340\ \ \ \ \ \ \ \ \ bn\_ctx\ ctx(BN\_CTX\_new());}
 \DoxyCodeLine{00341\ \ \ \ \ \ \ \ \ ssl\_bignum\ order;}
 \DoxyCodeLine{00342\ \ \ \ \ \ \ \ \ EC\_GROUP\_get\_order(group,\ order,\ ctx);}
@@ -213,7 +214,8 @@ Definition at line \mbox{\hyperlink{elliptic__r1_8cpp_source_l00334}{334}} of fi
 \DoxyCodeLine{00355\ \ \ \ \ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -240,7 +242,8 @@ Definition at line \mbox{\hyperlink{elliptic__r1_8cpp_source_l00494}{494}} of fi
 \DoxyCodeLine{00500\ \ \ \ \ \}}
 
 \end{DoxyCode}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -277,7 +280,8 @@ Definition at line \mbox{\hyperlink{elliptic__r1_8cpp_source_l00373}{373}} of fi
 \DoxyCodeLine{00389\ \ \ \ \ \}}
 
 \end{DoxyCode}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -305,7 +309,8 @@ Definition at line \mbox{\hyperlink{elliptic__r1_8cpp_source_l00503}{503}} of fi
 \DoxyCodeLine{00510\ \ \ \ \ \}}
 
 \end{DoxyCode}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -327,7 +332,8 @@ Definition at line \mbox{\hyperlink{elliptic__r1_8hpp_source_l00102}{102}} of fi
 \DoxyCodeLine{00102\ \{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classfc_1_1crypto_1_1r1_1_1private__key_a837d10115ce323da31a31d2ad1a18e18}{get\_secret}}();\ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -407,7 +413,8 @@ Definition at line \mbox{\hyperlink{elliptic__r1_8cpp_source_l00357}{357}} of fi
 \DoxyCodeLine{00371\ \ \ \ \ \}}
 
 \end{DoxyCode}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -444,7 +451,8 @@ Definition at line \mbox{\hyperlink{elliptic__r1_8cpp_source_l00416}{416}} of fi
 \DoxyCodeLine{00432\ \ \ \ \ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -536,14 +544,16 @@ Definition at line \mbox{\hyperlink{elliptic__openssl_8cpp_source_l00178}{178}} 
 \DoxyCodeLine{00249\ \ \ \ \ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
 \includegraphics[width=350pt]{classfc_1_1crypto_1_1r1_1_1private__key_a9f54b768f15f9685167c846e2cdcd61e_cgraph}
 \end{center}
 \end{figure}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -567,7 +577,8 @@ Definition at line \mbox{\hyperlink{elliptic__r1_8cpp_source_l00489}{489}} of fi
 \DoxyCodeLine{00492\ \ \ \ \ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode

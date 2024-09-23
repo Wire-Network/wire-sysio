@@ -275,7 +275,7 @@ Static Public Attributes</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="friends" name="friends"></a>
 Friends</h2></td></tr>
-<tr class="memitem:a9928f8039f1a54a64ab137101ecdb5a7" id="r_a9928f8039f1a54a64ab137101ecdb5a7"><td class="memItemLeft" align="right" valign="top">std::ostream &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a9928f8039f1a54a64ab137101ecdb5a7">operator&lt;&lt;</a> (std::ostream &amp;os, const <a class="el" href="classmie_1_1_fp.html">Fp</a> &amp;x)</td></tr>
+<tr class="memitem:a9928f8039f1a54a64ab137101ecdb5a7" id="r_a9928f8039f1a54a64ab137101ecdb5a7"><td class="memItemLeft" align="right" valign="top">std::ostream &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a9928f8039f1a54a64ab137101ecdb5a7">operator&lt;&lt;</a> (std::ostream &amp;<a class="el" href="environment_8hpp.html#a3951483d0b31c29ca95336206cd35238">os</a>, const <a class="el" href="classmie_1_1_fp.html">Fp</a> &amp;x)</td></tr>
 <tr class="separator:a9928f8039f1a54a64ab137101ecdb5a7"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a7bbff18a912513a0084fdb80df70bc90" id="r_a7bbff18a912513a0084fdb80df70bc90"><td class="memItemLeft" align="right" valign="top">std::istream &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a7bbff18a912513a0084fdb80df70bc90">operator&gt;&gt;</a> (std::istream &amp;is, <a class="el" href="classmie_1_1_fp.html">Fp</a> &amp;x)</td></tr>
 <tr class="separator:a7bbff18a912513a0084fdb80df70bc90"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -1276,13 +1276,13 @@ Here is the caller graph for this function:</div>
 <div class="line"><span class="lineno">  169</span>        <span class="keywordtype">int</span> k = <a class="code hl_variable" href="#a39c03a6b5ab1bfeddbde09e0b85e0baf">preInv</a>(<a class="code hl_variable" href="bn_8cpp.html#af0a5201ca8846f05f25435b41d7f39f7">r</a>, x);</div>
 <div class="line"><span class="lineno">  170</span><span class="preprocessor">#else</span></div>
 <div class="line"><span class="lineno">  171</span>        <span class="keyword">static</span> <span class="keyword">const</span> <a class="code hl_class" href="class_fp.html">Fp</a> <a class="code hl_variable" href="bn_8cpp.html#a8b0eadcc506862e9d751ab45185053aa">p</a>(&amp;p_[0]);</div>
-<div class="line"><span class="lineno">  172</span>        <a class="code hl_class" href="class_fp.html">Fp</a> u, <a class="code hl_variable" href="namespacedevelop_build.html#ade64cd34608f9442ef3049116a2da428">v</a>, <a class="code hl_variable" href="bn_8cpp.html#af0a5201ca8846f05f25435b41d7f39f7">r</a>, <a class="code hl_variable" href="yubihsm__pkcs11_8c.html#a506da415c9307c897ca9be93acfe1d0f">s</a>;</div>
+<div class="line"><span class="lineno">  172</span>        <a class="code hl_class" href="class_fp.html">Fp</a> u, v, <a class="code hl_variable" href="bn_8cpp.html#af0a5201ca8846f05f25435b41d7f39f7">r</a>, <a class="code hl_variable" href="yubihsm__pkcs11_8c.html#a506da415c9307c897ca9be93acfe1d0f">s</a>;</div>
 <div class="line"><span class="lineno">  173</span>        u = <a class="code hl_variable" href="bn_8cpp.html#a8b0eadcc506862e9d751ab45185053aa">p</a>;</div>
-<div class="line"><span class="lineno">  174</span>        <a class="code hl_variable" href="namespacedevelop_build.html#ade64cd34608f9442ef3049116a2da428">v</a> = x;</div>
+<div class="line"><span class="lineno">  174</span>        v = x;</div>
 <div class="line"><span class="lineno">  175</span>        <a class="code hl_variable" href="bn_8cpp.html#af0a5201ca8846f05f25435b41d7f39f7">r</a>.<a class="code hl_function" href="structmie_1_1_vuint_t.html#a37838a763e8b608a0aeba236ec1313a7">clear</a>();</div>
 <div class="line"><span class="lineno">  176</span>        <a class="code hl_variable" href="yubihsm__pkcs11_8c.html#a506da415c9307c897ca9be93acfe1d0f">s</a>.clear(); <a class="code hl_variable" href="yubihsm__pkcs11_8c.html#a506da415c9307c897ca9be93acfe1d0f">s</a>[0] = 1; <span class="comment">// s is real 1</span></div>
 <div class="line"><span class="lineno">  177</span>        <span class="keywordtype">int</span> k = 0;</div>
-<div class="line"><span class="lineno">  178</span>        <span class="keywordflow">while</span> (!<a class="code hl_variable" href="namespacedevelop_build.html#ade64cd34608f9442ef3049116a2da428">v</a>.isZero()) {</div>
+<div class="line"><span class="lineno">  178</span>        <span class="keywordflow">while</span> (!v.isZero()) {</div>
 <div class="line"><span class="lineno">  179</span>            <span class="keywordflow">if</span> ((u[0] &amp; 1) == 0) {</div>
 <div class="line"><span class="lineno">  180</span>                <a class="code hl_variable" href="#ae19df313e92faa969ea61d5892f33ef0">shr1</a>(u, u);</div>
 <div class="line"><span class="lineno">  181</span>                <a class="code hl_variable" href="#a16401a650d5f3fd8c2112b1a3e3f59ea">addNC</a>(<a class="code hl_variable" href="yubihsm__pkcs11_8c.html#a506da415c9307c897ca9be93acfe1d0f">s</a>, <a class="code hl_variable" href="yubihsm__pkcs11_8c.html#a506da415c9307c897ca9be93acfe1d0f">s</a>, <a class="code hl_variable" href="yubihsm__pkcs11_8c.html#a506da415c9307c897ca9be93acfe1d0f">s</a>);</div>
@@ -1319,7 +1319,6 @@ Here is the caller graph for this function:</div>
 <div class="ttc" id="abn_8cpp_html_af0a5201ca8846f05f25435b41d7f39f7"><div class="ttname"><a href="bn_8cpp.html#af0a5201ca8846f05f25435b41d7f39f7">r</a></div><div class="ttdeci">const mie::Vuint &amp; r</div><div class="ttdef"><b>Definition</b> <a href="bn_8cpp_source.html#l00028">bn.cpp:28</a></div></div>
 <div class="ttc" id="aclassmie_1_1_fp_html_a39c03a6b5ab1bfeddbde09e0b85e0baf"><div class="ttname"><a href="#a39c03a6b5ab1bfeddbde09e0b85e0baf">mie::Fp::preInv</a></div><div class="ttdeci">static int(* preInv)(Fp &amp;r, const Fp &amp;x)</div><div class="ttdef"><b>Definition</b> <a href="zm2_8h_source.html#l00094">zm2.h:94</a></div></div>
 <div class="ttc" id="aclassmie_1_1_fp_html_ade824375254153bbf7b11cbff2b42cca"><div class="ttname"><a href="#ade824375254153bbf7b11cbff2b42cca">mie::Fp::subNC</a></div><div class="ttdeci">static void(* subNC)(Fp &amp;out, const Fp &amp;x, const Fp &amp;y)</div><div class="ttdef"><b>Definition</b> <a href="zm2_8h_source.html#l00087">zm2.h:87</a></div></div>
-<div class="ttc" id="anamespacedevelop_build_html_ade64cd34608f9442ef3049116a2da428"><div class="ttname"><a href="namespacedevelop_build.html#ade64cd34608f9442ef3049116a2da428">developBuild.v</a></div><div class="ttdeci">v</div><div class="ttdef"><b>Definition</b> <a href="develop_build_8py_source.html#l00006">developBuild.py:6</a></div></div>
 <div class="ttc" id="astructmie_1_1_vuint_t_html_a37838a763e8b608a0aeba236ec1313a7"><div class="ttname"><a href="structmie_1_1_vuint_t.html#a37838a763e8b608a0aeba236ec1313a7">mie::VuintT::clear</a></div><div class="ttdeci">void clear()</div><div class="ttdef"><b>Definition</b> <a href="zm_8h_source.html#l00406">zm.h:406</a></div></div>
 <div class="ttc" id="astructmie_1_1_vuint_t_html_a5ebbc4896607410c747186c4f55d6b1b"><div class="ttname"><a href="structmie_1_1_vuint_t.html#a5ebbc4896607410c747186c4f55d6b1b">mie::VuintT::isZero</a></div><div class="ttdeci">bool isZero() const</div><div class="ttdef"><b>Definition</b> <a href="zm_8h_source.html#l00521">zm.h:521</a></div></div>
 <div class="ttc" id="ayubihsm__pkcs11_8c_html_a506da415c9307c897ca9be93acfe1d0f"><div class="ttname"><a href="yubihsm__pkcs11_8c.html#a506da415c9307c897ca9be93acfe1d0f">s</a></div><div class="ttdeci">char * s</div><div class="ttdef"><b>Definition</b> <a href="yubihsm__pkcs11_8c_source.html#l00524">yubihsm_pkcs11.c:524</a></div></div>
@@ -1328,11 +1327,13 @@ Here is the call graph for this function:</div>
 <div class="dyncontent">
 <div class="center"><img src="classmie_1_1_fp_a3ec640185d307358357c22c7feed35f3_cgraph.png" border="0" usemap="#aclassmie_1_1_fp_a3ec640185d307358357c22c7feed35f3_cgraph" alt=""/></div>
 <map name="aclassmie_1_1_fp_a3ec640185d307358357c22c7feed35f3_cgraph" id="aclassmie_1_1_fp_a3ec640185d307358357c22c7feed35f3_cgraph">
-<area shape="rect" title=" " alt="" coords="5,31,96,56"/>
+<area shape="rect" title=" " alt="" coords="5,55,96,80"/>
 <area shape="rect" href="structmie_1_1_vuint_t.html#a37838a763e8b608a0aeba236ec1313a7" title=" " alt="" coords="148,5,270,31"/>
-<area shape="poly" title=" " alt="" coords="96,34,132,28,133,33,96,39"/>
-<area shape="rect" href="structmie_1_1_vuint_t.html#a5ebbc4896607410c747186c4f55d6b1b" title=" " alt="" coords="144,55,274,80"/>
-<area shape="poly" title=" " alt="" coords="96,48,129,53,128,58,96,53"/>
+<area shape="poly" title=" " alt="" coords="94,51,150,34,151,39,95,57"/>
+<area shape="rect" href="classmie_1_1_fp.html#aad61a39ac267933278ea88ae87aa3357" title=" " alt="" coords="154,55,264,80"/>
+<area shape="poly" title=" " alt="" coords="96,65,139,65,139,70,96,70"/>
+<area shape="rect" href="structmie_1_1_vuint_t.html#a5ebbc4896607410c747186c4f55d6b1b" title=" " alt="" coords="144,104,274,130"/>
+<area shape="poly" title=" " alt="" coords="95,78,151,96,150,101,94,84"/>
 </map>
 </div>
 <div class="dynheader">
@@ -1410,13 +1411,15 @@ Here is the call graph for this function:</div>
 <div class="dyncontent">
 <div class="center"><img src="classmie_1_1_fp_af2f3c85caac8802fc4f6a5e7b512cc9f_cgraph.png" border="0" usemap="#aclassmie_1_1_fp_af2f3c85caac8802fc4f6a5e7b512cc9f_cgraph" alt=""/></div>
 <map name="aclassmie_1_1_fp_af2f3c85caac8802fc4f6a5e7b512cc9f_cgraph" id="aclassmie_1_1_fp_af2f3c85caac8802fc4f6a5e7b512cc9f_cgraph">
-<area shape="rect" title=" " alt="" coords="5,31,121,56"/>
-<area shape="rect" href="classmie_1_1_fp.html#a3ec640185d307358357c22c7feed35f3" title=" " alt="" coords="169,31,259,56"/>
-<area shape="poly" title=" " alt="" coords="121,41,153,41,153,46,121,46"/>
+<area shape="rect" title=" " alt="" coords="5,55,121,80"/>
+<area shape="rect" href="classmie_1_1_fp.html#a3ec640185d307358357c22c7feed35f3" title=" " alt="" coords="169,55,259,80"/>
+<area shape="poly" title=" " alt="" coords="121,65,153,65,153,70,121,70"/>
 <area shape="rect" href="structmie_1_1_vuint_t.html#a37838a763e8b608a0aeba236ec1313a7" title=" " alt="" coords="311,5,433,31"/>
-<area shape="poly" title=" " alt="" coords="259,34,295,28,296,33,260,39"/>
-<area shape="rect" href="structmie_1_1_vuint_t.html#a5ebbc4896607410c747186c4f55d6b1b" title=" " alt="" coords="307,55,437,80"/>
-<area shape="poly" title=" " alt="" coords="260,48,292,53,291,58,259,53"/>
+<area shape="poly" title=" " alt="" coords="257,51,313,34,315,39,259,57"/>
+<area shape="rect" href="classmie_1_1_fp.html#aad61a39ac267933278ea88ae87aa3357" title=" " alt="" coords="318,55,427,80"/>
+<area shape="poly" title=" " alt="" coords="259,65,302,65,302,70,259,70"/>
+<area shape="rect" href="structmie_1_1_vuint_t.html#a5ebbc4896607410c747186c4f55d6b1b" title=" " alt="" coords="307,104,437,130"/>
+<area shape="poly" title=" " alt="" coords="259,78,315,96,313,101,257,84"/>
 </map>
 </div>
 
@@ -1501,29 +1504,62 @@ Here is the caller graph for this function:</div>
 <div class="dyncontent">
 <div class="center"><img src="classmie_1_1_fp_aad61a39ac267933278ea88ae87aa3357_icgraph.png" border="0" usemap="#aclassmie_1_1_fp_aad61a39ac267933278ea88ae87aa3357_icgraph" alt=""/></div>
 <map name="aclassmie_1_1_fp_aad61a39ac267933278ea88ae87aa3357_icgraph" id="aclassmie_1_1_fp_aad61a39ac267933278ea88ae87aa3357_icgraph">
-<area shape="rect" title=" " alt="" coords="665,210,775,236"/>
-<area shape="rect" href="classlibff_1_1bn128___g1.html#a1134ff417c9818b8820feb8d4cd02f16" title=" " alt="" coords="458,210,617,236"/>
-<area shape="poly" title=" " alt="" coords="650,226,617,226,617,220,650,220"/>
-<area shape="rect" href="classlibff_1_1bn128___g1.html#a5f28c4c967c995559251d91228bf0af4" title=" " alt="" coords="256,5,384,46"/>
-<area shape="poly" title=" " alt="" coords="520,198,476,130,444,93,408,61,383,47,385,42,412,57,448,90,480,127,525,195"/>
-<area shape="rect" href="classlibff_1_1bn128___g1.html#a030efeb524acaca972a566fa3723f08c" title=" " alt="" coords="256,71,384,111"/>
-<area shape="poly" title=" " alt="" coords="510,202,465,163,409,125,383,113,385,108,411,121,468,159,514,198"/>
-<area shape="rect" href="classlibff_1_1bn128___g1.html#a7b54631aa80a0729a1e48ef4a873f503" title=" " alt="" coords="230,136,410,161"/>
-<area shape="poly" title=" " alt="" coords="491,206,409,175,374,164,376,159,411,170,493,201"/>
-<area shape="rect" href="classlibff_1_1bn128___g1.html#a6a0a3a932247ce88a942feaaa128eacf" title=" " alt="" coords="234,185,406,210"/>
-<area shape="poly" title=" " alt="" coords="442,215,406,210,407,205,443,209"/>
-<area shape="rect" href="classlibff_1_1bn128___g1.html#a5fd53c6a2166f3077d7cbc447a47e5da" title=" " alt="" coords="230,234,410,260"/>
-<area shape="poly" title=" " alt="" coords="443,236,411,240,410,234,442,231"/>
-<area shape="rect" href="classlibff_1_1bn128___g1.html#a0c6d8eb2c99bc860e3cf7217b74eec00" title=" " alt="" coords="249,284,391,309"/>
-<area shape="poly" title=" " alt="" coords="492,245,411,275,375,285,374,280,409,270,490,240"/>
-<area shape="rect" href="classlibff_1_1bn128___g1.html#a251b11c4dc3493d836f0b616e342ad93" title=" " alt="" coords="249,333,391,374"/>
-<area shape="poly" title=" " alt="" coords="513,249,467,287,411,324,388,335,386,330,409,319,464,282,510,245"/>
-<area shape="rect" href="classlibff_1_1bn128___g1.html#a84a04d9b8081d52ed31dfea639b22b05" title=" " alt="" coords="253,399,387,439"/>
-<area shape="poly" title=" " alt="" coords="524,251,480,318,448,355,412,388,389,401,386,397,408,384,444,352,475,315,520,248"/>
-<area shape="rect" href="classlibff_1_1bn128___g1.html#aebbaf25d587de9beb6c189e4d589481a" title=" " alt="" coords="5,234,182,260"/>
-<area shape="poly" title=" " alt="" coords="214,250,182,250,182,244,214,244"/>
-<area shape="rect" href="classlibff_1_1bn128___g1.html#a0172b7317b39021abe2854147acec0c2" title=" " alt="" coords="29,399,158,439"/>
-<area shape="poly" title=" " alt="" coords="238,422,158,422,158,416,238,416"/>
+<area shape="rect" title=" " alt="" coords="1149,292,1259,318"/>
+<area shape="rect" href="classmie_1_1_fp.html#a3ec640185d307358357c22c7feed35f3" title=" " alt="" coords="976,153,1067,179"/>
+<area shape="poly" title=" " alt="" coords="1172,284,1039,182,1042,178,1175,280"/>
+<area shape="rect" href="classlibff_1_1bn128___g1.html#a1134ff417c9818b8820feb8d4cd02f16" title=" " alt="" coords="942,407,1101,432"/>
+<area shape="poly" title=" " alt="" coords="1171,328,1045,408,1042,404,1168,324"/>
+<area shape="rect" href="bn_8cpp.html#a9b1695f6f245f5416a3cd3f71ad7947f" title=" " alt="" coords="768,79,840,104"/>
+<area shape="poly" title=" " alt="" coords="975,149,893,118,839,102,841,97,895,113,977,144"/>
+<area shape="rect" href="structbn_1_1_fp2_t.html#a33eb74d5e0b840035a523ab86e43dd43" title=" " alt="" coords="743,128,864,154"/>
+<area shape="poly" title=" " alt="" coords="961,162,865,151,865,145,962,157"/>
+<area shape="rect" href="classmie_1_1_fp.html#af2f3c85caac8802fc4f6a5e7b512cc9f" title=" " alt="" coords="746,177,862,203"/>
+<area shape="poly" title=" " alt="" coords="962,175,862,186,862,181,961,170"/>
+<area shape="rect" href="bn_8cpp.html#a40f2351c00194125aea1e53e4f691989" title=" " alt="" coords="542,29,613,55"/>
+<area shape="poly" title=" " alt="" coords="752,83,613,52,614,47,753,78"/>
+<area shape="rect" href="bn_8cpp.html#ac7541943975ec756b5566b942e78974c" title=" " alt="" coords="538,79,617,104"/>
+<area shape="poly" title=" " alt="" coords="752,94,617,94,617,89,752,89"/>
+<area shape="poly" title=" " alt="" coords="615,17,602,10,577,8,555,10,542,15,540,20,546,27,542,31,535,21,539,11,553,5,578,3,604,5,617,12"/>
+<area shape="rect" href="bn_8cpp.html#a0ddf1224851353fc92bfbff6f499fa97" title=" " alt="" coords="337,79,386,104"/>
+<area shape="poly" title=" " alt="" coords="527,56,387,89,386,83,526,51"/>
+<area shape="poly" title=" " alt="" coords="523,94,387,94,387,89,523,89"/>
+<area shape="rect" href="structbn_1_1_param_t.html#aae3c7ee13b7b29d24da8638bc854dffb" title=" " alt="" coords="521,128,634,154"/>
+<area shape="poly" title=" " alt="" coords="728,144,634,144,634,138,728,138"/>
+<area shape="poly" title=" " alt="" coords="505,127,386,100,387,94,507,122"/>
+<area shape="rect" href="namespacelibff.html#ac6fb1d4d50b5298ed361253e9a777c10" title=" " alt="" coords="282,128,441,154"/>
+<area shape="poly" title=" " alt="" coords="506,144,442,144,442,138,506,138"/>
+<area shape="rect" href="loop__test_8cpp.html#ae66f6b31b5ad750f1fe042a706a4e3d4" title=" " alt="" coords="337,177,386,203"/>
+<area shape="poly" title=" " alt="" coords="507,160,387,187,386,182,505,154"/>
+<area shape="rect" href="bn254__if_8hpp.html#abd5a104987528829c883e7498602008f" title=" " alt="" coords="320,227,404,252"/>
+<area shape="poly" title=" " alt="" coords="544,164,497,191,442,218,405,231,403,226,440,213,494,187,541,160"/>
+<area shape="rect" href="classlibff_1_1bn128__pp.html#ae44372429d5c8f7d85e87d6ddeb10a19" title=" " alt="" coords="103,120,234,161"/>
+<area shape="poly" title=" " alt="" coords="266,144,234,144,234,138,266,138"/>
+<area shape="rect" href="test__fields_8cpp.html#ae66f6b31b5ad750f1fe042a706a4e3d4" title=" " alt="" coords="5,104,55,130"/>
+<area shape="poly" title=" " alt="" coords="87,129,55,124,55,118,88,124"/>
+<area shape="rect" href="test__bilinearity_8cpp.html#a840291bc02cba5474a4cb46a9b9566fe" title=" " alt="" coords="5,153,55,179"/>
+<area shape="poly" title=" " alt="" coords="88,158,55,164,55,159,87,153"/>
+<area shape="rect" href="java__api_8cpp.html#ae66f6b31b5ad750f1fe042a706a4e3d4" title=" " alt="" coords="144,227,193,252"/>
+<area shape="poly" title=" " alt="" coords="304,242,194,242,194,237,304,237"/>
+<area shape="rect" href="classlibff_1_1bn128___g1.html#a5f28c4c967c995559251d91228bf0af4" title=" " alt="" coords="740,227,868,268"/>
+<area shape="poly" title=" " alt="" coords="1001,395,955,339,925,309,893,283,866,269,869,264,895,279,929,305,959,336,1005,392"/>
+<area shape="rect" href="classlibff_1_1bn128___g1.html#a030efeb524acaca972a566fa3723f08c" title=" " alt="" coords="740,292,868,333"/>
+<area shape="poly" title=" " alt="" coords="986,400,943,374,893,347,867,336,869,331,895,342,945,369,989,396"/>
+<area shape="rect" href="classlibff_1_1bn128___g1.html#a7b54631aa80a0729a1e48ef4a873f503" title=" " alt="" coords="714,357,894,383"/>
+<area shape="poly" title=" " alt="" coords="946,405,863,386,864,381,947,400"/>
+<area shape="rect" href="classlibff_1_1bn128___g1.html#a6a0a3a932247ce88a942feaaa128eacf" title=" " alt="" coords="718,407,890,432"/>
+<area shape="poly" title=" " alt="" coords="926,422,891,422,891,417,926,417"/>
+<area shape="rect" href="classlibff_1_1bn128___g1.html#a5fd53c6a2166f3077d7cbc447a47e5da" title=" " alt="" coords="714,456,894,482"/>
+<area shape="poly" title=" " alt="" coords="947,439,864,458,863,453,946,434"/>
+<area shape="rect" href="classlibff_1_1bn128___g1.html#a0c6d8eb2c99bc860e3cf7217b74eec00" title=" " alt="" coords="733,505,875,531"/>
+<area shape="poly" title=" " alt="" coords="990,444,946,471,895,497,865,507,863,502,893,492,944,466,988,439"/>
+<area shape="rect" href="classlibff_1_1bn128___g1.html#a251b11c4dc3493d836f0b616e342ad93" title=" " alt="" coords="733,555,875,596"/>
+<area shape="poly" title=" " alt="" coords="1002,447,957,496,927,523,895,546,874,557,872,552,893,541,924,518,953,492,998,443"/>
+<area shape="rect" href="classlibff_1_1bn128___g1.html#a84a04d9b8081d52ed31dfea639b22b05" title=" " alt="" coords="737,620,871,661"/>
+<area shape="poly" title=" " alt="" coords="1011,448,993,484,968,527,935,571,896,610,873,624,870,619,892,605,931,568,963,524,989,481,1006,445"/>
+<area shape="rect" href="classlibff_1_1bn128___g1.html#aebbaf25d587de9beb6c189e4d589481a" title=" " alt="" coords="489,456,666,482"/>
+<area shape="poly" title=" " alt="" coords="698,472,666,472,666,466,698,466"/>
+<area shape="rect" href="classlibff_1_1bn128___g1.html#a0172b7317b39021abe2854147acec0c2" title=" " alt="" coords="513,620,642,661"/>
+<area shape="poly" title=" " alt="" coords="722,644,642,644,642,638,722,638"/>
 </map>
 </div>
 
@@ -2353,9 +2389,10 @@ Here is the caller graph for this function:</div>
 
 <p class="definition">Definition at line <a class="el" href="zm2_8h_source.html#l00116">116</a> of file <a class="el" href="zm2_8h_source.html">zm2.h</a>.</p>
 <div class="fragment"><div class="line"><span class="lineno">  117</span>    {</div>
-<div class="line"><span class="lineno">  118</span>        <span class="keywordflow">return</span> os &lt;&lt; x.<a class="code hl_function" href="class_fp.html#a98e98bf5f1cddca8a66434fdbaa46c0f">toString</a>(os.flags() &amp; std::ios_base::hex ? 16 : 10);</div>
+<div class="line"><span class="lineno">  118</span>        <span class="keywordflow">return</span> <a class="code hl_variable" href="environment_8hpp.html#a3951483d0b31c29ca95336206cd35238">os</a> &lt;&lt; x.<a class="code hl_function" href="class_fp.html#a98e98bf5f1cddca8a66434fdbaa46c0f">toString</a>(<a class="code hl_variable" href="environment_8hpp.html#a3951483d0b31c29ca95336206cd35238">os</a>.flags() &amp; std::ios_base::hex ? 16 : 10);</div>
 <div class="line"><span class="lineno">  119</span>    }</div>
 <div class="ttc" id="aclass_fp_html_a98e98bf5f1cddca8a66434fdbaa46c0f"><div class="ttname"><a href="class_fp.html#a98e98bf5f1cddca8a66434fdbaa46c0f">Fp::toString</a></div><div class="ttdeci">std::string toString() const</div><div class="ttdef"><b>Definition</b> <a href="bn254__if_8hpp_source.html#l00073">bn254_if.hpp:73</a></div></div>
+<div class="ttc" id="aenvironment_8hpp_html_a3951483d0b31c29ca95336206cd35238"><div class="ttname"><a href="environment_8hpp.html#a3951483d0b31c29ca95336206cd35238">os</a></div><div class="ttdeci">os_t os</div><div class="ttdef"><b>Definition</b> <a href="environment_8hpp_source.html#l00023">environment.hpp:23</a></div></div>
 </div><!-- fragment -->
 </div>
 </div>

@@ -1,35 +1,3 @@
 <map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
-<area shape="rect" id="Node000000" href="$class_c_l_i_1_1_validator.html" title="Some validators that are provided." alt="" coords="5,359,106,384"/>
-<area shape="rect" id="Node000001" href="$class_c_l_i_1_1_as_number_with_unit.html" title=" " alt="" coords="167,5,330,31"/>
-<area shape="poly" id="edge264_Node000000_Node000001" title=" " alt="" coords="54,343,57,281,71,199,83,156,100,114,123,75,152,40,167,29,170,34,155,44,127,78,105,116,88,158,76,201,62,281,59,343"/>
-<area shape="rect" id="Node000003" href="$class_c_l_i_1_1_bound.html" title="Produce a bounded range (factory). Min and max are inclusive." alt="" coords="205,55,292,80"/>
-<area shape="poly" id="edge266_Node000000_Node000003" title=" " alt="" coords="56,343,62,289,77,221,90,185,106,150,126,118,152,89,176,75,204,67,205,72,179,79,155,94,131,121,111,153,95,187,82,222,67,290,61,343"/>
-<area shape="rect" id="Node000004" href="$class_c_l_i_1_1_checked_transformer.html" title="translate named items to other or a value set" alt="" coords="162,104,334,130"/>
-<area shape="poly" id="edge267_Node000000_Node000004" title=" " alt="" coords="58,343,67,298,84,243,112,187,130,161,152,139,169,128,172,132,155,143,134,165,116,190,89,245,72,299,63,344"/>
-<area shape="rect" id="Node000005" href="$class_c_l_i_1_1_custom_validator.html" title="Class wrapping some of the accessors of Validator." alt="" coords="175,153,322,179"/>
-<area shape="poly" id="edge268_Node000000_Node000005" title=" " alt="" coords="61,343,73,307,92,266,118,224,152,188,173,176,176,180,155,192,122,227,97,268,78,309,67,345"/>
-<area shape="rect" id="Node000006" href="$class_c_l_i_1_1_is_member.html" title="Verify items are in a set." alt="" coords="194,203,302,228"/>
-<area shape="poly" id="edge269_Node000000_Node000006" title=" " alt="" coords="67,343,100,289,124,261,152,237,172,227,193,220,195,225,174,232,155,242,128,265,105,292,72,346"/>
-<area shape="rect" id="Node000007" href="$class_c_l_i_1_1_range.html" title="Produce a range (factory). Min and max are inclusive." alt="" coords="204,252,292,278"/>
-<area shape="poly" id="edge270_Node000000_Node000007" title=" " alt="" coords="77,346,111,315,152,286,203,269,205,274,155,291,114,319,81,350"/>
-<area shape="rect" id="Node000008" href="$class_c_l_i_1_1_transformer.html" title="Translate named items to other or a value set." alt="" coords="188,301,308,327"/>
-<area shape="poly" id="edge271_Node000000_Node000008" title=" " alt="" coords="109,351,153,337,195,325,196,330,154,342,111,356"/>
-<area shape="rect" id="Node000009" href="$class_c_l_i_1_1detail_1_1_existing_directory_validator.html" title="Check for an existing directory (returns error message if check fails)" alt="" coords="154,351,343,392"/>
-<area shape="poly" id="edge272_Node000000_Node000009" title=" " alt="" coords="121,369,153,369,153,374,121,374"/>
-<area shape="rect" id="Node000010" href="$class_c_l_i_1_1detail_1_1_existing_file_validator.html" title="Check for an existing file (returns error message if check fails)" alt="" coords="170,416,327,457"/>
-<area shape="poly" id="edge273_Node000000_Node000010" title=" " alt="" coords="111,387,187,413,185,418,109,392"/>
-<area shape="rect" id="Node000011" href="$class_c_l_i_1_1detail_1_1_existing_path_validator.html" title="Check for an existing path." alt="" coords="167,482,330,522"/>
-<area shape="poly" id="edge274_Node000000_Node000011" title=" " alt="" coords="78,394,112,431,155,467,179,479,176,484,152,471,108,435,74,398"/>
-<area shape="rect" id="Node000012" href="$class_c_l_i_1_1detail_1_1_i_p_v4_validator.html" title="Validate the given string is a legal ipv4 address." alt="" coords="164,547,332,572"/>
-<area shape="poly" id="edge275_Node000000_Node000012" title=" " alt="" coords="68,398,81,429,100,466,124,502,155,532,176,544,174,548,152,536,120,505,95,469,76,432,63,400"/>
-<area shape="rect" id="Node000013" href="$class_c_l_i_1_1detail_1_1_non_negative_number.html" title="Validate the argument is a number and greater than or equal to 0." alt="" coords="166,596,331,637"/>
-<area shape="poly" id="edge276_Node000000_Node000013" title=" " alt="" coords="65,398,75,439,93,489,119,539,136,562,155,583,171,594,168,598,152,587,132,566,115,542,88,491,70,441,59,400"/>
-<area shape="rect" id="Node000014" href="$class_c_l_i_1_1detail_1_1_nonexistent_path_validator.html" title="Check for an non&#45;existing path." alt="" coords="169,662,328,702"/>
-<area shape="poly" id="edge277_Node000000_Node000014" title=" " alt="" coords="61,399,69,452,85,518,113,587,132,619,156,647,171,659,168,663,152,651,128,622,108,589,80,519,63,453,56,400"/>
-<area shape="rect" id="Node000015" href="$class_c_l_i_1_1detail_1_1_number.html" title="Validate the argument is a number." alt="" coords="181,727,316,752"/>
-<area shape="poly" id="edge278_Node000000_Node000015" title=" " alt="" coords="59,400,62,464,74,548,86,593,104,636,126,677,155,712,182,728,179,733,152,716,122,680,99,639,81,594,69,549,56,465,53,400"/>
-<area shape="rect" id="Node000016" href="$class_c_l_i_1_1detail_1_1_positive_number.html" title="Validate the argument is a number and greater than 0." alt="" coords="157,776,340,802"/>
-<area shape="poly" id="edge279_Node000000_Node000016" title=" " alt="" coords="63,400,74,483,94,593,121,696,137,736,156,763,169,773,166,777,152,767,133,739,116,698,88,594,69,484,57,400"/>
-<area shape="rect" id="Node000002" href="$class_c_l_i_1_1_as_size_value.html" title=" " alt="" coords="391,5,515,31"/>
-<area shape="poly" id="edge265_Node000001_Node000002" title=" " alt="" coords="345,16,391,16,391,21,345,21"/>
+<area shape="rect" id="Node000000" href="$structcloserex__subcommand.html" title=" " alt="" coords="5,5,161,31"/>
 </map>

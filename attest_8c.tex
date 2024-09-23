@@ -9,7 +9,8 @@
 {\ttfamily \#include $<$openssl/x509.\+h$>$}\newline
 {\ttfamily \#include $<$yubihsm.\+h$>$}\newline
 {\ttfamily \#include "{}openssl-\/compat.\+h"{}}\newline
-Include dependency graph for attest.\+c\+:\nopagebreak
+Include dependency graph for attest.\+c\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -183,9 +184,9 @@ Definition at line \mbox{\hyperlink{attest_8c_source_l00107}{107}} of file \mbox
 \DoxyCodeLine{00224\ \ \ assert(sk\_X509\_EXTENSION\_num(extensions\_list)\ >=\ 6);}
 \DoxyCodeLine{00225\ }
 \DoxyCodeLine{00226\ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{int}\ i\ =\ 0;\ i\ <\ sk\_X509\_EXTENSION\_num(extensions\_list);\ i++)\ \{}
-\DoxyCodeLine{00227\ \ \ \ \ X509\_EXTENSION\ *\mbox{\hyperlink{namespacevalidate__reflection_a34a4c51cfedb3b3cad290fcb3a1945cc}{extension}};}
+\DoxyCodeLine{00227\ \ \ \ \ X509\_EXTENSION\ *extension;}
 \DoxyCodeLine{00228\ }
-\DoxyCodeLine{00229\ \ \ \ \ \mbox{\hyperlink{namespacevalidate__reflection_a34a4c51cfedb3b3cad290fcb3a1945cc}{extension}}\ =\ sk\_X509\_EXTENSION\_value(extensions\_list,\ i);}
+\DoxyCodeLine{00229\ \ \ \ \ extension\ =\ sk\_X509\_EXTENSION\_value(extensions\_list,\ i);}
 \DoxyCodeLine{00230\ }
 \DoxyCodeLine{00231\ \ \ \ \ print\_extension(extension);}
 \DoxyCodeLine{00232\ \ \ \}}
@@ -208,7 +209,8 @@ Definition at line \mbox{\hyperlink{attest_8c_source_l00107}{107}} of file \mbox
 \DoxyCodeLine{00249\ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode

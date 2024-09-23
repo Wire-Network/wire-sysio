@@ -28,7 +28,7 @@
 \DoxyCodeLine{\Hypertarget{vm_2signals_8hpp_source_l00024}00024\ \ \ \ \textcolor{keyword}{inline}\ \textcolor{keyword}{struct\ }sigaction\ \mbox{\hyperlink{namespacesysio_1_1vm_a1066b30cdd1da122a6405a37fd63f75a}{prev\_signal\_handler}};}
 \DoxyCodeLine{\Hypertarget{vm_2signals_8hpp_source_l00025}00025\ }
 \DoxyCodeLine{\Hypertarget{vm_2signals_8hpp_source_l00026}00026\ \ \ \ \textcolor{keyword}{inline}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespacesysio_1_1vm_aa2e30fac0f99c3450ef6d78aa934490f}{signal\_handler}}(\textcolor{keywordtype}{int}\ sig,\ siginfo\_t*\ info,\ \textcolor{keywordtype}{void}*\ uap)\ \{}
-\DoxyCodeLine{\Hypertarget{vm_2signals_8hpp_source_l00027}00027\ \ \ \ \ \ \ sigjmp\_buf*\ \mbox{\hyperlink{namespaceupload_a770d9c7b49b1fede80de6078d5e49af7}{dest}}\ =\ std::atomic\_load(\&signal\_dest);}
+\DoxyCodeLine{\Hypertarget{vm_2signals_8hpp_source_l00027}00027\ \ \ \ \ \ \ sigjmp\_buf*\ dest\ =\ std::atomic\_load(\&signal\_dest);}
 \DoxyCodeLine{\Hypertarget{vm_2signals_8hpp_source_l00028}00028\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (dest)\ \{}
 \DoxyCodeLine{\Hypertarget{vm_2signals_8hpp_source_l00029}00029\ \ \ \ \ \ \ \ \ \ siglongjmp(*dest,\ sig);}
 \DoxyCodeLine{\Hypertarget{vm_2signals_8hpp_source_l00030}00030\ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
@@ -79,7 +79,7 @@
 \DoxyCodeLine{\Hypertarget{vm_2signals_8hpp_source_l00075}00075\ \ \ \ \ \ \ \ \ \ sigemptyset(\&block\_mask);}
 \DoxyCodeLine{\Hypertarget{vm_2signals_8hpp_source_l00076}00076\ \ \ \ \ \ \ \ \ \ sigaddset(\&block\_mask,\ SIGPROF);}
 \DoxyCodeLine{\Hypertarget{vm_2signals_8hpp_source_l00077}00077\ \ \ \ \ \ \ \ \ \ pthread\_sigmask(SIG\_BLOCK,\ \&block\_mask,\ \textcolor{keyword}{nullptr});}
-\DoxyCodeLine{\Hypertarget{vm_2signals_8hpp_source_l00078}00078\ \ \ \ \ \ \ \ \ \ sigjmp\_buf*\ \mbox{\hyperlink{namespaceupload_a770d9c7b49b1fede80de6078d5e49af7}{dest}}\ =\ std::atomic\_load(\&signal\_dest);}
+\DoxyCodeLine{\Hypertarget{vm_2signals_8hpp_source_l00078}00078\ \ \ \ \ \ \ \ \ \ sigjmp\_buf*\ dest\ =\ std::atomic\_load(\&signal\_dest);}
 \DoxyCodeLine{\Hypertarget{vm_2signals_8hpp_source_l00079}00079\ \ \ \ \ \ \ \ \ \ siglongjmp(*dest,\ -\/1);}
 \DoxyCodeLine{\Hypertarget{vm_2signals_8hpp_source_l00080}00080\ \ \ \ \ \ \ \}}
 \DoxyCodeLine{\Hypertarget{vm_2signals_8hpp_source_l00081}00081\ \ \ \ \}}
@@ -91,7 +91,7 @@
 \DoxyCodeLine{\Hypertarget{vm_2signals_8hpp_source_l00087}00087\ \ \ \ \ \ \ sigemptyset(\&block\_mask);}
 \DoxyCodeLine{\Hypertarget{vm_2signals_8hpp_source_l00088}00088\ \ \ \ \ \ \ sigaddset(\&block\_mask,\ SIGPROF);}
 \DoxyCodeLine{\Hypertarget{vm_2signals_8hpp_source_l00089}00089\ \ \ \ \ \ \ pthread\_sigmask(SIG\_BLOCK,\ \&block\_mask,\ \textcolor{keyword}{nullptr});}
-\DoxyCodeLine{\Hypertarget{vm_2signals_8hpp_source_l00090}00090\ \ \ \ \ \ \ sigjmp\_buf*\ \mbox{\hyperlink{namespaceupload_a770d9c7b49b1fede80de6078d5e49af7}{dest}}\ =\ std::atomic\_load(\&signal\_dest);}
+\DoxyCodeLine{\Hypertarget{vm_2signals_8hpp_source_l00090}00090\ \ \ \ \ \ \ sigjmp\_buf*\ dest\ =\ std::atomic\_load(\&signal\_dest);}
 \DoxyCodeLine{\Hypertarget{vm_2signals_8hpp_source_l00091}00091\ \ \ \ \ \ \ siglongjmp(*dest,\ -\/1);}
 \DoxyCodeLine{\Hypertarget{vm_2signals_8hpp_source_l00092}00092\ \ \ \ \}}
 \DoxyCodeLine{\Hypertarget{vm_2signals_8hpp_source_l00093}00093\ }
@@ -118,7 +118,7 @@
 \DoxyCodeLine{\Hypertarget{vm_2signals_8hpp_source_l00122}00122\ \ \ \ \textcolor{keyword}{template}<\textcolor{keyword}{typename}\ F,\ \textcolor{keyword}{typename}\ E>}
 \DoxyCodeLine{\Hypertarget{vm_2signals_8hpp_source_l00123}00123\ \ \ \ [[gnu::noinline]]\ \textcolor{keyword}{auto}\ \mbox{\hyperlink{namespacesysio_1_1vm_a071298ad9404d4cd62434edde161b767}{invoke\_with\_signal\_handler}}(F\&\&\ \mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}},\ E\&\&\ e)\ \{}
 \DoxyCodeLine{\Hypertarget{vm_2signals_8hpp_source_l00124}00124\ \ \ \ \ \ \ \mbox{\hyperlink{namespacesysio_1_1vm_a2bf040912c32fbb2ea68f5338bb304fe}{setup\_signal\_handler}}();}
-\DoxyCodeLine{\Hypertarget{vm_2signals_8hpp_source_l00125}00125\ \ \ \ \ \ \ sigjmp\_buf\ \mbox{\hyperlink{namespaceupload_a770d9c7b49b1fede80de6078d5e49af7}{dest}};}
+\DoxyCodeLine{\Hypertarget{vm_2signals_8hpp_source_l00125}00125\ \ \ \ \ \ \ sigjmp\_buf\ dest;}
 \DoxyCodeLine{\Hypertarget{vm_2signals_8hpp_source_l00126}00126\ \ \ \ \ \ \ sigjmp\_buf*\ \textcolor{keyword}{volatile}\ old\_signal\_handler\ =\ \textcolor{keyword}{nullptr};}
 \DoxyCodeLine{\Hypertarget{vm_2signals_8hpp_source_l00127}00127\ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ sig;}
 \DoxyCodeLine{\Hypertarget{vm_2signals_8hpp_source_l00128}00128\ \ \ \ \ \ \ \textcolor{keywordflow}{if}((sig\ =\ sigsetjmp(dest,\ 1))\ ==\ 0)\ \{}

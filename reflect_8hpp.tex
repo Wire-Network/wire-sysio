@@ -10,14 +10,16 @@
 {\ttfamily \#include $<$stdint.\+h$>$}\newline
 {\ttfamily \#include $<$string.\+h$>$}\newline
 {\ttfamily \#include $<$fc/reflect/typename.\+hpp$>$}\newline
-Include dependency graph for reflect.\+hpp\+:\nopagebreak
+Include dependency graph for reflect.\+hpp\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
 \includegraphics[width=350pt]{reflect_8hpp__incl}
 \end{center}
 \end{figure}
-This graph shows which files directly or indirectly include this file\+:\nopagebreak
+This graph shows which files directly or indirectly include this file\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -227,7 +229,7 @@ Definition at line \mbox{\hyperlink{reflect_8hpp_source_l00166}{166}} of file \m
 \DoxyCodeLine{\ \ \ \ \ \ \ std::forward<Visitor>(v).reflector\_init();\ \(\backslash\)}
 \DoxyCodeLine{\ \ \ \ \}\ \(\backslash\)}
 \DoxyCodeLine{\ \ \ \ \textcolor{keyword}{template}<\textcolor{keyword}{typename}\ Visitor>\ \(\backslash\)}
-\DoxyCodeLine{\ \ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{auto}\ init\_imp(Visitor\&\&\ v,\ \textcolor{keywordtype}{long})\ -\/>\ \textcolor{keyword}{decltype}(\mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}},\ void())\ \{\}\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{auto}\ init\_imp(Visitor\&\&\ v,\ \textcolor{keywordtype}{long})\ -\/>\ \textcolor{keyword}{decltype}(v,\ void())\ \{\}\ \(\backslash\)}
 \DoxyCodeLine{\ \ \ \ \textcolor{keyword}{template}<\textcolor{keyword}{typename}\ Visitor>\ \(\backslash\)}
 \DoxyCodeLine{\ \ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{auto}\ \mbox{\hyperlink{lib_8h_a02fd73d861ef2e4aabb38c0c9ff82947}{init}}(Visitor\&\&\ v)\ -\/>\ \textcolor{keyword}{decltype}(init\_imp(std::forward<Visitor>(v),\ 0),\ void())\ \{\ \(\backslash\)}
 \DoxyCodeLine{\ \ \ \ \ \ \ init\_imp(std::forward<Visitor>(v),\ 0);\ \(\backslash\)}

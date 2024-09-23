@@ -86,7 +86,7 @@
 \DoxyCodeLine{\Hypertarget{parsebyparts_8cpp_source_l00082}00082\ \ \ \ \ \textcolor{keyword}{struct\ }AsyncStringStream\ \{}
 \DoxyCodeLine{\Hypertarget{parsebyparts_8cpp_source_l00083}00083\ \ \ \ \ \ \ \ \ \textcolor{keyword}{typedef}\ \textcolor{keywordtype}{char}\ \mbox{\hyperlink{hash__impl_8h_ab0a0d1ad13c7e4d3cb38c89f7127c85a}{Ch}};}
 \DoxyCodeLine{\Hypertarget{parsebyparts_8cpp_source_l00084}00084\ }
-\DoxyCodeLine{\Hypertarget{parsebyparts_8cpp_source_l00085}00085\ \ \ \ \ \ \ \ \ AsyncStringStream(AsyncDocumentParser\&\ parser)\ :\ parser\_(\mbox{\hyperlink{namespaceupload_af9e508d19dc2dd9cdb7c642dde0bdd21}{parser}}),\ src\_(),\ end\_(),\ count\_()\ \{\}}
+\DoxyCodeLine{\Hypertarget{parsebyparts_8cpp_source_l00085}00085\ \ \ \ \ \ \ \ \ AsyncStringStream(AsyncDocumentParser\&\ parser)\ :\ parser\_(parser),\ src\_(),\ end\_(),\ count\_()\ \{\}}
 \DoxyCodeLine{\Hypertarget{parsebyparts_8cpp_source_l00086}00086\ }
 \DoxyCodeLine{\Hypertarget{parsebyparts_8cpp_source_l00087}00087\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{char}\ Peek()\textcolor{keyword}{\ const\ }\{}
 \DoxyCodeLine{\Hypertarget{parsebyparts_8cpp_source_l00088}00088\ \ \ \ \ \ \ \ \ \ \ \ \ std::unique\_lock<std::mutex>\ \mbox{\hyperlink{xbyak__mnemonic_8h_aa81aed607133209dade63a226818224d}{lock}}(parser\_.mutex\_);}
@@ -144,16 +144,16 @@
 \DoxyCodeLine{\Hypertarget{parsebyparts_8cpp_source_l00140}00140\ \ \ \ \ \mbox{\hyperlink{class_generic_document}{Document}}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a107648633008a7f2d872b4b3d98c2f96}{d}};}
 \DoxyCodeLine{\Hypertarget{parsebyparts_8cpp_source_l00141}00141\ }
 \DoxyCodeLine{\Hypertarget{parsebyparts_8cpp_source_l00142}00142\ \ \ \ \ \{}
-\DoxyCodeLine{\Hypertarget{parsebyparts_8cpp_source_l00143}00143\ \ \ \ \ \ \ \ \ AsyncDocumentParser<>\ \mbox{\hyperlink{namespaceupload_af9e508d19dc2dd9cdb7c642dde0bdd21}{parser}}(d);}
+\DoxyCodeLine{\Hypertarget{parsebyparts_8cpp_source_l00143}00143\ \ \ \ \ \ \ \ \ AsyncDocumentParser<>\ parser(d);}
 \DoxyCodeLine{\Hypertarget{parsebyparts_8cpp_source_l00144}00144\ }
 \DoxyCodeLine{\Hypertarget{parsebyparts_8cpp_source_l00145}00145\ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ json1[]\ =\ \textcolor{stringliteral}{"{}\ \{\ \(\backslash\)"{}hello\(\backslash\)"{}\ :\ \(\backslash\)"{}world\(\backslash\)"{},\ \(\backslash\)"{}t\(\backslash\)"{}\ :\ tr"{}};}
 \DoxyCodeLine{\Hypertarget{parsebyparts_8cpp_source_l00146}00146\ \ \ \ \ \ \ \ \ \textcolor{comment}{//const\ char\ json1[]\ =\ "{}\ \{\ \(\backslash\)"{}hello\(\backslash\)"{}\ :\ \(\backslash\)"{}world\(\backslash\)"{},\ \(\backslash\)"{}t\(\backslash\)"{}\ :\ trX"{};\ //\ For\ test\ parsing\ error}}
 \DoxyCodeLine{\Hypertarget{parsebyparts_8cpp_source_l00147}00147\ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ json2[]\ =\ \textcolor{stringliteral}{"{}ue,\ \(\backslash\)"{}f\(\backslash\)"{}\ :\ false,\ \(\backslash\)"{}n\(\backslash\)"{}:\ null,\ \(\backslash\)"{}i\(\backslash\)"{}:123,\ \(\backslash\)"{}pi\(\backslash\)"{}:\ 3.14"{}};}
 \DoxyCodeLine{\Hypertarget{parsebyparts_8cpp_source_l00148}00148\ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ json3[]\ =\ \textcolor{stringliteral}{"{}16,\ \(\backslash\)"{}a\(\backslash\)"{}:[1,\ 2,\ 3,\ 4]\ \}\ "{}};}
 \DoxyCodeLine{\Hypertarget{parsebyparts_8cpp_source_l00149}00149\ }
-\DoxyCodeLine{\Hypertarget{parsebyparts_8cpp_source_l00150}00150\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespaceupload_af9e508d19dc2dd9cdb7c642dde0bdd21}{parser}}.ParsePart(json1,\ \textcolor{keyword}{sizeof}(json1)\ -\/\ 1);}
-\DoxyCodeLine{\Hypertarget{parsebyparts_8cpp_source_l00151}00151\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespaceupload_af9e508d19dc2dd9cdb7c642dde0bdd21}{parser}}.ParsePart(json2,\ \textcolor{keyword}{sizeof}(json2)\ -\/\ 1);}
-\DoxyCodeLine{\Hypertarget{parsebyparts_8cpp_source_l00152}00152\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespaceupload_af9e508d19dc2dd9cdb7c642dde0bdd21}{parser}}.ParsePart(json3,\ \textcolor{keyword}{sizeof}(json3)\ -\/\ 1);}
+\DoxyCodeLine{\Hypertarget{parsebyparts_8cpp_source_l00150}00150\ \ \ \ \ \ \ \ \ parser.ParsePart(json1,\ \textcolor{keyword}{sizeof}(json1)\ -\/\ 1);}
+\DoxyCodeLine{\Hypertarget{parsebyparts_8cpp_source_l00151}00151\ \ \ \ \ \ \ \ \ parser.ParsePart(json2,\ \textcolor{keyword}{sizeof}(json2)\ -\/\ 1);}
+\DoxyCodeLine{\Hypertarget{parsebyparts_8cpp_source_l00152}00152\ \ \ \ \ \ \ \ \ parser.ParsePart(json3,\ \textcolor{keyword}{sizeof}(json3)\ -\/\ 1);}
 \DoxyCodeLine{\Hypertarget{parsebyparts_8cpp_source_l00153}00153\ \ \ \ \ \}}
 \DoxyCodeLine{\Hypertarget{parsebyparts_8cpp_source_l00154}00154\ }
 \DoxyCodeLine{\Hypertarget{parsebyparts_8cpp_source_l00155}00155\ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{yubihsm__pkcs11_8c_a107648633008a7f2d872b4b3d98c2f96}{d}}.HasParseError())\ \{}
@@ -163,7 +163,7 @@
 \DoxyCodeLine{\Hypertarget{parsebyparts_8cpp_source_l00159}00159\ \ \ \ \ }
 \DoxyCodeLine{\Hypertarget{parsebyparts_8cpp_source_l00160}00160\ \ \ \ \ \textcolor{comment}{//\ Stringify\ the\ JSON\ to\ cout}}
 \DoxyCodeLine{\Hypertarget{parsebyparts_8cpp_source_l00161}00161\ \ \ \ \ \mbox{\hyperlink{class_o_stream_wrapper}{OStreamWrapper}}\ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}(std::cout);}
-\DoxyCodeLine{\Hypertarget{parsebyparts_8cpp_source_l00162}00162\ \ \ \ \ \mbox{\hyperlink{class_writer}{Writer<OStreamWrapper>}}\ writer(os);}
+\DoxyCodeLine{\Hypertarget{parsebyparts_8cpp_source_l00162}00162\ \ \ \ \ \mbox{\hyperlink{class_writer}{Writer<OStreamWrapper>}}\ writer(\mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}});}
 \DoxyCodeLine{\Hypertarget{parsebyparts_8cpp_source_l00163}00163\ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a107648633008a7f2d872b4b3d98c2f96}{d}}.Accept(writer);}
 \DoxyCodeLine{\Hypertarget{parsebyparts_8cpp_source_l00164}00164\ \ \ \ \ std::cout\ <<\ std::endl;}
 \DoxyCodeLine{\Hypertarget{parsebyparts_8cpp_source_l00165}00165\ }

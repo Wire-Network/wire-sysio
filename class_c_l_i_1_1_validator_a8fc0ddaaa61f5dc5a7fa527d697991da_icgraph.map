@@ -1,46 +1,19 @@
 <map id="CLI::Validator::name" name="CLI::Validator::name">
-<area shape="rect" id="Node000001" title="Specify the type string." alt="" coords="673,357,814,382"/>
-<area shape="rect" id="Node000002" href="$classcpp_1_1ast_1_1___nested_type.html#a944c5478ca7586a71d1d10bfcc7be1bb" title=" " alt="" coords="456,5,605,46"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="737,342,728,283,708,207,693,167,675,128,651,92,624,60,604,46,607,41,627,56,656,89,679,126,698,165,713,206,733,282,742,341"/>
-<area shape="rect" id="Node000003" href="$classcpp_1_1ast_1_1_class.html#a572953e3438a048cdc5f103fbf6ab7b0" title=" " alt="" coords="456,70,605,96"/>
-<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="735,342,724,292,703,228,670,164,649,134,624,109,604,97,607,93,627,105,653,131,675,161,708,226,729,290,740,341"/>
-<area shape="rect" id="Node000004" href="$classcpp_1_1ast_1_1_define.html#a8e51e0611e1a76c5874f6b39e27a6d6a" title=" " alt="" coords="454,120,607,145"/>
-<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="732,343,718,301,695,252,664,202,645,179,624,160,604,148,606,144,627,156,649,176,669,199,700,249,723,300,737,341"/>
-<area shape="rect" id="Node000005" href="$classcpp_1_1ast_1_1_function.html#a61e8eadca35b3848183554f62acf0ffb" title=" " alt="" coords="466,169,595,210"/>
-<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="725,345,684,285,656,253,624,225,594,209,597,205,627,221,660,249,688,281,730,341"/>
-<area shape="rect" id="Node000006" href="$classcpp_1_1ast_1_1_parameter.html#aebd069a2a057dc791df21c56e22912bb" title=" " alt="" coords="464,235,596,275"/>
-<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="713,349,672,319,624,289,595,277,597,272,627,285,675,314,717,345"/>
-<area shape="rect" id="Node000007" href="$classcpp_1_1ast_1_1_typedef.html#ac461b1e6209716f39cc06baa5d726f56" title=" " alt="" coords="450,300,611,325"/>
-<area shape="poly" id="edge6_Node000001_Node000007" title=" " alt="" coords="678,355,625,340,580,328,582,323,626,335,679,350"/>
-<area shape="rect" id="Node000008" href="$classcpp_1_1tokenize_1_1_token.html#ad93a4059e9932fa2dea149510f0ef002" title=" " alt="" coords="461,349,599,390"/>
-<area shape="poly" id="edge7_Node000001_Node000008" title=" " alt="" coords="658,372,600,372,600,367,658,367"/>
-<area shape="rect" id="Node000009" href="$classvalidate__reflection_1_1_empty_scope.html#a423076007160dd8dd8e9b314aa1429b1" title=" " alt="" coords="446,415,614,455"/>
-<area shape="poly" id="edge8_Node000001_Node000009" title=" " alt="" coords="685,390,600,417,598,412,684,385"/>
-<area shape="rect" id="Node000010" href="$classvalidate__reflection_1_1_empty_scope.html#a5c2e058527ec1f3b72266c29c77ad0b2" title=" " alt="" coords="446,480,614,521"/>
-<area shape="poly" id="edge9_Node000001_Node000010" title=" " alt="" coords="721,395,679,433,627,469,601,482,598,477,624,465,676,429,717,391"/>
-<area shape="rect" id="Node000011" href="$classvalidate__reflection_1_1_empty_scope.html#a1fb4f76506790294268dc078986d7430" title=" " alt="" coords="211,456,379,497"/>
-<area shape="poly" id="edge20_Node000001_Node000011" title=" " alt="" coords="734,398,719,432,696,470,665,507,627,535,576,554,533,557,488,549,434,535,409,524,386,511,358,500,360,495,388,506,412,519,436,530,489,543,533,551,575,549,624,530,661,503,691,467,714,429,730,396"/>
-<area shape="rect" id="Node000012" href="$class_c_l_i_1_1_option.html#ae94ff5bfc6549f9c86aff629be829353" title="Adds a Validator with a built in type name." alt="" coords="464,596,596,621"/>
-<area shape="poly" id="edge11_Node000001_Node000012" title=" " alt="" coords="736,398,721,438,698,486,667,536,627,578,593,597,591,593,624,574,663,532,694,484,716,436,731,396"/>
-<area shape="rect" id="Node000020" href="$classcpp_1_1ast_1_1___generic_declaration.html#a4851c5ea09b0a312d762342b71211bb1" title=" " alt="" coords="435,645,625,686"/>
-<area shape="poly" id="edge19_Node000001_Node000020" title=" " alt="" coords="740,398,728,449,707,512,674,578,652,609,627,636,611,647,608,643,624,632,648,605,669,575,702,510,723,447,735,397"/>
-<area shape="rect" id="Node000021" href="$classcpp_1_1ast_1_1_variable_declaration.html#ad8821ceb26b91d7c3604486a424c3f8f" title=" " alt="" coords="438,727,622,767"/>
-<area shape="poly" id="edge21_Node000001_Node000021" title=" " alt="" coords="742,398,732,458,711,538,678,622,655,663,627,699,609,716,589,728,586,724,606,711,623,696,650,660,673,620,706,536,726,457,736,397"/>
-<area shape="poly" id="edge10_Node000010_Node000011" title=" " alt="" coords="430,493,379,488,380,482,431,488"/>
-<area shape="rect" id="Node000013" href="$class_c_l_i_1_1_app.html#af5c81d9b35b386fb07c43db9df3fc958" title="Add set of options (with default, set can be changed afterwards &#45; do not destroy the set) DEPRECATED." alt="" coords="205,521,385,546"/>
-<area shape="poly" id="edge12_Node000012_Node000013" title=" " alt="" coords="473,592,434,579,386,560,350,550,352,545,388,555,436,574,474,587"/>
-<area shape="rect" id="Node000014" href="$class_c_l_i_1_1_app.html#a25a06eb9b7b65d34cf92cc84cccfeeef" title="Add set of options (No default, set can be changed afterwards &#45; do not destroy the set) DEPRECATED." alt="" coords="205,570,385,596"/>
-<area shape="poly" id="edge13_Node000012_Node000014" title=" " alt="" coords="448,602,385,595,386,590,449,597"/>
-<area shape="rect" id="Node000015" href="$class_c_l_i_1_1_app.html#a128d9994f3bd1d884abad7d4802dd9c7" title="Add set of options (with default, static set, such as an inline set) DEPRECATED." alt="" coords="231,620,358,645"/>
-<area shape="poly" id="edge14_Node000012_Node000015" title=" " alt="" coords="449,619,359,629,359,623,449,614"/>
-<area shape="rect" id="Node000016" href="$class_c_l_i_1_1_app.html#a7edb5c2efdd04bfbbb49ee666a375dde" title="Add set of options (No default, temp reference, such as an inline set) DEPRECATED." alt="" coords="231,669,358,694"/>
-<area shape="poly" id="edge15_Node000012_Node000016" title=" " alt="" coords="458,629,436,636,388,660,355,671,354,666,386,655,434,631,456,624"/>
-<area shape="rect" id="Node000017" href="$namespace_c_l_i.html#a6cb6f8bfff8c49385fb24f6f23a23c21" title="Helper function to mark an option as deprecated." alt="" coords="220,718,370,744"/>
-<area shape="poly" id="edge16_Node000012_Node000017" title=" " alt="" coords="451,627,437,636,421,653,413,671,406,691,389,709,369,720,367,715,385,705,401,688,409,669,416,650,433,632,448,623"/>
-<area shape="rect" id="Node000018" href="$namespace_c_l_i.html#a5e83d92a6ec271c2439141feaede1136" title="Helper function to mark an option as deprecated." alt="" coords="5,694,155,720"/>
-<area shape="poly" id="edge17_Node000017_Node000018" title=" " alt="" coords="205,724,155,718,155,713,205,718"/>
-<area shape="rect" id="Node000019" href="$namespace_c_l_i.html#ad6d89b5d1aba2ebdca5f94534d658cab" title="Helper function to mark an option as deprecated." alt="" coords="5,744,155,769"/>
-<area shape="poly" id="edge18_Node000017_Node000019" title=" " alt="" coords="205,744,155,750,155,745,205,739"/>
-<area shape="rect" id="Node000022" href="$classcpp_1_1ast_1_1_variable_declaration.html#aeafe1b55bcf3005d00951f0accb18def" title=" " alt="" coords="203,768,387,809"/>
-<area shape="poly" id="edge22_Node000021_Node000022" title=" " alt="" coords="423,768,388,775,387,769,422,763"/>
+<area shape="rect" id="Node000001" title="Specify the type string." alt="" coords="610,104,751,130"/>
+<area shape="rect" id="Node000002" href="$class_c_l_i_1_1_option.html#ae94ff5bfc6549f9c86aff629be829353" title="Adds a Validator with a built in type name." alt="" coords="431,104,562,130"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="595,120,563,120,563,114,595,114"/>
+<area shape="rect" id="Node000003" href="$class_c_l_i_1_1_app.html#af5c81d9b35b386fb07c43db9df3fc958" title="Add set of options (with default, set can be changed afterwards &#45; do not destroy the set) DEPRECATED." alt="" coords="203,5,383,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="466,97,427,70,382,45,353,34,355,29,384,40,430,65,469,92"/>
+<area shape="rect" id="Node000004" href="$class_c_l_i_1_1_app.html#a25a06eb9b7b65d34cf92cc84cccfeeef" title="Add set of options (No default, set can be changed afterwards &#45; do not destroy the set) DEPRECATED." alt="" coords="203,55,383,80"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="425,102,348,84,350,78,426,97"/>
+<area shape="rect" id="Node000005" href="$class_c_l_i_1_1_app.html#a128d9994f3bd1d884abad7d4802dd9c7" title="Add set of options (with default, static set, such as an inline set) DEPRECATED." alt="" coords="229,104,356,130"/>
+<area shape="poly" id="edge4_Node000002_Node000005" title=" " alt="" coords="415,120,357,120,357,114,415,114"/>
+<area shape="rect" id="Node000006" href="$class_c_l_i_1_1_app.html#a7edb5c2efdd04bfbbb49ee666a375dde" title="Add set of options (No default, temp reference, such as an inline set) DEPRECATED." alt="" coords="229,153,356,179"/>
+<area shape="poly" id="edge5_Node000002_Node000006" title=" " alt="" coords="426,137,350,155,348,150,425,131"/>
+<area shape="rect" id="Node000007" href="$namespace_c_l_i.html#a6cb6f8bfff8c49385fb24f6f23a23c21" title="Helper function to mark an option as deprecated." alt="" coords="218,203,368,228"/>
+<area shape="poly" id="edge6_Node000002_Node000007" title=" " alt="" coords="469,141,430,169,384,194,355,205,353,200,382,189,427,164,466,137"/>
+<area shape="rect" id="Node000008" href="$namespace_c_l_i.html#a5e83d92a6ec271c2439141feaede1136" title="Helper function to mark an option as deprecated." alt="" coords="5,177,155,203"/>
+<area shape="poly" id="edge7_Node000007_Node000008" title=" " alt="" coords="203,207,155,202,155,196,203,202"/>
+<area shape="rect" id="Node000009" href="$namespace_c_l_i.html#ad6d89b5d1aba2ebdca5f94534d658cab" title="Helper function to mark an option as deprecated." alt="" coords="5,227,155,252"/>
+<area shape="poly" id="edge8_Node000007_Node000009" title=" " alt="" coords="203,228,155,234,155,228,203,223"/>
 </map>

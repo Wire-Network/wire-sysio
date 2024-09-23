@@ -242,7 +242,7 @@ Static Public Attributes</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="friends" name="friends"></a>
 Friends</h2></td></tr>
-<tr class="memitem:adebb874478d11d1035fcbadb665cea69" id="r_adebb874478d11d1035fcbadb665cea69"><td class="memItemLeft" align="right" valign="top">std::ostream &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#adebb874478d11d1035fcbadb665cea69">operator&lt;&lt;</a> (std::ostream &amp;os, const <a class="el" href="structbn_1_1_fp12_t.html">Fp12T</a> &amp;x)</td></tr>
+<tr class="memitem:adebb874478d11d1035fcbadb665cea69" id="r_adebb874478d11d1035fcbadb665cea69"><td class="memItemLeft" align="right" valign="top">std::ostream &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#adebb874478d11d1035fcbadb665cea69">operator&lt;&lt;</a> (std::ostream &amp;<a class="el" href="environment_8hpp.html#a3951483d0b31c29ca95336206cd35238">os</a>, const <a class="el" href="structbn_1_1_fp12_t.html">Fp12T</a> &amp;x)</td></tr>
 <tr class="separator:adebb874478d11d1035fcbadb665cea69"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a373a7a247fd5619d29199977af69821f" id="r_a373a7a247fd5619d29199977af69821f"><td class="memItemLeft" align="right" valign="top">std::istream &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a373a7a247fd5619d29199977af69821f">operator&gt;&gt;</a> (std::istream &amp;is, <a class="el" href="structbn_1_1_fp12_t.html">Fp12T</a> &amp;x)</td></tr>
 <tr class="separator:a373a7a247fd5619d29199977af69821f"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -655,13 +655,11 @@ Here is the caller graph for this function:</div>
 <div class="dyncontent">
 <div class="center"><img src="structbn_1_1_fp12_t_aad8c783fb3d3005f8f5b91b58c1bcbd9_icgraph.png" border="0" usemap="#astructbn_1_1_fp12_t_aad8c783fb3d3005f8f5b91b58c1bcbd9_icgraph" alt=""/></div>
 <map name="astructbn_1_1_fp12_t_aad8c783fb3d3005f8f5b91b58c1bcbd9_icgraph" id="astructbn_1_1_fp12_t_aad8c783fb3d3005f8f5b91b58c1bcbd9_icgraph">
-<area shape="rect" title=" " alt="" coords="438,59,546,84"/>
-<area shape="rect" href="bn_8cpp.html#ac9befa92976b6ff595009adafacd54b3" title=" " alt="" coords="264,29,349,55"/>
-<area shape="poly" title=" " alt="" coords="422,63,349,51,350,46,423,58"/>
-<area shape="rect" href="classvalidate__reflection_1_1_empty_scope.html#a1fb4f76506790294268dc078986d7430" title=" " alt="" coords="222,79,390,120"/>
-<area shape="poly" title=" " alt="" coords="423,85,391,89,390,84,422,79"/>
+<area shape="rect" title=" " alt="" coords="355,29,463,55"/>
+<area shape="rect" href="bn_8cpp.html#ac9befa92976b6ff595009adafacd54b3" title=" " alt="" coords="222,29,307,55"/>
+<area shape="poly" title=" " alt="" coords="340,45,308,45,308,40,340,40"/>
 <area shape="rect" href="bn_8cpp.html#a40f2351c00194125aea1e53e4f691989" title=" " alt="" coords="103,29,174,55"/>
-<area shape="poly" title=" " alt="" coords="248,45,175,45,175,40,248,40"/>
+<area shape="poly" title=" " alt="" coords="206,45,174,45,174,40,206,40"/>
 <area shape="poly" title=" " alt="" coords="156,16,150,10,138,8,128,10,122,14,121,20,124,28,119,30,115,21,118,11,125,5,138,3,152,5,159,12"/>
 <area shape="rect" href="bn_8cpp.html#a0ddf1224851353fc92bfbff6f499fa97" title=" " alt="" coords="5,29,55,55"/>
 <area shape="poly" title=" " alt="" coords="87,45,55,45,55,40,87,40"/>
@@ -2218,8 +2216,9 @@ template&lt;<a class="el" href="yubihsm__pkcs11_8c.html#a5c230edcb923568000cb798
 
 <p class="definition">Definition at line <a class="el" href="bn_8h_source.html#l01421">1421</a> of file <a class="el" href="bn_8h_source.html">bn.h</a>.</p>
 <div class="fragment"><div class="line"><span class="lineno"> 1422</span>    {</div>
-<div class="line"><span class="lineno"> 1423</span>        <span class="keywordflow">return</span> os &lt;&lt; <span class="stringliteral">&quot;[&quot;</span> &lt;&lt; x.a_ &lt;&lt; <span class="stringliteral">&quot;,\n &quot;</span> &lt;&lt; x.b_ &lt;&lt; <span class="stringliteral">&quot;]&quot;</span>;</div>
+<div class="line"><span class="lineno"> 1423</span>        <span class="keywordflow">return</span> <a class="code hl_variable" href="environment_8hpp.html#a3951483d0b31c29ca95336206cd35238">os</a> &lt;&lt; <span class="stringliteral">&quot;[&quot;</span> &lt;&lt; x.a_ &lt;&lt; <span class="stringliteral">&quot;,\n &quot;</span> &lt;&lt; x.b_ &lt;&lt; <span class="stringliteral">&quot;]&quot;</span>;</div>
 <div class="line"><span class="lineno"> 1424</span>    }</div>
+<div class="ttc" id="aenvironment_8hpp_html_a3951483d0b31c29ca95336206cd35238"><div class="ttname"><a href="environment_8hpp.html#a3951483d0b31c29ca95336206cd35238">os</a></div><div class="ttdeci">os_t os</div><div class="ttdef"><b>Definition</b> <a href="environment_8hpp_source.html#l00023">environment.hpp:23</a></div></div>
 </div><!-- fragment -->
 </div>
 </div>

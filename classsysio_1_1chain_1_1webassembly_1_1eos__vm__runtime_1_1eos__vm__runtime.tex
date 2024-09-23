@@ -6,7 +6,8 @@
 
 
 
-Inheritance diagram for sysio\+::chain\+::webassembly\+::eos\+\_\+vm\+\_\+runtime\+::eos\+\_\+vm\+\_\+runtime\texorpdfstring{$<$}{<} Backend \texorpdfstring{$>$}{>}\+:\nopagebreak
+Inheritance diagram for sysio\+::chain\+::webassembly\+::eos\+\_\+vm\+\_\+runtime\+::eos\+\_\+vm\+\_\+runtime\texorpdfstring{$<$}{<} Backend \texorpdfstring{$>$}{>}\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -15,7 +16,8 @@ Inheritance diagram for sysio\+::chain\+::webassembly\+::eos\+\_\+vm\+\_\+runtim
 \end{figure}
 
 
-Collaboration diagram for sysio\+::chain\+::webassembly\+::eos\+\_\+vm\+\_\+runtime\+::eos\+\_\+vm\+\_\+runtime\texorpdfstring{$<$}{<} Backend \texorpdfstring{$>$}{>}\+:\nopagebreak
+Collaboration diagram for sysio\+::chain\+::webassembly\+::eos\+\_\+vm\+\_\+runtime\+::eos\+\_\+vm\+\_\+runtime\texorpdfstring{$<$}{<} Backend \texorpdfstring{$>$}{>}\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -116,7 +118,7 @@ Definition at line \mbox{\hyperlink{sys-vm_8cpp_source_l00242}{242}} of file \mb
 \DoxyCodeLine{00245\ \ \ \ \textcolor{keyword}{using\ }\mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend\_t}}\ =\ \mbox{\hyperlink{namespacesysio_1_1chain_a48442460d3a1314dec60433ab2f5ab15}{eos\_vm\_backend\_t<Impl>}};}
 \DoxyCodeLine{00246\ \ \ \ \textcolor{keywordflow}{try}\ \{}
 \DoxyCodeLine{00247\ \ \ \ \ \ \ \mbox{\hyperlink{namespacesysio_1_1vm_a9ec5735264f754f4960b35edb8693bfa}{wasm\_code\_ptr}}\ code((\mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}*)code\_bytes,\ code\_size);}
-\DoxyCodeLine{00248\ \ \ \ \ \ \ apply\_options\ \mbox{\hyperlink{namespacebenchmark_compile_acf738bbf3b8391aa78929ceeceb8a03b}{options}}\ =\ \{\ .max\_pages\ =\ 65536,}
+\DoxyCodeLine{00248\ \ \ \ \ \ \ apply\_options\ options\ =\ \{\ .max\_pages\ =\ 65536,}
 \DoxyCodeLine{00249\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ .max\_call\_depth\ =\ 0\ \};}
 \DoxyCodeLine{00250\ \ \ \ \ \ \ std::unique\_ptr<backend\_t>\ \mbox{\hyperlink{hello__driver_8cpp_a80e74e0649e294630eb0d356133d8c0b}{bkend}}\ =\ std::make\_unique<backend\_t>(code,\ code\_size,\ \textcolor{keyword}{nullptr},\ options);}
 \DoxyCodeLine{00251\ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1vm_1_1registered__host__functions_abb74daf946a6b4a1756a0ba3f08c1c04}{eos\_vm\_host\_functions\_t::resolve}}(\mbox{\hyperlink{hello__driver_8cpp_a80e74e0649e294630eb0d356133d8c0b}{bkend}}-\/>\mbox{\hyperlink{classsysio_1_1vm_1_1backend_af2bdf6918391f431538eb92100389eab}{get\_module}}());}
@@ -127,7 +129,8 @@ Definition at line \mbox{\hyperlink{sys-vm_8cpp_source_l00242}{242}} of file \mb
 \DoxyCodeLine{00256\ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode

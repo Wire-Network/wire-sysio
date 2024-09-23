@@ -1,5 +1,5 @@
 <map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
-<area shape="rect" id="Node000000" href="$structchainbase_1_1object.html" title=" " alt="" coords="5,5,163,76"/>
-<area shape="rect" id="Node000001" href="$classsysio_1_1chain_1_1permission__link__object.html" title="The permission_link_object class assigns permission_objects to message types." alt="" coords="211,20,373,61"/>
-<area shape="poly" id="edge218_Node000000_Node000001" title=" " alt="" coords="178,38,210,38,210,43,178,43"/>
+<area shape="rect" id="Node000000" href="$structchainbase_1_1object.html" title=" " alt="" coords="5,5,172,61"/>
+<area shape="rect" id="Node000001" href="$classsysio_1_1chain_1_1permission__object.html" title=" " alt="" coords="220,13,382,54"/>
+<area shape="poly" id="edge219_Node000000_Node000001" title=" " alt="" coords="187,30,219,30,219,36,187,36"/>
 </map>

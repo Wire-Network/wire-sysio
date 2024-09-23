@@ -70,7 +70,8 @@ Definition at line \mbox{\hyperlink{sha3_8cpp_source_l00042}{42}} of file \mbox{
 \DoxyCodeLine{00042\ \{\ \mbox{\hyperlink{structfc_1_1sha3__impl_a2121cb9f91ded54866b6ad70ca0dec02}{init}}();\ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -100,7 +101,8 @@ Definition at line \mbox{\hyperlink{sha3_8cpp_source_l00160}{160}} of file \mbox
 \DoxyCodeLine{00165\ \ \ \ \ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -125,14 +127,16 @@ Definition at line \mbox{\hyperlink{sha3_8cpp_source_l00141}{141}} of file \mbox
 \DoxyCodeLine{00144\ \ \ \ \ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
 \includegraphics[width=261pt]{structfc_1_1sha3__impl_a2121cb9f91ded54866b6ad70ca0dec02_cgraph}
 \end{center}
 \end{figure}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -166,7 +170,8 @@ Definition at line \mbox{\hyperlink{sha3_8cpp_source_l00146}{146}} of file \mbox
 \DoxyCodeLine{00158\ \ \ \ \ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -190,15 +195,15 @@ Definition at line \mbox{\hyperlink{sha3_8cpp_source_l00057}{57}} of file \mbox{
 \DoxyCodeLine{00060\ }
 \DoxyCodeLine{00061\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ \textcolor{keyword}{constexpr}\ (!\mbox{\hyperlink{namespacelibff_a91495578c17649f0bb3bc532c59dda94}{is\_little\_endian}})}
 \DoxyCodeLine{00062\ \ \ \ \ \ \ \ \ \{}
-\DoxyCodeLine{00063\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\ *\mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}};}
+\DoxyCodeLine{00063\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\ *v;}
 \DoxyCodeLine{00064\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ convert\ the\ buffer\ to\ little\ endian}}
 \DoxyCodeLine{00065\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (std::size\_t\ i;\ i\ <\ \mbox{\hyperlink{structfc_1_1sha3__impl_ac881a901d427d93e2ca1d8a82b4a895e}{number\_of\_words}};\ i++)}
 \DoxyCodeLine{00066\ \ \ \ \ \ \ \ \ \ \ \ \ \{}
-\DoxyCodeLine{00067\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}\ =\ \textcolor{keyword}{reinterpret\_cast<}\mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\ *\textcolor{keyword}{>}(\mbox{\hyperlink{structfc_1_1sha3__impl_ac7fbd364b810404c438fcfa3c00272ed}{words}}\ +\ i);}
-\DoxyCodeLine{00068\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structfc_1_1sha3__impl_ac7fbd364b810404c438fcfa3c00272ed}{words}}[i]\ =\ ((\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}})\mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}[0])\ |\ (((\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}})v[1])\ <<\ 8)\ |}
-\DoxyCodeLine{00069\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (((\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}})\mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}[2])\ <<\ 16)\ |\ (((\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}})v[3])\ <<\ 24)\ |}
-\DoxyCodeLine{00070\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (((\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}})\mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}[4])\ <<\ 32)\ |\ (((\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}})v[5])\ <<\ 40)\ |}
-\DoxyCodeLine{00071\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (((\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}})\mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}[6])\ <<\ 48)\ |\ (((\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}})v[7])\ <<\ 56);}
+\DoxyCodeLine{00067\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ v\ =\ \textcolor{keyword}{reinterpret\_cast<}\mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\ *\textcolor{keyword}{>}(\mbox{\hyperlink{structfc_1_1sha3__impl_ac7fbd364b810404c438fcfa3c00272ed}{words}}\ +\ i);}
+\DoxyCodeLine{00068\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structfc_1_1sha3__impl_ac7fbd364b810404c438fcfa3c00272ed}{words}}[i]\ =\ ((\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}})v[0])\ |\ (((\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}})v[1])\ <<\ 8)\ |}
+\DoxyCodeLine{00069\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (((\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}})v[2])\ <<\ 16)\ |\ (((\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}})v[3])\ <<\ 24)\ |}
+\DoxyCodeLine{00070\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (((\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}})v[4])\ <<\ 32)\ |\ (((\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}})v[5])\ <<\ 40)\ |}
+\DoxyCodeLine{00071\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (((\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}})v[6])\ <<\ 48)\ |\ (((\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}})v[7])\ <<\ 56);}
 \DoxyCodeLine{00072\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
 \DoxyCodeLine{00073\ \ \ \ \ \ \ \ \ \}}
 \DoxyCodeLine{00074\ }
@@ -249,27 +254,28 @@ Definition at line \mbox{\hyperlink{sha3_8cpp_source_l00057}{57}} of file \mbox{
 \DoxyCodeLine{00119\ }
 \DoxyCodeLine{00120\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ \textcolor{keyword}{constexpr}\ (!\mbox{\hyperlink{namespacelibff_a91495578c17649f0bb3bc532c59dda94}{is\_little\_endian}})}
 \DoxyCodeLine{00121\ \ \ \ \ \ \ \ \ \{}
-\DoxyCodeLine{00122\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\ *\mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}};}
+\DoxyCodeLine{00122\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\ *v;}
 \DoxyCodeLine{00123\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ tmp;}
 \DoxyCodeLine{00124\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ convert\ back\ to\ big\ endian}}
 \DoxyCodeLine{00125\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (std::size\_t\ i\ =\ 0;\ i\ <\ \textcolor{keyword}{sizeof}(\mbox{\hyperlink{structfc_1_1sha3__impl_ac7fbd364b810404c438fcfa3c00272ed}{words}});\ i++)}
 \DoxyCodeLine{00126\ \ \ \ \ \ \ \ \ \ \ \ \ \{}
-\DoxyCodeLine{00127\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}\ =\ (\mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\ *)(\mbox{\hyperlink{structfc_1_1sha3__impl_ac7fbd364b810404c438fcfa3c00272ed}{words}}\ +\ i);}
+\DoxyCodeLine{00127\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ v\ =\ (\mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\ *)(\mbox{\hyperlink{structfc_1_1sha3__impl_ac7fbd364b810404c438fcfa3c00272ed}{words}}\ +\ i);}
 \DoxyCodeLine{00128\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ tmp\ =\ \mbox{\hyperlink{structfc_1_1sha3__impl_ac7fbd364b810404c438fcfa3c00272ed}{words}}[i];}
-\DoxyCodeLine{00129\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}[0]\ =\ tmp\ \&\ 0xFF;}
-\DoxyCodeLine{00130\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}[1]\ =\ (tmp\ >>\ 8)\ \&\ 0xFF;}
-\DoxyCodeLine{00131\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}[2]\ =\ (tmp\ >>\ 16)\ \&\ 0xFF;}
-\DoxyCodeLine{00132\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}[3]\ =\ (tmp\ >>\ 24)\ \&\ 0xFF;}
-\DoxyCodeLine{00133\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}[4]\ =\ (tmp\ >>\ 32)\ \&\ 0xFF;}
-\DoxyCodeLine{00134\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}[5]\ =\ (tmp\ >>\ 40)\ \&\ 0xFF;}
-\DoxyCodeLine{00135\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}[6]\ =\ (tmp\ >>\ 48)\ \&\ 0xFF;}
-\DoxyCodeLine{00136\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}[7]\ =\ (tmp\ >>\ 56)\ \&\ 0xFF;}
+\DoxyCodeLine{00129\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ v[0]\ =\ tmp\ \&\ 0xFF;}
+\DoxyCodeLine{00130\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ v[1]\ =\ (tmp\ >>\ 8)\ \&\ 0xFF;}
+\DoxyCodeLine{00131\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ v[2]\ =\ (tmp\ >>\ 16)\ \&\ 0xFF;}
+\DoxyCodeLine{00132\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ v[3]\ =\ (tmp\ >>\ 24)\ \&\ 0xFF;}
+\DoxyCodeLine{00133\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ v[4]\ =\ (tmp\ >>\ 32)\ \&\ 0xFF;}
+\DoxyCodeLine{00134\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ v[5]\ =\ (tmp\ >>\ 40)\ \&\ 0xFF;}
+\DoxyCodeLine{00135\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ v[6]\ =\ (tmp\ >>\ 48)\ \&\ 0xFF;}
+\DoxyCodeLine{00136\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ v[7]\ =\ (tmp\ >>\ 56)\ \&\ 0xFF;}
 \DoxyCodeLine{00137\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
 \DoxyCodeLine{00138\ \ \ \ \ \ \ \ \ \}}
 \DoxyCodeLine{00139\ \ \ \ \ \}}
 
 \end{DoxyCode}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode

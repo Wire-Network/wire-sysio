@@ -476,7 +476,7 @@ template&lt;<a class="el" href="yubihsm__pkcs11_8c.html#a5c230edcb923568000cb798
 <div class="line"><span class="lineno">  548</span>        <a class="code hl_function" href="#a2f6a423f7ae8c7ac24b468538693aa26">ParamGenerator&lt;ParamType&gt;</a> generator((*gen_it-&gt;generator)());</div>
 <div class="line"><span class="lineno">  549</span>        <a class="code hl_typedef" href="#a69934b21930d71c0b99d10a36ad08306">ParamNameGeneratorFunc</a>* name_func = gen_it-&gt;name_func;</div>
 <div class="line"><span class="lineno">  550</span>        <span class="keyword">const</span> <span class="keywordtype">char</span>* file = gen_it-&gt;file;</div>
-<div class="line"><span class="lineno">  551</span>        <span class="keywordtype">int</span> <a class="code hl_variable" href="namespacevalidate__reflection.html#a54d4e98ade8417b88a7e3859a693630a">line</a> = gen_it-&gt;line;</div>
+<div class="line"><span class="lineno">  551</span>        <span class="keywordtype">int</span> line = gen_it-&gt;line;</div>
 <div class="line"><span class="lineno">  552</span> </div>
 <div class="line"><span class="lineno">  553</span>        std::string test_case_name;</div>
 <div class="line"><span class="lineno">  554</span>        <span class="keywordflow">if</span> ( !instantiation_name.empty() )</div>
@@ -496,11 +496,11 @@ template&lt;<a class="el" href="yubihsm__pkcs11_8c.html#a5c230edcb923568000cb798
 <div class="line"><span class="lineno">  568</span>          <a class="code hl_define" href="gtest-port_8h.html#ab54343f0a36dc4cb0ce8a478dd7847b8">GTEST_CHECK_</a>(IsValidParamName(param_name))</div>
 <div class="line"><span class="lineno">  569</span>              &lt;&lt; <span class="stringliteral">&quot;Parameterized test name &#39;&quot;</span> &lt;&lt; param_name</div>
 <div class="line"><span class="lineno">  570</span>              &lt;&lt; <span class="stringliteral">&quot;&#39; is invalid, in &quot;</span> &lt;&lt; file</div>
-<div class="line"><span class="lineno">  571</span>              &lt;&lt; <span class="stringliteral">&quot; line &quot;</span> &lt;&lt; <a class="code hl_variable" href="namespacevalidate__reflection.html#a54d4e98ade8417b88a7e3859a693630a">line</a> &lt;&lt; std::endl;</div>
+<div class="line"><span class="lineno">  571</span>              &lt;&lt; <span class="stringliteral">&quot; line &quot;</span> &lt;&lt; line &lt;&lt; std::endl;</div>
 <div class="line"><span class="lineno">  572</span> </div>
 <div class="line"><span class="lineno">  573</span>          <a class="code hl_define" href="gtest-port_8h.html#ab54343f0a36dc4cb0ce8a478dd7847b8">GTEST_CHECK_</a>(test_param_names.count(param_name) == 0)</div>
 <div class="line"><span class="lineno">  574</span>              &lt;&lt; <span class="stringliteral">&quot;Duplicate parameterized test name &#39;&quot;</span> &lt;&lt; param_name</div>
-<div class="line"><span class="lineno">  575</span>              &lt;&lt; <span class="stringliteral">&quot;&#39;, in &quot;</span> &lt;&lt; file &lt;&lt; <span class="stringliteral">&quot; line &quot;</span> &lt;&lt; <a class="code hl_variable" href="namespacevalidate__reflection.html#a54d4e98ade8417b88a7e3859a693630a">line</a> &lt;&lt; std::endl;</div>
+<div class="line"><span class="lineno">  575</span>              &lt;&lt; <span class="stringliteral">&quot;&#39;, in &quot;</span> &lt;&lt; file &lt;&lt; <span class="stringliteral">&quot; line &quot;</span> &lt;&lt; line &lt;&lt; std::endl;</div>
 <div class="line"><span class="lineno">  576</span> </div>
 <div class="line"><span class="lineno">  577</span>          test_param_names.insert(param_name);</div>
 <div class="line"><span class="lineno">  578</span> </div>
@@ -525,7 +525,6 @@ template&lt;<a class="el" href="yubihsm__pkcs11_8c.html#a5c230edcb923568000cb798
 <div class="ttc" id="aclasstesting_1_1internal_1_1_parameterized_test_case_info_html_a69934b21930d71c0b99d10a36ad08306"><div class="ttname"><a href="#a69934b21930d71c0b99d10a36ad08306">testing::internal::ParameterizedTestCaseInfo::ParamNameGeneratorFunc</a></div><div class="ttdeci">ParamNameGenFunc&lt; ParamType &gt;::Type ParamNameGeneratorFunc</div><div class="ttdef"><b>Definition</b> <a href="gtest-param-util_8h_source.html#l00502">gtest-param-util.h:502</a></div></div>
 <div class="ttc" id="agtest-port_8h_html_ab54343f0a36dc4cb0ce8a478dd7847b8"><div class="ttname"><a href="gtest-port_8h.html#ab54343f0a36dc4cb0ce8a478dd7847b8">GTEST_CHECK_</a></div><div class="ttdeci">#define GTEST_CHECK_(condition)</div><div class="ttdef"><b>Definition</b> <a href="gtest-port_8h_source.html#l01367">gtest-port.h:1367</a></div></div>
 <div class="ttc" id="anamespacetesting_1_1internal_html_a7f2e4e46c969fcae9d801d93a3e932fd"><div class="ttname"><a href="namespacetesting_1_1internal.html#a7f2e4e46c969fcae9d801d93a3e932fd">testing::internal::MakeAndRegisterTestInfo</a></div><div class="ttdeci">GTEST_API_ TestInfo * MakeAndRegisterTestInfo(const char *test_case_name, const char *name, const char *type_param, const char *value_param, CodeLocation code_location, TypeId fixture_class_id, SetUpTestCaseFunc set_up_tc, TearDownTestCaseFunc tear_down_tc, TestFactoryBase *factory)</div><div class="ttdef"><b>Definition</b> <a href="gtest_8cc_source.html#l02561">gtest.cc:2561</a></div></div>
-<div class="ttc" id="anamespacevalidate__reflection_html_a54d4e98ade8417b88a7e3859a693630a"><div class="ttname"><a href="namespacevalidate__reflection.html#a54d4e98ade8417b88a7e3859a693630a">validate_reflection.line</a></div><div class="ttdeci">line</div><div class="ttdef"><b>Definition</b> <a href="validate__reflection_8py_source.html#l00735">validate_reflection.py:735</a></div></div>
 </div><!-- fragment --><div class="dynheader">
 Here is the call graph for this function:</div>
 <div class="dyncontent">

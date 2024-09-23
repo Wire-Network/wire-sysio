@@ -219,10 +219,10 @@
 \DoxyCodeLine{\Hypertarget{bigint_8cpp_source_l00216}00216\ }
 \DoxyCodeLine{\Hypertarget{bigint_8cpp_source_l00218}\mbox{\hyperlink{namespacefc_ae1624b29ca5721e622d9f2a0775fd07a}{00218}}\ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespacefc_accef08adf4ee05c36ccc550d8101b08f}{from\_variant}}(\ \textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1variant}{variant}}\&\ v,\ \mbox{\hyperlink{classfc_1_1bigint}{bigint}}\&\ bi\ )}
 \DoxyCodeLine{\Hypertarget{bigint_8cpp_source_l00219}00219\ \ \ \{}
-\DoxyCodeLine{\Hypertarget{bigint_8cpp_source_l00220}00220\ \ \ \ \ \textcolor{keywordflow}{if}(\ v.is\_numeric()\ )\ bi\ =\ \mbox{\hyperlink{classfc_1_1bigint}{bigint}}(\ \textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{long}\textcolor{keyword}{>}(v.as\_uint64())\ );}
+\DoxyCodeLine{\Hypertarget{bigint_8cpp_source_l00220}00220\ \ \ \ \ \textcolor{keywordflow}{if}(\ v.\mbox{\hyperlink{classfc_1_1variant_a5c2238ce8bbeb5dc454134ec92624aab}{is\_numeric}}()\ )\ bi\ =\ \mbox{\hyperlink{classfc_1_1bigint}{bigint}}(\ \textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{long}\textcolor{keyword}{>}(v.\mbox{\hyperlink{classfc_1_1variant_a483bb1f23d9b71ae03e9ca03136ee453}{as\_uint64}}())\ );}
 \DoxyCodeLine{\Hypertarget{bigint_8cpp_source_l00221}00221\ \ \ \ \ \textcolor{keywordflow}{else}}
 \DoxyCodeLine{\Hypertarget{bigint_8cpp_source_l00222}00222\ \ \ \ \ \{}
-\DoxyCodeLine{\Hypertarget{bigint_8cpp_source_l00223}00223\ \ \ \ \ \ \ \ \ std::string\ b64\ =\ v.as\_string();}
+\DoxyCodeLine{\Hypertarget{bigint_8cpp_source_l00223}00223\ \ \ \ \ \ \ \ \ std::string\ b64\ =\ v.\mbox{\hyperlink{classfc_1_1variant_acbd70a93184e4277631f2a261acb707c}{as\_string}}();}
 \DoxyCodeLine{\Hypertarget{bigint_8cpp_source_l00224}00224\ \ \ \ \ \ \ \ \ std::string\ bin\ =\ \mbox{\hyperlink{namespacefc_ae8deb03ba4f32aa68c5dcc62578ea2de}{base64\_decode}}(b64);}
 \DoxyCodeLine{\Hypertarget{bigint_8cpp_source_l00225}00225\ \ \ \ \ \ \ \ \ bi\ =\ \mbox{\hyperlink{classfc_1_1bigint}{bigint}}(bin.c\_str(),\ bin.size()\ );}
 \DoxyCodeLine{\Hypertarget{bigint_8cpp_source_l00226}00226\ \ \ \ \ \}}

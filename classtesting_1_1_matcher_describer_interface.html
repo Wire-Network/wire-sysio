@@ -213,9 +213,9 @@ Inheritance diagram for testing::MatcherDescriberInterface:</div>
 Public Member Functions</h2></td></tr>
 <tr class="memitem:ae2236a56ad2cc35cad10efc1208854f4" id="r_ae2236a56ad2cc35cad10efc1208854f4"><td class="memItemLeft" align="right" valign="top">virtual&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ae2236a56ad2cc35cad10efc1208854f4">~MatcherDescriberInterface</a> ()</td></tr>
 <tr class="separator:ae2236a56ad2cc35cad10efc1208854f4"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ad9f861588bd969b6e3e717f13bb94e7b" id="r_ad9f861588bd969b6e3e717f13bb94e7b"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ad9f861588bd969b6e3e717f13bb94e7b">DescribeTo</a> (::std::ostream *os) const =0</td></tr>
+<tr class="memitem:ad9f861588bd969b6e3e717f13bb94e7b" id="r_ad9f861588bd969b6e3e717f13bb94e7b"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ad9f861588bd969b6e3e717f13bb94e7b">DescribeTo</a> (::std::ostream *<a class="el" href="environment_8hpp.html#a3951483d0b31c29ca95336206cd35238">os</a>) const =0</td></tr>
 <tr class="separator:ad9f861588bd969b6e3e717f13bb94e7b"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a2071afbc47097c4d1c0064275af34db0" id="r_a2071afbc47097c4d1c0064275af34db0"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a2071afbc47097c4d1c0064275af34db0">DescribeNegationTo</a> (::std::ostream *os) const</td></tr>
+<tr class="memitem:a2071afbc47097c4d1c0064275af34db0" id="r_a2071afbc47097c4d1c0064275af34db0"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a2071afbc47097c4d1c0064275af34db0">DescribeNegationTo</a> (::std::ostream *<a class="el" href="environment_8hpp.html#a3951483d0b31c29ca95336206cd35238">os</a>) const</td></tr>
 <tr class="separator:a2071afbc47097c4d1c0064275af34db0"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
@@ -278,11 +278,12 @@ Public Member Functions</h2></td></tr>
 
 <p class="definition">Definition at line <a class="el" href="gmock-matchers_8h_source.html#l00133">133</a> of file <a class="el" href="gmock-matchers_8h_source.html">gmock-matchers.h</a>.</p>
 <div class="fragment"><div class="line"><span class="lineno">  133</span>                                                        {</div>
-<div class="line"><span class="lineno">  134</span>    *os &lt;&lt; <span class="stringliteral">&quot;not (&quot;</span>;</div>
-<div class="line"><span class="lineno">  135</span>    <a class="code hl_function" href="#ad9f861588bd969b6e3e717f13bb94e7b">DescribeTo</a>(os);</div>
-<div class="line"><span class="lineno">  136</span>    *os &lt;&lt; <span class="stringliteral">&quot;)&quot;</span>;</div>
+<div class="line"><span class="lineno">  134</span>    *<a class="code hl_variable" href="environment_8hpp.html#a3951483d0b31c29ca95336206cd35238">os</a> &lt;&lt; <span class="stringliteral">&quot;not (&quot;</span>;</div>
+<div class="line"><span class="lineno">  135</span>    <a class="code hl_function" href="#ad9f861588bd969b6e3e717f13bb94e7b">DescribeTo</a>(<a class="code hl_variable" href="environment_8hpp.html#a3951483d0b31c29ca95336206cd35238">os</a>);</div>
+<div class="line"><span class="lineno">  136</span>    *<a class="code hl_variable" href="environment_8hpp.html#a3951483d0b31c29ca95336206cd35238">os</a> &lt;&lt; <span class="stringliteral">&quot;)&quot;</span>;</div>
 <div class="line"><span class="lineno">  137</span>  }</div>
 <div class="ttc" id="aclasstesting_1_1_matcher_describer_interface_html_ad9f861588bd969b6e3e717f13bb94e7b"><div class="ttname"><a href="#ad9f861588bd969b6e3e717f13bb94e7b">testing::MatcherDescriberInterface::DescribeTo</a></div><div class="ttdeci">virtual void DescribeTo(::std::ostream *os) const =0</div></div>
+<div class="ttc" id="aenvironment_8hpp_html_a3951483d0b31c29ca95336206cd35238"><div class="ttname"><a href="environment_8hpp.html#a3951483d0b31c29ca95336206cd35238">os</a></div><div class="ttdeci">os_t os</div><div class="ttdef"><b>Definition</b> <a href="environment_8hpp_source.html#l00023">environment.hpp:23</a></div></div>
 </div><!-- fragment --><div class="dynheader">
 Here is the call graph for this function:</div>
 <div class="dyncontent">

@@ -2,7 +2,8 @@
 \hypertarget{classfc_1_1detail_1_1rate__limited__tcp__write__operation}{}\label{classfc_1_1detail_1_1rate__limited__tcp__write__operation}\index{fc::detail::rate\_limited\_tcp\_write\_operation@{fc::detail::rate\_limited\_tcp\_write\_operation}}
 
 
-Inheritance diagram for fc\+::detail\+::rate\+\_\+limited\+\_\+tcp\+\_\+write\+\_\+operation\+:\nopagebreak
+Inheritance diagram for fc\+::detail\+::rate\+\_\+limited\+\_\+tcp\+\_\+write\+\_\+operation\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -11,7 +12,8 @@ Inheritance diagram for fc\+::detail\+::rate\+\_\+limited\+\_\+tcp\+\_\+write\+\
 \end{figure}
 
 
-Collaboration diagram for fc\+::detail\+::rate\+\_\+limited\+\_\+tcp\+\_\+write\+\_\+operation\+:\nopagebreak
+Collaboration diagram for fc\+::detail\+::rate\+\_\+limited\+\_\+tcp\+\_\+write\+\_\+operation\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -74,7 +76,7 @@ Definition at line \mbox{\hyperlink{rate__limiting_8cpp_source_l00062}{62}} of f
 \begin{DoxyCode}{0}
 \DoxyCodeLine{00066\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ :}
 \DoxyCodeLine{00067\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1detail_1_1rate__limited__operation_aa04333ce2124f5041df4d4c29edf6c43}{rate\_limited\_operation}}(length,\ \mbox{\hyperlink{classfc_1_1detail_1_1rate__limited__operation_a6ba877d2a0fdcb8b029af48feb07421f}{offset}},\ std::move(\mbox{\hyperlink{classfc_1_1detail_1_1rate__limited__operation_ac8b6e31c5908b626e58252fe8048f8b9}{completion\_promise}})),}
-\DoxyCodeLine{00068\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1detail_1_1rate__limited__tcp__write__operation_a1b36ac1191e9d7317cc51d57dd4c5f6f}{socket}}(socket),}
+\DoxyCodeLine{00068\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1detail_1_1rate__limited__tcp__write__operation_a1b36ac1191e9d7317cc51d57dd4c5f6f}{socket}}(\mbox{\hyperlink{classfc_1_1detail_1_1rate__limited__tcp__write__operation_a1b36ac1191e9d7317cc51d57dd4c5f6f}{socket}}),}
 \DoxyCodeLine{00069\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1detail_1_1rate__limited__tcp__write__operation_ab5343397e7574c37408274dbe835eb07}{raw\_buffer}}(\textcolor{keyword}{nullptr}),}
 \DoxyCodeLine{00070\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1detail_1_1rate__limited__tcp__write__operation_a8eecc0c17095acd1c5062ffcaed266e5}{shared\_buffer}}(buffer)}
 \DoxyCodeLine{00071\ \ \ \ \ \ \ \{\}}
@@ -101,11 +103,11 @@ Definition at line \mbox{\hyperlink{rate__limiting_8cpp_source_l00072}{72}} of f
 \begin{DoxyCode}{0}
 \DoxyCodeLine{00073\ \ \ \ \ \ \ \{}
 \DoxyCodeLine{00074\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{classfc_1_1detail_1_1rate__limited__tcp__write__operation_ab5343397e7574c37408274dbe835eb07}{raw\_buffer}})}
-\DoxyCodeLine{00075\ \ \ \ \ \ \ \ \ \ \ asio::async\_write\_some(socket,}
+\DoxyCodeLine{00075\ \ \ \ \ \ \ \ \ \ \ asio::async\_write\_some(\mbox{\hyperlink{classfc_1_1detail_1_1rate__limited__tcp__write__operation_a1b36ac1191e9d7317cc51d57dd4c5f6f}{socket}},}
 \DoxyCodeLine{00076\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1detail_1_1rate__limited__tcp__write__operation_ab5343397e7574c37408274dbe835eb07}{raw\_buffer}},\ \mbox{\hyperlink{classfc_1_1detail_1_1rate__limited__operation_ae0ebd3357543b80e348bf68b75b796ad}{permitted\_length}},}
 \DoxyCodeLine{00077\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1detail_1_1rate__limited__operation_ac8b6e31c5908b626e58252fe8048f8b9}{completion\_promise}});}
 \DoxyCodeLine{00078\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}}
-\DoxyCodeLine{00079\ \ \ \ \ \ \ \ \ \ \ asio::async\_write\_some(socket,}
+\DoxyCodeLine{00079\ \ \ \ \ \ \ \ \ \ \ asio::async\_write\_some(\mbox{\hyperlink{classfc_1_1detail_1_1rate__limited__tcp__write__operation_a1b36ac1191e9d7317cc51d57dd4c5f6f}{socket}},}
 \DoxyCodeLine{00080\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1detail_1_1rate__limited__tcp__write__operation_a8eecc0c17095acd1c5062ffcaed266e5}{shared\_buffer}},\ \mbox{\hyperlink{classfc_1_1detail_1_1rate__limited__operation_ae0ebd3357543b80e348bf68b75b796ad}{permitted\_length}},\ \mbox{\hyperlink{classfc_1_1detail_1_1rate__limited__operation_a6ba877d2a0fdcb8b029af48feb07421f}{offset}},}
 \DoxyCodeLine{00081\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1detail_1_1rate__limited__operation_ac8b6e31c5908b626e58252fe8048f8b9}{completion\_promise}});}
 \DoxyCodeLine{00082\ \ \ \ \ \ \ \}}

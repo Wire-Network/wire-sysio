@@ -29,9 +29,9 @@
 \DoxyCodeLine{\Hypertarget{test__configuration__utils_8cpp_source_l00025}00025\ }
 \DoxyCodeLine{\Hypertarget{test__configuration__utils_8cpp_source_l00026}\mbox{\hyperlink{structtemp__file__fixture_a21628eec6c32716a967c1f8a50ade61f}{00026}}\ \ \ \ std::string\ \mbox{\hyperlink{structtemp__file__fixture_a21628eec6c32716a967c1f8a50ade61f}{create\_temp\_file}}(\ \textcolor{keyword}{const}\ std::string\&\ contents\ )\ \{}
 \DoxyCodeLine{\Hypertarget{test__configuration__utils_8cpp_source_l00027}00027\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ \mbox{\hyperlink{classfc_1_1path}{path}}\ =\ bfs::temp\_directory\_path()\ /\ bfs::unique\_path();}
-\DoxyCodeLine{\Hypertarget{test__configuration__utils_8cpp_source_l00028}00028\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ os\ =\ bfs::ofstream(\mbox{\hyperlink{classfc_1_1path}{path}},\ std::ios\_base::out);}
-\DoxyCodeLine{\Hypertarget{test__configuration__utils_8cpp_source_l00029}00029\ \ \ \ \ \ \ os\ <<\ contents;}
-\DoxyCodeLine{\Hypertarget{test__configuration__utils_8cpp_source_l00030}00030\ \ \ \ \ \ \ os.close();}
+\DoxyCodeLine{\Hypertarget{test__configuration__utils_8cpp_source_l00028}00028\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}\ =\ bfs::ofstream(\mbox{\hyperlink{classfc_1_1path}{path}},\ std::ios\_base::out);}
+\DoxyCodeLine{\Hypertarget{test__configuration__utils_8cpp_source_l00029}00029\ \ \ \ \ \ \ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}\ <<\ contents;}
+\DoxyCodeLine{\Hypertarget{test__configuration__utils_8cpp_source_l00030}00030\ \ \ \ \ \ \ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}.close();}
 \DoxyCodeLine{\Hypertarget{test__configuration__utils_8cpp_source_l00031}00031\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{structtemp__file__fixture_a8641500328301e32a05bce0f9d737560}{paths}}.emplace\_back(std::move(\mbox{\hyperlink{classfc_1_1path}{path}})).generic\_string();}
 \DoxyCodeLine{\Hypertarget{test__configuration__utils_8cpp_source_l00032}00032\ \ \ \ \}}
 \DoxyCodeLine{\Hypertarget{test__configuration__utils_8cpp_source_l00033}00033\ }

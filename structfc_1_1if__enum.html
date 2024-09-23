@@ -152,12 +152,24 @@ template&lt;typename <a class="el" href="prettywritertest_8cpp.html#a6283df8c4e3
 
 <p class="definition">Definition at line <a class="el" href="fc_2include_2fc_2reflect_2variant_8hpp_source.html#l00071">71</a> of file <a class="el" href="fc_2include_2fc_2reflect_2variant_8hpp_source.html">variant.hpp</a>.</p>
 <div class="fragment"><div class="line"><span class="lineno">   72</span>     { </div>
-<div class="line"><span class="lineno">   73</span>         <span class="keyword">const</span> variant_object&amp; vo = <a class="code hl_variable" href="namespacedevelop_build.html#ade64cd34608f9442ef3049116a2da428">v</a>.get_object();</div>
+<div class="line"><span class="lineno">   73</span>         <span class="keyword">const</span> variant_object&amp; vo = v.<a class="code hl_function" href="classfc_1_1variant.html#a17a7054a10963360c6a14d60f6e30128">get_object</a>();</div>
 <div class="line"><span class="lineno">   74</span>         <a class="code hl_struct" href="structfc_1_1reflector.html">fc::reflector&lt;T&gt;::visit</a>( from_variant_visitor&lt;T&gt;( vo, o ) );</div>
 <div class="line"><span class="lineno">   75</span>     }</div>
-<div class="ttc" id="anamespacedevelop_build_html_ade64cd34608f9442ef3049116a2da428"><div class="ttname"><a href="namespacedevelop_build.html#ade64cd34608f9442ef3049116a2da428">developBuild.v</a></div><div class="ttdeci">v</div><div class="ttdef"><b>Definition</b> <a href="develop_build_8py_source.html#l00006">developBuild.py:6</a></div></div>
+<div class="ttc" id="aclassfc_1_1variant_html_a17a7054a10963360c6a14d60f6e30128"><div class="ttname"><a href="classfc_1_1variant.html#a17a7054a10963360c6a14d60f6e30128">fc::variant::get_object</a></div><div class="ttdeci">variant_object &amp; get_object()</div><div class="ttdef"><b>Definition</b> <a href="variant_8cpp_source.html#l00554">variant.cpp:554</a></div></div>
 <div class="ttc" id="astructfc_1_1reflector_html"><div class="ttname"><a href="structfc_1_1reflector.html">fc::reflector</a></div><div class="ttdoc">defines visit functions for T Unless this is specialized, visit() will not be defined for T.</div><div class="ttdef"><b>Definition</b> <a href="reflect_8hpp_source.html#l00033">reflect.hpp:33</a></div></div>
-</div><!-- fragment -->
+</div><!-- fragment --><div class="dynheader">
+Here is the call graph for this function:</div>
+<div class="dyncontent">
+<div class="center"><img src="structfc_1_1if__enum_a515a22cd66ac2c9020fa6407a130c697_cgraph.png" border="0" usemap="#astructfc_1_1if__enum_a515a22cd66ac2c9020fa6407a130c697_cgraph" alt=""/></div>
+<map name="astructfc_1_1if__enum_a515a22cd66ac2c9020fa6407a130c697_cgraph" id="astructfc_1_1if__enum_a515a22cd66ac2c9020fa6407a130c697_cgraph">
+<area shape="rect" title=" " alt="" coords="5,5,172,31"/>
+<area shape="rect" href="classfc_1_1variant.html#a17a7054a10963360c6a14d60f6e30128" title=" " alt="" coords="220,5,367,31"/>
+<area shape="poly" title=" " alt="" coords="172,16,205,16,205,21,172,21"/>
+<area shape="rect" href="classfc_1_1variant.html#afaae1df286ff97c83301eda21dbd51ea" title=" " alt="" coords="415,5,552,31"/>
+<area shape="poly" title=" " alt="" coords="367,16,400,16,400,21,367,21"/>
+</map>
+</div>
+
 </div>
 </div>
 <a id="a887c2ae7615074bf40b293aeabb748a3" name="a887c2ae7615074bf40b293aeabb748a3"></a>

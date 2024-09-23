@@ -6,7 +6,8 @@
 
 
 
-Inheritance diagram for testing\+::internal\+::Size\+Is\+Matcher\texorpdfstring{$<$}{<} Size\+Matcher \texorpdfstring{$>$}{>}\+::Impl\texorpdfstring{$<$}{<} Container \texorpdfstring{$>$}{>}\+:\nopagebreak
+Inheritance diagram for testing\+::internal\+::Size\+Is\+Matcher\texorpdfstring{$<$}{<} Size\+Matcher \texorpdfstring{$>$}{>}\+::Impl\texorpdfstring{$<$}{<} Container \texorpdfstring{$>$}{>}\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -15,7 +16,8 @@ Inheritance diagram for testing\+::internal\+::Size\+Is\+Matcher\texorpdfstring{
 \end{figure}
 
 
-Collaboration diagram for testing\+::internal\+::Size\+Is\+Matcher\texorpdfstring{$<$}{<} Size\+Matcher \texorpdfstring{$>$}{>}\+::Impl\texorpdfstring{$<$}{<} Container \texorpdfstring{$>$}{>}\+:\nopagebreak
+Collaboration diagram for testing\+::internal\+::Size\+Is\+Matcher\texorpdfstring{$<$}{<} Size\+Matcher \texorpdfstring{$>$}{>}\+::Impl\texorpdfstring{$<$}{<} Container \texorpdfstring{$>$}{>}\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -34,9 +36,9 @@ typedef Container\+View\+::type\+::size\+\_\+type \mbox{\hyperlink{classtesting_
 \item 
 \mbox{\hyperlink{classtesting_1_1internal_1_1_size_is_matcher_1_1_impl_aa5279c8598ec8982546350fb442223f3}{Impl}} (const Size\+Matcher \&size\+\_\+matcher)
 \item 
-virtual void \mbox{\hyperlink{classtesting_1_1internal_1_1_size_is_matcher_1_1_impl_a6b2524886e5fa751e96495a74d75b7cd}{Describe\+To}} (\+::std\+::ostream \texorpdfstring{$\ast$}{*}os) const
+virtual void \mbox{\hyperlink{classtesting_1_1internal_1_1_size_is_matcher_1_1_impl_a6b2524886e5fa751e96495a74d75b7cd}{Describe\+To}} (\+::std\+::ostream \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}) const
 \item 
-virtual void \mbox{\hyperlink{classtesting_1_1internal_1_1_size_is_matcher_1_1_impl_a24b76fc2ac7b8d58cb5c7a3c5d5d35ab}{Describe\+Negation\+To}} (\+::std\+::ostream \texorpdfstring{$\ast$}{*}os) const
+virtual void \mbox{\hyperlink{classtesting_1_1internal_1_1_size_is_matcher_1_1_impl_a24b76fc2ac7b8d58cb5c7a3c5d5d35ab}{Describe\+Negation\+To}} (\+::std\+::ostream \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}) const
 \item 
 virtual bool \mbox{\hyperlink{classtesting_1_1internal_1_1_size_is_matcher_1_1_impl_a5180472f5a18b8c0314ed835c52e09d4}{Match\+And\+Explain}} (Container container, \mbox{\hyperlink{classtesting_1_1_match_result_listener}{Match\+Result\+Listener}} \texorpdfstring{$\ast$}{*}listener) const
 \end{DoxyCompactItemize}
@@ -125,12 +127,13 @@ Definition at line \mbox{\hyperlink{gmock-matchers_8h_source_l02718}{2718}} of f
 
 \begin{DoxyCode}{0}
 \DoxyCodeLine{02718\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
-\DoxyCodeLine{02719\ \ \ \ \ \ \ *os\ <<\ \textcolor{stringliteral}{"{}size\ "{}};}
-\DoxyCodeLine{02720\ \ \ \ \ \ \ size\_matcher\_.\mbox{\hyperlink{classtesting_1_1internal_1_1_matcher_base_ac1089d49b6b8a381900618985cd69b7f}{DescribeNegationTo}}(os);}
+\DoxyCodeLine{02719\ \ \ \ \ \ \ *\mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}\ <<\ \textcolor{stringliteral}{"{}size\ "{}};}
+\DoxyCodeLine{02720\ \ \ \ \ \ \ size\_matcher\_.\mbox{\hyperlink{classtesting_1_1internal_1_1_matcher_base_ac1089d49b6b8a381900618985cd69b7f}{DescribeNegationTo}}(\mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}});}
 \DoxyCodeLine{02721\ \ \ \ \ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -156,12 +159,13 @@ Definition at line \mbox{\hyperlink{gmock-matchers_8h_source_l02714}{2714}} of f
 
 \begin{DoxyCode}{0}
 \DoxyCodeLine{02714\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
-\DoxyCodeLine{02715\ \ \ \ \ \ \ *os\ <<\ \textcolor{stringliteral}{"{}size\ "{}};}
-\DoxyCodeLine{02716\ \ \ \ \ \ \ size\_matcher\_.\mbox{\hyperlink{classtesting_1_1internal_1_1_matcher_base_a7e0c883c7745e0d646463077ef1c1267}{DescribeTo}}(os);}
+\DoxyCodeLine{02715\ \ \ \ \ \ \ *\mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}\ <<\ \textcolor{stringliteral}{"{}size\ "{}};}
+\DoxyCodeLine{02716\ \ \ \ \ \ \ size\_matcher\_.\mbox{\hyperlink{classtesting_1_1internal_1_1_matcher_base_a7e0c883c7745e0d646463077ef1c1267}{DescribeTo}}(\mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}});}
 \DoxyCodeLine{02717\ \ \ \ \ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -197,7 +201,8 @@ Definition at line \mbox{\hyperlink{gmock-matchers_8h_source_l02723}{2723}} of f
 \DoxyCodeLine{02732\ \ \ \ \ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode

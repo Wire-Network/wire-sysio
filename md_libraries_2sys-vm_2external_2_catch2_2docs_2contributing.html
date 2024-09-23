@@ -121,7 +121,7 @@ $(function(){initNavTree('md_libraries_2sys-vm_2external_2_catch2_2docs_2contrib
 <div class="line">$ ctest -j 2 --output-on-failure</div>
 </div><!-- fragment --> If you added new tests, approval tests are very likely to fail. If they do not, it means that your changes weren't run as part of them. This <em>might</em> be intentional, but usually is not.</li>
 </ul>
-<p>The approval tests compare current output of the SelfTest binary in various configurations against known good outputs. The reason it fails is, <em>usually</em>, that you've added new tests but have not yet approved the changes they introduce. This is done with the <code><a class="el" href="approve_8py.html">scripts/approve.py</a></code> script, but before you do so, you need to check that the introduced changes are indeed intentional.</p>
+<p>The approval tests compare current output of the SelfTest binary in various configurations against known good outputs. The reason it fails is, <em>usually</em>, that you've added new tests but have not yet approved the changes they introduce. This is done with the <code>scripts/approve.py</code> script, but before you do so, you need to check that the introduced changes are indeed intentional.</p>
 <h2><a class="el" href="struct_code.html">Code</a> constructs to watch out for</h2>
 <p>This section is a (sadly incomplete) listing of various constructs that are problematic and are not always caught by our CI infrastructure.</p>
 <h3>Naked exceptions and exceptions-related function</h3>

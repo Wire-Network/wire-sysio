@@ -3,7 +3,8 @@
 {\ttfamily \#include $<$sysio/trace\+\_\+api/cmd\+\_\+registration.\+hpp$>$}\newline
 {\ttfamily \#include $<$iostream$>$}\newline
 {\ttfamily \#include $<$boost/program\+\_\+options.\+hpp$>$}\newline
-Include dependency graph for trace\+\_\+api\+\_\+util.\+cpp\+:\nopagebreak
+Include dependency graph for trace\+\_\+api\+\_\+util.\+cpp\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -51,22 +52,22 @@ Definition at line \mbox{\hyperlink{trace__api__util_8cpp_source_l00029}{29}} of
 \DoxyCodeLine{00047\ \ \ \ \textcolor{keyword}{auto}\ parsed\_args\ =\ bpo::command\_line\_parser(argc,\ \mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}}).options(cmdline\_options).positional(pos\_desc).allow\_unregistered().run();}
 \DoxyCodeLine{00048\ \ \ \ bpo::store(parsed\_args,\ vm);}
 \DoxyCodeLine{00049\ }
-\DoxyCodeLine{00050\ \ \ \ std::vector<std::string>\ \mbox{\hyperlink{namespacebenchmark_compile_ad0ed96ae1454e4347ca61ac3887c379e}{args}}\ =\ bpo::collect\_unrecognized(parsed\_args.options,\ bpo::include\_positional);}
+\DoxyCodeLine{00050\ \ \ \ std::vector<std::string>\ args\ =\ bpo::collect\_unrecognized(parsed\_args.options,\ bpo::include\_positional);}
 \DoxyCodeLine{00051\ }
 \DoxyCodeLine{00052\ \ \ \ \textcolor{keyword}{auto}\ show\_help\ =\ [\&](std::ostream\&\ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}})\ \{}
-\DoxyCodeLine{00053\ \ \ \ \ \ \ os\ <<}
+\DoxyCodeLine{00053\ \ \ \ \ \ \ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}\ <<}
 \DoxyCodeLine{00054\ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}Usage:\ trace\_api\_util\ <options>\ command\ ...\(\backslash\)n"{}}}
 \DoxyCodeLine{00055\ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}\(\backslash\)n"{}}}
 \DoxyCodeLine{00056\ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}Commands:\(\backslash\)n"{}};}
 \DoxyCodeLine{00057\ }
 \DoxyCodeLine{00058\ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ e:\ command\_map)\ \{}
-\DoxyCodeLine{00059\ \ \ \ \ \ \ \ \ \ os\ <<\ \textcolor{stringliteral}{"{}\ \ "{}}\ <<\ e.second-\/>name\ <<\ \textcolor{stringliteral}{"{}\ \ \ \ \ \ \ \ \ \ \ \ \ \ "{}}\ <<\ e.second-\/>slug\ <<\ \textcolor{stringliteral}{"{}\(\backslash\)n"{}};}
+\DoxyCodeLine{00059\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}\ <<\ \textcolor{stringliteral}{"{}\ \ "{}}\ <<\ e.second-\/>name\ <<\ \textcolor{stringliteral}{"{}\ \ \ \ \ \ \ \ \ \ \ \ \ \ "{}}\ <<\ e.second-\/>slug\ <<\ \textcolor{stringliteral}{"{}\(\backslash\)n"{}};}
 \DoxyCodeLine{00060\ \ \ \ \ \ \ \}}
 \DoxyCodeLine{00061\ }
-\DoxyCodeLine{00062\ \ \ \ \ \ \ os\ <<\ \textcolor{stringliteral}{"{}\(\backslash\)n"{}}\ <<\ vis\_desc\ <<\ \textcolor{stringliteral}{"{}\(\backslash\)n"{}};}
+\DoxyCodeLine{00062\ \ \ \ \ \ \ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}\ <<\ \textcolor{stringliteral}{"{}\(\backslash\)n"{}}\ <<\ vis\_desc\ <<\ \textcolor{stringliteral}{"{}\(\backslash\)n"{}};}
 \DoxyCodeLine{00063\ \ \ \ \};}
 \DoxyCodeLine{00064\ }
-\DoxyCodeLine{00065\ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{namespacebenchmark_compile_ad0ed96ae1454e4347ca61ac3887c379e}{args}}.size()\ <\ 1)\ \{}
+\DoxyCodeLine{00065\ \ \ \ \textcolor{keywordflow}{if}\ (args.size()\ <\ 1)\ \{}
 \DoxyCodeLine{00066\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (vm.count(\textcolor{stringliteral}{"{}help"{}})\ >\ 0)\ \{}
 \DoxyCodeLine{00067\ \ \ \ \ \ \ \ \ \ show\_help(std::cout);}
 \DoxyCodeLine{00068\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ 0;}
@@ -75,14 +76,14 @@ Definition at line \mbox{\hyperlink{trace__api__util_8cpp_source_l00029}{29}} of
 \DoxyCodeLine{00071\ \ \ \ \ \ \ std::cerr\ <<\ \textcolor{stringliteral}{"{}Error:\ No\ command\ provided\(\backslash\)n\(\backslash\)n"{}};}
 \DoxyCodeLine{00072\ \ \ \ \ \ \ show\_help(std::cerr);}
 \DoxyCodeLine{00073\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ 1;}
-\DoxyCodeLine{00074\ \ \ \ \}\ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}\ (command\_map.count(\mbox{\hyperlink{namespacebenchmark_compile_ad0ed96ae1454e4347ca61ac3887c379e}{args}}.at(0))\ ==\ 0)\ \{}
-\DoxyCodeLine{00075\ \ \ \ \ \ \ std::cerr\ <<\ \textcolor{stringliteral}{"{}Error:\ unknown\ command\ \(\backslash\)"{}"{}}\ <<\ \mbox{\hyperlink{namespacebenchmark_compile_ad0ed96ae1454e4347ca61ac3887c379e}{args}}.at(0)\ <<\ \textcolor{stringliteral}{"{}\(\backslash\)"{}\(\backslash\)n\(\backslash\)n"{}};}
+\DoxyCodeLine{00074\ \ \ \ \}\ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}\ (command\_map.count(args.at(0))\ ==\ 0)\ \{}
+\DoxyCodeLine{00075\ \ \ \ \ \ \ std::cerr\ <<\ \textcolor{stringliteral}{"{}Error:\ unknown\ command\ \(\backslash\)"{}"{}}\ <<\ args.at(0)\ <<\ \textcolor{stringliteral}{"{}\(\backslash\)"{}\(\backslash\)n\(\backslash\)n"{}};}
 \DoxyCodeLine{00076\ \ \ \ \ \ \ show\_help(std::cerr);}
 \DoxyCodeLine{00077\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ 1;}
 \DoxyCodeLine{00078\ \ \ \ \}}
 \DoxyCodeLine{00079\ }
 \DoxyCodeLine{00080\ \ \ \ \textcolor{comment}{//\ trim\ the\ command\ name\ and\ pass\ the\ rest\ of\ the\ args\ to\ the\ defined\ command}}
-\DoxyCodeLine{00081\ \ \ \ \textcolor{keywordflow}{return}\ command\_map.at(\mbox{\hyperlink{namespacebenchmark_compile_ad0ed96ae1454e4347ca61ac3887c379e}{args}}.at(0))-\/>func(vm,\ std::vector<std::string>(\mbox{\hyperlink{namespacebenchmark_compile_ad0ed96ae1454e4347ca61ac3887c379e}{args}}.begin()\ +\ 1,\ \mbox{\hyperlink{namespacebenchmark_compile_ad0ed96ae1454e4347ca61ac3887c379e}{args}}.end()));}
+\DoxyCodeLine{00081\ \ \ \ \textcolor{keywordflow}{return}\ command\_map.at(args.at(0))-\/>func(vm,\ std::vector<std::string>(args.begin()\ +\ 1,\ args.end()));}
 \DoxyCodeLine{00082\ \}}
 
 \end{DoxyCode}

@@ -22,7 +22,7 @@
 \DoxyCodeLine{\Hypertarget{pretty_8cpp_source_l00018}00018\ \ \ \ \ \textcolor{comment}{//\ Prepare\ writer\ and\ output\ stream.}}
 \DoxyCodeLine{\Hypertarget{pretty_8cpp_source_l00019}00019\ \ \ \ \ \textcolor{keywordtype}{char}\ writeBuffer[65536];}
 \DoxyCodeLine{\Hypertarget{pretty_8cpp_source_l00020}00020\ \ \ \ \ \mbox{\hyperlink{class_file_write_stream}{FileWriteStream}}\ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}(stdout,\ writeBuffer,\ \textcolor{keyword}{sizeof}(writeBuffer));}
-\DoxyCodeLine{\Hypertarget{pretty_8cpp_source_l00021}00021\ \ \ \ \ \mbox{\hyperlink{class_pretty_writer}{PrettyWriter<FileWriteStream>}}\ writer(os);}
+\DoxyCodeLine{\Hypertarget{pretty_8cpp_source_l00021}00021\ \ \ \ \ \mbox{\hyperlink{class_pretty_writer}{PrettyWriter<FileWriteStream>}}\ writer(\mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}});}
 \DoxyCodeLine{\Hypertarget{pretty_8cpp_source_l00022}00022\ }
 \DoxyCodeLine{\Hypertarget{pretty_8cpp_source_l00023}00023\ \ \ \ \ \textcolor{comment}{//\ JSON\ reader\ parse\ from\ the\ input\ stream\ and\ let\ writer\ generate\ the\ output.}}
 \DoxyCodeLine{\Hypertarget{pretty_8cpp_source_l00024}00024\ \ \ \ \ \textcolor{keywordflow}{if}\ (!reader.\mbox{\hyperlink{class_generic_reader_a0c450620d14ff1824e58bb7bd9b42099}{Parse}}<\mbox{\hyperlink{reader_8h_ab7be7dabe6ffcba60fad441505583450a9b3baa16346575d2dc072b23a88e1928}{kParseValidateEncodingFlag}}>(is,\ writer))\ \{}

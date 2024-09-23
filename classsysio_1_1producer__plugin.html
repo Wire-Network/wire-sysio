@@ -452,7 +452,7 @@ Here is the caller graph for this function:</div>
 <div class="line"><span class="lineno"> 1411</span>   <span class="comment">// maintain legacy exception if the snapshot exists</span></div>
 <div class="line"><span class="lineno"> 1412</span>   <span class="keywordflow">if</span>( <a class="code hl_function" href="namespacefc.html#a6855142912d4cfb89281ba0c7f4938a2">fc::is_regular_file</a>(snapshot_path) ) {</div>
 <div class="line"><span class="lineno"> 1413</span>      <span class="keyword">auto</span> ex = snapshot_exists_exception( <a class="code hl_define" href="log__message_8hpp.html#a4a4df4bb5cffbe07aadf7d29fd44c75e">FC_LOG_MESSAGE</a>( error, <span class="stringliteral">&quot;snapshot named ${name} already exists&quot;</span>, (<span class="stringliteral">&quot;name&quot;</span>, snapshot_path.generic_string()) ) );</div>
-<div class="line"><span class="lineno"> 1414</span>      <a class="code hl_function" href="namespacecpp_1_1ast.html#a25b104cfd21fb8487a07063b6ce62062">next</a>(ex.dynamic_copy_exception());</div>
+<div class="line"><span class="lineno"> 1414</span>      <a class="code hl_function" href="namespaceutf8.html#afc093dfde66a6f52cb4a5caefe0e580d">next</a>(ex.dynamic_copy_exception());</div>
 <div class="line"><span class="lineno"> 1415</span>      <span class="keywordflow">return</span>;</div>
 <div class="line"><span class="lineno"> 1416</span>   }</div>
 <div class="line"><span class="lineno"> 1417</span> </div>
@@ -492,7 +492,7 @@ Here is the caller graph for this function:</div>
 <div class="line"><span class="lineno"> 1451</span>               (<span class="stringliteral">&quot;ec&quot;</span>, ec.value())</div>
 <div class="line"><span class="lineno"> 1452</span>               (<span class="stringliteral">&quot;message&quot;</span>, ec.message()));</div>
 <div class="line"><span class="lineno"> 1453</span> </div>
-<div class="line"><span class="lineno"> 1454</span>         <a class="code hl_function" href="namespacecpp_1_1ast.html#a25b104cfd21fb8487a07063b6ce62062">next</a>( producer_plugin::snapshot_information{head_id, head_block_num, head_block_time, <a class="code hl_variable" href="structsysio_1_1chain_1_1chain__snapshot__header.html#ad7357c9cee48e084e060efb76dce03e4">chain_snapshot_header::current_version</a>, snapshot_path.generic_string()} );</div>
+<div class="line"><span class="lineno"> 1454</span>         <a class="code hl_function" href="namespaceutf8.html#afc093dfde66a6f52cb4a5caefe0e580d">next</a>( producer_plugin::snapshot_information{head_id, head_block_num, head_block_time, <a class="code hl_variable" href="structsysio_1_1chain_1_1chain__snapshot__header.html#ad7357c9cee48e084e060efb76dce03e4">chain_snapshot_header::current_version</a>, snapshot_path.generic_string()} );</div>
 <div class="line"><span class="lineno"> 1455</span>      } <a class="code hl_define" href="chain_2include_2sysio_2chain_2exceptions_8hpp.html#ab200d016fe1306acaed181b722a3cac6">CATCH_AND_CALL</a> (next);</div>
 <div class="line"><span class="lineno"> 1456</span>      <span class="keywordflow">return</span>;</div>
 <div class="line"><span class="lineno"> 1457</span>   }</div>
@@ -505,9 +505,9 @@ Here is the caller graph for this function:</div>
 <div class="line"><span class="lineno"> 1464</span>   <span class="keywordflow">if</span>( existing != pending_by_id.end() ) {</div>
 <div class="line"><span class="lineno"> 1465</span>      <span class="comment">// if a snapshot at this block is already pending, attach this requests handler to it</span></div>
 <div class="line"><span class="lineno"> 1466</span>      pending_by_id.modify(existing, [&amp;next]( <span class="keyword">auto</span>&amp; entry ){</div>
-<div class="line"><span class="lineno"> 1467</span>         entry.next = [prev = entry.next, <a class="code hl_function" href="namespacecpp_1_1ast.html#a25b104cfd21fb8487a07063b6ce62062">next</a>](<span class="keyword">const</span> std::variant&lt;fc::exception_ptr, producer_plugin::snapshot_information&gt;&amp; res){</div>
+<div class="line"><span class="lineno"> 1467</span>         entry.next = [prev = entry.next, <a class="code hl_function" href="namespaceutf8.html#afc093dfde66a6f52cb4a5caefe0e580d">next</a>](<span class="keyword">const</span> std::variant&lt;fc::exception_ptr, producer_plugin::snapshot_information&gt;&amp; res){</div>
 <div class="line"><span class="lineno"> 1468</span>            prev(res);</div>
-<div class="line"><span class="lineno"> 1469</span>            <a class="code hl_function" href="namespacecpp_1_1ast.html#a25b104cfd21fb8487a07063b6ce62062">next</a>(res);</div>
+<div class="line"><span class="lineno"> 1469</span>            <a class="code hl_function" href="namespaceutf8.html#afc093dfde66a6f52cb4a5caefe0e580d">next</a>(res);</div>
 <div class="line"><span class="lineno"> 1470</span>         };</div>
 <div class="line"><span class="lineno"> 1471</span>      });</div>
 <div class="line"><span class="lineno"> 1472</span>   } <span class="keywordflow">else</span> {</div>
@@ -534,50 +534,56 @@ Here is the caller graph for this function:</div>
 <div class="ttc" id="aclasssysio_1_1pending__snapshot_html_a5c1d883bec4e7ed86c903ad81d4301cd"><div class="ttname"><a href="classsysio_1_1pending__snapshot.html#a5c1d883bec4e7ed86c903ad81d4301cd">sysio::pending_snapshot::get_temp_path</a></div><div class="ttdeci">static bfs::path get_temp_path(const block_id_type &amp;block_id, const bfs::path &amp;snapshots_dir)</div><div class="ttdef"><b>Definition</b> <a href="producer__plugin_8cpp_source.html#l00145">producer_plugin.cpp:145</a></div></div>
 <div class="ttc" id="aclasssysio_1_1pending__snapshot_html_a79fc9801d0442d3b7f58833f23d6c9f9"><div class="ttname"><a href="classsysio_1_1pending__snapshot.html#a79fc9801d0442d3b7f58833f23d6c9f9">sysio::pending_snapshot::get_final_path</a></div><div class="ttdeci">static bfs::path get_final_path(const block_id_type &amp;block_id, const bfs::path &amp;snapshots_dir)</div><div class="ttdef"><b>Definition</b> <a href="producer__plugin_8cpp_source.html#l00137">producer_plugin.cpp:137</a></div></div>
 <div class="ttc" id="alog__message_8hpp_html_a4a4df4bb5cffbe07aadf7d29fd44c75e"><div class="ttname"><a href="log__message_8hpp.html#a4a4df4bb5cffbe07aadf7d29fd44c75e">FC_LOG_MESSAGE</a></div><div class="ttdeci">#define FC_LOG_MESSAGE(LOG_LEVEL, FORMAT,...)</div><div class="ttdoc">A helper method for generating log messages.</div><div class="ttdef"><b>Definition</b> <a href="log__message_8hpp_source.html#l00165">log_message.hpp:165</a></div></div>
-<div class="ttc" id="anamespacecpp_1_1ast_html_a25b104cfd21fb8487a07063b6ce62062"><div class="ttname"><a href="namespacecpp_1_1ast.html#a25b104cfd21fb8487a07063b6ce62062">cpp.ast.next</a></div><div class="ttdeci">next(obj)</div><div class="ttdef"><b>Definition</b> <a href="ast_8py_source.html#l00058">ast.py:58</a></div></div>
 <div class="ttc" id="anamespacefc_html_a23d89b54a8ffd84f7e7efeb21747d846"><div class="ttname"><a href="namespacefc.html#a23d89b54a8ffd84f7e7efeb21747d846">fc::make_scoped_exit</a></div><div class="ttdeci">scoped_exit&lt; Callback &gt; make_scoped_exit(Callback &amp;&amp;c)</div><div class="ttdef"><b>Definition</b> <a href="scoped__exit_8hpp_source.html#l00035">scoped_exit.hpp:35</a></div></div>
 <div class="ttc" id="anamespacefc_html_a6855142912d4cfb89281ba0c7f4938a2"><div class="ttname"><a href="namespacefc.html#a6855142912d4cfb89281ba0c7f4938a2">fc::is_regular_file</a></div><div class="ttdeci">bool is_regular_file(const path &amp;p)</div><div class="ttdef"><b>Definition</b> <a href="filesystem_8cpp_source.html#l00226">filesystem.cpp:226</a></div></div>
+<div class="ttc" id="anamespaceutf8_html_afc093dfde66a6f52cb4a5caefe0e580d"><div class="ttname"><a href="namespaceutf8.html#afc093dfde66a6f52cb4a5caefe0e580d">utf8::next</a></div><div class="ttdeci">uint32_t next(octet_iterator &amp;it, octet_iterator end)</div><div class="ttdef"><b>Definition</b> <a href="checked_8h_source.html#l00137">checked.h:137</a></div></div>
 <div class="ttc" id="astructsysio_1_1chain_1_1chain__snapshot__header_html_ad7357c9cee48e084e060efb76dce03e4"><div class="ttname"><a href="structsysio_1_1chain_1_1chain__snapshot__header.html#ad7357c9cee48e084e060efb76dce03e4">sysio::chain::chain_snapshot_header::current_version</a></div><div class="ttdeci">static constexpr uint32_t current_version</div><div class="ttdef"><b>Definition</b> <a href="chain__snapshot_8hpp_source.html#l00029">chain_snapshot.hpp:29</a></div></div>
 </div><!-- fragment --><div class="dynheader">
 Here is the call graph for this function:</div>
 <div class="dyncontent">
 <div class="center"><img src="classsysio_1_1producer__plugin_a62c42eef3c18cf6d357411865399fe50_cgraph.png" border="0" usemap="#aclasssysio_1_1producer__plugin_a62c42eef3c18cf6d357411865399fe50_cgraph" alt=""/></div>
 <map name="aclasssysio_1_1producer__plugin_a62c42eef3c18cf6d357411865399fe50_cgraph" id="aclasssysio_1_1producer__plugin_a62c42eef3c18cf6d357411865399fe50_cgraph">
-<area shape="rect" title=" " alt="" coords="5,524,157,565"/>
-<area shape="rect" href="classsysio_1_1pending__snapshot.html#a79fc9801d0442d3b7f58833f23d6c9f9" title=" " alt="" coords="205,393,370,434"/>
-<area shape="poly" title=" " alt="" coords="103,522,147,484,203,445,214,439,217,443,206,449,151,488,106,526"/>
-<area shape="rect" href="classsysio_1_1pending__snapshot.html#a44c77e2240938dc9116890df2818bf4b" title=" " alt="" coords="205,197,370,238"/>
-<area shape="poly" title=" " alt="" coords="83,523,94,469,116,396,151,319,175,282,203,249,207,246,210,250,207,253,179,285,156,321,121,398,99,471,88,524"/>
-<area shape="rect" href="classsysio_1_1chain_1_1controller.html#a28d33629f3badcb8155c08be3e05b99e" title=" " alt="" coords="211,328,364,369"/>
-<area shape="poly" title=" " alt="" coords="91,522,134,453,166,414,203,380,210,374,213,379,206,384,170,418,138,456,95,525"/>
-<area shape="rect" href="classsysio_1_1pending__snapshot.html#a5c1d883bec4e7ed86c903ad81d4301cd" title=" " alt="" coords="205,263,370,303"/>
-<area shape="poly" title=" " alt="" coords="86,522,100,480,124,424,158,366,179,339,203,314,208,310,212,314,206,318,183,342,163,369,129,427,105,482,91,524"/>
-<area shape="rect" href="classsysio_1_1chain_1_1controller.html#a37d0a44faef74cf0f96127982c1ce124" title=" " alt="" coords="211,459,364,499"/>
-<area shape="poly" title=" " alt="" coords="147,521,205,502,207,507,148,526"/>
-<area shape="rect" href="classsysio_1_1chain_1_1controller.html#a33704b4936bb9bbd2ea6b0874ca521b4" title=" " alt="" coords="211,524,364,565"/>
-<area shape="poly" title=" " alt="" coords="157,542,196,542,196,547,157,547"/>
-<area shape="rect" href="classsysio_1_1chain_1_1controller.html#aea3612e7cb52dfcaa2e6afdc1b3e2f51" title=" " alt="" coords="211,589,364,630"/>
-<area shape="poly" title=" " alt="" coords="148,563,207,581,205,587,147,568"/>
-<area shape="rect" href="classsysio_1_1chain_1_1controller.html#a286751cd6498b500b70a0d3678672263" title=" " alt="" coords="211,655,364,695"/>
-<area shape="poly" title=" " alt="" coords="106,563,151,601,206,639,217,645,214,650,203,644,147,605,103,567"/>
-<area shape="rect" href="namespacefc.html#a6855142912d4cfb89281ba0c7f4938a2" title=" " alt="" coords="227,720,348,745"/>
-<area shape="poly" title=" " alt="" coords="95,564,137,633,169,672,206,705,215,710,212,715,203,709,165,675,133,636,90,567"/>
-<area shape="rect" href="namespacefc.html#a23d89b54a8ffd84f7e7efeb21747d846" title=" " alt="" coords="213,769,362,794"/>
-<area shape="poly" title=" " alt="" coords="91,564,105,605,129,656,163,710,183,734,206,756,211,759,208,763,203,760,179,738,158,713,124,659,100,607,86,566"/>
-<area shape="rect" href="classsysio_1_1chain_1_1controller.html#a407d1c6dfd6e7b3e1d4e1567d15e344c" title=" " alt="" coords="211,819,364,859"/>
-<area shape="poly" title=" " alt="" coords="89,565,102,613,124,677,159,745,181,777,207,805,209,808,206,812,203,809,177,780,154,748,119,679,97,615,84,566"/>
-<area shape="rect" href="namespacefc.html#acd5129981ae93fce3154d3fed6f6acbc" title=" " alt="" coords="418,270,534,296"/>
-<area shape="poly" title=" " alt="" coords="346,391,369,378,415,342,452,305,456,309,418,346,371,383,348,395"/>
-<area shape="rect" href="namespacefc.html#a578c57f57002a845da7e91ee8bf4287a" title=" " alt="" coords="605,184,725,209"/>
-<area shape="poly" title=" " alt="" coords="505,267,620,214,623,218,507,272"/>
-<area shape="rect" href="classfc_1_1time__point.html#aeccf1b70aa34b132c5269313b8a50573" title=" " alt="" coords="582,270,748,296"/>
-<area shape="poly" title=" " alt="" coords="535,280,567,280,567,286,535,286"/>
-<area shape="rect" href="classfc_1_1json.html#aa6541960d7f05567559b866cfaf88dfa" title=" " alt="" coords="604,332,726,357"/>
-<area shape="poly" title=" " alt="" coords="519,294,609,324,608,329,518,299"/>
+<area shape="rect" title=" " alt="" coords="5,572,157,613"/>
+<area shape="rect" href="classsysio_1_1pending__snapshot.html#a79fc9801d0442d3b7f58833f23d6c9f9" title=" " alt="" coords="205,441,370,482"/>
+<area shape="poly" title=" " alt="" coords="103,570,147,532,203,493,214,487,217,491,206,497,151,536,106,574"/>
+<area shape="rect" href="classsysio_1_1pending__snapshot.html#a44c77e2240938dc9116890df2818bf4b" title=" " alt="" coords="205,245,370,286"/>
+<area shape="poly" title=" " alt="" coords="83,571,94,517,116,444,151,367,175,330,203,297,207,294,210,298,207,301,179,333,156,369,121,446,99,519,88,572"/>
+<area shape="rect" href="classsysio_1_1chain_1_1controller.html#a28d33629f3badcb8155c08be3e05b99e" title=" " alt="" coords="211,376,364,417"/>
+<area shape="poly" title=" " alt="" coords="91,570,134,501,166,462,203,428,210,422,213,427,206,432,170,466,138,504,95,573"/>
+<area shape="rect" href="classsysio_1_1pending__snapshot.html#a5c1d883bec4e7ed86c903ad81d4301cd" title=" " alt="" coords="205,311,370,351"/>
+<area shape="poly" title=" " alt="" coords="86,570,100,528,124,472,158,414,179,387,203,362,208,358,212,362,206,366,183,390,163,417,129,475,105,530,91,572"/>
+<area shape="rect" href="classsysio_1_1chain_1_1controller.html#a37d0a44faef74cf0f96127982c1ce124" title=" " alt="" coords="211,507,364,547"/>
+<area shape="poly" title=" " alt="" coords="147,569,205,550,207,555,148,574"/>
+<area shape="rect" href="classsysio_1_1chain_1_1controller.html#a33704b4936bb9bbd2ea6b0874ca521b4" title=" " alt="" coords="211,572,364,613"/>
+<area shape="poly" title=" " alt="" coords="157,590,196,590,196,595,157,595"/>
+<area shape="rect" href="classsysio_1_1chain_1_1controller.html#aea3612e7cb52dfcaa2e6afdc1b3e2f51" title=" " alt="" coords="211,637,364,678"/>
+<area shape="poly" title=" " alt="" coords="148,611,207,629,205,635,147,616"/>
+<area shape="rect" href="classsysio_1_1chain_1_1controller.html#a286751cd6498b500b70a0d3678672263" title=" " alt="" coords="211,703,364,743"/>
+<area shape="poly" title=" " alt="" coords="106,611,151,649,206,687,217,693,214,698,203,692,147,653,103,615"/>
+<area shape="rect" href="namespacefc.html#a6855142912d4cfb89281ba0c7f4938a2" title=" " alt="" coords="227,768,348,793"/>
+<area shape="poly" title=" " alt="" coords="95,612,137,681,169,720,206,753,215,758,212,763,203,757,165,723,133,684,90,615"/>
+<area shape="rect" href="namespacefc.html#a23d89b54a8ffd84f7e7efeb21747d846" title=" " alt="" coords="213,817,362,842"/>
+<area shape="poly" title=" " alt="" coords="91,612,105,653,129,704,163,758,183,782,206,804,211,807,208,811,203,808,179,786,158,761,124,707,100,655,86,614"/>
+<area shape="rect" href="classsysio_1_1chain_1_1controller.html#a407d1c6dfd6e7b3e1d4e1567d15e344c" title=" " alt="" coords="211,867,364,907"/>
+<area shape="poly" title=" " alt="" coords="89,613,102,661,124,725,159,793,181,825,207,853,209,856,206,860,203,857,177,828,154,796,119,727,97,663,84,614"/>
+<area shape="rect" href="namespacefc.html#acd5129981ae93fce3154d3fed6f6acbc" title=" " alt="" coords="418,318,534,344"/>
+<area shape="poly" title=" " alt="" coords="346,439,369,426,415,390,452,353,456,357,418,394,371,431,348,443"/>
+<area shape="rect" href="namespacefc.html#a578c57f57002a845da7e91ee8bf4287a" title=" " alt="" coords="605,158,725,184"/>
+<area shape="poly" title=" " alt="" coords="482,316,518,257,547,222,581,193,589,188,592,192,584,197,551,226,523,260,486,319"/>
+<area shape="rect" href="classfc_1_1variant__object.html#a804706455398e249f6272b3ff19cef5d" title=" " alt="" coords="590,208,740,233"/>
+<area shape="poly" title=" " alt="" coords="489,316,528,280,581,243,595,237,598,241,584,248,531,284,492,320"/>
+<area shape="rect" href="classfc_1_1variant__object.html#acfef67913fd3c24ea8017b3a5ad49144" title=" " alt="" coords="604,281,726,322"/>
+<area shape="poly" title=" " alt="" coords="534,319,589,311,590,316,535,325"/>
+<area shape="rect" href="classfc_1_1time__point.html#aeccf1b70aa34b132c5269313b8a50573" title=" " alt="" coords="582,346,748,372"/>
+<area shape="poly" title=" " alt="" coords="535,337,567,342,567,347,534,342"/>
+<area shape="rect" href="classfc_1_1variant__object.html#a0e523ff3ad212b0582ad2ac8a07773ae" title=" " alt="" coords="604,396,726,437"/>
+<area shape="poly" title=" " alt="" coords="503,342,583,382,595,387,593,392,581,387,501,347"/>
+<area shape="rect" href="classfc_1_1json.html#aa6541960d7f05567559b866cfaf88dfa" title=" " alt="" coords="604,461,726,486"/>
+<area shape="poly" title=" " alt="" coords="488,343,526,393,553,422,584,446,594,452,592,457,581,451,549,426,522,397,484,346"/>
 <area shape="rect" href="namespacefc.html#aee7bbe89bfe8d6273f5212938cc1d458" title=" " alt="" coords="828,184,950,209"/>
-<area shape="poly" title=" " alt="" coords="726,194,812,194,812,199,726,199"/>
+<area shape="poly" title=" " alt="" coords="726,175,813,185,812,190,725,180"/>
 <area shape="rect" href="xbyak__mnemonic_8h.html#ad8856ea517c970ed0584a251c3fdc94f" title=" " alt="" coords="868,134,910,160"/>
-<area shape="poly" title=" " alt="" coords="725,181,852,152,853,157,726,186"/>
+<area shape="poly" title=" " alt="" coords="725,162,852,148,853,153,726,167"/>
 <area shape="rect" href="namespacefc.html#a47ce6fdd4f18f7f06601e820866d54ec" title=" " alt="" coords="1078,184,1192,209"/>
 <area shape="poly" title=" " alt="" coords="950,194,1063,194,1063,199,950,199"/>
 <area shape="rect" href="namespacefc.html#afdef7bae8756a2c4ba14524f5913d485" title=" " alt="" coords="1062,233,1208,258"/>
@@ -611,17 +617,18 @@ Here is the call graph for this function:</div>
 <area shape="poly" title=" " alt="" coords="1810,415,1872,415,1872,420,1810,420"/>
 <area shape="poly" title=" " alt="" coords="1811,109,1889,135,1887,141,1809,114"/>
 <area shape="poly" title=" " alt="" coords="1208,235,1273,227,1273,232,1208,240"/>
-<area shape="rect" href="classfc_1_1microseconds.html#afc3eb0bfd792c7b1cda062e559e30c2e" title=" " alt="" coords="796,298,982,324"/>
-<area shape="poly" title=" " alt="" coords="748,291,780,295,780,300,748,296"/>
-<area shape="rect" href="classfc_1_1time__point.html#ab46781dcaab4880902bc136f36e39e5e" title=" " alt="" coords="822,233,956,274"/>
-<area shape="poly" title=" " alt="" coords="748,270,806,262,807,267,748,275"/>
-<area shape="rect" href="classfc_1_1microseconds.html#a0c79856cd3ab96153901a64961bf216f" title=" " alt="" coords="1030,298,1240,324"/>
-<area shape="poly" title=" " alt="" coords="983,308,1015,308,1015,314,983,314"/>
-<area shape="rect" href="namespacefc.html#af9bea69c5790941ddc601fcd96cce071" title=" " alt="" coords="840,372,938,397"/>
-<area shape="poly" title=" " alt="" coords="727,353,825,370,824,375,726,358"/>
-<area shape="poly" title=" " alt="" coords="852,373,844,363,849,353,864,347,889,345,916,348,930,354,928,359,915,353,889,350,865,352,852,357,850,362,856,369"/>
-<area shape="poly" title=" " alt="" coords="349,236,423,262,421,267,347,241"/>
-<area shape="poly" title=" " alt="" coords="370,280,403,280,403,286,370,286"/>
+<area shape="poly" title=" " alt="" coords="629,281,627,271,633,262,646,257,665,255,686,257,698,263,695,268,684,262,665,260,647,262,636,267,632,272,634,280"/>
+<area shape="rect" href="classfc_1_1microseconds.html#afc3eb0bfd792c7b1cda062e559e30c2e" title=" " alt="" coords="796,366,982,392"/>
+<area shape="poly" title=" " alt="" coords="748,364,780,367,780,372,748,369"/>
+<area shape="rect" href="classfc_1_1time__point.html#ab46781dcaab4880902bc136f36e39e5e" title=" " alt="" coords="822,301,956,342"/>
+<area shape="poly" title=" " alt="" coords="746,343,806,333,807,338,747,348"/>
+<area shape="rect" href="classfc_1_1microseconds.html#a0c79856cd3ab96153901a64961bf216f" title=" " alt="" coords="1030,366,1240,392"/>
+<area shape="poly" title=" " alt="" coords="983,376,1015,376,1015,382,983,382"/>
+<area shape="rect" href="namespacefc.html#af9bea69c5790941ddc601fcd96cce071" title=" " alt="" coords="840,461,938,486"/>
+<area shape="poly" title=" " alt="" coords="727,471,824,471,824,476,727,476"/>
+<area shape="poly" title=" " alt="" coords="852,462,844,452,849,442,864,436,889,434,916,437,930,444,928,448,915,442,889,439,865,442,852,446,850,452,856,459"/>
+<area shape="poly" title=" " alt="" coords="349,284,423,310,421,315,347,289"/>
+<area shape="poly" title=" " alt="" coords="370,328,403,328,403,334,370,334"/>
 </map>
 </div>
 
@@ -647,7 +654,7 @@ Here is the call graph for this function:</div>
 <div class="line"><span class="lineno"> 1554</span>   get_account_ram_corrections_result result;</div>
 <div class="line"><span class="lineno"> 1555</span>   <span class="keyword">const</span> <span class="keyword">auto</span>&amp; db = my-&gt;chain_plug-&gt;chain().db();</div>
 <div class="line"><span class="lineno"> 1556</span> </div>
-<div class="line"><span class="lineno"> 1557</span>   <span class="keyword">const</span> <span class="keyword">auto</span>&amp; <a class="code hl_variable" href="namespacehost__functions__tests__1.html#a8496a24b5236a2dc07bb4f2930d88342">idx</a> = db.get_index&lt;<a class="code hl_typedef" href="namespacesysio_1_1chain.html#a4c900d23edfaeb9e6e25aa3a21e0ab4b">chain::account_ram_correction_index</a>, chain::by_name&gt;();</div>
+<div class="line"><span class="lineno"> 1557</span>   <span class="keyword">const</span> <span class="keyword">auto</span>&amp; idx = db.get_index&lt;<a class="code hl_typedef" href="namespacesysio_1_1chain.html#a4c900d23edfaeb9e6e25aa3a21e0ab4b">chain::account_ram_correction_index</a>, chain::by_name&gt;();</div>
 <div class="line"><span class="lineno"> 1558</span>   <a class="code hl_typedef" href="namespacesysio_1_1chain.html#ac32ce8e75243f2b3f76aff0c1984f11b">account_name</a> lower_bound_value{ std::numeric_limits&lt;uint64_t&gt;::lowest() };</div>
 <div class="line"><span class="lineno"> 1559</span>   <a class="code hl_typedef" href="namespacesysio_1_1chain.html#ac32ce8e75243f2b3f76aff0c1984f11b">account_name</a> upper_bound_value{ std::numeric_limits&lt;uint64_t&gt;::max() };</div>
 <div class="line"><span class="lineno"> 1560</span> </div>
@@ -675,8 +682,8 @@ Here is the call graph for this function:</div>
 <div class="line"><span class="lineno"> 1582</span>      }</div>
 <div class="line"><span class="lineno"> 1583</span>   };</div>
 <div class="line"><span class="lineno"> 1584</span> </div>
-<div class="line"><span class="lineno"> 1585</span>   <span class="keyword">auto</span> lower = <a class="code hl_variable" href="namespacehost__functions__tests__1.html#a8496a24b5236a2dc07bb4f2930d88342">idx</a>.lower_bound( lower_bound_value );</div>
-<div class="line"><span class="lineno"> 1586</span>   <span class="keyword">auto</span> upper = <a class="code hl_variable" href="namespacehost__functions__tests__1.html#a8496a24b5236a2dc07bb4f2930d88342">idx</a>.upper_bound( upper_bound_value );</div>
+<div class="line"><span class="lineno"> 1585</span>   <span class="keyword">auto</span> lower = idx.lower_bound( lower_bound_value );</div>
+<div class="line"><span class="lineno"> 1586</span>   <span class="keyword">auto</span> upper = idx.upper_bound( upper_bound_value );</div>
 <div class="line"><span class="lineno"> 1587</span>   <span class="keywordflow">if</span>( <a class="code hl_typedef" href="test__account__query__db_8cpp.html#aedc91aab307c8fb7ad822c3e16a6dd73">params</a>.reverse ) {</div>
 <div class="line"><span class="lineno"> 1588</span>      walk_range( boost::make_reverse_iterator(upper), boost::make_reverse_iterator(lower) );</div>
 <div class="line"><span class="lineno"> 1589</span>   } <span class="keywordflow">else</span> {</div>
@@ -687,7 +694,6 @@ Here is the call graph for this function:</div>
 <div class="line"><span class="lineno"> 1594</span>}</div>
 <div class="ttc" id="aclassfc_1_1variant_html"><div class="ttname"><a href="classfc_1_1variant.html">fc::variant</a></div><div class="ttdoc">stores null, int64, uint64, double, bool, string, std::vector&lt;variant&gt;, and variant_object's.</div><div class="ttdef"><b>Definition</b> <a href="fc_2include_2fc_2variant_8hpp_source.html#l00190">variant.hpp:191</a></div></div>
 <div class="ttc" id="agmock__stress__test_8cc_html_afd9db40e3361ae09188795e8cbe19752"><div class="ttname"><a href="gmock__stress__test_8cc.html#afd9db40e3361ae09188795e8cbe19752">count</a></div><div class="ttdeci">int * count</div><div class="ttdef"><b>Definition</b> <a href="gmock__stress__test_8cc_source.html#l00177">gmock_stress_test.cc:177</a></div></div>
-<div class="ttc" id="anamespacehost__functions__tests__1_html_a8496a24b5236a2dc07bb4f2930d88342"><div class="ttname"><a href="namespacehost__functions__tests__1.html#a8496a24b5236a2dc07bb4f2930d88342">host_functions_tests_1.idx</a></div><div class="ttdeci">int idx</div><div class="ttdef"><b>Definition</b> <a href="host__functions__tests__1_8py_source.html#l00021">host_functions_tests_1.py:21</a></div></div>
 <div class="ttc" id="anamespacesysio_1_1chain_html_a4c900d23edfaeb9e6e25aa3a21e0ab4b"><div class="ttname"><a href="namespacesysio_1_1chain.html#a4c900d23edfaeb9e6e25aa3a21e0ab4b">sysio::chain::account_ram_correction_index</a></div><div class="ttdeci">chainbase::shared_multi_index_container&lt; account_ram_correction_object, indexed_by&lt; ordered_unique&lt; tag&lt; by_id &gt;, member&lt; account_ram_correction_object, account_ram_correction_object::id_type, &amp;account_ram_correction_object::id &gt; &gt;, ordered_unique&lt; tag&lt; by_name &gt;, member&lt; account_ram_correction_object, account_name, &amp;account_ram_correction_object::name &gt; &gt; &gt; &gt; account_ram_correction_index</div><div class="ttdef"><b>Definition</b> <a href="account__object_8hpp_source.html#l00093">account_object.hpp:93</a></div></div>
 <div class="ttc" id="anamespacesysio_1_1chain_html_ac32ce8e75243f2b3f76aff0c1984f11b"><div class="ttname"><a href="namespacesysio_1_1chain.html#ac32ce8e75243f2b3f76aff0c1984f11b">sysio::chain::account_name</a></div><div class="ttdeci">name account_name</div><div class="ttdef"><b>Definition</b> <a href="chain_2include_2sysio_2chain_2types_8hpp_source.html#l00120">types.hpp:120</a></div></div>
 </div><!-- fragment -->
@@ -1224,14 +1230,14 @@ Here is the caller graph for this function:</div>
 <div class="fragment"><div class="line"><span class="lineno">  980</span>{ <span class="keywordflow">try</span> {</div>
 <div class="line"><span class="lineno">  981</span>   my-&gt;chain_plug = <a class="code hl_function" href="namespaceappbase.html#a99374dc23934f008a09f2f79be9eae40">app</a>().<a class="code hl_function" href="classappbase_1_1application.html#a1d2c585f90007be342c9c64ee9cc0f7c">find_plugin</a>&lt;<a class="code hl_class" href="classchain__plugin.html">chain_plugin</a>&gt;();</div>
 <div class="line"><span class="lineno">  982</span>   <a class="code hl_define" href="chain_2include_2sysio_2chain_2exceptions_8hpp.html#a40c2826a6fba35c1ffbf912bdf559792">SYS_ASSERT</a>( my-&gt;chain_plug, plugin_config_exception, <span class="stringliteral">&quot;chain_plugin not found&quot;</span> );</div>
-<div class="line"><span class="lineno">  983</span>   my-&gt;_options = &amp;<a class="code hl_variable" href="namespacebenchmark_compile.html#acf738bbf3b8391aa78929ceeceb8a03b">options</a>;</div>
+<div class="line"><span class="lineno">  983</span>   my-&gt;_options = &amp;options;</div>
 <div class="line"><span class="lineno">  984</span>   <a class="code hl_define" href="chain__plugin_8cpp.html#ac96900c0c3efb424647faf59995487d6">LOAD_VALUE_SET</a>(options, <span class="stringliteral">&quot;producer-name&quot;</span>, my-&gt;_producers)</div>
 <div class="line"><span class="lineno">  985</span> </div>
 <div class="line"><span class="lineno">  986</span>   chain::controller&amp; chain = my-&gt;chain_plug-&gt;chain();</div>
 <div class="line"><span class="lineno">  987</span> </div>
 <div class="line"><span class="lineno">  988</span>   <a class="code hl_function" href="yubihsm__pkcs11_8c.html#a75d8898b07aafc20a48a415a1c6e7bf0">if</a>( options.<a class="code hl_variable" href="gmock__stress__test_8cc.html#afd9db40e3361ae09188795e8cbe19752">count</a>(&quot;private-key&quot;) )</div>
 <div class="line"><span class="lineno">  989</span>   {</div>
-<div class="line"><span class="lineno">  990</span>      <span class="keyword">const</span> std::vector&lt;std::string&gt; key_id_to_wif_pair_strings = <a class="code hl_variable" href="namespacebenchmark_compile.html#acf738bbf3b8391aa78929ceeceb8a03b">options</a>[<span class="stringliteral">&quot;private-key&quot;</span>].as&lt;std::vector&lt;std::string&gt;&gt;();</div>
+<div class="line"><span class="lineno">  990</span>      <span class="keyword">const</span> std::vector&lt;std::string&gt; key_id_to_wif_pair_strings = options[<span class="stringliteral">&quot;private-key&quot;</span>].as&lt;std::vector&lt;std::string&gt;&gt;();</div>
 <div class="line"><span class="lineno">  991</span>      <span class="keywordflow">for</span> (<span class="keyword">const</span> std::string&amp; key_id_to_wif_pair_string : key_id_to_wif_pair_strings)</div>
 <div class="line"><span class="lineno">  992</span>      {</div>
 <div class="line"><span class="lineno">  993</span>         <span class="keywordflow">try</span> {</div>
@@ -1245,8 +1251,8 @@ Here is the caller graph for this function:</div>
 <div class="line"><span class="lineno"> 1001</span>      }</div>
 <div class="line"><span class="lineno"> 1002</span>   }</div>
 <div class="line"><span class="lineno"> 1003</span> </div>
-<div class="line"><span class="lineno"> 1004</span>   <span class="keywordflow">if</span>( <a class="code hl_variable" href="namespacebenchmark_compile.html#acf738bbf3b8391aa78929ceeceb8a03b">options</a>.count(<span class="stringliteral">&quot;signature-provider&quot;</span>) ) {</div>
-<div class="line"><span class="lineno"> 1005</span>      <span class="keyword">const</span> std::vector&lt;std::string&gt; key_spec_pairs = <a class="code hl_variable" href="namespacebenchmark_compile.html#acf738bbf3b8391aa78929ceeceb8a03b">options</a>[<span class="stringliteral">&quot;signature-provider&quot;</span>].as&lt;std::vector&lt;std::string&gt;&gt;();</div>
+<div class="line"><span class="lineno"> 1004</span>   <span class="keywordflow">if</span>( options.count(<span class="stringliteral">&quot;signature-provider&quot;</span>) ) {</div>
+<div class="line"><span class="lineno"> 1005</span>      <span class="keyword">const</span> std::vector&lt;std::string&gt; key_spec_pairs = options[<span class="stringliteral">&quot;signature-provider&quot;</span>].as&lt;std::vector&lt;std::string&gt;&gt;();</div>
 <div class="line"><span class="lineno"> 1006</span>      <span class="keywordflow">for</span> (<span class="keyword">const</span> <span class="keyword">auto</span>&amp; key_spec_pair : key_spec_pairs) {</div>
 <div class="line"><span class="lineno"> 1007</span>         <span class="keywordflow">try</span> {</div>
 <div class="line"><span class="lineno"> 1008</span>            <span class="keyword">auto</span> delim = key_spec_pair.find(<span class="stringliteral">&quot;=&quot;</span>);</div>
@@ -1273,26 +1279,26 @@ Here is the caller graph for this function:</div>
 <div class="line"><span class="lineno"> 1029</span>      }</div>
 <div class="line"><span class="lineno"> 1030</span>   }</div>
 <div class="line"><span class="lineno"> 1031</span> </div>
-<div class="line"><span class="lineno"> 1032</span>   my-&gt;_kiod_provider_timeout_us = <a class="code hl_function" href="namespacefc.html#a76ae235ec7e9b8862e70740058d7eb1b">fc::milliseconds</a>(<a class="code hl_variable" href="namespacebenchmark_compile.html#acf738bbf3b8391aa78929ceeceb8a03b">options</a>.at(<span class="stringliteral">&quot;kiod-provider-timeout&quot;</span>).as&lt;<a class="code hl_typedef" href="stdint_8h.html#ab1967d8591af1a4e48c37fd2b0f184d0">int32_t</a>&gt;());</div>
+<div class="line"><span class="lineno"> 1032</span>   my-&gt;_kiod_provider_timeout_us = <a class="code hl_function" href="namespacefc.html#a76ae235ec7e9b8862e70740058d7eb1b">fc::milliseconds</a>(options.at(<span class="stringliteral">&quot;kiod-provider-timeout&quot;</span>).as&lt;<a class="code hl_typedef" href="stdint_8h.html#ab1967d8591af1a4e48c37fd2b0f184d0">int32_t</a>&gt;());</div>
 <div class="line"><span class="lineno"> 1033</span> </div>
-<div class="line"><span class="lineno"> 1034</span>   my-&gt;_account_fails.set_max_failures_per_account( <a class="code hl_variable" href="namespacebenchmark_compile.html#acf738bbf3b8391aa78929ceeceb8a03b">options</a>.at(<span class="stringliteral">&quot;subjective-account-max-failures&quot;</span>).as&lt;<a class="code hl_typedef" href="stdint_8h.html#a435d1572bf3f880d55459d9805097f62">uint32_t</a>&gt;() );</div>
+<div class="line"><span class="lineno"> 1034</span>   my-&gt;_account_fails.set_max_failures_per_account( options.at(<span class="stringliteral">&quot;subjective-account-max-failures&quot;</span>).as&lt;<a class="code hl_typedef" href="stdint_8h.html#a435d1572bf3f880d55459d9805097f62">uint32_t</a>&gt;() );</div>
 <div class="line"><span class="lineno"> 1035</span> </div>
-<div class="line"><span class="lineno"> 1036</span>   my-&gt;_produce_time_offset_us = <a class="code hl_variable" href="namespacebenchmark_compile.html#acf738bbf3b8391aa78929ceeceb8a03b">options</a>.at(<span class="stringliteral">&quot;produce-time-offset-us&quot;</span>).as&lt;<a class="code hl_typedef" href="stdint_8h.html#ab1967d8591af1a4e48c37fd2b0f184d0">int32_t</a>&gt;();</div>
+<div class="line"><span class="lineno"> 1036</span>   my-&gt;_produce_time_offset_us = options.at(<span class="stringliteral">&quot;produce-time-offset-us&quot;</span>).as&lt;<a class="code hl_typedef" href="stdint_8h.html#ab1967d8591af1a4e48c37fd2b0f184d0">int32_t</a>&gt;();</div>
 <div class="line"><span class="lineno"> 1037</span>   <a class="code hl_define" href="chain_2include_2sysio_2chain_2exceptions_8hpp.html#a40c2826a6fba35c1ffbf912bdf559792">SYS_ASSERT</a>( my-&gt;_produce_time_offset_us &lt;= 0 &amp;&amp; my-&gt;_produce_time_offset_us &gt;= -config::block_interval_us, plugin_config_exception,</div>
 <div class="line"><span class="lineno"> 1038</span>               <span class="stringliteral">&quot;produce-time-offset-us ${o} must be 0 .. -${bi}&quot;</span>, (<span class="stringliteral">&quot;bi&quot;</span>, config::block_interval_us)(<span class="stringliteral">&quot;o&quot;</span>, my-&gt;_produce_time_offset_us) );</div>
 <div class="line"><span class="lineno"> 1039</span> </div>
-<div class="line"><span class="lineno"> 1040</span>   my-&gt;_last_block_time_offset_us = <a class="code hl_variable" href="namespacebenchmark_compile.html#acf738bbf3b8391aa78929ceeceb8a03b">options</a>.at(<span class="stringliteral">&quot;last-block-time-offset-us&quot;</span>).as&lt;<a class="code hl_typedef" href="stdint_8h.html#ab1967d8591af1a4e48c37fd2b0f184d0">int32_t</a>&gt;();</div>
+<div class="line"><span class="lineno"> 1040</span>   my-&gt;_last_block_time_offset_us = options.at(<span class="stringliteral">&quot;last-block-time-offset-us&quot;</span>).as&lt;<a class="code hl_typedef" href="stdint_8h.html#ab1967d8591af1a4e48c37fd2b0f184d0">int32_t</a>&gt;();</div>
 <div class="line"><span class="lineno"> 1041</span>   <a class="code hl_define" href="chain_2include_2sysio_2chain_2exceptions_8hpp.html#a40c2826a6fba35c1ffbf912bdf559792">SYS_ASSERT</a>( my-&gt;_last_block_time_offset_us &lt;= 0 &amp;&amp; my-&gt;_last_block_time_offset_us &gt;= -config::block_interval_us, plugin_config_exception,</div>
 <div class="line"><span class="lineno"> 1042</span>               <span class="stringliteral">&quot;last-block-time-offset-us ${o} must be 0 .. -${bi}&quot;</span>, (<span class="stringliteral">&quot;bi&quot;</span>, config::block_interval_us)(<span class="stringliteral">&quot;o&quot;</span>, my-&gt;_last_block_time_offset_us) );</div>
 <div class="line"><span class="lineno"> 1043</span> </div>
-<div class="line"><span class="lineno"> 1044</span>   <a class="code hl_typedef" href="stdint_8h.html#a435d1572bf3f880d55459d9805097f62">uint32_t</a> cpu_effort_pct = <a class="code hl_variable" href="namespacebenchmark_compile.html#acf738bbf3b8391aa78929ceeceb8a03b">options</a>.at(<span class="stringliteral">&quot;cpu-effort-percent&quot;</span>).as&lt;<a class="code hl_typedef" href="stdint_8h.html#a435d1572bf3f880d55459d9805097f62">uint32_t</a>&gt;();</div>
+<div class="line"><span class="lineno"> 1044</span>   <a class="code hl_typedef" href="stdint_8h.html#a435d1572bf3f880d55459d9805097f62">uint32_t</a> cpu_effort_pct = options.at(<span class="stringliteral">&quot;cpu-effort-percent&quot;</span>).as&lt;<a class="code hl_typedef" href="stdint_8h.html#a435d1572bf3f880d55459d9805097f62">uint32_t</a>&gt;();</div>
 <div class="line"><span class="lineno"> 1045</span>   <a class="code hl_define" href="chain_2include_2sysio_2chain_2exceptions_8hpp.html#a40c2826a6fba35c1ffbf912bdf559792">SYS_ASSERT</a>( cpu_effort_pct &gt;= 0 &amp;&amp; cpu_effort_pct &lt;= 100, plugin_config_exception,</div>
 <div class="line"><span class="lineno"> 1046</span>               <span class="stringliteral">&quot;cpu-effort-percent ${pct} must be 0 - 100&quot;</span>, (<span class="stringliteral">&quot;pct&quot;</span>, cpu_effort_pct) );</div>
 <div class="line"><span class="lineno"> 1047</span>      cpu_effort_pct *= config::percent_1;</div>
 <div class="line"><span class="lineno"> 1048</span>   <a class="code hl_typedef" href="stdint_8h.html#ab1967d8591af1a4e48c37fd2b0f184d0">int32_t</a> cpu_effort_offset_us =</div>
 <div class="line"><span class="lineno"> 1049</span>         -<a class="code hl_function" href="chain_2include_2sysio_2chain_2config_8hpp.html#a0b4bacb63f31764f50a185f320551fbc">SYS_PERCENT</a>( config::block_interval_us, chain::config::percent_100 - cpu_effort_pct );</div>
 <div class="line"><span class="lineno"> 1050</span> </div>
-<div class="line"><span class="lineno"> 1051</span>   <a class="code hl_typedef" href="stdint_8h.html#a435d1572bf3f880d55459d9805097f62">uint32_t</a> last_block_cpu_effort_pct = <a class="code hl_variable" href="namespacebenchmark_compile.html#acf738bbf3b8391aa78929ceeceb8a03b">options</a>.at(<span class="stringliteral">&quot;last-block-cpu-effort-percent&quot;</span>).as&lt;<a class="code hl_typedef" href="stdint_8h.html#a435d1572bf3f880d55459d9805097f62">uint32_t</a>&gt;();</div>
+<div class="line"><span class="lineno"> 1051</span>   <a class="code hl_typedef" href="stdint_8h.html#a435d1572bf3f880d55459d9805097f62">uint32_t</a> last_block_cpu_effort_pct = options.at(<span class="stringliteral">&quot;last-block-cpu-effort-percent&quot;</span>).as&lt;<a class="code hl_typedef" href="stdint_8h.html#a435d1572bf3f880d55459d9805097f62">uint32_t</a>&gt;();</div>
 <div class="line"><span class="lineno"> 1052</span>   <a class="code hl_define" href="chain_2include_2sysio_2chain_2exceptions_8hpp.html#a40c2826a6fba35c1ffbf912bdf559792">SYS_ASSERT</a>( last_block_cpu_effort_pct &gt;= 0 &amp;&amp; last_block_cpu_effort_pct &lt;= 100, plugin_config_exception,</div>
 <div class="line"><span class="lineno"> 1053</span>               <span class="stringliteral">&quot;last-block-cpu-effort-percent ${pct} must be 0 - 100&quot;</span>, (<span class="stringliteral">&quot;pct&quot;</span>, last_block_cpu_effort_pct) );</div>
 <div class="line"><span class="lineno"> 1054</span>      last_block_cpu_effort_pct *= config::percent_1;</div>
@@ -1302,40 +1308,40 @@ Here is the caller graph for this function:</div>
 <div class="line"><span class="lineno"> 1058</span>   my-&gt;_produce_time_offset_us = std::min( my-&gt;_produce_time_offset_us, cpu_effort_offset_us );</div>
 <div class="line"><span class="lineno"> 1059</span>   my-&gt;_last_block_time_offset_us = std::min( my-&gt;_last_block_time_offset_us, last_block_cpu_effort_offset_us );</div>
 <div class="line"><span class="lineno"> 1060</span> </div>
-<div class="line"><span class="lineno"> 1061</span>   my-&gt;_max_block_cpu_usage_threshold_us = <a class="code hl_variable" href="namespacebenchmark_compile.html#acf738bbf3b8391aa78929ceeceb8a03b">options</a>.at( <span class="stringliteral">&quot;max-block-cpu-usage-threshold-us&quot;</span> ).as&lt;<a class="code hl_typedef" href="stdint_8h.html#a435d1572bf3f880d55459d9805097f62">uint32_t</a>&gt;();</div>
+<div class="line"><span class="lineno"> 1061</span>   my-&gt;_max_block_cpu_usage_threshold_us = options.at( <span class="stringliteral">&quot;max-block-cpu-usage-threshold-us&quot;</span> ).as&lt;<a class="code hl_typedef" href="stdint_8h.html#a435d1572bf3f880d55459d9805097f62">uint32_t</a>&gt;();</div>
 <div class="line"><span class="lineno"> 1062</span>   <a class="code hl_define" href="chain_2include_2sysio_2chain_2exceptions_8hpp.html#a40c2826a6fba35c1ffbf912bdf559792">SYS_ASSERT</a>( my-&gt;_max_block_cpu_usage_threshold_us &lt; config::block_interval_us, plugin_config_exception,</div>
 <div class="line"><span class="lineno"> 1063</span>               <span class="stringliteral">&quot;max-block-cpu-usage-threshold-us ${t} must be 0 .. ${bi}&quot;</span>, (<span class="stringliteral">&quot;bi&quot;</span>, config::block_interval_us)(<span class="stringliteral">&quot;t&quot;</span>, my-&gt;_max_block_cpu_usage_threshold_us) );</div>
 <div class="line"><span class="lineno"> 1064</span> </div>
-<div class="line"><span class="lineno"> 1065</span>   my-&gt;_max_block_net_usage_threshold_bytes = <a class="code hl_variable" href="namespacebenchmark_compile.html#acf738bbf3b8391aa78929ceeceb8a03b">options</a>.at( <span class="stringliteral">&quot;max-block-net-usage-threshold-bytes&quot;</span> ).as&lt;<a class="code hl_typedef" href="stdint_8h.html#a435d1572bf3f880d55459d9805097f62">uint32_t</a>&gt;();</div>
+<div class="line"><span class="lineno"> 1065</span>   my-&gt;_max_block_net_usage_threshold_bytes = options.at( <span class="stringliteral">&quot;max-block-net-usage-threshold-bytes&quot;</span> ).as&lt;<a class="code hl_typedef" href="stdint_8h.html#a435d1572bf3f880d55459d9805097f62">uint32_t</a>&gt;();</div>
 <div class="line"><span class="lineno"> 1066</span> </div>
-<div class="line"><span class="lineno"> 1067</span>   my-&gt;_max_scheduled_transaction_time_per_block_ms = <a class="code hl_variable" href="namespacebenchmark_compile.html#acf738bbf3b8391aa78929ceeceb8a03b">options</a>.at(<span class="stringliteral">&quot;max-scheduled-transaction-time-per-block-ms&quot;</span>).as&lt;<a class="code hl_typedef" href="stdint_8h.html#ab1967d8591af1a4e48c37fd2b0f184d0">int32_t</a>&gt;();</div>
+<div class="line"><span class="lineno"> 1067</span>   my-&gt;_max_scheduled_transaction_time_per_block_ms = options.at(<span class="stringliteral">&quot;max-scheduled-transaction-time-per-block-ms&quot;</span>).as&lt;<a class="code hl_typedef" href="stdint_8h.html#ab1967d8591af1a4e48c37fd2b0f184d0">int32_t</a>&gt;();</div>
 <div class="line"><span class="lineno"> 1068</span> </div>
-<div class="line"><span class="lineno"> 1069</span>   <span class="keywordflow">if</span>( <a class="code hl_variable" href="namespacebenchmark_compile.html#acf738bbf3b8391aa78929ceeceb8a03b">options</a>.at( <span class="stringliteral">&quot;subjective-cpu-leeway-us&quot;</span> ).as&lt;<a class="code hl_typedef" href="stdint_8h.html#ab1967d8591af1a4e48c37fd2b0f184d0">int32_t</a>&gt;() != config::default_subjective_cpu_leeway_us ) {</div>
-<div class="line"><span class="lineno"> 1070</span>      chain.set_subjective_cpu_leeway( <a class="code hl_class" href="classfc_1_1microseconds.html">fc::microseconds</a>( <a class="code hl_variable" href="namespacebenchmark_compile.html#acf738bbf3b8391aa78929ceeceb8a03b">options</a>.at( <span class="stringliteral">&quot;subjective-cpu-leeway-us&quot;</span> ).as&lt;<a class="code hl_typedef" href="stdint_8h.html#ab1967d8591af1a4e48c37fd2b0f184d0">int32_t</a>&gt;() ) );</div>
+<div class="line"><span class="lineno"> 1069</span>   <span class="keywordflow">if</span>( options.at( <span class="stringliteral">&quot;subjective-cpu-leeway-us&quot;</span> ).as&lt;<a class="code hl_typedef" href="stdint_8h.html#ab1967d8591af1a4e48c37fd2b0f184d0">int32_t</a>&gt;() != config::default_subjective_cpu_leeway_us ) {</div>
+<div class="line"><span class="lineno"> 1070</span>      chain.set_subjective_cpu_leeway( <a class="code hl_class" href="classfc_1_1microseconds.html">fc::microseconds</a>( options.at( <span class="stringliteral">&quot;subjective-cpu-leeway-us&quot;</span> ).as&lt;<a class="code hl_typedef" href="stdint_8h.html#ab1967d8591af1a4e48c37fd2b0f184d0">int32_t</a>&gt;() ) );</div>
 <div class="line"><span class="lineno"> 1071</span>   }</div>
 <div class="line"><span class="lineno"> 1072</span> </div>
-<div class="line"><span class="lineno"> 1073</span>   <a class="code hl_class" href="classfc_1_1microseconds.html">fc::microseconds</a> subjective_account_decay_time = <a class="code hl_function" href="namespacefc.html#a9c3f2826ca2b6652fcef4da96f33503a">fc::minutes</a>(<a class="code hl_variable" href="namespacebenchmark_compile.html#acf738bbf3b8391aa78929ceeceb8a03b">options</a>.at( <span class="stringliteral">&quot;subjective-account-decay-time-minutes&quot;</span> ).as&lt;<a class="code hl_typedef" href="stdint_8h.html#a435d1572bf3f880d55459d9805097f62">uint32_t</a>&gt;());</div>
+<div class="line"><span class="lineno"> 1073</span>   <a class="code hl_class" href="classfc_1_1microseconds.html">fc::microseconds</a> subjective_account_decay_time = <a class="code hl_function" href="namespacefc.html#a9c3f2826ca2b6652fcef4da96f33503a">fc::minutes</a>(options.at( <span class="stringliteral">&quot;subjective-account-decay-time-minutes&quot;</span> ).as&lt;<a class="code hl_typedef" href="stdint_8h.html#a435d1572bf3f880d55459d9805097f62">uint32_t</a>&gt;());</div>
 <div class="line"><span class="lineno"> 1074</span>   <a class="code hl_define" href="chain_2include_2sysio_2chain_2exceptions_8hpp.html#a40c2826a6fba35c1ffbf912bdf559792">SYS_ASSERT</a>( subjective_account_decay_time.<a class="code hl_function" href="classfc_1_1microseconds.html#a20fba59ec7e1f50c6b8f2c9443cc9b92">count</a>() &gt; 0, plugin_config_exception,</div>
 <div class="line"><span class="lineno"> 1075</span>               <span class="stringliteral">&quot;subjective-account-decay-time-minutes ${dt} must be greater than 0&quot;</span>, (<span class="stringliteral">&quot;dt&quot;</span>, subjective_account_decay_time.<a class="code hl_function" href="classfc_1_1microseconds.html#a12ee4fe7bac52aeb600d8ea39291e765">to_seconds</a>() / 60));</div>
 <div class="line"><span class="lineno"> 1076</span>   my-&gt;_subjective_billing.set_expired_accumulator_average_window( subjective_account_decay_time );</div>
 <div class="line"><span class="lineno"> 1077</span> </div>
-<div class="line"><span class="lineno"> 1078</span>   my-&gt;_max_transaction_time_ms = <a class="code hl_variable" href="namespacebenchmark_compile.html#acf738bbf3b8391aa78929ceeceb8a03b">options</a>.at(<span class="stringliteral">&quot;max-transaction-time&quot;</span>).as&lt;<a class="code hl_typedef" href="stdint_8h.html#ab1967d8591af1a4e48c37fd2b0f184d0">int32_t</a>&gt;();</div>
+<div class="line"><span class="lineno"> 1078</span>   my-&gt;_max_transaction_time_ms = options.at(<span class="stringliteral">&quot;max-transaction-time&quot;</span>).as&lt;<a class="code hl_typedef" href="stdint_8h.html#ab1967d8591af1a4e48c37fd2b0f184d0">int32_t</a>&gt;();</div>
 <div class="line"><span class="lineno"> 1079</span> </div>
-<div class="line"><span class="lineno"> 1080</span>   my-&gt;_max_irreversible_block_age_us = <a class="code hl_function" href="namespacefc.html#a9623b8cae3f48bbed6aa1fc2afe9b174">fc::seconds</a>(<a class="code hl_variable" href="namespacebenchmark_compile.html#acf738bbf3b8391aa78929ceeceb8a03b">options</a>.at(<span class="stringliteral">&quot;max-irreversible-block-age&quot;</span>).as&lt;<a class="code hl_typedef" href="stdint_8h.html#ab1967d8591af1a4e48c37fd2b0f184d0">int32_t</a>&gt;());</div>
+<div class="line"><span class="lineno"> 1080</span>   my-&gt;_max_irreversible_block_age_us = <a class="code hl_function" href="namespacefc.html#a9623b8cae3f48bbed6aa1fc2afe9b174">fc::seconds</a>(options.at(<span class="stringliteral">&quot;max-irreversible-block-age&quot;</span>).as&lt;<a class="code hl_typedef" href="stdint_8h.html#ab1967d8591af1a4e48c37fd2b0f184d0">int32_t</a>&gt;());</div>
 <div class="line"><span class="lineno"> 1081</span> </div>
-<div class="line"><span class="lineno"> 1082</span>   <span class="keyword">auto</span> max_incoming_transaction_queue_size = <a class="code hl_variable" href="namespacebenchmark_compile.html#acf738bbf3b8391aa78929ceeceb8a03b">options</a>.at(<span class="stringliteral">&quot;incoming-transaction-queue-size-mb&quot;</span>).as&lt;<a class="code hl_typedef" href="stdint_8h.html#a273cf69d639a59973b6019625df33e30">uint16_t</a>&gt;() * 1024*1024;</div>
+<div class="line"><span class="lineno"> 1082</span>   <span class="keyword">auto</span> max_incoming_transaction_queue_size = options.at(<span class="stringliteral">&quot;incoming-transaction-queue-size-mb&quot;</span>).as&lt;<a class="code hl_typedef" href="stdint_8h.html#a273cf69d639a59973b6019625df33e30">uint16_t</a>&gt;() * 1024*1024;</div>
 <div class="line"><span class="lineno"> 1083</span> </div>
 <div class="line"><span class="lineno"> 1084</span>   <a class="code hl_define" href="chain_2include_2sysio_2chain_2exceptions_8hpp.html#a40c2826a6fba35c1ffbf912bdf559792">SYS_ASSERT</a>( max_incoming_transaction_queue_size &gt; 0, plugin_config_exception,</div>
 <div class="line"><span class="lineno"> 1085</span>               <span class="stringliteral">&quot;incoming-transaction-queue-size-mb ${mb} must be greater than 0&quot;</span>, (<span class="stringliteral">&quot;mb&quot;</span>, max_incoming_transaction_queue_size) );</div>
 <div class="line"><span class="lineno"> 1086</span> </div>
 <div class="line"><span class="lineno"> 1087</span>   my-&gt;_unapplied_transactions.set_max_transaction_queue_size( max_incoming_transaction_queue_size );</div>
 <div class="line"><span class="lineno"> 1088</span> </div>
-<div class="line"><span class="lineno"> 1089</span>   my-&gt;_incoming_defer_ratio = <a class="code hl_variable" href="namespacebenchmark_compile.html#acf738bbf3b8391aa78929ceeceb8a03b">options</a>.at(<span class="stringliteral">&quot;incoming-defer-ratio&quot;</span>).as&lt;<span class="keywordtype">double</span>&gt;();</div>
+<div class="line"><span class="lineno"> 1089</span>   my-&gt;_incoming_defer_ratio = options.at(<span class="stringliteral">&quot;incoming-defer-ratio&quot;</span>).as&lt;<span class="keywordtype">double</span>&gt;();</div>
 <div class="line"><span class="lineno"> 1090</span> </div>
-<div class="line"><span class="lineno"> 1091</span>   my-&gt;_disable_persist_until_expired = <a class="code hl_variable" href="namespacebenchmark_compile.html#acf738bbf3b8391aa78929ceeceb8a03b">options</a>.at(<span class="stringliteral">&quot;disable-api-persisted-trx&quot;</span>).as&lt;<span class="keywordtype">bool</span>&gt;();</div>
-<div class="line"><span class="lineno"> 1092</span>   <span class="keywordtype">bool</span> disable_subjective_billing = <a class="code hl_variable" href="namespacebenchmark_compile.html#acf738bbf3b8391aa78929ceeceb8a03b">options</a>.at(<span class="stringliteral">&quot;disable-subjective-billing&quot;</span>).as&lt;<span class="keywordtype">bool</span>&gt;();</div>
-<div class="line"><span class="lineno"> 1093</span>   my-&gt;_disable_subjective_p2p_billing = <a class="code hl_variable" href="namespacebenchmark_compile.html#acf738bbf3b8391aa78929ceeceb8a03b">options</a>.at(<span class="stringliteral">&quot;disable-subjective-p2p-billing&quot;</span>).as&lt;<span class="keywordtype">bool</span>&gt;();</div>
-<div class="line"><span class="lineno"> 1094</span>   my-&gt;_disable_subjective_api_billing = <a class="code hl_variable" href="namespacebenchmark_compile.html#acf738bbf3b8391aa78929ceeceb8a03b">options</a>.at(<span class="stringliteral">&quot;disable-subjective-api-billing&quot;</span>).as&lt;<span class="keywordtype">bool</span>&gt;();</div>
+<div class="line"><span class="lineno"> 1091</span>   my-&gt;_disable_persist_until_expired = options.at(<span class="stringliteral">&quot;disable-api-persisted-trx&quot;</span>).as&lt;<span class="keywordtype">bool</span>&gt;();</div>
+<div class="line"><span class="lineno"> 1092</span>   <span class="keywordtype">bool</span> disable_subjective_billing = options.at(<span class="stringliteral">&quot;disable-subjective-billing&quot;</span>).as&lt;<span class="keywordtype">bool</span>&gt;();</div>
+<div class="line"><span class="lineno"> 1093</span>   my-&gt;_disable_subjective_p2p_billing = options.at(<span class="stringliteral">&quot;disable-subjective-p2p-billing&quot;</span>).as&lt;<span class="keywordtype">bool</span>&gt;();</div>
+<div class="line"><span class="lineno"> 1094</span>   my-&gt;_disable_subjective_api_billing = options.at(<span class="stringliteral">&quot;disable-subjective-api-billing&quot;</span>).as&lt;<span class="keywordtype">bool</span>&gt;();</div>
 <div class="line"><span class="lineno"> 1095</span>   <a class="code hl_define" href="logger_8hpp.html#a3da1571bad6ca6c94df9a3660b2115ee">dlog</a>( <span class="stringliteral">&quot;disable-subjective-billing: ${s}, disable-subjective-p2p-billing: ${p2p}, disable-subjective-api-billing: ${api}&quot;</span>,</div>
 <div class="line"><span class="lineno"> 1096</span>         (<span class="stringliteral">&quot;s&quot;</span>, disable_subjective_billing)(<span class="stringliteral">&quot;p2p&quot;</span>, my-&gt;_disable_subjective_p2p_billing)(<span class="stringliteral">&quot;api&quot;</span>, my-&gt;_disable_subjective_api_billing) );</div>
 <div class="line"><span class="lineno"> 1097</span>   <span class="keywordflow">if</span>( !disable_subjective_billing ) {</div>
@@ -1353,13 +1359,13 @@ Here is the caller graph for this function:</div>
 <div class="line"><span class="lineno"> 1109</span>       <span class="keywordflow">if</span>( my-&gt;_disable_subjective_api_billing ) <a class="code hl_define" href="logger_8hpp.html#a831cf08dc63704c11fd154132c6e8bdb">ilog</a>( <span class="stringliteral">&quot;Subjective CPU billing of API trxs disabled &quot;</span> );</div>
 <div class="line"><span class="lineno"> 1110</span>   }</div>
 <div class="line"><span class="lineno"> 1111</span> </div>
-<div class="line"><span class="lineno"> 1112</span>   <span class="keyword">auto</span> thread_pool_size = <a class="code hl_variable" href="namespacebenchmark_compile.html#acf738bbf3b8391aa78929ceeceb8a03b">options</a>.at( <span class="stringliteral">&quot;producer-threads&quot;</span> ).as&lt;<a class="code hl_typedef" href="stdint_8h.html#a273cf69d639a59973b6019625df33e30">uint16_t</a>&gt;();</div>
+<div class="line"><span class="lineno"> 1112</span>   <span class="keyword">auto</span> thread_pool_size = options.at( <span class="stringliteral">&quot;producer-threads&quot;</span> ).as&lt;<a class="code hl_typedef" href="stdint_8h.html#a273cf69d639a59973b6019625df33e30">uint16_t</a>&gt;();</div>
 <div class="line"><span class="lineno"> 1113</span>   <a class="code hl_define" href="chain_2include_2sysio_2chain_2exceptions_8hpp.html#a40c2826a6fba35c1ffbf912bdf559792">SYS_ASSERT</a>( thread_pool_size &gt; 0, plugin_config_exception,</div>
 <div class="line"><span class="lineno"> 1114</span>               <span class="stringliteral">&quot;producer-threads ${num} must be greater than 0&quot;</span>, (<span class="stringliteral">&quot;num&quot;</span>, thread_pool_size));</div>
 <div class="line"><span class="lineno"> 1115</span>   my-&gt;_thread_pool.emplace( <span class="stringliteral">&quot;prod&quot;</span>, thread_pool_size );</div>
 <div class="line"><span class="lineno"> 1116</span> </div>
-<div class="line"><span class="lineno"> 1117</span>   <span class="keywordflow">if</span>( <a class="code hl_variable" href="namespacebenchmark_compile.html#acf738bbf3b8391aa78929ceeceb8a03b">options</a>.count( <span class="stringliteral">&quot;snapshots-dir&quot;</span> )) {</div>
-<div class="line"><span class="lineno"> 1118</span>      <span class="keyword">auto</span> sd = <a class="code hl_variable" href="namespacebenchmark_compile.html#acf738bbf3b8391aa78929ceeceb8a03b">options</a>.at( <span class="stringliteral">&quot;snapshots-dir&quot;</span> ).as&lt;bfs::path&gt;();</div>
+<div class="line"><span class="lineno"> 1117</span>   <span class="keywordflow">if</span>( options.count( <span class="stringliteral">&quot;snapshots-dir&quot;</span> )) {</div>
+<div class="line"><span class="lineno"> 1118</span>      <span class="keyword">auto</span> sd = options.at( <span class="stringliteral">&quot;snapshots-dir&quot;</span> ).as&lt;bfs::path&gt;();</div>
 <div class="line"><span class="lineno"> 1119</span>      <span class="keywordflow">if</span>( sd.is_relative()) {</div>
 <div class="line"><span class="lineno"> 1120</span>         my-&gt;_snapshots_dir = <a class="code hl_function" href="namespaceappbase.html#a99374dc23934f008a09f2f79be9eae40">app</a>().<a class="code hl_function" href="classappbase_1_1application.html#a5dfd3cfb1124c57963fa17b3f4aabbe1">data_dir</a>() / sd;</div>
 <div class="line"><span class="lineno"> 1121</span>         <span class="keywordflow">if</span> (!<a class="code hl_function" href="namespacefc.html#a3fcf0d920aea28014aacae50a51d8485">fc::exists</a>(my-&gt;_snapshots_dir)) {</div>
@@ -1387,8 +1393,8 @@ Here is the caller graph for this function:</div>
 <div class="line"><span class="lineno"> 1143</span>      <span class="keywordflow">return</span> my-&gt;on_incoming_transaction_async(trx, persist_until_expired, <a class="code hl_enumvalue" href="namespacefc.html#a3d8a2be677709cc41f09aa7925f2d55fad6bcd1364809e1b881bb22334d14cd56">read_only</a>, return_failure_traces, next );</div>
 <div class="line"><span class="lineno"> 1144</span>   });</div>
 <div class="line"><span class="lineno"> 1145</span> </div>
-<div class="line"><span class="lineno"> 1146</span>   <span class="keywordflow">if</span> (<a class="code hl_variable" href="namespacebenchmark_compile.html#acf738bbf3b8391aa78929ceeceb8a03b">options</a>.count(<span class="stringliteral">&quot;greylist-account&quot;</span>)) {</div>
-<div class="line"><span class="lineno"> 1147</span>      std::vector&lt;std::string&gt; greylist = <a class="code hl_variable" href="namespacebenchmark_compile.html#acf738bbf3b8391aa78929ceeceb8a03b">options</a>[<span class="stringliteral">&quot;greylist-account&quot;</span>].as&lt;std::vector&lt;std::string&gt;&gt;();</div>
+<div class="line"><span class="lineno"> 1146</span>   <span class="keywordflow">if</span> (options.count(<span class="stringliteral">&quot;greylist-account&quot;</span>)) {</div>
+<div class="line"><span class="lineno"> 1147</span>      std::vector&lt;std::string&gt; greylist = options[<span class="stringliteral">&quot;greylist-account&quot;</span>].as&lt;std::vector&lt;std::string&gt;&gt;();</div>
 <div class="line"><span class="lineno"> 1148</span>      greylist_params param;</div>
 <div class="line"><span class="lineno"> 1149</span>      <span class="keywordflow">for</span> (<span class="keyword">auto</span> &amp;<a class="code hl_variable" href="pointer_8h.html#aeeddce917cf130d62c370b8f216026dd">a</a> : greylist) {</div>
 <div class="line"><span class="lineno"> 1150</span>         param.accounts.push_back(<a class="code hl_typedef" href="namespacesysio_1_1chain.html#ac32ce8e75243f2b3f76aff0c1984f11b">account_name</a>(<a class="code hl_variable" href="pointer_8h.html#aeeddce917cf130d62c370b8f216026dd">a</a>));</div>
@@ -1397,12 +1403,12 @@ Here is the caller graph for this function:</div>
 <div class="line"><span class="lineno"> 1153</span>   }</div>
 <div class="line"><span class="lineno"> 1154</span> </div>
 <div class="line"><span class="lineno"> 1155</span>   {</div>
-<div class="line"><span class="lineno"> 1156</span>      <a class="code hl_typedef" href="stdint_8h.html#a435d1572bf3f880d55459d9805097f62">uint32_t</a> greylist_limit = <a class="code hl_variable" href="namespacebenchmark_compile.html#acf738bbf3b8391aa78929ceeceb8a03b">options</a>.at(<span class="stringliteral">&quot;greylist-limit&quot;</span>).as&lt;<a class="code hl_typedef" href="stdint_8h.html#a435d1572bf3f880d55459d9805097f62">uint32_t</a>&gt;();</div>
+<div class="line"><span class="lineno"> 1156</span>      <a class="code hl_typedef" href="stdint_8h.html#a435d1572bf3f880d55459d9805097f62">uint32_t</a> greylist_limit = options.at(<span class="stringliteral">&quot;greylist-limit&quot;</span>).as&lt;<a class="code hl_typedef" href="stdint_8h.html#a435d1572bf3f880d55459d9805097f62">uint32_t</a>&gt;();</div>
 <div class="line"><span class="lineno"> 1157</span>      chain.set_greylist_limit( greylist_limit );</div>
 <div class="line"><span class="lineno"> 1158</span>   }</div>
 <div class="line"><span class="lineno"> 1159</span> </div>
-<div class="line"><span class="lineno"> 1160</span>   <span class="keywordflow">if</span>( <a class="code hl_variable" href="namespacebenchmark_compile.html#acf738bbf3b8391aa78929ceeceb8a03b">options</a>.count(<span class="stringliteral">&quot;disable-subjective-account-billing&quot;</span>) ) {</div>
-<div class="line"><span class="lineno"> 1161</span>      std::vector&lt;std::string&gt; accounts = <a class="code hl_variable" href="namespacebenchmark_compile.html#acf738bbf3b8391aa78929ceeceb8a03b">options</a>[<span class="stringliteral">&quot;disable-subjective-account-billing&quot;</span>].as&lt;std::vector&lt;std::string&gt;&gt;();</div>
+<div class="line"><span class="lineno"> 1160</span>   <span class="keywordflow">if</span>( options.count(<span class="stringliteral">&quot;disable-subjective-account-billing&quot;</span>) ) {</div>
+<div class="line"><span class="lineno"> 1161</span>      std::vector&lt;std::string&gt; accounts = options[<span class="stringliteral">&quot;disable-subjective-account-billing&quot;</span>].as&lt;std::vector&lt;std::string&gt;&gt;();</div>
 <div class="line"><span class="lineno"> 1162</span>      <span class="keywordflow">for</span>( <span class="keyword">const</span> <span class="keyword">auto</span>&amp; <a class="code hl_variable" href="pointer_8h.html#aeeddce917cf130d62c370b8f216026dd">a</a> : accounts ) {</div>
 <div class="line"><span class="lineno"> 1163</span>         my-&gt;_subjective_billing.disable_account( <a class="code hl_typedef" href="namespacesysio_1_1chain.html#ac32ce8e75243f2b3f76aff0c1984f11b">account_name</a>(<a class="code hl_variable" href="pointer_8h.html#aeeddce917cf130d62c370b8f216026dd">a</a>) );</div>
 <div class="line"><span class="lineno"> 1164</span>      }</div>
@@ -1425,7 +1431,6 @@ Here is the caller graph for this function:</div>
 <div class="ttc" id="alogger_8hpp_html_a3da1571bad6ca6c94df9a3660b2115ee"><div class="ttname"><a href="logger_8hpp.html#a3da1571bad6ca6c94df9a3660b2115ee">dlog</a></div><div class="ttdeci">#define dlog(FORMAT,...)</div><div class="ttdef"><b>Definition</b> <a href="logger_8hpp_source.html#l00101">logger.hpp:101</a></div></div>
 <div class="ttc" id="alogger_8hpp_html_a831cf08dc63704c11fd154132c6e8bdb"><div class="ttname"><a href="logger_8hpp.html#a831cf08dc63704c11fd154132c6e8bdb">ilog</a></div><div class="ttdeci">#define ilog(FORMAT,...)</div><div class="ttdef"><b>Definition</b> <a href="logger_8hpp_source.html#l00118">logger.hpp:118</a></div></div>
 <div class="ttc" id="alogger_8hpp_html_a9e3cdbaecd5a34b42956e888f7326fad"><div class="ttname"><a href="logger_8hpp.html#a9e3cdbaecd5a34b42956e888f7326fad">elog</a></div><div class="ttdeci">#define elog(FORMAT,...)</div><div class="ttdef"><b>Definition</b> <a href="logger_8hpp_source.html#l00130">logger.hpp:130</a></div></div>
-<div class="ttc" id="anamespacebenchmark_compile_html_acf738bbf3b8391aa78929ceeceb8a03b"><div class="ttname"><a href="namespacebenchmark_compile.html#acf738bbf3b8391aa78929ceeceb8a03b">benchmarkCompile.options</a></div><div class="ttdeci">list options</div><div class="ttdef"><b>Definition</b> <a href="benchmark_compile_8py_source.html#l00107">benchmarkCompile.py:107</a></div></div>
 <div class="ttc" id="anamespacefc_html_a3d8a2be677709cc41f09aa7925f2d55fad6bcd1364809e1b881bb22334d14cd56"><div class="ttname"><a href="namespacefc.html#a3d8a2be677709cc41f09aa7925f2d55fad6bcd1364809e1b881bb22334d14cd56">fc::read_only</a></div><div class="ttdeci">@ read_only</div><div class="ttdef"><b>Definition</b> <a href="file__mapping_8hpp_source.html#l00013">file_mapping.hpp:13</a></div></div>
 <div class="ttc" id="anamespacefc_html_a3fcf0d920aea28014aacae50a51d8485"><div class="ttname"><a href="namespacefc.html#a3fcf0d920aea28014aacae50a51d8485">fc::exists</a></div><div class="ttdeci">bool exists(const path &amp;p)</div><div class="ttdef"><b>Definition</b> <a href="filesystem_8cpp_source.html#l00217">filesystem.cpp:217</a></div></div>
 <div class="ttc" id="anamespacefc_html_a76b0787468a9f403087b71a894c07ce2"><div class="ttname"><a href="namespacefc.html#a76b0787468a9f403087b71a894c07ce2">fc::create_directories</a></div><div class="ttdeci">void create_directories(const path &amp;p)</div><div class="ttdef"><b>Definition</b> <a href="filesystem_8cpp_source.html#l00218">filesystem.cpp:218</a></div></div>
@@ -2296,29 +2301,29 @@ Here is the caller graph for this function:</div>
 <div class="line"><span class="lineno"> 1272</span>   chain::controller&amp; chain = my-&gt;chain_plug-&gt;chain();</div>
 <div class="line"><span class="lineno"> 1273</span>   <span class="keywordtype">bool</span> check_speculating = <span class="keyword">false</span>;</div>
 <div class="line"><span class="lineno"> 1274</span> </div>
-<div class="line"><span class="lineno"> 1275</span>   <span class="keywordflow">if</span> (<a class="code hl_variable" href="namespacebenchmark_compile.html#acf738bbf3b8391aa78929ceeceb8a03b">options</a>.max_transaction_time) {</div>
-<div class="line"><span class="lineno"> 1276</span>      my-&gt;_max_transaction_time_ms = *<a class="code hl_variable" href="namespacebenchmark_compile.html#acf738bbf3b8391aa78929ceeceb8a03b">options</a>.max_transaction_time;</div>
+<div class="line"><span class="lineno"> 1275</span>   <span class="keywordflow">if</span> (options.max_transaction_time) {</div>
+<div class="line"><span class="lineno"> 1276</span>      my-&gt;_max_transaction_time_ms = *options.max_transaction_time;</div>
 <div class="line"><span class="lineno"> 1277</span>   }</div>
 <div class="line"><span class="lineno"> 1278</span> </div>
-<div class="line"><span class="lineno"> 1279</span>   <span class="keywordflow">if</span> (<a class="code hl_variable" href="namespacebenchmark_compile.html#acf738bbf3b8391aa78929ceeceb8a03b">options</a>.max_irreversible_block_age) {</div>
-<div class="line"><span class="lineno"> 1280</span>      my-&gt;_max_irreversible_block_age_us =  <a class="code hl_function" href="namespacefc.html#a9623b8cae3f48bbed6aa1fc2afe9b174">fc::seconds</a>(*<a class="code hl_variable" href="namespacebenchmark_compile.html#acf738bbf3b8391aa78929ceeceb8a03b">options</a>.max_irreversible_block_age);</div>
+<div class="line"><span class="lineno"> 1279</span>   <span class="keywordflow">if</span> (options.max_irreversible_block_age) {</div>
+<div class="line"><span class="lineno"> 1280</span>      my-&gt;_max_irreversible_block_age_us =  <a class="code hl_function" href="namespacefc.html#a9623b8cae3f48bbed6aa1fc2afe9b174">fc::seconds</a>(*options.max_irreversible_block_age);</div>
 <div class="line"><span class="lineno"> 1281</span>      check_speculating = <span class="keyword">true</span>;</div>
 <div class="line"><span class="lineno"> 1282</span>   }</div>
 <div class="line"><span class="lineno"> 1283</span> </div>
-<div class="line"><span class="lineno"> 1284</span>   <span class="keywordflow">if</span> (<a class="code hl_variable" href="namespacebenchmark_compile.html#acf738bbf3b8391aa78929ceeceb8a03b">options</a>.produce_time_offset_us) {</div>
-<div class="line"><span class="lineno"> 1285</span>      my-&gt;_produce_time_offset_us = *<a class="code hl_variable" href="namespacebenchmark_compile.html#acf738bbf3b8391aa78929ceeceb8a03b">options</a>.produce_time_offset_us;</div>
+<div class="line"><span class="lineno"> 1284</span>   <span class="keywordflow">if</span> (options.produce_time_offset_us) {</div>
+<div class="line"><span class="lineno"> 1285</span>      my-&gt;_produce_time_offset_us = *options.produce_time_offset_us;</div>
 <div class="line"><span class="lineno"> 1286</span>   }</div>
 <div class="line"><span class="lineno"> 1287</span> </div>
-<div class="line"><span class="lineno"> 1288</span>   <span class="keywordflow">if</span> (<a class="code hl_variable" href="namespacebenchmark_compile.html#acf738bbf3b8391aa78929ceeceb8a03b">options</a>.last_block_time_offset_us) {</div>
-<div class="line"><span class="lineno"> 1289</span>      my-&gt;_last_block_time_offset_us = *<a class="code hl_variable" href="namespacebenchmark_compile.html#acf738bbf3b8391aa78929ceeceb8a03b">options</a>.last_block_time_offset_us;</div>
+<div class="line"><span class="lineno"> 1288</span>   <span class="keywordflow">if</span> (options.last_block_time_offset_us) {</div>
+<div class="line"><span class="lineno"> 1289</span>      my-&gt;_last_block_time_offset_us = *options.last_block_time_offset_us;</div>
 <div class="line"><span class="lineno"> 1290</span>   }</div>
 <div class="line"><span class="lineno"> 1291</span> </div>
-<div class="line"><span class="lineno"> 1292</span>   <span class="keywordflow">if</span> (<a class="code hl_variable" href="namespacebenchmark_compile.html#acf738bbf3b8391aa78929ceeceb8a03b">options</a>.max_scheduled_transaction_time_per_block_ms) {</div>
-<div class="line"><span class="lineno"> 1293</span>      my-&gt;_max_scheduled_transaction_time_per_block_ms = *<a class="code hl_variable" href="namespacebenchmark_compile.html#acf738bbf3b8391aa78929ceeceb8a03b">options</a>.max_scheduled_transaction_time_per_block_ms;</div>
+<div class="line"><span class="lineno"> 1292</span>   <span class="keywordflow">if</span> (options.max_scheduled_transaction_time_per_block_ms) {</div>
+<div class="line"><span class="lineno"> 1293</span>      my-&gt;_max_scheduled_transaction_time_per_block_ms = *options.max_scheduled_transaction_time_per_block_ms;</div>
 <div class="line"><span class="lineno"> 1294</span>   }</div>
 <div class="line"><span class="lineno"> 1295</span> </div>
-<div class="line"><span class="lineno"> 1296</span>   <span class="keywordflow">if</span> (<a class="code hl_variable" href="namespacebenchmark_compile.html#acf738bbf3b8391aa78929ceeceb8a03b">options</a>.incoming_defer_ratio) {</div>
-<div class="line"><span class="lineno"> 1297</span>      my-&gt;_incoming_defer_ratio = *<a class="code hl_variable" href="namespacebenchmark_compile.html#acf738bbf3b8391aa78929ceeceb8a03b">options</a>.incoming_defer_ratio;</div>
+<div class="line"><span class="lineno"> 1296</span>   <span class="keywordflow">if</span> (options.incoming_defer_ratio) {</div>
+<div class="line"><span class="lineno"> 1297</span>      my-&gt;_incoming_defer_ratio = *options.incoming_defer_ratio;</div>
 <div class="line"><span class="lineno"> 1298</span>   }</div>
 <div class="line"><span class="lineno"> 1299</span> </div>
 <div class="line"><span class="lineno"> 1300</span>   <span class="keywordflow">if</span> (check_speculating &amp;&amp; my-&gt;_pending_block_mode == <a class="code hl_enumvalue" href="namespacesysio.html#acd1c637e1a22040dbf666b0301cbc475aa25b9b4361a3bd215c739cf4f9cf2e4a">pending_block_mode::speculating</a>) {</div>
@@ -2326,12 +2331,12 @@ Here is the caller graph for this function:</div>
 <div class="line"><span class="lineno"> 1302</span>      my-&gt;schedule_production_loop();</div>
 <div class="line"><span class="lineno"> 1303</span>   }</div>
 <div class="line"><span class="lineno"> 1304</span> </div>
-<div class="line"><span class="lineno"> 1305</span>   <span class="keywordflow">if</span> (<a class="code hl_variable" href="namespacebenchmark_compile.html#acf738bbf3b8391aa78929ceeceb8a03b">options</a>.subjective_cpu_leeway_us) {</div>
-<div class="line"><span class="lineno"> 1306</span>      chain.set_subjective_cpu_leeway(<a class="code hl_class" href="classfc_1_1microseconds.html">fc::microseconds</a>(*<a class="code hl_variable" href="namespacebenchmark_compile.html#acf738bbf3b8391aa78929ceeceb8a03b">options</a>.subjective_cpu_leeway_us));</div>
+<div class="line"><span class="lineno"> 1305</span>   <span class="keywordflow">if</span> (options.subjective_cpu_leeway_us) {</div>
+<div class="line"><span class="lineno"> 1306</span>      chain.set_subjective_cpu_leeway(<a class="code hl_class" href="classfc_1_1microseconds.html">fc::microseconds</a>(*options.subjective_cpu_leeway_us));</div>
 <div class="line"><span class="lineno"> 1307</span>   }</div>
 <div class="line"><span class="lineno"> 1308</span> </div>
-<div class="line"><span class="lineno"> 1309</span>   <span class="keywordflow">if</span> (<a class="code hl_variable" href="namespacebenchmark_compile.html#acf738bbf3b8391aa78929ceeceb8a03b">options</a>.greylist_limit) {</div>
-<div class="line"><span class="lineno"> 1310</span>      chain.set_greylist_limit(*<a class="code hl_variable" href="namespacebenchmark_compile.html#acf738bbf3b8391aa78929ceeceb8a03b">options</a>.greylist_limit);</div>
+<div class="line"><span class="lineno"> 1309</span>   <span class="keywordflow">if</span> (options.greylist_limit) {</div>
+<div class="line"><span class="lineno"> 1310</span>      chain.set_greylist_limit(*options.greylist_limit);</div>
 <div class="line"><span class="lineno"> 1311</span>   }</div>
 <div class="line"><span class="lineno"> 1312</span>}</div>
 </div><!-- fragment --><div class="dynheader">

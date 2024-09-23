@@ -6,7 +6,8 @@
 
 
 
-Inheritance diagram for sysio\+::net\+\_\+plugin\+:\nopagebreak
+Inheritance diagram for sysio\+::net\+\_\+plugin\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -15,7 +16,8 @@ Inheritance diagram for sysio\+::net\+\_\+plugin\+:\nopagebreak
 \end{figure}
 
 
-Collaboration diagram for sysio\+::net\+\_\+plugin\+:\nopagebreak
+Collaboration diagram for sysio\+::net\+\_\+plugin\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -219,14 +221,16 @@ Definition at line \mbox{\hyperlink{net__plugin_8cpp_source_l03801}{3801}} of fi
 \DoxyCodeLine{03803\ \ \ \ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
 \includegraphics[width=350pt]{classsysio_1_1net__plugin_a961ce31b4538d04eac61b299bc970621_cgraph}
 \end{center}
 \end{figure}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -248,54 +252,54 @@ Definition at line \mbox{\hyperlink{net__plugin_8cpp_source_l03596}{3596}} of fi
 \DoxyCodeLine{03596\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
 \DoxyCodeLine{03597\ \ \ \ \ \ \ \mbox{\hyperlink{logger_8hpp_a067e87b091ade3787bcdda5775354654}{fc\_ilog}}(\ \mbox{\hyperlink{classfc_1_1logger}{logger}},\ \textcolor{stringliteral}{"{}Initialize\ net\ plugin"{}}\ );}
 \DoxyCodeLine{03598\ \ \ \ \ \ \ \textcolor{keywordflow}{try}\ \{}
-\DoxyCodeLine{03599\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacesysio_a4f30e0f4812705f23bf9b5bbd3eba7fc}{peer\_log\_format}}\ =\ \mbox{\hyperlink{namespacebenchmark_compile_acf738bbf3b8391aa78929ceeceb8a03b}{options}}.at(\ \textcolor{stringliteral}{"{}peer-\/log-\/format"{}}\ ).as<\textcolor{keywordtype}{string}>();}
+\DoxyCodeLine{03599\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacesysio_a4f30e0f4812705f23bf9b5bbd3eba7fc}{peer\_log\_format}}\ =\ options.at(\ \textcolor{stringliteral}{"{}peer-\/log-\/format"{}}\ ).as<\textcolor{keywordtype}{string}>();}
 \DoxyCodeLine{03600\ }
-\DoxyCodeLine{03601\ \ \ \ \ \ \ \ \ \ my-\/>sync\_master.reset(\ \textcolor{keyword}{new}\ sync\_manager(\ \mbox{\hyperlink{namespacebenchmark_compile_acf738bbf3b8391aa78929ceeceb8a03b}{options}}.at(\ \textcolor{stringliteral}{"{}sync-\/fetch-\/span"{}}\ ).as<\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}>()));}
+\DoxyCodeLine{03601\ \ \ \ \ \ \ \ \ \ my-\/>sync\_master.reset(\ \textcolor{keyword}{new}\ sync\_manager(\ options.at(\ \textcolor{stringliteral}{"{}sync-\/fetch-\/span"{}}\ ).as<\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}>()));}
 \DoxyCodeLine{03602\ }
-\DoxyCodeLine{03603\ \ \ \ \ \ \ \ \ \ my-\/>connector\_period\ =\ std::chrono::seconds(\ \mbox{\hyperlink{namespacebenchmark_compile_acf738bbf3b8391aa78929ceeceb8a03b}{options}}.at(\ \textcolor{stringliteral}{"{}connection-\/cleanup-\/period"{}}\ ).as<\textcolor{keywordtype}{int}>());}
-\DoxyCodeLine{03604\ \ \ \ \ \ \ \ \ \ my-\/>max\_cleanup\_time\_ms\ =\ \mbox{\hyperlink{namespacebenchmark_compile_acf738bbf3b8391aa78929ceeceb8a03b}{options}}.at(\textcolor{stringliteral}{"{}max-\/cleanup-\/time-\/msec"{}}).as<\textcolor{keywordtype}{int}>();}
+\DoxyCodeLine{03603\ \ \ \ \ \ \ \ \ \ my-\/>connector\_period\ =\ std::chrono::seconds(\ options.at(\ \textcolor{stringliteral}{"{}connection-\/cleanup-\/period"{}}\ ).as<\textcolor{keywordtype}{int}>());}
+\DoxyCodeLine{03604\ \ \ \ \ \ \ \ \ \ my-\/>max\_cleanup\_time\_ms\ =\ options.at(\textcolor{stringliteral}{"{}max-\/cleanup-\/time-\/msec"{}}).as<\textcolor{keywordtype}{int}>();}
 \DoxyCodeLine{03605\ \ \ \ \ \ \ \ \ \ my-\/>txn\_exp\_period\ =\ \mbox{\hyperlink{namespacesysio_ad1d3c8f07448b49a782d5fcd4640aa42}{def\_txn\_expire\_wait}};}
-\DoxyCodeLine{03606\ \ \ \ \ \ \ \ \ \ my-\/>p2p\_dedup\_cache\_expire\_time\_us\ =\ \mbox{\hyperlink{namespacefc_a9623b8cae3f48bbed6aa1fc2afe9b174}{fc::seconds}}(\ \mbox{\hyperlink{namespacebenchmark_compile_acf738bbf3b8391aa78929ceeceb8a03b}{options}}.at(\ \textcolor{stringliteral}{"{}p2p-\/dedup-\/cache-\/expire-\/time-\/sec"{}}\ ).as<\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}>()\ );}
+\DoxyCodeLine{03606\ \ \ \ \ \ \ \ \ \ my-\/>p2p\_dedup\_cache\_expire\_time\_us\ =\ \mbox{\hyperlink{namespacefc_a9623b8cae3f48bbed6aa1fc2afe9b174}{fc::seconds}}(\ options.at(\ \textcolor{stringliteral}{"{}p2p-\/dedup-\/cache-\/expire-\/time-\/sec"{}}\ ).as<\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}>()\ );}
 \DoxyCodeLine{03607\ \ \ \ \ \ \ \ \ \ my-\/>resp\_expected\_period\ =\ \mbox{\hyperlink{namespacesysio_ab32afcbe569174291edb4f3f98d8ccc8}{def\_resp\_expected\_wait}};}
-\DoxyCodeLine{03608\ \ \ \ \ \ \ \ \ \ my-\/>max\_client\_count\ =\ \mbox{\hyperlink{namespacebenchmark_compile_acf738bbf3b8391aa78929ceeceb8a03b}{options}}.at(\ \textcolor{stringliteral}{"{}max-\/clients"{}}\ ).as<\textcolor{keywordtype}{int}>();}
-\DoxyCodeLine{03609\ \ \ \ \ \ \ \ \ \ my-\/>max\_nodes\_per\_host\ =\ \mbox{\hyperlink{namespacebenchmark_compile_acf738bbf3b8391aa78929ceeceb8a03b}{options}}.at(\ \textcolor{stringliteral}{"{}p2p-\/max-\/nodes-\/per-\/host"{}}\ ).as<\textcolor{keywordtype}{int}>();}
-\DoxyCodeLine{03610\ \ \ \ \ \ \ \ \ \ my-\/>p2p\_accept\_transactions\ =\ \mbox{\hyperlink{namespacebenchmark_compile_acf738bbf3b8391aa78929ceeceb8a03b}{options}}.at(\ \textcolor{stringliteral}{"{}p2p-\/accept-\/transactions"{}}\ ).as<\textcolor{keywordtype}{bool}>();}
+\DoxyCodeLine{03608\ \ \ \ \ \ \ \ \ \ my-\/>max\_client\_count\ =\ options.at(\ \textcolor{stringliteral}{"{}max-\/clients"{}}\ ).as<\textcolor{keywordtype}{int}>();}
+\DoxyCodeLine{03609\ \ \ \ \ \ \ \ \ \ my-\/>max\_nodes\_per\_host\ =\ options.at(\ \textcolor{stringliteral}{"{}p2p-\/max-\/nodes-\/per-\/host"{}}\ ).as<\textcolor{keywordtype}{int}>();}
+\DoxyCodeLine{03610\ \ \ \ \ \ \ \ \ \ my-\/>p2p\_accept\_transactions\ =\ options.at(\ \textcolor{stringliteral}{"{}p2p-\/accept-\/transactions"{}}\ ).as<\textcolor{keywordtype}{bool}>();}
 \DoxyCodeLine{03611\ }
-\DoxyCodeLine{03612\ \ \ \ \ \ \ \ \ \ my-\/>use\_socket\_read\_watermark\ =\ \mbox{\hyperlink{namespacebenchmark_compile_acf738bbf3b8391aa78929ceeceb8a03b}{options}}.at(\ \textcolor{stringliteral}{"{}use-\/socket-\/read-\/watermark"{}}\ ).as<\textcolor{keywordtype}{bool}>();}
-\DoxyCodeLine{03613\ \ \ \ \ \ \ \ \ \ my-\/>keepalive\_interval\ =\ std::chrono::milliseconds(\ \mbox{\hyperlink{namespacebenchmark_compile_acf738bbf3b8391aa78929ceeceb8a03b}{options}}.at(\ \textcolor{stringliteral}{"{}p2p-\/keepalive-\/interval-\/ms"{}}\ ).as<\textcolor{keywordtype}{int}>()\ );}
+\DoxyCodeLine{03612\ \ \ \ \ \ \ \ \ \ my-\/>use\_socket\_read\_watermark\ =\ options.at(\ \textcolor{stringliteral}{"{}use-\/socket-\/read-\/watermark"{}}\ ).as<\textcolor{keywordtype}{bool}>();}
+\DoxyCodeLine{03613\ \ \ \ \ \ \ \ \ \ my-\/>keepalive\_interval\ =\ std::chrono::milliseconds(\ options.at(\ \textcolor{stringliteral}{"{}p2p-\/keepalive-\/interval-\/ms"{}}\ ).as<\textcolor{keywordtype}{int}>()\ );}
 \DoxyCodeLine{03614\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp_a40c2826a6fba35c1ffbf912bdf559792}{SYS\_ASSERT}}(\ my-\/>keepalive\_interval.count()\ >\ 0,\ chain::plugin\_config\_exception,}
 \DoxyCodeLine{03615\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}p2p-\/keepalive\_interval-\/ms\ must\ be\ greater\ than\ 0"{}}\ );}
 \DoxyCodeLine{03616\ }
-\DoxyCodeLine{03617\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ \mbox{\hyperlink{namespacebenchmark_compile_acf738bbf3b8391aa78929ceeceb8a03b}{options}}.count(\ \textcolor{stringliteral}{"{}p2p-\/keepalive-\/interval-\/ms"{}}\ ))\ \{}
-\DoxyCodeLine{03618\ \ \ \ \ \ \ \ \ \ \ \ \ my-\/>heartbeat\_timeout\ =\ std::chrono::milliseconds(\ \mbox{\hyperlink{namespacebenchmark_compile_acf738bbf3b8391aa78929ceeceb8a03b}{options}}.at(\ \textcolor{stringliteral}{"{}p2p-\/keepalive-\/interval-\/ms"{}}\ ).as<\textcolor{keywordtype}{int}>()\ *\ 2\ );}
+\DoxyCodeLine{03617\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ options.count(\ \textcolor{stringliteral}{"{}p2p-\/keepalive-\/interval-\/ms"{}}\ ))\ \{}
+\DoxyCodeLine{03618\ \ \ \ \ \ \ \ \ \ \ \ \ my-\/>heartbeat\_timeout\ =\ std::chrono::milliseconds(\ options.at(\ \textcolor{stringliteral}{"{}p2p-\/keepalive-\/interval-\/ms"{}}\ ).as<\textcolor{keywordtype}{int}>()\ *\ 2\ );}
 \DoxyCodeLine{03619\ \ \ \ \ \ \ \ \ \ \}}
 \DoxyCodeLine{03620\ }
-\DoxyCodeLine{03621\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ \mbox{\hyperlink{namespacebenchmark_compile_acf738bbf3b8391aa78929ceeceb8a03b}{options}}.count(\ \textcolor{stringliteral}{"{}p2p-\/listen-\/endpoint"{}}\ )\ \&\&\ \mbox{\hyperlink{namespacebenchmark_compile_acf738bbf3b8391aa78929ceeceb8a03b}{options}}.at(\textcolor{stringliteral}{"{}p2p-\/listen-\/endpoint"{}}).as<\textcolor{keywordtype}{string}>().length())\ \{}
-\DoxyCodeLine{03622\ \ \ \ \ \ \ \ \ \ \ \ \ my-\/>p2p\_address\ =\ \mbox{\hyperlink{namespacebenchmark_compile_acf738bbf3b8391aa78929ceeceb8a03b}{options}}.at(\ \textcolor{stringliteral}{"{}p2p-\/listen-\/endpoint"{}}\ ).as<\textcolor{keywordtype}{string}>();}
+\DoxyCodeLine{03621\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ options.count(\ \textcolor{stringliteral}{"{}p2p-\/listen-\/endpoint"{}}\ )\ \&\&\ options.at(\textcolor{stringliteral}{"{}p2p-\/listen-\/endpoint"{}}).as<\textcolor{keywordtype}{string}>().length())\ \{}
+\DoxyCodeLine{03622\ \ \ \ \ \ \ \ \ \ \ \ \ my-\/>p2p\_address\ =\ options.at(\ \textcolor{stringliteral}{"{}p2p-\/listen-\/endpoint"{}}\ ).as<\textcolor{keywordtype}{string}>();}
 \DoxyCodeLine{03623\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp_a40c2826a6fba35c1ffbf912bdf559792}{SYS\_ASSERT}}(\ my-\/>p2p\_address.length()\ <=\ \mbox{\hyperlink{namespacesysio_aaf6ae4a29f942a879217e395bfcd58fe}{max\_p2p\_address\_length}},\ chain::plugin\_config\_exception,}
 \DoxyCodeLine{03624\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}p2p-\/listen-\/endpoint\ too\ long,\ must\ be\ less\ than\ \$\{m\}"{}},\ (\textcolor{stringliteral}{"{}m"{}},\ \mbox{\hyperlink{namespacesysio_aaf6ae4a29f942a879217e395bfcd58fe}{max\_p2p\_address\_length}})\ );}
 \DoxyCodeLine{03625\ \ \ \ \ \ \ \ \ \ \}}
-\DoxyCodeLine{03626\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ \mbox{\hyperlink{namespacebenchmark_compile_acf738bbf3b8391aa78929ceeceb8a03b}{options}}.count(\ \textcolor{stringliteral}{"{}p2p-\/server-\/address"{}}\ )\ )\ \{}
-\DoxyCodeLine{03627\ \ \ \ \ \ \ \ \ \ \ \ \ my-\/>p2p\_server\_address\ =\ \mbox{\hyperlink{namespacebenchmark_compile_acf738bbf3b8391aa78929ceeceb8a03b}{options}}.at(\ \textcolor{stringliteral}{"{}p2p-\/server-\/address"{}}\ ).as<\textcolor{keywordtype}{string}>();}
+\DoxyCodeLine{03626\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ options.count(\ \textcolor{stringliteral}{"{}p2p-\/server-\/address"{}}\ )\ )\ \{}
+\DoxyCodeLine{03627\ \ \ \ \ \ \ \ \ \ \ \ \ my-\/>p2p\_server\_address\ =\ options.at(\ \textcolor{stringliteral}{"{}p2p-\/server-\/address"{}}\ ).as<\textcolor{keywordtype}{string}>();}
 \DoxyCodeLine{03628\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp_a40c2826a6fba35c1ffbf912bdf559792}{SYS\_ASSERT}}(\ my-\/>p2p\_server\_address.length()\ <=\ \mbox{\hyperlink{namespacesysio_aaf6ae4a29f942a879217e395bfcd58fe}{max\_p2p\_address\_length}},\ chain::plugin\_config\_exception,}
 \DoxyCodeLine{03629\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}p2p\_server\_address\ too\ long,\ must\ be\ less\ than\ \$\{m\}"{}},\ (\textcolor{stringliteral}{"{}m"{}},\ \mbox{\hyperlink{namespacesysio_aaf6ae4a29f942a879217e395bfcd58fe}{max\_p2p\_address\_length}})\ );}
 \DoxyCodeLine{03630\ \ \ \ \ \ \ \ \ \ \}}
 \DoxyCodeLine{03631\ }
-\DoxyCodeLine{03632\ \ \ \ \ \ \ \ \ \ my-\/>thread\_pool\_size\ =\ \mbox{\hyperlink{namespacebenchmark_compile_acf738bbf3b8391aa78929ceeceb8a03b}{options}}.at(\ \textcolor{stringliteral}{"{}net-\/threads"{}}\ ).as<\mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\_t}}>();}
+\DoxyCodeLine{03632\ \ \ \ \ \ \ \ \ \ my-\/>thread\_pool\_size\ =\ options.at(\ \textcolor{stringliteral}{"{}net-\/threads"{}}\ ).as<\mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\_t}}>();}
 \DoxyCodeLine{03633\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp_a40c2826a6fba35c1ffbf912bdf559792}{SYS\_ASSERT}}(\ my-\/>thread\_pool\_size\ >\ 0,\ chain::plugin\_config\_exception,}
 \DoxyCodeLine{03634\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}net-\/threads\ \$\{num\}\ must\ be\ greater\ than\ 0"{}},\ (\textcolor{stringliteral}{"{}num"{}},\ my-\/>thread\_pool\_size)\ );}
 \DoxyCodeLine{03635\ }
-\DoxyCodeLine{03636\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ \mbox{\hyperlink{namespacebenchmark_compile_acf738bbf3b8391aa78929ceeceb8a03b}{options}}.count(\ \textcolor{stringliteral}{"{}p2p-\/peer-\/address"{}}\ ))\ \{}
-\DoxyCodeLine{03637\ \ \ \ \ \ \ \ \ \ \ \ \ my-\/>supplied\_peers\ =\ \mbox{\hyperlink{namespacebenchmark_compile_acf738bbf3b8391aa78929ceeceb8a03b}{options}}.at(\ \textcolor{stringliteral}{"{}p2p-\/peer-\/address"{}}\ ).as<\mbox{\hyperlink{classfc_1_1vector}{vector<string>}}\ >();}
+\DoxyCodeLine{03636\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ options.count(\ \textcolor{stringliteral}{"{}p2p-\/peer-\/address"{}}\ ))\ \{}
+\DoxyCodeLine{03637\ \ \ \ \ \ \ \ \ \ \ \ \ my-\/>supplied\_peers\ =\ options.at(\ \textcolor{stringliteral}{"{}p2p-\/peer-\/address"{}}\ ).as<\mbox{\hyperlink{classfc_1_1vector}{vector<string>}}\ >();}
 \DoxyCodeLine{03638\ \ \ \ \ \ \ \ \ \ \}}
-\DoxyCodeLine{03639\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ \mbox{\hyperlink{namespacebenchmark_compile_acf738bbf3b8391aa78929ceeceb8a03b}{options}}.count(\ \textcolor{stringliteral}{"{}agent-\/name"{}}\ ))\ \{}
-\DoxyCodeLine{03640\ \ \ \ \ \ \ \ \ \ \ \ \ my-\/>user\_agent\_name\ =\ \mbox{\hyperlink{namespacebenchmark_compile_acf738bbf3b8391aa78929ceeceb8a03b}{options}}.at(\ \textcolor{stringliteral}{"{}agent-\/name"{}}\ ).as<\textcolor{keywordtype}{string}>();}
+\DoxyCodeLine{03639\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ options.count(\ \textcolor{stringliteral}{"{}agent-\/name"{}}\ ))\ \{}
+\DoxyCodeLine{03640\ \ \ \ \ \ \ \ \ \ \ \ \ my-\/>user\_agent\_name\ =\ options.at(\ \textcolor{stringliteral}{"{}agent-\/name"{}}\ ).as<\textcolor{keywordtype}{string}>();}
 \DoxyCodeLine{03641\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp_a40c2826a6fba35c1ffbf912bdf559792}{SYS\_ASSERT}}(\ my-\/>user\_agent\_name.length()\ <=\ \mbox{\hyperlink{namespacesysio_a221fdeb3635b31daaa70c0ef5dedb044}{max\_handshake\_str\_length}},\ chain::plugin\_config\_exception,}
 \DoxyCodeLine{03642\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}agent-\/name\ too\ long,\ must\ be\ less\ than\ \$\{m\}"{}},\ (\textcolor{stringliteral}{"{}m"{}},\ \mbox{\hyperlink{namespacesysio_a221fdeb3635b31daaa70c0ef5dedb044}{max\_handshake\_str\_length}})\ );}
 \DoxyCodeLine{03643\ \ \ \ \ \ \ \ \ \ \}}
 \DoxyCodeLine{03644\ }
-\DoxyCodeLine{03645\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ \mbox{\hyperlink{namespacebenchmark_compile_acf738bbf3b8391aa78929ceeceb8a03b}{options}}.count(\ \textcolor{stringliteral}{"{}allowed-\/connection"{}}\ ))\ \{}
-\DoxyCodeLine{03646\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ std::vector<std::string>\ allowed\_remotes\ =\ \mbox{\hyperlink{namespacebenchmark_compile_acf738bbf3b8391aa78929ceeceb8a03b}{options}}[\textcolor{stringliteral}{"{}allowed-\/connection"{}}].as<std::vector<std::string>>();}
+\DoxyCodeLine{03645\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ options.count(\ \textcolor{stringliteral}{"{}allowed-\/connection"{}}\ ))\ \{}
+\DoxyCodeLine{03646\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ std::vector<std::string>\ allowed\_remotes\ =\ options[\textcolor{stringliteral}{"{}allowed-\/connection"{}}].as<std::vector<std::string>>();}
 \DoxyCodeLine{03647\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}(\ \textcolor{keyword}{const}\ std::string\&\ allowed\_remote\ :\ allowed\_remotes\ )\ \{}
 \DoxyCodeLine{03648\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ allowed\_remote\ ==\ \textcolor{stringliteral}{"{}any"{}}\ )}
 \DoxyCodeLine{03649\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ my-\/>allowed\_connections\ |=\ \mbox{\hyperlink{classsysio_1_1net__plugin__impl_a1c25537da28bd87529e8d9b3c8c1c862a08ad73d963e0e19658fbd7435648f87c}{net\_plugin\_impl::Any}};}
@@ -309,19 +313,19 @@ Definition at line \mbox{\hyperlink{net__plugin_8cpp_source_l03596}{3596}} of fi
 \DoxyCodeLine{03657\ \ \ \ \ \ \ \ \ \ \}}
 \DoxyCodeLine{03658\ }
 \DoxyCodeLine{03659\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ my-\/>allowed\_connections\ \&\ \mbox{\hyperlink{classsysio_1_1net__plugin__impl_a1c25537da28bd87529e8d9b3c8c1c862adc9b035d3131983b4c9e8faa6052bd7b}{net\_plugin\_impl::Specified}}\ )}
-\DoxyCodeLine{03660\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp_a40c2826a6fba35c1ffbf912bdf559792}{SYS\_ASSERT}}(\ \mbox{\hyperlink{namespacebenchmark_compile_acf738bbf3b8391aa78929ceeceb8a03b}{options}}.count(\ \textcolor{stringliteral}{"{}peer-\/key"{}}\ ),}
+\DoxyCodeLine{03660\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp_a40c2826a6fba35c1ffbf912bdf559792}{SYS\_ASSERT}}(\ options.count(\ \textcolor{stringliteral}{"{}peer-\/key"{}}\ ),}
 \DoxyCodeLine{03661\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ plugin\_config\_exception,}
 \DoxyCodeLine{03662\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}At\ least\ one\ peer-\/key\ must\ accompany\ 'allowed-\/connection=specified'"{}}\ );}
 \DoxyCodeLine{03663\ }
-\DoxyCodeLine{03664\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ \mbox{\hyperlink{namespacebenchmark_compile_acf738bbf3b8391aa78929ceeceb8a03b}{options}}.count(\ \textcolor{stringliteral}{"{}peer-\/key"{}}\ ))\ \{}
-\DoxyCodeLine{03665\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ std::vector<std::string>\ key\_strings\ =\ \mbox{\hyperlink{namespacebenchmark_compile_acf738bbf3b8391aa78929ceeceb8a03b}{options}}[\textcolor{stringliteral}{"{}peer-\/key"{}}].as<std::vector<std::string>>();}
+\DoxyCodeLine{03664\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ options.count(\ \textcolor{stringliteral}{"{}peer-\/key"{}}\ ))\ \{}
+\DoxyCodeLine{03665\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ std::vector<std::string>\ key\_strings\ =\ options[\textcolor{stringliteral}{"{}peer-\/key"{}}].as<std::vector<std::string>>();}
 \DoxyCodeLine{03666\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}(\ \textcolor{keyword}{const}\ std::string\&\ key\_string\ :\ key\_strings\ )\ \{}
 \DoxyCodeLine{03667\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ my-\/>allowed\_peers.push\_back(\ \mbox{\hyperlink{namespacesysio_a57a25df07ccdce01a63d0b026d80ea5f}{dejsonify<chain::public\_key\_type>}}(\ key\_string\ ));}
 \DoxyCodeLine{03668\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
 \DoxyCodeLine{03669\ \ \ \ \ \ \ \ \ \ \}}
 \DoxyCodeLine{03670\ }
-\DoxyCodeLine{03671\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ \mbox{\hyperlink{namespacebenchmark_compile_acf738bbf3b8391aa78929ceeceb8a03b}{options}}.count(\ \textcolor{stringliteral}{"{}peer-\/private-\/key"{}}\ ))\ \{}
-\DoxyCodeLine{03672\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ std::vector<std::string>\ key\_id\_to\_wif\_pair\_strings\ =\ \mbox{\hyperlink{namespacebenchmark_compile_acf738bbf3b8391aa78929ceeceb8a03b}{options}}[\textcolor{stringliteral}{"{}peer-\/private-\/key"{}}].as<std::vector<std::string>>();}
+\DoxyCodeLine{03671\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ options.count(\ \textcolor{stringliteral}{"{}peer-\/private-\/key"{}}\ ))\ \{}
+\DoxyCodeLine{03672\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ std::vector<std::string>\ key\_id\_to\_wif\_pair\_strings\ =\ options[\textcolor{stringliteral}{"{}peer-\/private-\/key"{}}].as<std::vector<std::string>>();}
 \DoxyCodeLine{03673\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}(\ \textcolor{keyword}{const}\ std::string\&\ key\_id\_to\_wif\_pair\_string\ :\ key\_id\_to\_wif\_pair\_strings\ )\ \{}
 \DoxyCodeLine{03674\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ key\_id\_to\_wif\_pair\ =\ \mbox{\hyperlink{namespacesysio_a57a25df07ccdce01a63d0b026d80ea5f}{dejsonify<std::pair<chain::public\_key\_type,\ std::string>}}>(}
 \DoxyCodeLine{03675\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ key\_id\_to\_wif\_pair\_string\ );}
@@ -350,7 +354,8 @@ Definition at line \mbox{\hyperlink{net__plugin_8cpp_source_l03596}{3596}} of fi
 \DoxyCodeLine{03698\ \ \ \ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -414,14 +419,16 @@ Definition at line \mbox{\hyperlink{net__plugin_8cpp_source_l03805}{3805}} of fi
 \DoxyCodeLine{03847\ \ \ \ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
 \includegraphics[width=350pt]{classsysio_1_1net__plugin_a9a4274f04d57a07434e3df9dd58359b4_cgraph}
 \end{center}
 \end{figure}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -542,7 +549,8 @@ Definition at line \mbox{\hyperlink{net__plugin_8cpp_source_l03700}{3700}} of fi
 \DoxyCodeLine{03799\ \ \ \ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode

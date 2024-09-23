@@ -110,9 +110,9 @@ Classes</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="func-members" name="func-members"></a>
 Functions</h2></td></tr>
-<tr class="memitem:a469f00dab6318267fb48fab73226ca95" id="r_a469f00dab6318267fb48fab73226ca95"><td class="memItemLeft" align="right" valign="top">std::ostream &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a469f00dab6318267fb48fab73226ca95">operator&lt;&lt;</a> (std::ostream &amp;os, const <a class="el" href="classnamespace1_1_1_my_type_in_name_space1.html">MyTypeInNameSpace1</a> &amp;val)</td></tr>
+<tr class="memitem:a469f00dab6318267fb48fab73226ca95" id="r_a469f00dab6318267fb48fab73226ca95"><td class="memItemLeft" align="right" valign="top">std::ostream &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a469f00dab6318267fb48fab73226ca95">operator&lt;&lt;</a> (std::ostream &amp;<a class="el" href="environment_8hpp.html#a3951483d0b31c29ca95336206cd35238">os</a>, const <a class="el" href="classnamespace1_1_1_my_type_in_name_space1.html">MyTypeInNameSpace1</a> &amp;val)</td></tr>
 <tr class="separator:a469f00dab6318267fb48fab73226ca95"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a9be9cab39b3a33a012040d70e1c86949" id="r_a9be9cab39b3a33a012040d70e1c86949"><td class="memItemLeft" align="right" valign="top">std::ostream &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a9be9cab39b3a33a012040d70e1c86949">operator&lt;&lt;</a> (std::ostream &amp;os, const <a class="el" href="classnamespace1_1_1_my_type_in_name_space1.html">MyTypeInNameSpace1</a> *<a class="el" href="pointer_8h.html#aae1f8d263916ad71bd415381591549c0">pointer</a>)</td></tr>
+<tr class="memitem:a9be9cab39b3a33a012040d70e1c86949" id="r_a9be9cab39b3a33a012040d70e1c86949"><td class="memItemLeft" align="right" valign="top">std::ostream &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a9be9cab39b3a33a012040d70e1c86949">operator&lt;&lt;</a> (std::ostream &amp;<a class="el" href="environment_8hpp.html#a3951483d0b31c29ca95336206cd35238">os</a>, const <a class="el" href="classnamespace1_1_1_my_type_in_name_space1.html">MyTypeInNameSpace1</a> *<a class="el" href="pointer_8h.html#aae1f8d263916ad71bd415381591549c0">pointer</a>)</td></tr>
 <tr class="separator:a9be9cab39b3a33a012040d70e1c86949"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <h2 class="groupheader">Function Documentation</h2>
@@ -137,8 +137,9 @@ Functions</h2></td></tr>
 
 <p class="definition">Definition at line <a class="el" href="gtest__unittest_8cc_source.html#l05244">5244</a> of file <a class="el" href="gtest__unittest_8cc_source.html">gtest_unittest.cc</a>.</p>
 <div class="fragment"><div class="line"><span class="lineno"> 5245</span>                                                        {</div>
-<div class="line"><span class="lineno"> 5246</span>  <span class="keywordflow">return</span> os &lt;&lt; val.x();</div>
+<div class="line"><span class="lineno"> 5246</span>  <span class="keywordflow">return</span> <a class="code hl_variable" href="environment_8hpp.html#a3951483d0b31c29ca95336206cd35238">os</a> &lt;&lt; val.x();</div>
 <div class="line"><span class="lineno"> 5247</span>}</div>
+<div class="ttc" id="aenvironment_8hpp_html_a3951483d0b31c29ca95336206cd35238"><div class="ttname"><a href="environment_8hpp.html#a3951483d0b31c29ca95336206cd35238">os</a></div><div class="ttdeci">os_t os</div><div class="ttdef"><b>Definition</b> <a href="environment_8hpp_source.html#l00023">environment.hpp:23</a></div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -163,7 +164,7 @@ Functions</h2></td></tr>
 
 <p class="definition">Definition at line <a class="el" href="gtest__unittest_8cc_source.html#l05248">5248</a> of file <a class="el" href="gtest__unittest_8cc_source.html">gtest_unittest.cc</a>.</p>
 <div class="fragment"><div class="line"><span class="lineno"> 5249</span>                                                            {</div>
-<div class="line"><span class="lineno"> 5250</span>  <span class="keywordflow">return</span> os &lt;&lt; <span class="stringliteral">&quot;(&quot;</span> &lt;&lt; <a class="code hl_variable" href="pointer_8h.html#aae1f8d263916ad71bd415381591549c0">pointer</a>-&gt;x() &lt;&lt; <span class="stringliteral">&quot;)&quot;</span>;</div>
+<div class="line"><span class="lineno"> 5250</span>  <span class="keywordflow">return</span> <a class="code hl_variable" href="environment_8hpp.html#a3951483d0b31c29ca95336206cd35238">os</a> &lt;&lt; <span class="stringliteral">&quot;(&quot;</span> &lt;&lt; <a class="code hl_variable" href="pointer_8h.html#aae1f8d263916ad71bd415381591549c0">pointer</a>-&gt;x() &lt;&lt; <span class="stringliteral">&quot;)&quot;</span>;</div>
 <div class="line"><span class="lineno"> 5251</span>}</div>
 <div class="ttc" id="apointer_8h_html_aae1f8d263916ad71bd415381591549c0"><div class="ttname"><a href="pointer_8h.html#aae1f8d263916ad71bd415381591549c0">pointer</a></div><div class="ttdeci">const GenericPointer&lt; typename T::ValueType &gt; &amp; pointer</div><div class="ttdef"><b>Definition</b> <a href="pointer_8h_source.html#l01181">pointer.h:1181</a></div></div>
 </div><!-- fragment -->

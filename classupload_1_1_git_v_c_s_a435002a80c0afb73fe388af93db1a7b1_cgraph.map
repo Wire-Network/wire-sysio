@@ -1,9 +1,0 @@
-<map id="upload.GitVCS.GetUnknownFiles" name="upload.GitVCS.GetUnknownFiles">
-<area shape="rect" id="Node000001" title=" " alt="" coords="5,23,194,64"/>
-<area shape="rect" id="Node000002" href="$namespaceupload.html#adc4aea7c4a79d29dfab04f650c274fdb" title=" " alt="" coords="242,31,358,56"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="194,41,226,41,226,46,194,46"/>
-<area shape="rect" id="Node000003" href="$namespaceupload.html#aded00b2430ea094be3da97c21c1ec61f" title=" " alt="" coords="456,5,570,31"/>
-<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="358,34,440,24,440,29,359,39"/>
-<area shape="rect" id="Node000004" href="$namespaceupload.html#aaf7f85c895770c6aba543e1bf57533ae" title=" " alt="" coords="406,55,619,80"/>
-<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="359,47,391,51,390,56,358,53"/>
-</map>

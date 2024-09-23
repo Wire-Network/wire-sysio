@@ -738,29 +738,29 @@
 \DoxyCodeLine{\Hypertarget{undo__index_8hpp_source_l00737}00737\ \ \ \ \ \ \ \textcolor{keyword}{template}<\textcolor{keywordtype}{bool}\ unique,\ \textcolor{keywordtype}{int}\ N\ =\ 0>}
 \DoxyCodeLine{\Hypertarget{undo__index_8hpp_source_l00738}00738\ \ \ \ \ \ \ \textcolor{keywordtype}{bool}\ post\_modify(value\_type\&\ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}})\ \{}
 \DoxyCodeLine{\Hypertarget{undo__index_8hpp_source_l00739}00739\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ \textcolor{keyword}{constexpr}\ (\mbox{\hyperlink{quantize_8cpp_ab2b6b0c222cd1ce70d6a831f57241e59}{N}}\ <\ \textcolor{keyword}{sizeof}...(Indices))\ \{}
-\DoxyCodeLine{\Hypertarget{undo__index_8hpp_source_l00740}00740\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\&\ \mbox{\hyperlink{namespacehost__functions__tests__1_a8496a24b5236a2dc07bb4f2930d88342}{idx}}\ =\ std::get<N>(\_indices);}
-\DoxyCodeLine{\Hypertarget{undo__index_8hpp_source_l00741}00741\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ iter\ =\ \mbox{\hyperlink{namespacehost__functions__tests__1_a8496a24b5236a2dc07bb4f2930d88342}{idx}}.iterator\_to(\mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}});}
+\DoxyCodeLine{\Hypertarget{undo__index_8hpp_source_l00740}00740\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\&\ idx\ =\ std::get<N>(\_indices);}
+\DoxyCodeLine{\Hypertarget{undo__index_8hpp_source_l00741}00741\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ iter\ =\ idx.iterator\_to(\mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}});}
 \DoxyCodeLine{\Hypertarget{undo__index_8hpp_source_l00742}00742\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{bool}\ fixup\ =\ \textcolor{keyword}{false};}
-\DoxyCodeLine{\Hypertarget{undo__index_8hpp_source_l00743}00743\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (iter\ !=\ \mbox{\hyperlink{namespacehost__functions__tests__1_a8496a24b5236a2dc07bb4f2930d88342}{idx}}.begin())\ \{}
+\DoxyCodeLine{\Hypertarget{undo__index_8hpp_source_l00743}00743\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (iter\ !=\ idx.begin())\ \{}
 \DoxyCodeLine{\Hypertarget{undo__index_8hpp_source_l00744}00744\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ \mbox{\hyperlink{namespacefc_a79771837fffd80fcc4bc658ee2fc4b2b}{copy}}\ =\ iter;}
 \DoxyCodeLine{\Hypertarget{undo__index_8hpp_source_l00745}00745\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ -\/-\/\mbox{\hyperlink{namespacefc_a79771837fffd80fcc4bc658ee2fc4b2b}{copy}};}
-\DoxyCodeLine{\Hypertarget{undo__index_8hpp_source_l00746}00746\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!\mbox{\hyperlink{namespacehost__functions__tests__1_a8496a24b5236a2dc07bb4f2930d88342}{idx}}.value\_comp()(*copy,\ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}))\ fixup\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{\Hypertarget{undo__index_8hpp_source_l00746}00746\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!idx.value\_comp()(*copy,\ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}))\ fixup\ =\ \textcolor{keyword}{true};}
 \DoxyCodeLine{\Hypertarget{undo__index_8hpp_source_l00747}00747\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
 \DoxyCodeLine{\Hypertarget{undo__index_8hpp_source_l00748}00748\ \ \ \ \ \ \ \ \ \ \ \ \ ++iter;}
-\DoxyCodeLine{\Hypertarget{undo__index_8hpp_source_l00749}00749\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (iter\ !=\ \mbox{\hyperlink{namespacehost__functions__tests__1_a8496a24b5236a2dc07bb4f2930d88342}{idx}}.end())\ \{}
-\DoxyCodeLine{\Hypertarget{undo__index_8hpp_source_l00750}00750\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(!\mbox{\hyperlink{namespacehost__functions__tests__1_a8496a24b5236a2dc07bb4f2930d88342}{idx}}.value\_comp()(\mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}},\ *iter))\ fixup\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{\Hypertarget{undo__index_8hpp_source_l00749}00749\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (iter\ !=\ idx.end())\ \{}
+\DoxyCodeLine{\Hypertarget{undo__index_8hpp_source_l00750}00750\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(!idx.value\_comp()(\mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}},\ *iter))\ fixup\ =\ \textcolor{keyword}{true};}
 \DoxyCodeLine{\Hypertarget{undo__index_8hpp_source_l00751}00751\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
 \DoxyCodeLine{\Hypertarget{undo__index_8hpp_source_l00752}00752\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(fixup)\ \{}
-\DoxyCodeLine{\Hypertarget{undo__index_8hpp_source_l00753}00753\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ iter2\ =\ \mbox{\hyperlink{namespacehost__functions__tests__1_a8496a24b5236a2dc07bb4f2930d88342}{idx}}.iterator\_to(\mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}});}
-\DoxyCodeLine{\Hypertarget{undo__index_8hpp_source_l00754}00754\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacehost__functions__tests__1_a8496a24b5236a2dc07bb4f2930d88342}{idx}}.erase(iter2);}
+\DoxyCodeLine{\Hypertarget{undo__index_8hpp_source_l00753}00753\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ iter2\ =\ idx.iterator\_to(\mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}});}
+\DoxyCodeLine{\Hypertarget{undo__index_8hpp_source_l00754}00754\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ idx.erase(iter2);}
 \DoxyCodeLine{\Hypertarget{undo__index_8hpp_source_l00755}00755\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ \textcolor{keyword}{constexpr}\ (unique)\ \{}
-\DoxyCodeLine{\Hypertarget{undo__index_8hpp_source_l00756}00756\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ [new\_pos,\ inserted]\ =\ \mbox{\hyperlink{namespacehost__functions__tests__1_a8496a24b5236a2dc07bb4f2930d88342}{idx}}.insert\_unique(\mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}});}
+\DoxyCodeLine{\Hypertarget{undo__index_8hpp_source_l00756}00756\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ [new\_pos,\ inserted]\ =\ idx.insert\_unique(\mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}});}
 \DoxyCodeLine{\Hypertarget{undo__index_8hpp_source_l00757}00757\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!inserted)\ \{}
-\DoxyCodeLine{\Hypertarget{undo__index_8hpp_source_l00758}00758\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacehost__functions__tests__1_a8496a24b5236a2dc07bb4f2930d88342}{idx}}.insert\_before(new\_pos,\ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}});}
+\DoxyCodeLine{\Hypertarget{undo__index_8hpp_source_l00758}00758\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ idx.insert\_before(new\_pos,\ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}});}
 \DoxyCodeLine{\Hypertarget{undo__index_8hpp_source_l00759}00759\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
 \DoxyCodeLine{\Hypertarget{undo__index_8hpp_source_l00760}00760\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
 \DoxyCodeLine{\Hypertarget{undo__index_8hpp_source_l00761}00761\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
-\DoxyCodeLine{\Hypertarget{undo__index_8hpp_source_l00762}00762\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacehost__functions__tests__1_a8496a24b5236a2dc07bb4f2930d88342}{idx}}.insert\_equal(\mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}});}
+\DoxyCodeLine{\Hypertarget{undo__index_8hpp_source_l00762}00762\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ idx.insert\_equal(\mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}});}
 \DoxyCodeLine{\Hypertarget{undo__index_8hpp_source_l00763}00763\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
 \DoxyCodeLine{\Hypertarget{undo__index_8hpp_source_l00764}00764\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
 \DoxyCodeLine{\Hypertarget{undo__index_8hpp_source_l00765}00765\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ post\_modify<unique,\ N+1>(\mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}});}

@@ -1,5 +1,9 @@
 <map id="sysio::chain::impl::abi_from_variant::extract" name="sysio::chain::impl::abi_from_variant::extract">
-<area shape="rect" id="Node000001" title=" " alt="" coords="5,5,139,61"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,39,139,94"/>
 <area shape="rect" id="Node000002" href="$structsysio_1_1chain_1_1impl_1_1abi__traverse__context.html#aa59879bd83e287e7174d4d0ba248d3ea" title=" " alt="" coords="187,5,337,61"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="139,30,171,30,171,36,139,36"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="139,52,171,46,172,52,140,57"/>
+<area shape="rect" id="Node000003" href="$classfc_1_1variant.html#a17a7054a10963360c6a14d60f6e30128" title=" " alt="" coords="188,86,336,111"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="140,75,174,81,173,86,139,80"/>
+<area shape="rect" id="Node000004" href="$classfc_1_1variant.html#afaae1df286ff97c83301eda21dbd51ea" title=" " alt="" coords="385,86,522,111"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="336,96,369,96,369,101,336,101"/>
 </map>

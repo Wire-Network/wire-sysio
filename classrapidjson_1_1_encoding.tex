@@ -20,13 +20,13 @@ Concept for encoding of Unicode characters.
 \DoxyCodeLine{\ \ \ \ enum\ \{\ supportUnicode\ =\ 1\ \};\ \textcolor{comment}{//\ or\ 0\ if\ not\ supporting\ unicode}}
 \DoxyCodeLine{}
 \DoxyCodeLine{\ \ \ \ \textcolor{keyword}{template}<\textcolor{keyword}{typename}\ OutputStream>}
-\DoxyCodeLine{\ \ \ \ \textcolor{keyword}{static}\ \textcolor{keywordtype}{void}\ Encode(OutputStream\&\ os,\ \textcolor{keywordtype}{unsigned}\ codepoint);}
+\DoxyCodeLine{\ \ \ \ \textcolor{keyword}{static}\ \textcolor{keywordtype}{void}\ Encode(OutputStream\&\ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}},\ \textcolor{keywordtype}{unsigned}\ codepoint);}
 \DoxyCodeLine{}
 \DoxyCodeLine{\ \ \ \ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ InputStream>}
 \DoxyCodeLine{\ \ \ \ \textcolor{keyword}{static}\ \textcolor{keywordtype}{bool}\ Decode(InputStream\&\ is,\ \textcolor{keywordtype}{unsigned}*\ codepoint);}
 \DoxyCodeLine{}
 \DoxyCodeLine{\ \ \ \ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ InputStream,\ \textcolor{keyword}{typename}\ OutputStream>}
-\DoxyCodeLine{\ \ \ \ \textcolor{keyword}{static}\ \textcolor{keywordtype}{bool}\ Validate(InputStream\&\ is,\ OutputStream\&\ os);}
+\DoxyCodeLine{\ \ \ \ \textcolor{keyword}{static}\ \textcolor{keywordtype}{bool}\ Validate(InputStream\&\ is,\ OutputStream\&\ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}});}
 \DoxyCodeLine{}
 \DoxyCodeLine{\ \ \ \ \textcolor{comment}{//\ The\ following\ functions\ are\ deal\ with\ byte\ streams.}}
 \DoxyCodeLine{}
@@ -37,10 +37,10 @@ Concept for encoding of Unicode characters.
 \DoxyCodeLine{\ \ \ \ \textcolor{keyword}{static}\ \mbox{\hyperlink{hash__impl_8h_ab0a0d1ad13c7e4d3cb38c89f7127c85a}{Ch}}\ Take(InputByteStream\&\ is);}
 \DoxyCodeLine{}
 \DoxyCodeLine{\ \ \ \ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ OutputByteStream>}
-\DoxyCodeLine{\ \ \ \ \textcolor{keyword}{static}\ \textcolor{keywordtype}{void}\ PutBOM(OutputByteStream\&\ os);}
+\DoxyCodeLine{\ \ \ \ \textcolor{keyword}{static}\ \textcolor{keywordtype}{void}\ PutBOM(OutputByteStream\&\ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}});}
 \DoxyCodeLine{}
 \DoxyCodeLine{\ \ \ \ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ OutputByteStream>}
-\DoxyCodeLine{\ \ \ \ \textcolor{keyword}{static}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{bench_8cpp_a8496465558c5f8a68e4583295fb89c7d}{Put}}(OutputByteStream\&\ os,\ \mbox{\hyperlink{hash__impl_8h_ab0a0d1ad13c7e4d3cb38c89f7127c85a}{Ch}}\ c);}
+\DoxyCodeLine{\ \ \ \ \textcolor{keyword}{static}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{bench_8cpp_a8496465558c5f8a68e4583295fb89c7d}{Put}}(OutputByteStream\&\ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}},\ \mbox{\hyperlink{hash__impl_8h_ab0a0d1ad13c7e4d3cb38c89f7127c85a}{Ch}}\ c);}
 \DoxyCodeLine{\};}
 
 \end{DoxyCode}

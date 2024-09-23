@@ -3,7 +3,8 @@
 {\ttfamily \#include "{}archiver.\+h"{}}\newline
 {\ttfamily \#include $<$iostream$>$}\newline
 {\ttfamily \#include $<$vector$>$}\newline
-Include dependency graph for archivertest.\+cpp\+:\nopagebreak
+Include dependency graph for archivertest.\+cpp\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -30,13 +31,13 @@ class \mbox{\hyperlink{class_canvas}{Canvas}}
 \item 
 {\footnotesize template$<$typename \mbox{\hyperlink{class_archiver}{Archiver}} $>$ }\\\mbox{\hyperlink{class_archiver}{Archiver}} \& \mbox{\hyperlink{archivertest_8cpp_a228adf99d45c4d34b9699fddc0050321}{operator\&}} (\mbox{\hyperlink{class_archiver}{Archiver}} \&ar, \mbox{\hyperlink{struct_student}{Student}} \&\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}})
 \item 
-std\+::ostream \& \mbox{\hyperlink{archivertest_8cpp_a07bff4b34ee18e927d9e711b6aef336f}{operator$<$$<$}} (std\+::ostream \&os, const \mbox{\hyperlink{struct_student}{Student}} \&\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}})
+std\+::ostream \& \mbox{\hyperlink{archivertest_8cpp_a07bff4b34ee18e927d9e711b6aef336f}{operator$<$$<$}} (std\+::ostream \&\mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}, const \mbox{\hyperlink{struct_student}{Student}} \&\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}})
 \item 
 void \mbox{\hyperlink{archivertest_8cpp_a1440a7779ac56f47a3f355ce4a8c7da0}{test1}} ()
 \item 
 {\footnotesize template$<$typename \mbox{\hyperlink{class_archiver}{Archiver}} $>$ }\\\mbox{\hyperlink{class_archiver}{Archiver}} \& \mbox{\hyperlink{archivertest_8cpp_aa9f8d187a44a0d9114d97d40cda5be2b}{operator\&}} (\mbox{\hyperlink{class_archiver}{Archiver}} \&ar, \mbox{\hyperlink{struct_group}{Group}} \&g)
 \item 
-std\+::ostream \& \mbox{\hyperlink{archivertest_8cpp_ae256975f96ff58f1b3ba60f4ec716b9f}{operator$<$$<$}} (std\+::ostream \&os, const \mbox{\hyperlink{struct_group}{Group}} \&g)
+std\+::ostream \& \mbox{\hyperlink{archivertest_8cpp_ae256975f96ff58f1b3ba60f4ec716b9f}{operator$<$$<$}} (std\+::ostream \&\mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}, const \mbox{\hyperlink{struct_group}{Group}} \&g)
 \item 
 void \mbox{\hyperlink{archivertest_8cpp_a0283886819c7c140a023582b7269e2d0}{test2}} ()
 \item 
@@ -76,7 +77,8 @@ Definition at line \mbox{\hyperlink{archivertest_8cpp_source_l00283}{283}} of fi
 \DoxyCodeLine{00287\ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -231,7 +233,8 @@ Definition at line \mbox{\hyperlink{archivertest_8cpp_source_l00229}{229}} of fi
 \DoxyCodeLine{00242\ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -274,9 +277,9 @@ Definition at line \mbox{\hyperlink{archivertest_8cpp_source_l00086}{86}} of fil
 
 \begin{DoxyCode}{0}
 \DoxyCodeLine{00086\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
-\DoxyCodeLine{00087\ \ \ \ \ os\ <<\ g.\mbox{\hyperlink{struct_group_ab2ad2245f13f8ff8ef5ef0fbebc54eb8}{groupName}}\ <<\ std::endl;}
+\DoxyCodeLine{00087\ \ \ \ \ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}\ <<\ g.\mbox{\hyperlink{struct_group_ab2ad2245f13f8ff8ef5ef0fbebc54eb8}{groupName}}\ <<\ std::endl;}
 \DoxyCodeLine{00088\ \ \ \ \ \textcolor{keywordflow}{for}\ (std::vector<Student>::const\_iterator\ itr\ =\ g.\mbox{\hyperlink{struct_group_a2c1ae6c9cfbec5e2c7082a67c2cd2bdc}{students}}.begin();\ itr\ !=\ g.\mbox{\hyperlink{struct_group_a2c1ae6c9cfbec5e2c7082a67c2cd2bdc}{students}}.end();\ ++itr)}
-\DoxyCodeLine{00089\ \ \ \ \ \ \ \ \ os\ <<\ *itr\ <<\ std::endl;}
+\DoxyCodeLine{00089\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}\ <<\ *itr\ <<\ std::endl;}
 \DoxyCodeLine{00090\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}};}
 \DoxyCodeLine{00091\ \}}
 
@@ -294,7 +297,7 @@ Definition at line \mbox{\hyperlink{archivertest_8cpp_source_l00030}{30}} of fil
 
 \begin{DoxyCode}{0}
 \DoxyCodeLine{00030\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
-\DoxyCodeLine{00031\ \ \ \ \ \textcolor{keywordflow}{return}\ os\ <<\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}.name\ <<\ \textcolor{stringliteral}{"{}\ "{}}\ <<\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}.age\ <<\ \textcolor{stringliteral}{"{}\ "{}}\ <<\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}.height\ <<\ \textcolor{stringliteral}{"{}\ "{}}\ <<\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}.canSwim;}
+\DoxyCodeLine{00031\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}\ <<\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}.name\ <<\ \textcolor{stringliteral}{"{}\ "{}}\ <<\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}.age\ <<\ \textcolor{stringliteral}{"{}\ "{}}\ <<\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}.height\ <<\ \textcolor{stringliteral}{"{}\ "{}}\ <<\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}.canSwim;}
 \DoxyCodeLine{00032\ \}}
 
 \end{DoxyCode}
@@ -333,14 +336,16 @@ Definition at line \mbox{\hyperlink{archivertest_8cpp_source_l00034}{34}} of fil
 \DoxyCodeLine{00054\ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
 \includegraphics[width=264pt]{archivertest_8cpp_a1440a7779ac56f47a3f355ce4a8c7da0_cgraph}
 \end{center}
 \end{figure}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -388,14 +393,16 @@ Definition at line \mbox{\hyperlink{archivertest_8cpp_source_l00093}{93}} of fil
 \DoxyCodeLine{00119\ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
 \includegraphics[width=264pt]{archivertest_8cpp_a0283886819c7c140a023582b7269e2d0_cgraph}
 \end{center}
 \end{figure}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -439,14 +446,16 @@ Definition at line \mbox{\hyperlink{archivertest_8cpp_source_l00257}{257}} of fi
 \DoxyCodeLine{00279\ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
 \includegraphics[width=264pt]{archivertest_8cpp_a6d0455dd5c30adda100e95f0423c786e_cgraph}
 \end{center}
 \end{figure}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode

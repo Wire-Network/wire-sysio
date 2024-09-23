@@ -1,9 +1,11 @@
 <map id="mie::Fp::inverse" name="mie::Fp::inverse">
-<area shape="rect" id="Node000001" title=" " alt="" coords="5,31,121,56"/>
-<area shape="rect" id="Node000002" href="$classmie_1_1_fp.html#a3ec640185d307358357c22c7feed35f3" title=" " alt="" coords="169,31,259,56"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="121,41,153,41,153,46,121,46"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,55,121,80"/>
+<area shape="rect" id="Node000002" href="$classmie_1_1_fp.html#a3ec640185d307358357c22c7feed35f3" title=" " alt="" coords="169,55,259,80"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="121,65,153,65,153,70,121,70"/>
 <area shape="rect" id="Node000003" href="$structmie_1_1_vuint_t.html#a37838a763e8b608a0aeba236ec1313a7" title=" " alt="" coords="311,5,433,31"/>
-<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="259,34,295,28,296,33,260,39"/>
-<area shape="rect" id="Node000004" href="$structmie_1_1_vuint_t.html#a5ebbc4896607410c747186c4f55d6b1b" title=" " alt="" coords="307,55,437,80"/>
-<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="260,48,292,53,291,58,259,53"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="257,51,313,34,315,39,259,57"/>
+<area shape="rect" id="Node000004" href="$classmie_1_1_fp.html#aad61a39ac267933278ea88ae87aa3357" title=" " alt="" coords="318,55,427,80"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="259,65,302,65,302,70,259,70"/>
+<area shape="rect" id="Node000005" href="$structmie_1_1_vuint_t.html#a5ebbc4896607410c747186c4f55d6b1b" title=" " alt="" coords="307,104,437,130"/>
+<area shape="poly" id="edge4_Node000002_Node000005" title=" " alt="" coords="259,78,315,96,313,101,257,84"/>
 </map>

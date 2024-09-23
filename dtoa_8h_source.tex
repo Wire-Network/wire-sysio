@@ -116,10 +116,10 @@
 \DoxyCodeLine{\Hypertarget{dtoa_8h_source_l00112}\mbox{\hyperlink{namespaceinternal_aeb7b6c0784b644968003cbd1b9da57e3}{00112}}\ \textcolor{keyword}{inline}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespaceinternal_aeb7b6c0784b644968003cbd1b9da57e3}{Grisu2}}(\textcolor{keywordtype}{double}\ \mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}},\ \textcolor{keywordtype}{char}*\ buffer,\ \textcolor{keywordtype}{int}*\ length,\ \textcolor{keywordtype}{int}*\ \mbox{\hyperlink{make__512_8cpp_a3d4e997ddc51e0c06c306fe4862826c0}{K}})\ \{}
 \DoxyCodeLine{\Hypertarget{dtoa_8h_source_l00113}00113\ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{structinternal_1_1_diy_fp}{DiyFp}}\ v(\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}});}
 \DoxyCodeLine{\Hypertarget{dtoa_8h_source_l00114}00114\ \ \ \ \ \mbox{\hyperlink{structinternal_1_1_diy_fp}{DiyFp}}\ w\_m,\ w\_p;}
-\DoxyCodeLine{\Hypertarget{dtoa_8h_source_l00115}00115\ \ \ \ \ v.NormalizedBoundaries(\&w\_m,\ \&w\_p);}
+\DoxyCodeLine{\Hypertarget{dtoa_8h_source_l00115}00115\ \ \ \ \ v.\mbox{\hyperlink{structinternal_1_1_diy_fp_adef8bf723f24db9dc6cefa260e8c2390}{NormalizedBoundaries}}(\&w\_m,\ \&w\_p);}
 \DoxyCodeLine{\Hypertarget{dtoa_8h_source_l00116}00116\ }
 \DoxyCodeLine{\Hypertarget{dtoa_8h_source_l00117}00117\ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{structinternal_1_1_diy_fp}{DiyFp}}\ c\_mk\ =\ \mbox{\hyperlink{namespaceinternal_abac3dbfa1070756c37725829148f6038}{GetCachedPower}}(w\_p.\mbox{\hyperlink{structinternal_1_1_diy_fp_afa9db335eeb61c7f966d888d89b1e6f2}{e}},\ \mbox{\hyperlink{make__512_8cpp_a3d4e997ddc51e0c06c306fe4862826c0}{K}});}
-\DoxyCodeLine{\Hypertarget{dtoa_8h_source_l00118}00118\ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{structinternal_1_1_diy_fp}{DiyFp}}\ W\ =\ v.Normalize()\ *\ c\_mk;}
+\DoxyCodeLine{\Hypertarget{dtoa_8h_source_l00118}00118\ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{structinternal_1_1_diy_fp}{DiyFp}}\ W\ =\ v.\mbox{\hyperlink{structinternal_1_1_diy_fp_aa6cbacc8dfcd92cb8c57884e45548976}{Normalize}}()\ *\ c\_mk;}
 \DoxyCodeLine{\Hypertarget{dtoa_8h_source_l00119}00119\ \ \ \ \ \mbox{\hyperlink{structinternal_1_1_diy_fp}{DiyFp}}\ Wp\ =\ w\_p\ *\ c\_mk;}
 \DoxyCodeLine{\Hypertarget{dtoa_8h_source_l00120}00120\ \ \ \ \ \mbox{\hyperlink{structinternal_1_1_diy_fp}{DiyFp}}\ Wm\ =\ w\_m\ *\ c\_mk;}
 \DoxyCodeLine{\Hypertarget{dtoa_8h_source_l00121}00121\ \ \ \ \ Wm.\mbox{\hyperlink{structinternal_1_1_diy_fp_a09b9217a86e8a2e6aa8d2d48fc351008}{f}}++;}

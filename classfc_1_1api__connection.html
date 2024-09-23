@@ -260,30 +260,9 @@ Here is the caller graph for this function:</div>
 <div class="dyncontent">
 <div class="center"><img src="classfc_1_1api__connection_a31c921df625930a9a7d0ad114bb2ba1e_icgraph.png" border="0" usemap="#aclassfc_1_1api__connection_a31c921df625930a9a7d0ad114bb2ba1e_icgraph" alt=""/></div>
 <map name="aclassfc_1_1api__connection_a31c921df625930a9a7d0ad114bb2ba1e_icgraph" id="aclassfc_1_1api__connection_a31c921df625930a9a7d0ad114bb2ba1e_icgraph">
-<area shape="rect" title=" " alt="" coords="629,98,773,138"/>
-<area shape="rect" href="classfc_1_1rpc_1_1cli.html#a5ca2f4c807517379e93cbe65371f599d" title=" " alt="" coords="468,105,581,131"/>
-<area shape="poly" title=" " alt="" coords="614,121,582,121,582,116,614,116"/>
-<area shape="rect" href="classcpp_1_1tokenize_1_1_token.html#ad93a4059e9932fa2dea149510f0ef002" title=" " alt="" coords="260,15,398,56"/>
-<area shape="poly" title=" " alt="" coords="484,101,419,70,391,59,393,54,421,65,486,96"/>
-<area shape="rect" href="classpump_1_1_token.html#a1a3dc1ee7b0d66e90f4ab7228b37fc0d" title=" " alt="" coords="259,80,398,106"/>
-<area shape="poly" title=" " alt="" coords="452,112,399,104,399,99,453,106"/>
-<area shape="rect" href="classcpp_1_1ast_1_1_node.html#aade2369ed75b8cd0b9e76752bf6ae7fb" title=" " alt="" coords="238,129,420,155"/>
-<area shape="poly" title=" " alt="" coords="453,130,421,134,420,128,452,124"/>
-<area shape="rect" href="classpump_1_1_token.html#a808876dd5a7b1bf6c43a3855dc4a8868" title=" " alt="" coords="264,203,394,228"/>
-<area shape="poly" title=" " alt="" coords="485,141,358,204,356,200,482,136"/>
-<area shape="rect" href="classcpp_1_1ast_1_1_define.html#a8e51e0611e1a76c5874f6b39e27a6d6a" title=" " alt="" coords="21,5,174,31"/>
-<area shape="poly" title=" " alt="" coords="242,124,236,120,219,101,211,81,204,62,188,44,169,34,172,29,191,40,209,59,216,79,223,98,239,116,245,120"/>
-<area shape="rect" href="classcpp_1_1ast_1_1_expr.html#a47968bf1be367a77836f211ced014ec0" title=" " alt="" coords="27,55,168,80"/>
-<area shape="poly" title=" " alt="" coords="254,127,237,121,212,107,189,94,157,83,159,78,191,89,215,102,239,116,255,122"/>
-<area shape="rect" href="classcpp_1_1ast_1_1_goto.html#ad3bb8a557e3075d7b68c5b0449fb494c" title=" " alt="" coords="26,104,169,130"/>
-<area shape="poly" title=" " alt="" coords="222,133,169,127,170,122,223,128"/>
-<area shape="rect" href="classcpp_1_1ast_1_1_using.html#aa489ba90656b2c28290af718f644d2f4" title=" " alt="" coords="23,153,172,179"/>
-<area shape="poly" title=" " alt="" coords="222,156,173,161,172,156,222,151"/>
-<area shape="rect" href="classcpp_1_1ast_1_1_variable_declaration.html#aeafe1b55bcf3005d00951f0accb18def" title=" " alt="" coords="5,203,190,244"/>
-<area shape="poly" title=" " alt="" coords="256,163,239,169,215,181,191,194,163,205,161,200,189,189,212,176,237,164,254,158"/>
-<area shape="rect" href="classcpp_1_1ast_1_1_node.html#acceba1aa15a332dd139ba9587d439a51" title=" " alt="" coords="11,268,184,294"/>
-<area shape="poly" title=" " alt="" coords="244,165,240,168,223,189,216,212,209,235,191,258,171,270,168,265,188,253,205,232,211,210,218,187,236,164,241,161"/>
-<area shape="poly" title=" " alt="" coords="363,190,351,184,329,181,308,183,297,188,295,193,300,201,296,204,290,194,293,184,307,178,329,176,353,179,365,186"/>
+<area shape="rect" title=" " alt="" coords="167,5,310,46"/>
+<area shape="rect" href="classfc_1_1rpc_1_1cli.html#a5ca2f4c807517379e93cbe65371f599d" title=" " alt="" coords="5,13,119,38"/>
+<area shape="poly" title=" " alt="" coords="151,28,119,28,119,23,151,23"/>
 </map>
 </div>
 
@@ -406,9 +385,8 @@ Here is the caller graph for this function:</div>
 <p class="definition">Definition at line <a class="el" href="api__connection_8hpp_source.html#l00230">230</a> of file <a class="el" href="api__connection_8hpp_source.html">api_connection.hpp</a>.</p>
 <div class="fragment"><div class="line"><span class="lineno">  231</span>         {</div>
 <div class="line"><span class="lineno">  232</span>            <a class="code hl_define" href="exception_8hpp.html#abed525eeff3ae581be7e4e2fcd3b7bf4">FC_ASSERT</a>( _local_callbacks.size() &gt; callback_id );</div>
-<div class="line"><span class="lineno">  233</span>            <span class="keywordflow">return</span> _local_callbacks[callback_id]( <a class="code hl_variable" href="namespacebenchmark_compile.html#ad0ed96ae1454e4347ca61ac3887c379e">args</a> );</div>
+<div class="line"><span class="lineno">  233</span>            <span class="keywordflow">return</span> _local_callbacks[callback_id]( args );</div>
 <div class="line"><span class="lineno">  234</span>         }</div>
-<div class="ttc" id="anamespacebenchmark_compile_html_ad0ed96ae1454e4347ca61ac3887c379e"><div class="ttname"><a href="namespacebenchmark_compile.html#ad0ed96ae1454e4347ca61ac3887c379e">benchmarkCompile.args</a></div><div class="ttdeci">args</div><div class="ttdef"><b>Definition</b> <a href="benchmark_compile_8py_source.html#l00122">benchmarkCompile.py:122</a></div></div>
 </div><!-- fragment --><div class="dynheader">
 Here is the caller graph for this function:</div>
 <div class="dyncontent">
@@ -454,7 +432,7 @@ Here is the caller graph for this function:</div>
 <p class="definition">Definition at line <a class="el" href="api__connection_8hpp_source.html#l00235">235</a> of file <a class="el" href="api__connection_8hpp_source.html">api_connection.hpp</a>.</p>
 <div class="fragment"><div class="line"><span class="lineno">  236</span>         {</div>
 <div class="line"><span class="lineno">  237</span>            <a class="code hl_define" href="exception_8hpp.html#abed525eeff3ae581be7e4e2fcd3b7bf4">FC_ASSERT</a>( _local_callbacks.size() &gt; callback_id );</div>
-<div class="line"><span class="lineno">  238</span>            _local_callbacks[callback_id]( <a class="code hl_variable" href="namespacebenchmark_compile.html#ad0ed96ae1454e4347ca61ac3887c379e">args</a> );</div>
+<div class="line"><span class="lineno">  238</span>            _local_callbacks[callback_id]( args );</div>
 <div class="line"><span class="lineno">  239</span>         }</div>
 </div><!-- fragment --><div class="dynheader">
 Here is the caller graph for this function:</div>

@@ -6,7 +6,8 @@
 
 
 
-Inheritance diagram for testing\+::internal\+::Expectation\+Base\+:\nopagebreak
+Inheritance diagram for testing\+::internal\+::Expectation\+Base\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -15,7 +16,8 @@ Inheritance diagram for testing\+::internal\+::Expectation\+Base\+:\nopagebreak
 \end{figure}
 
 
-Collaboration diagram for testing\+::internal\+::Expectation\+Base\+:\nopagebreak
+Collaboration diagram for testing\+::internal\+::Expectation\+Base\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -37,11 +39,11 @@ const char \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{classtesting_1_1internal_
 \item 
 const \mbox{\hyperlink{classtesting_1_1_cardinality}{Cardinality}} \& \mbox{\hyperlink{classtesting_1_1internal_1_1_expectation_base_add89b0324797a421a1df77898528cbb7}{cardinality}} () const
 \item 
-void \mbox{\hyperlink{classtesting_1_1internal_1_1_expectation_base_a666e7f8fb2412e78f090244e6bfd4493}{Describe\+Location\+To}} (\+::std\+::ostream \texorpdfstring{$\ast$}{*}os) const
+void \mbox{\hyperlink{classtesting_1_1internal_1_1_expectation_base_a666e7f8fb2412e78f090244e6bfd4493}{Describe\+Location\+To}} (\+::std\+::ostream \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}) const
 \item 
-void \mbox{\hyperlink{classtesting_1_1internal_1_1_expectation_base_a2beebed3ade29077bcf294b449bb8b9d}{Describe\+Call\+Count\+To}} (\+::std\+::ostream \texorpdfstring{$\ast$}{*}os) const \mbox{\hyperlink{gtest-port_8h_a149f693bd59fa1bc937af54c0cdcb32f}{GTEST\+\_\+\+EXCLUSIVE\+\_\+\+LOCK\+\_\+\+REQUIRED\+\_\+}}(g\+\_\+gmock\+\_\+mutex)
+void \mbox{\hyperlink{classtesting_1_1internal_1_1_expectation_base_a2beebed3ade29077bcf294b449bb8b9d}{Describe\+Call\+Count\+To}} (\+::std\+::ostream \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}) const \mbox{\hyperlink{gtest-port_8h_a149f693bd59fa1bc937af54c0cdcb32f}{GTEST\+\_\+\+EXCLUSIVE\+\_\+\+LOCK\+\_\+\+REQUIRED\+\_\+}}(g\+\_\+gmock\+\_\+mutex)
 \item 
-virtual void \mbox{\hyperlink{classtesting_1_1internal_1_1_expectation_base_a5ce4f648c7b112d27b798711d1e3ff5b}{Maybe\+Describe\+Extra\+Matcher\+To}} (\+::std\+::ostream \texorpdfstring{$\ast$}{*}os)=0
+virtual void \mbox{\hyperlink{classtesting_1_1internal_1_1_expectation_base_a5ce4f648c7b112d27b798711d1e3ff5b}{Maybe\+Describe\+Extra\+Matcher\+To}} (\+::std\+::ostream \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}})=0
 \end{DoxyCompactItemize}
 \doxysubsubsection*{Protected Types}
 \begin{DoxyCompactItemize}
@@ -298,8 +300,8 @@ Definition at line \mbox{\hyperlink{gmock-spec-builders_8cc_source_l00131}{131}}
 \DoxyCodeLine{00139\ \ \ \ \ \textcolor{keywordflow}{for}\ (\mbox{\hyperlink{classtesting_1_1_expectation_set_a133d96bcaa13be84583cf2718a1e6c69}{ExpectationSet::const\_iterator}}\ it\ =}
 \DoxyCodeLine{00140\ \ \ \ \ \ \ \ \ \ \ \ \ \ exp-\/>immediate\_prerequisites\_.begin();}
 \DoxyCodeLine{00141\ \ \ \ \ \ \ \ \ \ it\ !=\ exp-\/>immediate\_prerequisites\_.end();\ ++it)\ \{}
-\DoxyCodeLine{00142\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{classtesting_1_1internal_1_1_expectation_base_a7ba2da3ba34dfca22d2202934405e676}{ExpectationBase}}*\ \mbox{\hyperlink{namespacecpp_1_1ast_a25b104cfd21fb8487a07063b6ce62062}{next}}\ =\ it-\/>expectation\_base().get();}
-\DoxyCodeLine{00143\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!\mbox{\hyperlink{namespacecpp_1_1ast_a25b104cfd21fb8487a07063b6ce62062}{next}}-\/>IsSatisfied())\ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00142\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{classtesting_1_1internal_1_1_expectation_base_a7ba2da3ba34dfca22d2202934405e676}{ExpectationBase}}*\ \mbox{\hyperlink{namespaceutf8_afc093dfde66a6f52cb4a5caefe0e580d}{next}}\ =\ it-\/>expectation\_base().get();}
+\DoxyCodeLine{00143\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!\mbox{\hyperlink{namespaceutf8_afc093dfde66a6f52cb4a5caefe0e580d}{next}}-\/>IsSatisfied())\ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
 \DoxyCodeLine{00144\ \ \ \ \ \ \ expectations.push\_back(next);}
 \DoxyCodeLine{00145\ \ \ \ \ \}}
 \DoxyCodeLine{00146\ \ \ \}}
@@ -307,7 +309,8 @@ Definition at line \mbox{\hyperlink{gmock-spec-builders_8cc_source_l00131}{131}}
 \DoxyCodeLine{00148\ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -331,7 +334,8 @@ Definition at line \mbox{\hyperlink{gmock-spec-builders_8h_source_l00746}{746}} 
 \DoxyCodeLine{00749\ \ \ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -371,7 +375,8 @@ Definition at line \mbox{\hyperlink{gmock-spec-builders_8h_source_l00707}{707}} 
 \DoxyCodeLine{00707\ \{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classtesting_1_1internal_1_1_expectation_base_ad0aedcc01c0c9a998952a2b2f486595c}{cardinality\_}};\ \}}
 
 \end{DoxyCode}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -456,7 +461,8 @@ Definition at line \mbox{\hyperlink{gmock-spec-builders_8cc_source_l00205}{205}}
 \DoxyCodeLine{00254\ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -479,14 +485,14 @@ Definition at line \mbox{\hyperlink{gmock-spec-builders_8cc_source_l00182}{182}}
 \DoxyCodeLine{00184\ \ \ g\_gmock\_mutex.AssertHeld();}
 \DoxyCodeLine{00185\ }
 \DoxyCodeLine{00186\ \ \ \textcolor{comment}{//\ Describes\ how\ many\ times\ the\ function\ is\ expected\ to\ be\ called.}}
-\DoxyCodeLine{00187\ \ \ *os\ <<\ \textcolor{stringliteral}{"{}\ \ \ \ \ \ \ \ \ Expected:\ to\ be\ "{}};}
-\DoxyCodeLine{00188\ \ \ \mbox{\hyperlink{classtesting_1_1internal_1_1_expectation_base_add89b0324797a421a1df77898528cbb7}{cardinality}}().\mbox{\hyperlink{classtesting_1_1_cardinality_a2955f4b65022c422f56e79b767c4fa71}{DescribeTo}}(os);}
-\DoxyCodeLine{00189\ \ \ *os\ <<\ \textcolor{stringliteral}{"{}\(\backslash\)n\ \ \ \ \ \ \ \ \ \ \ Actual:\ "{}};}
-\DoxyCodeLine{00190\ \ \ \mbox{\hyperlink{classtesting_1_1_cardinality_a7cbea339e2f3072a98367e087aa296e8}{Cardinality::DescribeActualCallCountTo}}(\mbox{\hyperlink{classtesting_1_1internal_1_1_expectation_base_aacc0399271907194ac1627439f65047a}{call\_count}}(),\ os);}
+\DoxyCodeLine{00187\ \ \ *\mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}\ <<\ \textcolor{stringliteral}{"{}\ \ \ \ \ \ \ \ \ Expected:\ to\ be\ "{}};}
+\DoxyCodeLine{00188\ \ \ \mbox{\hyperlink{classtesting_1_1internal_1_1_expectation_base_add89b0324797a421a1df77898528cbb7}{cardinality}}().\mbox{\hyperlink{classtesting_1_1_cardinality_a2955f4b65022c422f56e79b767c4fa71}{DescribeTo}}(\mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}});}
+\DoxyCodeLine{00189\ \ \ *\mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}\ <<\ \textcolor{stringliteral}{"{}\(\backslash\)n\ \ \ \ \ \ \ \ \ \ \ Actual:\ "{}};}
+\DoxyCodeLine{00190\ \ \ \mbox{\hyperlink{classtesting_1_1_cardinality_a7cbea339e2f3072a98367e087aa296e8}{Cardinality::DescribeActualCallCountTo}}(\mbox{\hyperlink{classtesting_1_1internal_1_1_expectation_base_aacc0399271907194ac1627439f65047a}{call\_count}}(),\ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}});}
 \DoxyCodeLine{00191\ }
 \DoxyCodeLine{00192\ \ \ \textcolor{comment}{//\ Describes\ the\ state\ of\ the\ expectation\ (e.g.\ is\ it\ satisfied?}}
 \DoxyCodeLine{00193\ \ \ \textcolor{comment}{//\ is\ it\ active?).}}
-\DoxyCodeLine{00194\ \ \ *os\ <<\ \textcolor{stringliteral}{"{}\ -\/\ "{}}\ <<\ (\mbox{\hyperlink{classtesting_1_1internal_1_1_expectation_base_a080dab35ecc6c57096f50758a0e8123d}{IsOverSaturated}}()\ ?\ \textcolor{stringliteral}{"{}over-\/saturated"{}}\ :}
+\DoxyCodeLine{00194\ \ \ *\mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}\ <<\ \textcolor{stringliteral}{"{}\ -\/\ "{}}\ <<\ (\mbox{\hyperlink{classtesting_1_1internal_1_1_expectation_base_a080dab35ecc6c57096f50758a0e8123d}{IsOverSaturated}}()\ ?\ \textcolor{stringliteral}{"{}over-\/saturated"{}}\ :}
 \DoxyCodeLine{00195\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classtesting_1_1internal_1_1_expectation_base_ad3e4340cedefdc24fce1478a8d6cab93}{IsSaturated}}()\ ?\ \textcolor{stringliteral}{"{}saturated"{}}\ :}
 \DoxyCodeLine{00196\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classtesting_1_1internal_1_1_expectation_base_ae629adc2dd9aee0ac62e50314f1a6449}{IsSatisfied}}()\ ?\ \textcolor{stringliteral}{"{}satisfied"{}}\ :\ \textcolor{stringliteral}{"{}unsatisfied"{}})}
 \DoxyCodeLine{00197\ \ \ \ \ \ \ <<\ \textcolor{stringliteral}{"{}\ and\ "{}}}
@@ -494,7 +500,8 @@ Definition at line \mbox{\hyperlink{gmock-spec-builders_8cc_source_l00182}{182}}
 \DoxyCodeLine{00199\ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -514,11 +521,12 @@ Definition at line \mbox{\hyperlink{gmock-spec-builders_8h_source_l00710}{710}} 
 
 \begin{DoxyCode}{0}
 \DoxyCodeLine{00710\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
-\DoxyCodeLine{00711\ \ \ \ \ *os\ <<\ \mbox{\hyperlink{namespacetesting_1_1internal_a31b7c3abed4a7c395f42c61e993989f4}{FormatFileLocation}}(\mbox{\hyperlink{classtesting_1_1internal_1_1_expectation_base_a4e6c2bf337d2213652dbe630be7fdcc7}{file}}(),\ \mbox{\hyperlink{classtesting_1_1internal_1_1_expectation_base_a6a44d831449d31e0e46d0070625b452c}{line}}())\ <<\ \textcolor{stringliteral}{"{}\ "{}};}
+\DoxyCodeLine{00711\ \ \ \ \ *\mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}\ <<\ \mbox{\hyperlink{namespacetesting_1_1internal_a31b7c3abed4a7c395f42c61e993989f4}{FormatFileLocation}}(\mbox{\hyperlink{classtesting_1_1internal_1_1_expectation_base_a4e6c2bf337d2213652dbe630be7fdcc7}{file}}(),\ \mbox{\hyperlink{classtesting_1_1internal_1_1_expectation_base_a6a44d831449d31e0e46d0070625b452c}{line}}())\ <<\ \textcolor{stringliteral}{"{}\ "{}};}
 \DoxyCodeLine{00712\ \ \ \}}
 
 \end{DoxyCode}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -542,14 +550,16 @@ Definition at line \mbox{\hyperlink{gmock-spec-builders_8h_source_l00752}{752}} 
 \DoxyCodeLine{00755\ \ \ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
 \includegraphics[width=350pt]{classtesting_1_1internal_1_1_expectation_base_af261dd0d844ab9db2328c37845c736c4_cgraph}
 \end{center}
 \end{figure}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -571,7 +581,8 @@ Definition at line \mbox{\hyperlink{gmock-spec-builders_8h_source_l00703}{703}} 
 \DoxyCodeLine{00703\ \{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classtesting_1_1internal_1_1_expectation_base_afabf690537298bbb84e9b443f62d7e97}{file\_}};\ \}}
 
 \end{DoxyCode}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -600,12 +611,12 @@ Definition at line \mbox{\hyperlink{gmock-spec-builders_8cc_source_l00151}{151}}
 \DoxyCodeLine{00159\ \ \ \ \ \textcolor{keywordflow}{for}\ (\mbox{\hyperlink{classtesting_1_1_expectation_set_a133d96bcaa13be84583cf2718a1e6c69}{ExpectationSet::const\_iterator}}\ it\ =}
 \DoxyCodeLine{00160\ \ \ \ \ \ \ \ \ \ \ \ \ \ exp-\/>immediate\_prerequisites\_.begin();}
 \DoxyCodeLine{00161\ \ \ \ \ \ \ \ \ \ it\ !=\ exp-\/>immediate\_prerequisites\_.end();\ ++it)\ \{}
-\DoxyCodeLine{00162\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{classtesting_1_1internal_1_1_expectation_base_a7ba2da3ba34dfca22d2202934405e676}{ExpectationBase}}*\ \mbox{\hyperlink{namespacecpp_1_1ast_a25b104cfd21fb8487a07063b6ce62062}{next}}\ =\ it-\/>expectation\_base().get();}
+\DoxyCodeLine{00162\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{classtesting_1_1internal_1_1_expectation_base_a7ba2da3ba34dfca22d2202934405e676}{ExpectationBase}}*\ \mbox{\hyperlink{namespaceutf8_afc093dfde66a6f52cb4a5caefe0e580d}{next}}\ =\ it-\/>expectation\_base().get();}
 \DoxyCodeLine{00163\ }
-\DoxyCodeLine{00164\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{namespacecpp_1_1ast_a25b104cfd21fb8487a07063b6ce62062}{next}}-\/>IsSatisfied())\ \{}
+\DoxyCodeLine{00164\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{namespaceutf8_afc093dfde66a6f52cb4a5caefe0e580d}{next}}-\/>IsSatisfied())\ \{}
 \DoxyCodeLine{00165\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ If\ *it\ is\ satisfied\ and\ has\ a\ call\ count\ of\ 0,\ some\ of\ its}}
 \DoxyCodeLine{00166\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ pre-\/requisites\ may\ not\ be\ satisfied\ yet.}}
-\DoxyCodeLine{00167\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{namespacecpp_1_1ast_a25b104cfd21fb8487a07063b6ce62062}{next}}-\/>call\_count\_\ ==\ 0)\ \{}
+\DoxyCodeLine{00167\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{namespaceutf8_afc093dfde66a6f52cb4a5caefe0e580d}{next}}-\/>call\_count\_\ ==\ 0)\ \{}
 \DoxyCodeLine{00168\ \ \ \ \ \ \ \ \ \ \ expectations.push\_back(next);}
 \DoxyCodeLine{00169\ \ \ \ \ \ \ \ \ \}}
 \DoxyCodeLine{00170\ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
@@ -619,7 +630,8 @@ Definition at line \mbox{\hyperlink{gmock-spec-builders_8cc_source_l00151}{151}}
 \DoxyCodeLine{00178\ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -674,7 +686,8 @@ Definition at line \mbox{\hyperlink{gmock-spec-builders_8h_source_l00779}{779}} 
 \DoxyCodeLine{00783\ \ \ \}}
 
 \end{DoxyCode}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -750,7 +763,8 @@ Definition at line \mbox{\hyperlink{gmock-spec-builders_8h_source_l00704}{704}} 
 \DoxyCodeLine{00704\ \{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classtesting_1_1internal_1_1_expectation_base_ab8143119e4b686ff1bb6c985924da57a}{line\_}};\ \}}
 
 \end{DoxyCode}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -812,9 +826,9 @@ Definition at line \mbox{\hyperlink{gmock-spec-builders_8cc_source_l00104}{104}}
 \DoxyCodeLine{00117\ \ \ \ \ \textcolor{keywordflow}{for}\ (\mbox{\hyperlink{classtesting_1_1_expectation_set_a133d96bcaa13be84583cf2718a1e6c69}{ExpectationSet::const\_iterator}}\ it\ =}
 \DoxyCodeLine{00118\ \ \ \ \ \ \ \ \ \ \ \ \ \ exp-\/>immediate\_prerequisites\_.begin();}
 \DoxyCodeLine{00119\ \ \ \ \ \ \ \ \ \ it\ !=\ exp-\/>immediate\_prerequisites\_.end();\ ++it)\ \{}
-\DoxyCodeLine{00120\ \ \ \ \ \ \ \mbox{\hyperlink{classtesting_1_1internal_1_1_expectation_base_a7ba2da3ba34dfca22d2202934405e676}{ExpectationBase}}*\ \mbox{\hyperlink{namespacecpp_1_1ast_a25b104cfd21fb8487a07063b6ce62062}{next}}\ =\ it-\/>expectation\_base().get();}
-\DoxyCodeLine{00121\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!\mbox{\hyperlink{namespacecpp_1_1ast_a25b104cfd21fb8487a07063b6ce62062}{next}}-\/>is\_retired())\ \{}
-\DoxyCodeLine{00122\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacecpp_1_1ast_a25b104cfd21fb8487a07063b6ce62062}{next}}-\/>Retire();}
+\DoxyCodeLine{00120\ \ \ \ \ \ \ \mbox{\hyperlink{classtesting_1_1internal_1_1_expectation_base_a7ba2da3ba34dfca22d2202934405e676}{ExpectationBase}}*\ \mbox{\hyperlink{namespaceutf8_afc093dfde66a6f52cb4a5caefe0e580d}{next}}\ =\ it-\/>expectation\_base().get();}
+\DoxyCodeLine{00121\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!\mbox{\hyperlink{namespaceutf8_afc093dfde66a6f52cb4a5caefe0e580d}{next}}-\/>is\_retired())\ \{}
+\DoxyCodeLine{00122\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespaceutf8_afc093dfde66a6f52cb4a5caefe0e580d}{next}}-\/>Retire();}
 \DoxyCodeLine{00123\ \ \ \ \ \ \ \ \ expectations.push\_back(next);}
 \DoxyCodeLine{00124\ \ \ \ \ \ \ \}}
 \DoxyCodeLine{00125\ \ \ \ \ \}}
@@ -822,7 +836,8 @@ Definition at line \mbox{\hyperlink{gmock-spec-builders_8cc_source_l00104}{104}}
 \DoxyCodeLine{00127\ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -861,7 +876,8 @@ Definition at line \mbox{\hyperlink{gmock-spec-builders_8h_source_l00705}{705}} 
 \DoxyCodeLine{00705\ \{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classtesting_1_1internal_1_1_expectation_base_a11ca157b7e8879b9f3b0ad1524eee5a4}{source\_text\_}}.c\_str();\ \}}
 
 \end{DoxyCode}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -886,7 +902,8 @@ Definition at line \mbox{\hyperlink{gmock-spec-builders_8cc_source_l00098}{98}} 
 \DoxyCodeLine{00101\ \}}
 
 \end{DoxyCode}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -922,7 +939,8 @@ Definition at line \mbox{\hyperlink{gmock-spec-builders_8cc_source_l00257}{257}}
 \DoxyCodeLine{00271\ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode

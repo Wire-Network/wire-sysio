@@ -1,3 +1,5 @@
 <map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
-<area shape="rect" id="Node000000" href="$classfc_1_1zipkin.html" title=" " alt="" coords="5,5,80,31"/>
+<area shape="rect" id="Node000000" href="$structfc_1_1zipkin__span.html" title=" " alt="" coords="5,5,115,31"/>
+<area shape="rect" id="Node000001" href="$structfc_1_1zipkin__trace.html" title=" " alt="" coords="163,5,273,31"/>
+<area shape="poly" id="edge413_Node000000_Node000001" title=" " alt="" coords="131,16,162,16,162,21,131,21"/>
 </map>

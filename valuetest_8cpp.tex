@@ -3,7 +3,8 @@
 {\ttfamily \#include "{}unittest.\+h"{}}\newline
 {\ttfamily \#include "{}rapidjson/document.\+h"{}}\newline
 {\ttfamily \#include $<$algorithm$>$}\newline
-Include dependency graph for valuetest.\+cpp\+:\nopagebreak
+Include dependency graph for valuetest.\+cpp\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -340,7 +341,8 @@ Definition at line \mbox{\hyperlink{valuetest_8cpp_source_l01124}{1124}} of file
 \DoxyCodeLine{01183\ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -403,7 +405,8 @@ Definition at line \mbox{\hyperlink{valuetest_8cpp_source_l00121}{121}} of file 
 \DoxyCodeLine{00162\ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -514,7 +517,8 @@ Definition at line \mbox{\hyperlink{valuetest_8cpp_source_l00283}{283}} of file 
 \DoxyCodeLine{00286\ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -669,7 +673,8 @@ Definition at line \mbox{\hyperlink{valuetest_8cpp_source_l00180}{180}} of file 
 \DoxyCodeLine{00247\ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -1061,7 +1066,8 @@ Definition at line \mbox{\hyperlink{valuetest_8cpp_source_l01819}{1819}} of file
 \DoxyCodeLine{01847\ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -1207,7 +1213,8 @@ Definition at line \mbox{\hyperlink{valuetest_8cpp_source_l01505}{1505}} of file
 \DoxyCodeLine{01558\ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -1257,44 +1264,45 @@ Definition at line \mbox{\hyperlink{valuetest_8cpp_source_l00882}{882}} of file 
 \DoxyCodeLine{00885\ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ nullPtr\ =\ 0;}
 \DoxyCodeLine{00886\ \ \ \ \ \{}
 \DoxyCodeLine{00887\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Construction\ with\ string\ type\ creates\ empty\ string}}
-\DoxyCodeLine{00888\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_generic_value}{Value}}\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}(\mbox{\hyperlink{rapidjson_8h_a1d1cfd8ffb84e947f82999c682b666a7a2d823b89b055bc743d05c03183d3f338}{kStringType}});}
-\DoxyCodeLine{00889\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{gtest_8h_a6ae7443947f25abc58bfcfcfc56b0d75}{EXPECT\_NE}}(\mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.GetString(),\ nullPtr);\ \textcolor{comment}{//\ non-\/null\ string\ returned}}
-\DoxyCodeLine{00890\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{gtest_8h_a4159019abda84f5366acdb7604ff220a}{EXPECT\_EQ}}(\mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.GetStringLength(),\ 0u);}
+\DoxyCodeLine{00888\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_generic_value}{Value}}\ v(\mbox{\hyperlink{rapidjson_8h_a1d1cfd8ffb84e947f82999c682b666a7a2d823b89b055bc743d05c03183d3f338}{kStringType}});}
+\DoxyCodeLine{00889\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{gtest_8h_a6ae7443947f25abc58bfcfcfc56b0d75}{EXPECT\_NE}}(v.GetString(),\ nullPtr);\ \textcolor{comment}{//\ non-\/null\ string\ returned}}
+\DoxyCodeLine{00890\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{gtest_8h_a4159019abda84f5366acdb7604ff220a}{EXPECT\_EQ}}(v.GetStringLength(),\ 0u);}
 \DoxyCodeLine{00891\ }
 \DoxyCodeLine{00892\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Construction\ from/setting\ to\ null\ without\ length\ not\ allowed}}
 \DoxyCodeLine{00893\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{gtest_8h_a789842b4475eed948e6fd18390d5a859}{EXPECT\_THROW}}(\mbox{\hyperlink{document_8h_a071cf97155ba72ac9a1fc4ad7e63d481}{Value}}(\mbox{\hyperlink{document_8h_aa6b9fd9f6aa49405a574c362ba9af6b5}{StringRef}}(nullPtr)),\ \mbox{\hyperlink{class_assert_exception}{AssertException}});}
 \DoxyCodeLine{00894\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{gtest_8h_a789842b4475eed948e6fd18390d5a859}{EXPECT\_THROW}}(\mbox{\hyperlink{document_8h_a071cf97155ba72ac9a1fc4ad7e63d481}{Value}}(\mbox{\hyperlink{document_8h_aa6b9fd9f6aa49405a574c362ba9af6b5}{StringRef}}(nullPtr),\ allocator),\ \mbox{\hyperlink{class_assert_exception}{AssertException}});}
-\DoxyCodeLine{00895\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{gtest_8h_a789842b4475eed948e6fd18390d5a859}{EXPECT\_THROW}}(\mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.SetString(nullPtr,\ allocator),\ \mbox{\hyperlink{class_assert_exception}{AssertException}});}
+\DoxyCodeLine{00895\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{gtest_8h_a789842b4475eed948e6fd18390d5a859}{EXPECT\_THROW}}(v.SetString(nullPtr,\ allocator),\ \mbox{\hyperlink{class_assert_exception}{AssertException}});}
 \DoxyCodeLine{00896\ }
 \DoxyCodeLine{00897\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Non-\/empty\ length\ with\ null\ string\ is\ not\ allowed}}
-\DoxyCodeLine{00898\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{gtest_8h_a789842b4475eed948e6fd18390d5a859}{EXPECT\_THROW}}(\mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.SetString(nullPtr,\ 17u),\ \mbox{\hyperlink{class_assert_exception}{AssertException}});}
-\DoxyCodeLine{00899\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{gtest_8h_a789842b4475eed948e6fd18390d5a859}{EXPECT\_THROW}}(\mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.SetString(nullPtr,\ 42u,\ allocator),\ \mbox{\hyperlink{class_assert_exception}{AssertException}});}
+\DoxyCodeLine{00898\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{gtest_8h_a789842b4475eed948e6fd18390d5a859}{EXPECT\_THROW}}(v.SetString(nullPtr,\ 17u),\ \mbox{\hyperlink{class_assert_exception}{AssertException}});}
+\DoxyCodeLine{00899\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{gtest_8h_a789842b4475eed948e6fd18390d5a859}{EXPECT\_THROW}}(v.SetString(nullPtr,\ 42u,\ allocator),\ \mbox{\hyperlink{class_assert_exception}{AssertException}});}
 \DoxyCodeLine{00900\ }
 \DoxyCodeLine{00901\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Setting\ to\ null\ string\ with\ empty\ length\ is\ allowed}}
-\DoxyCodeLine{00902\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.SetString(nullPtr,\ 0u);}
-\DoxyCodeLine{00903\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{gtest_8h_a6ae7443947f25abc58bfcfcfc56b0d75}{EXPECT\_NE}}(\mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.GetString(),\ nullPtr);\ \textcolor{comment}{//\ non-\/null\ string\ returned}}
-\DoxyCodeLine{00904\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{gtest_8h_a4159019abda84f5366acdb7604ff220a}{EXPECT\_EQ}}(\mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.GetStringLength(),\ 0u);}
+\DoxyCodeLine{00902\ \ \ \ \ \ \ \ \ v.SetString(nullPtr,\ 0u);}
+\DoxyCodeLine{00903\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{gtest_8h_a6ae7443947f25abc58bfcfcfc56b0d75}{EXPECT\_NE}}(v.GetString(),\ nullPtr);\ \textcolor{comment}{//\ non-\/null\ string\ returned}}
+\DoxyCodeLine{00904\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{gtest_8h_a4159019abda84f5366acdb7604ff220a}{EXPECT\_EQ}}(v.GetStringLength(),\ 0u);}
 \DoxyCodeLine{00905\ }
-\DoxyCodeLine{00906\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.SetNull();}
-\DoxyCodeLine{00907\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.SetString(nullPtr,\ 0u,\ allocator);}
-\DoxyCodeLine{00908\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{gtest_8h_a6ae7443947f25abc58bfcfcfc56b0d75}{EXPECT\_NE}}(\mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.GetString(),\ nullPtr);\ \textcolor{comment}{//\ non-\/null\ string\ returned}}
-\DoxyCodeLine{00909\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{gtest_8h_a4159019abda84f5366acdb7604ff220a}{EXPECT\_EQ}}(\mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.GetStringLength(),\ 0u);}
+\DoxyCodeLine{00906\ \ \ \ \ \ \ \ \ v.SetNull();}
+\DoxyCodeLine{00907\ \ \ \ \ \ \ \ \ v.SetString(nullPtr,\ 0u,\ allocator);}
+\DoxyCodeLine{00908\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{gtest_8h_a6ae7443947f25abc58bfcfcfc56b0d75}{EXPECT\_NE}}(v.GetString(),\ nullPtr);\ \textcolor{comment}{//\ non-\/null\ string\ returned}}
+\DoxyCodeLine{00909\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{gtest_8h_a4159019abda84f5366acdb7604ff220a}{EXPECT\_EQ}}(v.GetStringLength(),\ 0u);}
 \DoxyCodeLine{00910\ \ \ \ \ \}}
 \DoxyCodeLine{00911\ \ \ \ \ \textcolor{comment}{//\ Construction\ with\ null\ string\ and\ empty\ length\ is\ allowed}}
 \DoxyCodeLine{00912\ \ \ \ \ \{}
-\DoxyCodeLine{00913\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_generic_value}{Value}}\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}(nullPtr,0u);}
-\DoxyCodeLine{00914\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{gtest_8h_a6ae7443947f25abc58bfcfcfc56b0d75}{EXPECT\_NE}}(\mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.GetString(),\ nullPtr);\ \textcolor{comment}{//\ non-\/null\ string\ returned}}
-\DoxyCodeLine{00915\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{gtest_8h_a4159019abda84f5366acdb7604ff220a}{EXPECT\_EQ}}(\mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.GetStringLength(),\ 0u);}
+\DoxyCodeLine{00913\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_generic_value}{Value}}\ v(nullPtr,0u);}
+\DoxyCodeLine{00914\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{gtest_8h_a6ae7443947f25abc58bfcfcfc56b0d75}{EXPECT\_NE}}(v.GetString(),\ nullPtr);\ \textcolor{comment}{//\ non-\/null\ string\ returned}}
+\DoxyCodeLine{00915\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{gtest_8h_a4159019abda84f5366acdb7604ff220a}{EXPECT\_EQ}}(v.GetStringLength(),\ 0u);}
 \DoxyCodeLine{00916\ \ \ \ \ \}}
 \DoxyCodeLine{00917\ \ \ \ \ \{}
-\DoxyCodeLine{00918\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_generic_value}{Value}}\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}(nullPtr,\ 0u,\ allocator);}
-\DoxyCodeLine{00919\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{gtest_8h_a6ae7443947f25abc58bfcfcfc56b0d75}{EXPECT\_NE}}(\mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.GetString(),\ nullPtr);\ \textcolor{comment}{//\ non-\/null\ string\ returned}}
-\DoxyCodeLine{00920\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{gtest_8h_a4159019abda84f5366acdb7604ff220a}{EXPECT\_EQ}}(\mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.GetStringLength(),\ 0u);}
+\DoxyCodeLine{00918\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_generic_value}{Value}}\ v(nullPtr,\ 0u,\ allocator);}
+\DoxyCodeLine{00919\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{gtest_8h_a6ae7443947f25abc58bfcfcfc56b0d75}{EXPECT\_NE}}(v.GetString(),\ nullPtr);\ \textcolor{comment}{//\ non-\/null\ string\ returned}}
+\DoxyCodeLine{00920\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{gtest_8h_a4159019abda84f5366acdb7604ff220a}{EXPECT\_EQ}}(v.GetStringLength(),\ 0u);}
 \DoxyCodeLine{00921\ \ \ \ \ \}}
 \DoxyCodeLine{00922\ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -1488,7 +1496,8 @@ Definition at line \mbox{\hyperlink{valuetest_8cpp_source_l00732}{732}} of file 
 \DoxyCodeLine{00879\ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -1524,7 +1533,8 @@ Definition at line \mbox{\hyperlink{valuetest_8cpp_source_l00288}{288}} of file 
 \DoxyCodeLine{00302\ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -1757,7 +1767,8 @@ Definition at line \mbox{\hyperlink{valuetest_8cpp_source_l00250}{250}} of file 
 \DoxyCodeLine{00281\ \}}
 
 \end{DoxyCode}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -1785,7 +1796,8 @@ Definition at line \mbox{\hyperlink{valuetest_8cpp_source_l00165}{165}} of file 
 \DoxyCodeLine{00170\ \}}
 
 \end{DoxyCode}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -1813,7 +1825,8 @@ Definition at line \mbox{\hyperlink{valuetest_8cpp_source_l00173}{173}} of file 
 \DoxyCodeLine{00178\ \}}
 
 \end{DoxyCode}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode

@@ -6,7 +6,8 @@
 
 
 
-Inheritance diagram for testing\+::internal\+::Function\+Mocker\+Base\texorpdfstring{$<$}{<} F \texorpdfstring{$>$}{>}\+:\nopagebreak
+Inheritance diagram for testing\+::internal\+::Function\+Mocker\+Base\texorpdfstring{$<$}{<} F \texorpdfstring{$>$}{>}\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -15,7 +16,8 @@ Inheritance diagram for testing\+::internal\+::Function\+Mocker\+Base\texorpdfst
 \end{figure}
 
 
-Collaboration diagram for testing\+::internal\+::Function\+Mocker\+Base\texorpdfstring{$<$}{<} F \texorpdfstring{$>$}{>}\+:\nopagebreak
+Collaboration diagram for testing\+::internal\+::Function\+Mocker\+Base\texorpdfstring{$<$}{<} F \texorpdfstring{$>$}{>}\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -243,7 +245,8 @@ Definition at line \mbox{\hyperlink{gmock-spec-builders_8h_source_l01619}{1619}}
 \DoxyCodeLine{01638\ \ \ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -340,7 +343,8 @@ Definition at line \mbox{\hyperlink{gmock-spec-builders_8h_source_l01491}{1491}}
 \DoxyCodeLine{01502\ \ \ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -363,7 +367,7 @@ Definition at line \mbox{\hyperlink{gmock-spec-builders_8h_source_l01596}{1596}}
 \DoxyCodeLine{01598\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
 \DoxyCodeLine{01599\ \ \ \ \ \textcolor{comment}{//\ const\_cast\ is\ required\ since\ in\ C++98\ we\ still\ pass\ ArgumentTuple\ around}}
 \DoxyCodeLine{01600\ \ \ \ \ \textcolor{comment}{//\ by\ const\&\ instead\ of\ rvalue\ reference.}}
-\DoxyCodeLine{01601\ \ \ \ \ \textcolor{keywordtype}{void}*\ untyped\_args\ =\ \textcolor{keyword}{const\_cast<}\textcolor{keywordtype}{void}*\textcolor{keyword}{>}(\textcolor{keyword}{static\_cast<}\textcolor{keyword}{const\ }\textcolor{keywordtype}{void}*\textcolor{keyword}{>}(\&\mbox{\hyperlink{namespacebenchmark_compile_ad0ed96ae1454e4347ca61ac3887c379e}{args}}));}
+\DoxyCodeLine{01601\ \ \ \ \ \textcolor{keywordtype}{void}*\ untyped\_args\ =\ \textcolor{keyword}{const\_cast<}\textcolor{keywordtype}{void}*\textcolor{keyword}{>}(\textcolor{keyword}{static\_cast<}\textcolor{keyword}{const\ }\textcolor{keywordtype}{void}*\textcolor{keyword}{>}(\&args));}
 \DoxyCodeLine{01602\ \ \ \ \ scoped\_ptr<ResultHolder>\ holder(}
 \DoxyCodeLine{01603\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacetesting_1_1internal_a1a1a1aed3fe00908b8a45d5ab4a33665}{DownCast\_<ResultHolder*>}}(this-\/>\mbox{\hyperlink{classtesting_1_1internal_1_1_untyped_function_mocker_base_a819f2e6575f1245e65fc2040150b5bac}{UntypedInvokeWith}}(untyped\_args)));}
 \DoxyCodeLine{01604\ \ \ \ \ \textcolor{keywordflow}{return}\ holder-\/>Unwrap();}
@@ -404,14 +408,16 @@ Definition at line \mbox{\hyperlink{gmock-spec-builders_8h_source_l01511}{1511}}
 \DoxyCodeLine{01531\ \ \ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
 \includegraphics[width=348pt]{classtesting_1_1internal_1_1_function_mocker_base_a31904a256840331e75d9cc3cfa15897e_cgraph}
 \end{center}
 \end{figure}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -439,7 +445,7 @@ Definition at line \mbox{\hyperlink{gmock-spec-builders_8h_source_l01550}{1550}}
 \DoxyCodeLine{01552\ \ \ \ \ \textcolor{comment}{//\ Make\ a\ copy\ of\ the\ action\ before\ performing\ it,\ in\ case\ the}}
 \DoxyCodeLine{01553\ \ \ \ \ \textcolor{comment}{//\ action\ deletes\ the\ mock\ object\ (and\ thus\ deletes\ itself).}}
 \DoxyCodeLine{01554\ \ \ \ \ \textcolor{keyword}{const}\ Action<F>\ \mbox{\hyperlink{structaction}{action}}\ =\ *\textcolor{keyword}{static\_cast<}\textcolor{keyword}{const\ }Action<F>*\textcolor{keyword}{>}(untyped\_action);}
-\DoxyCodeLine{01555\ \ \ \ \ \mbox{\hyperlink{classtesting_1_1internal_1_1_function_mocker_base_a2bce16e3cb543ae3ca7554e163fb29a8}{ArgumentTuple}}*\ \mbox{\hyperlink{namespacebenchmark_compile_ad0ed96ae1454e4347ca61ac3887c379e}{args}}\ =\ \textcolor{keyword}{static\_cast<}\mbox{\hyperlink{classtesting_1_1internal_1_1_function_mocker_base_a2bce16e3cb543ae3ca7554e163fb29a8}{ArgumentTuple}}*\textcolor{keyword}{>}(untyped\_args);}
+\DoxyCodeLine{01555\ \ \ \ \ \mbox{\hyperlink{classtesting_1_1internal_1_1_function_mocker_base_a2bce16e3cb543ae3ca7554e163fb29a8}{ArgumentTuple}}*\ args\ =\ \textcolor{keyword}{static\_cast<}\mbox{\hyperlink{classtesting_1_1internal_1_1_function_mocker_base_a2bce16e3cb543ae3ca7554e163fb29a8}{ArgumentTuple}}*\textcolor{keyword}{>}(untyped\_args);}
 \DoxyCodeLine{01556\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classtesting_1_1internal_1_1_action_result_holder_a3735744e64fcefc41712beae09519b13}{ResultHolder::PerformAction}}(\mbox{\hyperlink{structaction}{action}},\ \mbox{\hyperlink{namespacetesting_1_1internal_aa1114d84589bd22f45d443527528cb35}{internal::move}}(*args));}
 \DoxyCodeLine{01557\ \ \ \}}
 
@@ -462,7 +468,7 @@ Definition at line \mbox{\hyperlink{gmock-spec-builders_8h_source_l01538}{1538}}
 
 \begin{DoxyCode}{0}
 \DoxyCodeLine{01540\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
-\DoxyCodeLine{01541\ \ \ \ \ \mbox{\hyperlink{classtesting_1_1internal_1_1_function_mocker_base_a2bce16e3cb543ae3ca7554e163fb29a8}{ArgumentTuple}}*\ \mbox{\hyperlink{namespacebenchmark_compile_ad0ed96ae1454e4347ca61ac3887c379e}{args}}\ =\ \textcolor{keyword}{static\_cast<}\mbox{\hyperlink{classtesting_1_1internal_1_1_function_mocker_base_a2bce16e3cb543ae3ca7554e163fb29a8}{ArgumentTuple}}*\textcolor{keyword}{>}(untyped\_args);}
+\DoxyCodeLine{01541\ \ \ \ \ \mbox{\hyperlink{classtesting_1_1internal_1_1_function_mocker_base_a2bce16e3cb543ae3ca7554e163fb29a8}{ArgumentTuple}}*\ args\ =\ \textcolor{keyword}{static\_cast<}\mbox{\hyperlink{classtesting_1_1internal_1_1_function_mocker_base_a2bce16e3cb543ae3ca7554e163fb29a8}{ArgumentTuple}}*\textcolor{keyword}{>}(untyped\_args);}
 \DoxyCodeLine{01542\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classtesting_1_1internal_1_1_action_result_holder_a47175ba122311867db65f060e2629fb1}{ResultHolder::PerformDefaultAction}}(\textcolor{keyword}{this},\ \mbox{\hyperlink{namespacetesting_1_1internal_aa1114d84589bd22f45d443527528cb35}{internal::move}}(*args),}
 \DoxyCodeLine{01543\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ call\_description);}
 \DoxyCodeLine{01544\ \ \ \}}

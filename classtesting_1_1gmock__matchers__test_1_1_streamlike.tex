@@ -19,7 +19,7 @@ typedef \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf
 \doxysubsubsection*{Friends}
 \begin{DoxyCompactItemize}
 \item 
-std\+::ostream \& \mbox{\hyperlink{classtesting_1_1gmock__matchers__test_1_1_streamlike_a8d1f96945c215c834326febecfb177a0}{operator$<$$<$}} (std\+::ostream \&os, const \mbox{\hyperlink{classtesting_1_1gmock__matchers__test_1_1_streamlike}{Streamlike}} \&\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}})
+std\+::ostream \& \mbox{\hyperlink{classtesting_1_1gmock__matchers__test_1_1_streamlike_a8d1f96945c215c834326febecfb177a0}{operator$<$$<$}} (std\+::ostream \&\mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}, const \mbox{\hyperlink{classtesting_1_1gmock__matchers__test_1_1_streamlike}{Streamlike}} \&\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}})
 \end{DoxyCompactItemize}
 
 
@@ -114,13 +114,6 @@ Definition at line \mbox{\hyperlink{gmock-matchers__test_8cc_source_l05197}{5197
 \DoxyCodeLine{05199\ \ \ \}}
 
 \end{DoxyCode}
-Here is the caller graph for this function\+:\nopagebreak
-\begin{figure}[H]
-\begin{center}
-\leavevmode
-\includegraphics[width=350pt]{classtesting_1_1gmock__matchers__test_1_1_streamlike_a3e3aa6924974abcf7855dab1094bd860_icgraph}
-\end{center}
-\end{figure}
 
 
 \doxysubsection{Friends And Related Symbol Documentation}
@@ -138,14 +131,14 @@ Definition at line \mbox{\hyperlink{gmock-matchers__test_8cc_source_l05246}{5246
 
 \begin{DoxyCode}{0}
 \DoxyCodeLine{05246\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
-\DoxyCodeLine{05247\ \ \ \ \ os\ <<\ \textcolor{stringliteral}{"{}["{}};}
-\DoxyCodeLine{05248\ \ \ \ \ \textcolor{keyword}{typedef}\ \textcolor{keyword}{typename}\ std::list<value\_type>::const\_iterator\ \mbox{\hyperlink{namespacegen__gtest__pred__impl_a620e5c968b63ea75d4c278eee04de8ad}{Iter}};}
+\DoxyCodeLine{05247\ \ \ \ \ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}\ <<\ \textcolor{stringliteral}{"{}["{}};}
+\DoxyCodeLine{05248\ \ \ \ \ \textcolor{keyword}{typedef}\ \textcolor{keyword}{typename}\ std::list<value\_type>::const\_iterator\ Iter;}
 \DoxyCodeLine{05249\ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ sep\ =\ \textcolor{stringliteral}{"{}"{}};}
 \DoxyCodeLine{05250\ \ \ \ \ \textcolor{keywordflow}{for}\ (Iter\ it\ =\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}.remainder\_.begin();\ it\ !=\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}.remainder\_.end();\ ++it)\ \{}
-\DoxyCodeLine{05251\ \ \ \ \ \ \ os\ <<\ sep\ <<\ *it;}
+\DoxyCodeLine{05251\ \ \ \ \ \ \ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}\ <<\ sep\ <<\ *it;}
 \DoxyCodeLine{05252\ \ \ \ \ \ \ sep\ =\ \textcolor{stringliteral}{"{},"{}};}
 \DoxyCodeLine{05253\ \ \ \ \ \}}
-\DoxyCodeLine{05254\ \ \ \ \ os\ <<\ \textcolor{stringliteral}{"{}]"{}};}
+\DoxyCodeLine{05254\ \ \ \ \ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}\ <<\ \textcolor{stringliteral}{"{}]"{}};}
 \DoxyCodeLine{05255\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}};}
 \DoxyCodeLine{05256\ \ \ \}}
 

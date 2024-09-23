@@ -30,7 +30,7 @@ auto \mbox{\hyperlink{class_catch_1_1clara_1_1_text_flow_1_1_columns_a755d820003
 \doxysubsubsection*{Friends}
 \begin{DoxyCompactItemize}
 \item 
-std\+::ostream \& \mbox{\hyperlink{class_catch_1_1clara_1_1_text_flow_1_1_columns_ac4bea99086aff5ca6c36a7d77d5dd0ff}{operator$<$$<$}} (std\+::ostream \&os, \mbox{\hyperlink{class_catch_1_1clara_1_1_text_flow_1_1_columns}{Columns}} const \&cols)
+std\+::ostream \& \mbox{\hyperlink{class_catch_1_1clara_1_1_text_flow_1_1_columns_ac4bea99086aff5ca6c36a7d77d5dd0ff}{operator$<$$<$}} (std\+::ostream \&\mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}, \mbox{\hyperlink{class_catch_1_1clara_1_1_text_flow_1_1_columns}{Columns}} const \&cols)
 \end{DoxyCompactItemize}
 
 
@@ -85,7 +85,8 @@ Definition at line \mbox{\hyperlink{include_2external_2clara_8hpp_source_l00329}
 \DoxyCodeLine{00329\ \{\ \textcolor{keywordflow}{return}\ \{\ *\textcolor{keyword}{this},\ iterator::EndTag()\ \};\ \}}
 
 \end{DoxyCode}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -170,8 +171,8 @@ Definition at line \mbox{\hyperlink{include_2external_2clara_8hpp_source_l00341}
 \DoxyCodeLine{00345\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (first)}
 \DoxyCodeLine{00346\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ first\ =\ \textcolor{keyword}{false};}
 \DoxyCodeLine{00347\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}}
-\DoxyCodeLine{00348\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ os\ <<\ \textcolor{stringliteral}{"{}\(\backslash\)n"{}};}
-\DoxyCodeLine{00349\ \ \ \ \ \ \ \ \ \ \ \ \ os\ <<\ \mbox{\hyperlink{namespacevalidate__reflection_a54d4e98ade8417b88a7e3859a693630a}{line}};}
+\DoxyCodeLine{00348\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}\ <<\ \textcolor{stringliteral}{"{}\(\backslash\)n"{}};}
+\DoxyCodeLine{00349\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}\ <<\ line;}
 \DoxyCodeLine{00350\ \ \ \ \ \ \ \ \ \}}
 \DoxyCodeLine{00351\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}};}
 \DoxyCodeLine{00352\ \ \ \ \ \}}

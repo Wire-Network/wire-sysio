@@ -14,7 +14,8 @@
 {\ttfamily \#include "{}util\+\_\+pkcs11.\+h"{}}\newline
 {\ttfamily \#include "{}yubihsm\+\_\+pkcs11.\+h"{}}\newline
 {\ttfamily \#include "{}../common/insecure\+\_\+memzero.\+h"{}}\newline
-Include dependency graph for yubihsm\+\_\+pkcs11.\+c\+:\nopagebreak
+Include dependency graph for yubihsm\+\_\+pkcs11.\+c\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -1062,7 +1063,8 @@ Definition at line \mbox{\hyperlink{yubihsm__pkcs11_8c_source_l00916}{916}} of f
 \DoxyCodeLine{00953\ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -1130,7 +1132,8 @@ Definition at line \mbox{\hyperlink{yubihsm__pkcs11_8c_source_l00868}{868}} of f
 \DoxyCodeLine{00914\ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -1187,7 +1190,8 @@ Definition at line \mbox{\hyperlink{yubihsm__pkcs11_8c_source_l00334}{334}} of f
 \DoxyCodeLine{00369\ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -1244,7 +1248,8 @@ Definition at line \mbox{\hyperlink{yubihsm__pkcs11_8c_source_l02281}{2281}} of 
 \DoxyCodeLine{02316\ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -1296,7 +1301,8 @@ Definition at line \mbox{\hyperlink{yubihsm__pkcs11_8c_source_l00371}{371}} of f
 \DoxyCodeLine{00401\ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -1394,19 +1400,19 @@ Definition at line \mbox{\hyperlink{yubihsm__pkcs11_8c_source_l00101}{101}} of f
 \DoxyCodeLine{00177\ \ \ \mbox{\hyperlink{test__account__query__db_8cpp_aedc91aab307c8fb7ad822c3e16a6dd73}{params}}.initialize\ =\ 0;}
 \DoxyCodeLine{00178\ \ \ \mbox{\hyperlink{test__account__query__db_8cpp_aedc91aab307c8fb7ad822c3e16a6dd73}{params}}.override\ =\ 1;}
 \DoxyCodeLine{00179\ }
-\DoxyCodeLine{00180\ \ \ \textcolor{keywordtype}{char}\ *\mbox{\hyperlink{namespacebenchmark_compile_ad0ed96ae1454e4347ca61ac3887c379e}{args}}\ =\ NULL;}
+\DoxyCodeLine{00180\ \ \ \textcolor{keywordtype}{char}\ *args\ =\ NULL;}
 \DoxyCodeLine{00181\ \ \ \textcolor{keywordtype}{char}\ *args\_parsed\ =\ NULL;}
 \DoxyCodeLine{00182\ }
 \DoxyCodeLine{00183\ \ \ \mbox{\hyperlink{structyh__connector}{yh\_connector}}\ **connector\_list\ =\ NULL;}
 \DoxyCodeLine{00184\ }
 \DoxyCodeLine{00185\ \ \ \textcolor{keywordflow}{if}\ (init\_args\ !=\ NULL\ \&\&\ init\_args-\/>pReserved\ !=\ NULL)\ \{}
-\DoxyCodeLine{00186\ \ \ \ \ \mbox{\hyperlink{namespacebenchmark_compile_ad0ed96ae1454e4347ca61ac3887c379e}{args}}\ =\ strdup(init\_args-\/>pReserved);}
+\DoxyCodeLine{00186\ \ \ \ \ args\ =\ strdup(init\_args-\/>pReserved);}
 \DoxyCodeLine{00187\ \ \ \ \ \textcolor{keywordflow}{if}\ (args\ ==\ NULL)\ \{}
 \DoxyCodeLine{00188\ \ \ \ \ \ \ \mbox{\hyperlink{debug__lib_8h_a2e3ed21e5ffba18d940d164aaec64a2a}{DBG\_ERR}}(\textcolor{stringliteral}{"{}Failed\ copying\ reserved\ string"{}});}
 \DoxyCodeLine{00189\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{pkcs11_8h_a91150ecacbaa624fcc7d861f1b54f57c}{CKR\_FUNCTION\_FAILED}};}
 \DoxyCodeLine{00190\ \ \ \ \ \}}
 \DoxyCodeLine{00191\ }
-\DoxyCodeLine{00192\ \ \ \ \ \textcolor{keywordtype}{char}\ *\mbox{\hyperlink{namespace_c_l_i_1_1detail_ab4542375c903302c3876ce0403d55596}{str}}\ =\ \mbox{\hyperlink{namespacebenchmark_compile_ad0ed96ae1454e4347ca61ac3887c379e}{args}};}
+\DoxyCodeLine{00192\ \ \ \ \ \textcolor{keywordtype}{char}\ *\mbox{\hyperlink{namespace_c_l_i_1_1detail_ab4542375c903302c3876ce0403d55596}{str}}\ =\ args;}
 \DoxyCodeLine{00193\ \ \ \ \ \textcolor{keywordtype}{char}\ *save\ =\ NULL;}
 \DoxyCodeLine{00194\ \ \ \ \ \textcolor{keywordtype}{char}\ *part;}
 \DoxyCodeLine{00195\ \ \ \ \ \textcolor{keywordflow}{while}\ ((part\ =\ strtok\_r(str,\ \textcolor{stringliteral}{"{}\ \(\backslash\)r\(\backslash\)n\(\backslash\)t"{}},\ \&save)))\ \{}
@@ -1435,16 +1441,16 @@ Definition at line \mbox{\hyperlink{yubihsm__pkcs11_8c_source_l00101}{101}} of f
 \DoxyCodeLine{00218\ \ \ \ \ \}}
 \DoxyCodeLine{00219\ }
 \DoxyCodeLine{00220\ \ \ \ \ free(args);}
-\DoxyCodeLine{00221\ \ \ \ \ \mbox{\hyperlink{namespacebenchmark_compile_ad0ed96ae1454e4347ca61ac3887c379e}{args}}\ =\ NULL;}
+\DoxyCodeLine{00221\ \ \ \ \ args\ =\ NULL;}
 \DoxyCodeLine{00222\ \ \ \ \ free(args\_parsed);}
 \DoxyCodeLine{00223\ \ \ \ \ args\_parsed\ =\ NULL;}
 \DoxyCodeLine{00224\ \ \ \}}
 \DoxyCodeLine{00225\ }
 \DoxyCodeLine{00226\ \ \ \textcolor{comment}{//\ NOTE(thorduri):\ \#TOCTOU}}
-\DoxyCodeLine{00227\ \ \ \textcolor{keywordtype}{char}\ *\mbox{\hyperlink{namespaceversiongenerate_afdfd8d6de9b62e742923b2b3326798e6}{config\_file}}\ =\ args\_info.config\_file\_arg;}
+\DoxyCodeLine{00227\ \ \ \textcolor{keywordtype}{char}\ *config\_file\ =\ args\_info.config\_file\_arg;}
 \DoxyCodeLine{00228\ \ \ \textcolor{keyword}{struct\ }stat\ sb;}
 \DoxyCodeLine{00229\ \ \ \textcolor{keywordflow}{if}\ (stat(config\_file,\ \&sb)\ ==\ -\/1)\ \{}
-\DoxyCodeLine{00230\ \ \ \ \ \mbox{\hyperlink{namespaceversiongenerate_afdfd8d6de9b62e742923b2b3326798e6}{config\_file}}\ =\ getenv(\textcolor{stringliteral}{"{}YUBIHSM\_PKCS11\_CONF"{}});}
+\DoxyCodeLine{00230\ \ \ \ \ config\_file\ =\ getenv(\textcolor{stringliteral}{"{}YUBIHSM\_PKCS11\_CONF"{}});}
 \DoxyCodeLine{00231\ \ \ \}}
 \DoxyCodeLine{00232\ }
 \DoxyCodeLine{00233\ \ \ \mbox{\hyperlink{test__account__query__db_8cpp_aedc91aab307c8fb7ad822c3e16a6dd73}{params}}.override\ =\ 0;}
@@ -1549,7 +1555,8 @@ Definition at line \mbox{\hyperlink{yubihsm__pkcs11_8c_source_l00101}{101}} of f
 \DoxyCodeLine{00332\ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -1612,7 +1619,8 @@ Definition at line \mbox{\hyperlink{yubihsm__pkcs11_8c_source_l01160}{1160}} of 
 \DoxyCodeLine{01201\ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -1890,7 +1898,8 @@ Definition at line \mbox{\hyperlink{yubihsm__pkcs11_8c_source_l01245}{1245}} of 
 \DoxyCodeLine{01297\ \ \ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -1932,7 +1941,8 @@ Definition at line \mbox{\hyperlink{yubihsm__pkcs11_8c_source_l00468}{468}} of f
 \DoxyCodeLine{00488\ \ \ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -1956,7 +1966,7 @@ Definition at line \mbox{\hyperlink{yubihsm__pkcs11_8c_source_l02227}{2227}} of 
 \DoxyCodeLine{02232\ \ \ \ \ \ \ \&\mbox{\hyperlink{yubihsm__pkcs11_8c_a0a2c7706d971796d7dc84fee36d6c84f}{session}}-\/>\mbox{\hyperlink{structyubihsm__pkcs11__session_a58793ac85964f76ba1cd95a5ef6df0a0}{operation}}.\mbox{\hyperlink{structyubihsm__pkcs11__op__info_a2a88bfeb3f914ab4bc36697f02838057}{op}}.\mbox{\hyperlink{unionop_a19c64a285a4ad9af5e201a4743cea197}{find}}}
 \DoxyCodeLine{02233\ \ \ \ \ \ \ \ \ \ .\mbox{\hyperlink{structfind__info_aee2306ca804f1b0e9998bb5851cc2537}{objects}}[\mbox{\hyperlink{yubihsm__pkcs11_8c_a0a2c7706d971796d7dc84fee36d6c84f}{session}}-\/>\mbox{\hyperlink{structyubihsm__pkcs11__session_a58793ac85964f76ba1cd95a5ef6df0a0}{operation}}.\mbox{\hyperlink{structyubihsm__pkcs11__op__info_a2a88bfeb3f914ab4bc36697f02838057}{op}}.\mbox{\hyperlink{unionop_a19c64a285a4ad9af5e201a4743cea197}{find}}.\mbox{\hyperlink{structfind__info_a0cd8c109769399b9b80841b1f63184de}{current\_object}}];}
 \DoxyCodeLine{02234\ \ \ \ \ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_aa0efefe21f4700d78692edc823e763be}{id}};}
-\DoxyCodeLine{02235\ \ \ \ \ \textcolor{keywordflow}{switch}\ (object-\/>type)\ \{}
+\DoxyCodeLine{02235\ \ \ \ \ \textcolor{keywordflow}{switch}\ (\mbox{\hyperlink{yubihsm__pkcs11_8c_a85d991d90970121ba1480cd98d93aab9}{object}}-\/>\mbox{\hyperlink{structyh__object__descriptor_ab8c1b3cc5b859e3c89eb228fa0763165}{type}})\ \{}
 \DoxyCodeLine{02236\ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{yubihsm_8h_a2fe39512cb4df34b270a67dbb8e13583ab71424e16384319d6e6a12f9a3d8ceae}{YH\_ASYMMETRIC\_KEY}}:}
 \DoxyCodeLine{02237\ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{yubihsm_8h_a2fe39512cb4df34b270a67dbb8e13583a5d37b7418d50b420621e6a6eb2700de4}{YH\_OPAQUE}}:}
 \DoxyCodeLine{02238\ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{yubihsm_8h_a2fe39512cb4df34b270a67dbb8e13583a16f0118db1dac3d0732e7d66630e1dba}{YH\_WRAP\_KEY}}:}
@@ -1967,11 +1977,11 @@ Definition at line \mbox{\hyperlink{yubihsm__pkcs11_8c_source_l02227}{2227}} of 
 \DoxyCodeLine{02243\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{id}\ |=\ \textcolor{keywordtype}{object}-\/>id;}
 \DoxyCodeLine{02244\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
 \DoxyCodeLine{02245\ \ \ \ \ \ \ \textcolor{keywordflow}{default}:}
-\DoxyCodeLine{02246\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (object-\/>type\ ==\ \mbox{\hyperlink{yubihsm__pkcs11_8h_ae849403f78233718f9beeea0a8b4dfd9}{ECDH\_KEY\_TYPE}})\ \{}
+\DoxyCodeLine{02246\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{yubihsm__pkcs11_8c_a85d991d90970121ba1480cd98d93aab9}{object}}-\/>\mbox{\hyperlink{structyh__object__descriptor_ab8c1b3cc5b859e3c89eb228fa0763165}{type}}\ ==\ \mbox{\hyperlink{yubihsm__pkcs11_8h_ae849403f78233718f9beeea0a8b4dfd9}{ECDH\_KEY\_TYPE}})\ \{}
 \DoxyCodeLine{02247\ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{id}\ =\ \mbox{\hyperlink{yubihsm__pkcs11_8h_ae849403f78233718f9beeea0a8b4dfd9}{ECDH\_KEY\_TYPE}}\ <<\ 16;}
 \DoxyCodeLine{02248\ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{id}\ |=\ \textcolor{keywordtype}{object}-\/>id;}
 \DoxyCodeLine{02249\ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
-\DoxyCodeLine{02250\ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{debug__lib_8h_a8c4742440a149ad8bcb5d58ae76c5ed3}{DBG\_INFO}}(\textcolor{stringliteral}{"{}Found\ unknown\ object\ type\ \%x,\ skipping\ over"{}},\ object-\/>type);}
+\DoxyCodeLine{02250\ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{debug__lib_8h_a8c4742440a149ad8bcb5d58ae76c5ed3}{DBG\_INFO}}(\textcolor{stringliteral}{"{}Found\ unknown\ object\ type\ \%x,\ skipping\ over"{}},\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a85d991d90970121ba1480cd98d93aab9}{object}}-\/>\mbox{\hyperlink{structyh__object__descriptor_ab8c1b3cc5b859e3c89eb228fa0763165}{type}});}
 \DoxyCodeLine{02251\ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{continue};}
 \DoxyCodeLine{02252\ \ \ \ \ \ \ \ \ \}}
 \DoxyCodeLine{02253\ \ \ \ \ \}}
@@ -1981,7 +1991,7 @@ Definition at line \mbox{\hyperlink{yubihsm__pkcs11_8c_source_l02227}{2227}} of 
 \DoxyCodeLine{02257\ \ \ \ \ *\mbox{\hyperlink{yubihsm__pkcs11_8c_afb1855fd1ec6f8f989191f119245b377}{pulObjectCount}}\ +=\ 1;}
 \DoxyCodeLine{02258\ }
 \DoxyCodeLine{02259\ \ \ \ \ \textcolor{keywordflow}{if}\ (!\mbox{\hyperlink{yubihsm__pkcs11_8c_a0a2c7706d971796d7dc84fee36d6c84f}{session}}-\/>\mbox{\hyperlink{structyubihsm__pkcs11__session_a58793ac85964f76ba1cd95a5ef6df0a0}{operation}}.\mbox{\hyperlink{structyubihsm__pkcs11__op__info_a2a88bfeb3f914ab4bc36697f02838057}{op}}.\mbox{\hyperlink{unionop_a19c64a285a4ad9af5e201a4743cea197}{find}}.\mbox{\hyperlink{structfind__info_adff3f997b46b3414402df6e5eed3d77a}{only\_private}}\ \&\&}
-\DoxyCodeLine{02260\ \ \ \ \ \ \ \ \ object-\/>type\ ==\ \mbox{\hyperlink{yubihsm_8h_a2fe39512cb4df34b270a67dbb8e13583ab71424e16384319d6e6a12f9a3d8ceae}{YH\_ASYMMETRIC\_KEY}})\ \{}
+\DoxyCodeLine{02260\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a85d991d90970121ba1480cd98d93aab9}{object}}-\/>\mbox{\hyperlink{structyh__object__descriptor_ab8c1b3cc5b859e3c89eb228fa0763165}{type}}\ ==\ \mbox{\hyperlink{yubihsm_8h_a2fe39512cb4df34b270a67dbb8e13583ab71424e16384319d6e6a12f9a3d8ceae}{YH\_ASYMMETRIC\_KEY}})\ \{}
 \DoxyCodeLine{02261\ \ \ \ \ \ \ \textcolor{keywordtype}{object}-\/>type\ |=\ 0x80;}
 \DoxyCodeLine{02262\ \ \ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a0a2c7706d971796d7dc84fee36d6c84f}{session}}-\/>\mbox{\hyperlink{structyubihsm__pkcs11__session_a58793ac85964f76ba1cd95a5ef6df0a0}{operation}}.\mbox{\hyperlink{structyubihsm__pkcs11__op__info_a2a88bfeb3f914ab4bc36697f02838057}{op}}.\mbox{\hyperlink{unionop_a19c64a285a4ad9af5e201a4743cea197}{find}}.\mbox{\hyperlink{structfind__info_a0cd8c109769399b9b80841b1f63184de}{current\_object}}-\/-\/;}
 \DoxyCodeLine{02263\ \ \ \ \ \ \ \mbox{\hyperlink{debug__lib_8h_a8c4742440a149ad8bcb5d58ae76c5ed3}{DBG\_INFO}}(\textcolor{stringliteral}{"{}stepping\ back"{}});}
@@ -2325,7 +2335,8 @@ Definition at line \mbox{\hyperlink{yubihsm__pkcs11_8c_source_l04030}{4030}} of 
 \DoxyCodeLine{04051\ \ \ \}\ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{util__pkcs11_8c_a7c0da3eb6986b1e9466392de8eb4b9f5}{is\_RSA\_sign\_mechanism}}(\mbox{\hyperlink{yubihsm__pkcs11_8c_a0a2c7706d971796d7dc84fee36d6c84f}{session}}-\/>\mbox{\hyperlink{structyubihsm__pkcs11__session_a58793ac85964f76ba1cd95a5ef6df0a0}{operation}}.\mbox{\hyperlink{structyubihsm__pkcs11__op__info_a261664672f3ef63ab3a20b864627c49a}{mechanism}}.\mbox{\hyperlink{structmechanism_afeb8198b0f33f94f4520c0ffbc584a9a}{mechanism}})\ ==}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -2459,7 +2470,7 @@ Definition at line \mbox{\hyperlink{yubihsm__pkcs11_8c_source_l02680}{2680}} of 
 \DoxyCodeLine{02682\ \ \ \ \ \mbox{\hyperlink{debug__lib_8h_a8c4742440a149ad8bcb5d58ae76c5ed3}{DBG\_INFO}}(\textcolor{stringliteral}{"{}RSA\ decryption\ requested"{}});}
 \DoxyCodeLine{02683\ }
 \DoxyCodeLine{02684\ \ \ \ \ \textcolor{keywordtype}{size\_t}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_ab8d33547e1ef26613cc6d92a7909d99a}{key\_length}};}
-\DoxyCodeLine{02685\ \ \ \ \ \mbox{\hyperlink{yubihsm_8h_ae4f602d2343d01b1727dfd633169d366}{yh\_rc}}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a9c8d6a4a7a87f74f070e816dca1a547b}{yrc}}\ =\ \mbox{\hyperlink{yubihsm_8c_a375000f12ac554eb8cbaa0e6b75c3a08}{yh\_get\_key\_bitlength}}(object-\/>object.algorithm,\ \&\mbox{\hyperlink{yubihsm__pkcs11_8c_ab8d33547e1ef26613cc6d92a7909d99a}{key\_length}});}
+\DoxyCodeLine{02685\ \ \ \ \ \mbox{\hyperlink{yubihsm_8h_ae4f602d2343d01b1727dfd633169d366}{yh\_rc}}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a9c8d6a4a7a87f74f070e816dca1a547b}{yrc}}\ =\ \mbox{\hyperlink{yubihsm_8c_a375000f12ac554eb8cbaa0e6b75c3a08}{yh\_get\_key\_bitlength}}(\mbox{\hyperlink{yubihsm__pkcs11_8c_a85d991d90970121ba1480cd98d93aab9}{object}}-\/>object.\mbox{\hyperlink{structyh__object__descriptor_a485734f824121a0901c151d814ab7226}{algorithm}},\ \&\mbox{\hyperlink{yubihsm__pkcs11_8c_ab8d33547e1ef26613cc6d92a7909d99a}{key\_length}});}
 \DoxyCodeLine{02686\ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{yubihsm__pkcs11_8c_a9c8d6a4a7a87f74f070e816dca1a547b}{yrc}}\ !=\ \mbox{\hyperlink{yubihsm_8h_ae4f602d2343d01b1727dfd633169d366a405155512dc2284dc210ed15be1d0815}{YHR\_SUCCESS}})\ \{}
 \DoxyCodeLine{02687\ \ \ \ \ \ \ \mbox{\hyperlink{debug__lib_8h_a2e3ed21e5ffba18d940d164aaec64a2a}{DBG\_ERR}}(\textcolor{stringliteral}{"{}Unable\ to\ get\ key\ length:\ \%s"{}},\ \mbox{\hyperlink{lib_2error_8c_a238eedb1e27dbff2a0ab9a3932eb3f8b}{yh\_strerror}}(\mbox{\hyperlink{yubihsm__pkcs11_8c_a9c8d6a4a7a87f74f070e816dca1a547b}{yrc}}));}
 \DoxyCodeLine{02688\ \ \ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a9dbb22e3510dddb1ebb576404a972e7d}{rv}}\ =\ \mbox{\hyperlink{pkcs11_8h_a91150ecacbaa624fcc7d861f1b54f57c}{CKR\_FUNCTION\_FAILED}};}
@@ -2549,10 +2560,11 @@ Definition at line \mbox{\hyperlink{yubihsm__pkcs11_8c_source_l02680}{2680}} of 
 \DoxyCodeLine{02772\ \ \ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a9dbb22e3510dddb1ebb576404a972e7d}{rv}}\ =\ \mbox{\hyperlink{pkcs11_8h_a0664e99597a479c7fce5b19411cfc1b1}{CKR\_MECHANISM\_INVALID}};}
 \DoxyCodeLine{02773\ \ \ \ \ \ \ \textcolor{keywordflow}{goto}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a718067a3e9978be0e45a15d4e680bb43}{c\_di\_out}};}
 \DoxyCodeLine{02774\ \ \ \ \ \}}
-\DoxyCodeLine{02775\ \ \ \}\ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}\ (object-\/>object.type\ ==\ \mbox{\hyperlink{yubihsm_8h_a2fe39512cb4df34b270a67dbb8e13583a16f0118db1dac3d0732e7d66630e1dba}{YH\_WRAP\_KEY}}\ \&\&}
+\DoxyCodeLine{02775\ \ \ \}\ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{yubihsm__pkcs11_8c_a85d991d90970121ba1480cd98d93aab9}{object}}-\/>object.\mbox{\hyperlink{structyh__object__descriptor_ab8c1b3cc5b859e3c89eb228fa0763165}{type}}\ ==\ \mbox{\hyperlink{yubihsm_8h_a2fe39512cb4df34b270a67dbb8e13583a16f0118db1dac3d0732e7d66630e1dba}{YH\_WRAP\_KEY}}\ \&\&}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -2864,7 +2876,8 @@ Definition at line \mbox{\hyperlink{yubihsm__pkcs11_8c_source_l04573}{4573}} of 
 \DoxyCodeLine{04578\ \ \ \}\ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{yubihsm__pkcs11_8c_ab0dca4e7a2bfa74ab9cae5b8c1995647}{pMechanism}}-\/>\mbox{\hyperlink{structck__mechanism_a01c48c2e7afe52b7b1acfa9c2e6fe030}{mechanism}}\ ==\ \mbox{\hyperlink{pkcs11_8h_a95733c79b5297ea9ac28476e680ad4fa}{CKM\_EC\_KEY\_PAIR\_GEN}})\ \{}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -2926,7 +2939,8 @@ Definition at line \mbox{\hyperlink{yubihsm__pkcs11_8c_source_l00409}{409}} of f
 \DoxyCodeLine{00412\ \ \ \}}
 
 \end{DoxyCode}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -2995,7 +3009,8 @@ Definition at line \mbox{\hyperlink{yubihsm__pkcs11_8c_source_l00439}{439}} of f
 \DoxyCodeLine{00463\ \ \ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -3090,7 +3105,7 @@ Definition at line \mbox{\hyperlink{yubihsm__pkcs11_8c_source_l04727}{4727}} of 
 \begin{DoxyCode}{0}
 \DoxyCodeLine{04727\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
 \DoxyCodeLine{04728\ \ \ \ \ *\mbox{\hyperlink{yubihsm__pkcs11_8c_a0b0171109b2dc700c4060c924c621bde}{pulWrappedKeyLen}}\ =}
-\DoxyCodeLine{04729\ \ \ \ \ \ \ \textcolor{keyword}{sizeof}(\mbox{\hyperlink{structyh__object__descriptor}{yh\_object\_descriptor}})\ +\ object-\/>object.len\ +\ \mbox{\hyperlink{yubihsm_8h_a70eafb443aa16eaee3a683e21f0b001a}{YH\_CCM\_WRAP\_OVERHEAD}};}
+\DoxyCodeLine{04729\ \ \ \ \ \ \ \textcolor{keyword}{sizeof}(\mbox{\hyperlink{structyh__object__descriptor}{yh\_object\_descriptor}})\ +\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a85d991d90970121ba1480cd98d93aab9}{object}}-\/>object.\mbox{\hyperlink{structyh__object__descriptor_a6257fd0aa3606d6e73dff1c1c23563b1}{len}}\ +\ \mbox{\hyperlink{yubihsm_8h_a70eafb443aa16eaee3a683e21f0b001a}{YH\_CCM\_WRAP\_OVERHEAD}};}
 \DoxyCodeLine{04730\ \ \ \ \ \mbox{\hyperlink{debug__lib_8h_a8c4742440a149ad8bcb5d58ae76c5ed3}{DBG\_INFO}}(\textcolor{stringliteral}{"{}Calculated\ that\ wrapping\ will\ need\ \%lu\ bytes"{}},\ *\mbox{\hyperlink{yubihsm__pkcs11_8c_a0b0171109b2dc700c4060c924c621bde}{pulWrappedKeyLen}});}
 \DoxyCodeLine{04731\ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a9dbb22e3510dddb1ebb576404a972e7d}{rv}}\ =\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a41f4ccf8d6aeae2795be204b4f91c076}{CKR\_OK}};}
 \DoxyCodeLine{04732\ \ \ \ \ \textcolor{keywordflow}{goto}\ c\_wk\_out;}
@@ -3210,7 +3225,8 @@ Definition at line \mbox{\hyperlink{yubihsm__pkcs11_8c_source_l02422}{2422}} of 
 \DoxyCodeLine{02426\ \ \ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -3264,7 +3280,8 @@ Definition at line \mbox{\hyperlink{yubihsm__pkcs11_8c_source_l02878}{2878}} of 
 \DoxyCodeLine{02893\ \ \ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -3373,7 +3390,8 @@ Definition at line \mbox{\hyperlink{yubihsm__pkcs11_8c_source_l01310}{1310}} of 
 \DoxyCodeLine{01317\ \ \ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -3421,7 +3439,8 @@ Definition at line \mbox{\hyperlink{yubihsm__pkcs11_8c_source_l01608}{1608}} of 
 \DoxyCodeLine{01617\ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -3574,7 +3593,8 @@ Definition at line \mbox{\hyperlink{yubihsm__pkcs11_8c_source_l02098}{2098}} of 
 \DoxyCodeLine{02173\ \ \ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -3762,7 +3782,8 @@ Definition at line \mbox{\hyperlink{yubihsm__pkcs11_8c_source_l03927}{3927}} of 
 \DoxyCodeLine{03982\ \ \ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -3811,7 +3832,8 @@ Definition at line \mbox{\hyperlink{yubihsm__pkcs11_8c_source_l04607}{4607}} of 
 \DoxyCodeLine{04634\ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -3912,7 +3934,8 @@ Definition at line \mbox{\hyperlink{yubihsm__pkcs11_8c_source_l00615}{615}} of f
 \DoxyCodeLine{00620\ \ \ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode

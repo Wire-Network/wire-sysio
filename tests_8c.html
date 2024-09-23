@@ -9239,7 +9239,7 @@ Here is the caller graph for this function:</div>
 <div class="line"><span class="lineno"> 4729</span> </div>
 <div class="line"><span class="lineno"> 4730</span>    <span class="keywordflow">for</span> (i = <a class="code hl_define" href="ecmult__impl_8h.html#ade3191685190c40779d2de9d0664216d">WNAF_SIZE_BITS</a>(bits, w); i &gt;= 0; --i) {</div>
 <div class="line"><span class="lineno"> 4731</span>        <a class="code hl_struct" href="structsecp256k1__scalar.html">secp256k1_scalar</a> t;</div>
-<div class="line"><span class="lineno"> 4732</span>        <span class="keywordtype">int</span> <a class="code hl_variable" href="namespacedevelop_build.html#ade64cd34608f9442ef3049116a2da428">v</a> = wnaf[i];</div>
+<div class="line"><span class="lineno"> 4732</span>        <span class="keywordtype">int</span> v = wnaf[i];</div>
 <div class="line"><span class="lineno"> 4733</span>        <a class="code hl_define" href="fc_2secp256k1_2secp256k1_2src_2util_8h.html#aba1590ff86288c886c47dc8a27b30467">CHECK</a>(v != 0); <span class="comment">/* check nonzero */</span></div>
 <div class="line"><span class="lineno"> 4734</span>        <a class="code hl_define" href="fc_2secp256k1_2secp256k1_2src_2util_8h.html#aba1590ff86288c886c47dc8a27b30467">CHECK</a>(v &amp; 1);  <span class="comment">/* check parity */</span></div>
 <div class="line"><span class="lineno"> 4735</span>        <a class="code hl_define" href="fc_2secp256k1_2secp256k1_2src_2util_8h.html#aba1590ff86288c886c47dc8a27b30467">CHECK</a>(v &gt; -(1 &lt;&lt; w)); <span class="comment">/* check range above */</span></div>
@@ -9260,7 +9260,6 @@ Here is the caller graph for this function:</div>
 <div class="line"><span class="lineno"> 4750</span>    <a class="code hl_define" href="fc_2secp256k1_2secp256k1_2src_2util_8h.html#aba1590ff86288c886c47dc8a27b30467">CHECK</a>(secp256k1_scalar_eq(&amp;x, &amp;num));</div>
 <div class="line"><span class="lineno"> 4751</span>}</div>
 <div class="ttc" id="aecmult__impl_8h_html_ade3191685190c40779d2de9d0664216d"><div class="ttname"><a href="ecmult__impl_8h.html#ade3191685190c40779d2de9d0664216d">WNAF_SIZE_BITS</a></div><div class="ttdeci">#define WNAF_SIZE_BITS(bits, w)</div><div class="ttdef"><b>Definition</b> <a href="ecmult__impl_8h_source.html#l00045">ecmult_impl.h:45</a></div></div>
-<div class="ttc" id="anamespacedevelop_build_html_ade64cd34608f9442ef3049116a2da428"><div class="ttname"><a href="namespacedevelop_build.html#ade64cd34608f9442ef3049116a2da428">developBuild.v</a></div><div class="ttdeci">v</div><div class="ttdef"><b>Definition</b> <a href="develop_build_8py_source.html#l00006">developBuild.py:6</a></div></div>
 </div><!-- fragment --><div class="dynheader">
 Here is the caller graph for this function:</div>
 <div class="dyncontent">
@@ -11418,7 +11417,7 @@ Here is the caller graph for this function:</div>
 <div class="line"><span class="lineno"> 4389</span><span class="comment">     * convert some of them to be both non-0-scalar and non-infinity-point. */</span></div>
 <div class="line"><span class="lineno"> 4390</span>    <span class="keywordflow">for</span> (i = 0; i &lt; rands; ++i) {</div>
 <div class="line"><span class="lineno"> 4391</span>        <span class="keywordtype">int</span> <a class="code hl_variable" href="yubihsm__pkcs11_8c.html#a538d097420e725c4dad63c3caa9e55bd">j</a>;</div>
-<div class="line"><span class="lineno"> 4392</span>        <a class="code hl_struct" href="structsecp256k1__scalar.html">secp256k1_scalar</a> <a class="code hl_variable" href="namespacedevelop_build.html#ade64cd34608f9442ef3049116a2da428">v</a>, iv;</div>
+<div class="line"><span class="lineno"> 4392</span>        <a class="code hl_struct" href="structsecp256k1__scalar.html">secp256k1_scalar</a> v, iv;</div>
 <div class="line"><span class="lineno"> 4393</span>        <span class="comment">/* Shuffle the entries. */</span></div>
 <div class="line"><span class="lineno"> 4394</span>        <span class="keywordflow">for</span> (<a class="code hl_variable" href="yubihsm__pkcs11_8c.html#a538d097420e725c4dad63c3caa9e55bd">j</a> = 0; <a class="code hl_variable" href="yubihsm__pkcs11_8c.html#a538d097420e725c4dad63c3caa9e55bd">j</a> &lt; num_nonzero; ++<a class="code hl_variable" href="yubihsm__pkcs11_8c.html#a538d097420e725c4dad63c3caa9e55bd">j</a>) {</div>
 <div class="line"><span class="lineno"> 4395</span>            <span class="keywordtype">int</span> k = secp256k1_testrand_int(num_nonzero - <a class="code hl_variable" href="yubihsm__pkcs11_8c.html#a538d097420e725c4dad63c3caa9e55bd">j</a>);</div>
@@ -11727,7 +11726,7 @@ Here is the caller graph for this function:</div>
 <div class="line"><span class="lineno"> 4766</span> </div>
 <div class="line"><span class="lineno"> 4767</span>    <span class="keywordflow">for</span> (i = <a class="code hl_define" href="ecmult__impl_8h.html#a23d9fb349265ae338b9977f7f7aab065">WNAF_SIZE</a>(w)-1; i &gt;= 0; --i) {</div>
 <div class="line"><span class="lineno"> 4768</span>        <a class="code hl_struct" href="structsecp256k1__scalar.html">secp256k1_scalar</a> t;</div>
-<div class="line"><span class="lineno"> 4769</span>        <span class="keywordtype">int</span> <a class="code hl_variable" href="namespacedevelop_build.html#ade64cd34608f9442ef3049116a2da428">v</a> = wnaf[i];</div>
+<div class="line"><span class="lineno"> 4769</span>        <span class="keywordtype">int</span> v = wnaf[i];</div>
 <div class="line"><span class="lineno"> 4770</span>        <a class="code hl_define" href="fc_2secp256k1_2secp256k1_2src_2util_8h.html#aba1590ff86288c886c47dc8a27b30467">CHECK</a>(v == 0 || v &amp; 1);  <span class="comment">/* check parity */</span></div>
 <div class="line"><span class="lineno"> 4771</span>        <a class="code hl_define" href="fc_2secp256k1_2secp256k1_2src_2util_8h.html#aba1590ff86288c886c47dc8a27b30467">CHECK</a>(v &gt; -(1 &lt;&lt; w)); <span class="comment">/* check range above */</span></div>
 <div class="line"><span class="lineno"> 4772</span>        <a class="code hl_define" href="fc_2secp256k1_2secp256k1_2src_2util_8h.html#aba1590ff86288c886c47dc8a27b30467">CHECK</a>(v &lt; (1 &lt;&lt; w));  <span class="comment">/* check range below */</span></div>
@@ -11787,7 +11786,7 @@ Here is the caller graph for this function:</div>
 <div class="line"><span class="lineno"> 4807</span>    secp256k1_scalar_set_int(&amp;num, 0);</div>
 <div class="line"><span class="lineno"> 4808</span>    skew = secp256k1_wnaf_fixed(wnaf, &amp;num, w);</div>
 <div class="line"><span class="lineno"> 4809</span>    <span class="keywordflow">for</span> (i = <a class="code hl_define" href="ecmult__impl_8h.html#a23d9fb349265ae338b9977f7f7aab065">WNAF_SIZE</a>(w)-1; i &gt;= 0; --i) {</div>
-<div class="line"><span class="lineno"> 4810</span>        <span class="keywordtype">int</span> <a class="code hl_variable" href="namespacedevelop_build.html#ade64cd34608f9442ef3049116a2da428">v</a> = wnaf[i];</div>
+<div class="line"><span class="lineno"> 4810</span>        <span class="keywordtype">int</span> v = wnaf[i];</div>
 <div class="line"><span class="lineno"> 4811</span>        <a class="code hl_define" href="fc_2secp256k1_2secp256k1_2src_2util_8h.html#aba1590ff86288c886c47dc8a27b30467">CHECK</a>(v == 0);</div>
 <div class="line"><span class="lineno"> 4812</span>    }</div>
 <div class="line"><span class="lineno"> 4813</span>    <a class="code hl_define" href="fc_2secp256k1_2secp256k1_2src_2util_8h.html#aba1590ff86288c886c47dc8a27b30467">CHECK</a>(skew == 0);</div>
@@ -11795,7 +11794,7 @@ Here is the caller graph for this function:</div>
 <div class="line"><span class="lineno"> 4815</span>    secp256k1_scalar_set_int(&amp;num, 1);</div>
 <div class="line"><span class="lineno"> 4816</span>    skew = secp256k1_wnaf_fixed(wnaf, &amp;num, w);</div>
 <div class="line"><span class="lineno"> 4817</span>    <span class="keywordflow">for</span> (i = <a class="code hl_define" href="ecmult__impl_8h.html#a23d9fb349265ae338b9977f7f7aab065">WNAF_SIZE</a>(w)-1; i &gt;= 1; --i) {</div>
-<div class="line"><span class="lineno"> 4818</span>        <span class="keywordtype">int</span> <a class="code hl_variable" href="namespacedevelop_build.html#ade64cd34608f9442ef3049116a2da428">v</a> = wnaf[i];</div>
+<div class="line"><span class="lineno"> 4818</span>        <span class="keywordtype">int</span> v = wnaf[i];</div>
 <div class="line"><span class="lineno"> 4819</span>        <a class="code hl_define" href="fc_2secp256k1_2secp256k1_2src_2util_8h.html#aba1590ff86288c886c47dc8a27b30467">CHECK</a>(v == 0);</div>
 <div class="line"><span class="lineno"> 4820</span>    }</div>
 <div class="line"><span class="lineno"> 4821</span>    <a class="code hl_define" href="fc_2secp256k1_2secp256k1_2src_2util_8h.html#aba1590ff86288c886c47dc8a27b30467">CHECK</a>(wnaf[0] == 1);</div>
@@ -13094,7 +13093,7 @@ Here is the caller graph for this function:</div>
 <p class="definition">Definition at line <a class="el" href="tests_8c_source.html#l02818">2818</a> of file <a class="el" href="tests_8c_source.html">tests.c</a>.</p>
 <div class="fragment"><div class="line"><span class="lineno"> 2818</span>                                                             {</div>
 <div class="line"><span class="lineno"> 2819</span>    <a class="code hl_struct" href="structsecp256k1__fe.html">secp256k1_fe</a> r1, r2;</div>
-<div class="line"><span class="lineno"> 2820</span>    <span class="keywordtype">int</span> <a class="code hl_variable" href="namespacedevelop_build.html#ade64cd34608f9442ef3049116a2da428">v</a> = secp256k1_fe_sqrt(&amp;r1, <a class="code hl_variable" href="pointer_8h.html#aeeddce917cf130d62c370b8f216026dd">a</a>);</div>
+<div class="line"><span class="lineno"> 2820</span>    <span class="keywordtype">int</span> v = secp256k1_fe_sqrt(&amp;r1, <a class="code hl_variable" href="pointer_8h.html#aeeddce917cf130d62c370b8f216026dd">a</a>);</div>
 <div class="line"><span class="lineno"> 2821</span>    <a class="code hl_define" href="fc_2secp256k1_2secp256k1_2src_2util_8h.html#aba1590ff86288c886c47dc8a27b30467">CHECK</a>((v == 0) == (k == NULL));</div>
 <div class="line"><span class="lineno"> 2822</span> </div>
 <div class="line"><span class="lineno"> 2823</span>    <span class="keywordflow">if</span> (k != NULL) {</div>
@@ -13139,7 +13138,7 @@ Here is the caller graph for this function:</div>
 <div class="line"><span class="lineno"> 4672</span>    bits = secp256k1_ecmult_wnaf(wnaf, 256, number, w);</div>
 <div class="line"><span class="lineno"> 4673</span>    <a class="code hl_define" href="fc_2secp256k1_2secp256k1_2src_2util_8h.html#aba1590ff86288c886c47dc8a27b30467">CHECK</a>(bits &lt;= 256);</div>
 <div class="line"><span class="lineno"> 4674</span>    <span class="keywordflow">for</span> (i = bits-1; i &gt;= 0; i--) {</div>
-<div class="line"><span class="lineno"> 4675</span>        <span class="keywordtype">int</span> <a class="code hl_variable" href="namespacedevelop_build.html#ade64cd34608f9442ef3049116a2da428">v</a> = wnaf[i];</div>
+<div class="line"><span class="lineno"> 4675</span>        <span class="keywordtype">int</span> v = wnaf[i];</div>
 <div class="line"><span class="lineno"> 4676</span>        secp256k1_scalar_mul(&amp;x, &amp;x, &amp;two);</div>
 <div class="line"><span class="lineno"> 4677</span>        <span class="keywordflow">if</span> (v) {</div>
 <div class="line"><span class="lineno"> 4678</span>            <a class="code hl_define" href="fc_2secp256k1_2secp256k1_2src_2util_8h.html#aba1590ff86288c886c47dc8a27b30467">CHECK</a>(zeroes == -1 || zeroes &gt;= w-1); <span class="comment">/* check that distance between non-zero elements is at least w-1 */</span></div>

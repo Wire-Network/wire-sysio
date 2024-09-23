@@ -1,23 +1,3 @@
 <map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
-<area shape="rect" id="Node000000" href="$structtesting_1_1internal_1_1_function_3_01_r_07_08_4.html" title=" " alt="" coords="5,20,124,61"/>
-<area shape="rect" id="Node000001" href="$structtesting_1_1internal_1_1_function_3_01_r_07_a1_08_4.html" title=" " alt="" coords="172,20,297,61"/>
-<area shape="poly" id="edge768_Node000000_Node000001" title=" " alt="" coords="140,38,171,38,171,43,140,43"/>
-<area shape="rect" id="Node000002" href="$structtesting_1_1internal_1_1_function_3_01_r_07_a1_00_01_a2_08_4.html" title=" " alt="" coords="345,20,493,61"/>
-<area shape="poly" id="edge769_Node000001_Node000002" title=" " alt="" coords="312,38,345,38,345,43,312,43"/>
-<area shape="rect" id="Node000003" href="$structtesting_1_1internal_1_1_function_3_01_r_07_a1_00_01_a2_00_01_a3_08_4.html" title=" " alt="" coords="541,20,713,61"/>
-<area shape="poly" id="edge770_Node000002_Node000003" title=" " alt="" coords="509,38,541,38,541,43,509,43"/>
-<area shape="rect" id="Node000004" href="$structtesting_1_1internal_1_1_function_3_01_r_07_a1_00_01_a2_00_01_a3_00_01_a4_08_4.html" title=" " alt="" coords="761,13,901,68"/>
-<area shape="poly" id="edge771_Node000003_Node000004" title=" " alt="" coords="728,38,760,38,760,43,728,43"/>
-<area shape="rect" id="Node000005" href="$structtesting_1_1internal_1_1_function_3_01_r_07_a1_00_01_a2_00_01_a3_00_01_a4_00_01_a5_08_4.html" title=" " alt="" coords="949,13,1089,68"/>
-<area shape="poly" id="edge772_Node000004_Node000005" title=" " alt="" coords="916,38,949,38,949,43,916,43"/>
-<area shape="rect" id="Node000006" href="$structtesting_1_1internal_1_1_function_3_01_r_07_a1_00_01_a2_00_01_a3_00_01_a4_00_01_a5_00_01_a6_08_4.html" title=" " alt="" coords="1137,13,1278,68"/>
-<area shape="poly" id="edge773_Node000005_Node000006" title=" " alt="" coords="1105,38,1137,38,1137,43,1105,43"/>
-<area shape="rect" id="Node000007" href="$structtesting_1_1internal_1_1_function_3_01_r_07_a1_00_01_a2_00_01_a3_00_01_a4_00_01_a5_00_01_a6_00_01_a7_08_4.html" title=" " alt="" coords="1326,13,1470,68"/>
-<area shape="poly" id="edge774_Node000006_Node000007" title=" " alt="" coords="1293,38,1326,38,1326,43,1293,43"/>
-<area shape="rect" id="Node000008" href="$structtesting_1_1internal_1_1_function_3_01_r_07_a1_00_01_a2_00_01_a3_00_01_a4_00_01_a5_00_01_a6_00_01_a7_00_01_a8_08_4.html" title=" " alt="" coords="1518,13,1685,68"/>
-<area shape="poly" id="edge775_Node000007_Node000008" title=" " alt="" coords="1486,38,1517,38,1517,43,1486,43"/>
-<area shape="rect" id="Node000009" href="$structtesting_1_1internal_1_1_function_3_01_r_07_a1_00_01_a2_00_01_a3_00_01_a4_00_01_a5_00_01_a6dfab3ccde80824a59fc4efd5336a27c1.html" title=" " alt="" coords="1733,5,1874,76"/>
-<area shape="poly" id="edge776_Node000008_Node000009" title=" " alt="" coords="1701,38,1733,38,1733,43,1701,43"/>
-<area shape="rect" id="Node000010" href="$structtesting_1_1internal_1_1_function_3_01_r_07_a1_00_01_a2_00_01_a3_00_01_a4_00_01_a5_00_01_a6f6ff91550f0557b7708e490e5002cd35.html" title=" " alt="" coords="1922,5,2062,76"/>
-<area shape="poly" id="edge777_Node000009_Node000010" title=" " alt="" coords="1889,38,1921,38,1921,43,1889,43"/>
+<area shape="rect" id="Node000000" href="$classtesting_1_1internal_1_1_invoke_helper_3_01_r_00_01_1_1testing_1_1tuple_3_01_a1_00_01_a2_00_cb3e0694d0722fcc616ae618dc383e5b.html" title=" " alt="" coords="5,5,181,76"/>
 </map>

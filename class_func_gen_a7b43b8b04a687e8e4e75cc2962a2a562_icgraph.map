@@ -1,7 +1,5 @@
 <map id="FuncGen::genPush" name="FuncGen::genPush">
-<area shape="rect" id="Node000001" title=" " alt="" coords="390,13,523,38"/>
-<area shape="rect" id="Node000002" href="$struct_grammar_1_1definition.html#a8cec5c1bd053c0de70c42d0e01225bea" title=" " alt="" coords="207,5,342,46"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="374,28,342,28,342,23,374,23"/>
-<area shape="rect" id="Node000003" href="$classcpp_1_1ast_1_1_define.html#a8e51e0611e1a76c5874f6b39e27a6d6a" title=" " alt="" coords="5,13,159,38"/>
-<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="191,28,159,28,159,23,191,23"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="189,13,322,38"/>
+<area shape="rect" id="Node000002" href="$struct_grammar_1_1definition.html#a8cec5c1bd053c0de70c42d0e01225bea" title=" " alt="" coords="5,5,141,46"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="173,28,141,28,141,23,173,23"/>
 </map>

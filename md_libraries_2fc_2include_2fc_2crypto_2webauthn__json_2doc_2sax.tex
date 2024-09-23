@@ -283,7 +283,7 @@ Anyway, using {\ttfamily \doxylink{class_writer}{Writer}} API is even simpler th
 \DoxyCodeLine{\textcolor{keyword}{template}<\textcolor{keyword}{typename}\ OutputStream,\ \textcolor{keyword}{typename}\ SourceEncoding\ =\ UTF8<>,\ \textcolor{keyword}{typename}\ TargetEncoding\ =\ UTF8<>,\ \textcolor{keyword}{typename}\ Allocator\ =\ CrtAllocator<>,\ \textcolor{keywordtype}{unsigned}\ writeFlags\ =\ kWriteDefaultFlags>}
 \DoxyCodeLine{\textcolor{keyword}{class\ }\mbox{\hyperlink{class_writer}{Writer}}\ \{}
 \DoxyCodeLine{\textcolor{keyword}{public}:}
-\DoxyCodeLine{\ \ \ \ \mbox{\hyperlink{class_writer}{Writer}}(OutputStream\&\ os,\ \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}}*\ allocator\ =\ 0,\ \textcolor{keywordtype}{size\_t}\ levelDepth\ =\ kDefaultLevelDepth)}
+\DoxyCodeLine{\ \ \ \ \mbox{\hyperlink{class_writer}{Writer}}(OutputStream\&\ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}},\ \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}}*\ allocator\ =\ 0,\ \textcolor{keywordtype}{size\_t}\ levelDepth\ =\ kDefaultLevelDepth)}
 \DoxyCodeLine{\textcolor{comment}{//\ ...}}
 \DoxyCodeLine{\};}
 \DoxyCodeLine{}
@@ -497,7 +497,7 @@ Actually, we can add intermediate layer(s) to filter the contents of JSON via th
 \DoxyCodeLine{\ \ \ \ \textcolor{comment}{//\ Prepare\ JSON\ writer\ and\ output\ stream.}}
 \DoxyCodeLine{\ \ \ \ \textcolor{keywordtype}{char}\ writeBuffer[65536];}
 \DoxyCodeLine{\ \ \ \ \mbox{\hyperlink{class_file_write_stream}{FileWriteStream}}\ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}(stdout,\ writeBuffer,\ \textcolor{keyword}{sizeof}(writeBuffer));}
-\DoxyCodeLine{\ \ \ \ \mbox{\hyperlink{class_writer}{Writer<FileWriteStream>}}\ writer(os);}
+\DoxyCodeLine{\ \ \ \ \mbox{\hyperlink{class_writer}{Writer<FileWriteStream>}}\ writer(\mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}});}
 \DoxyCodeLine{}
 \DoxyCodeLine{\ \ \ \ \textcolor{comment}{//\ JSON\ reader\ parse\ from\ the\ input\ stream\ and\ let\ writer\ generate\ the\ output.}}
 \DoxyCodeLine{\ \ \ \ \mbox{\hyperlink{struct_capitalize_filter}{CapitalizeFilter<Writer<FileWriteStream>}}\ >\ filter(writer);}

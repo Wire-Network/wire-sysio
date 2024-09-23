@@ -133,9 +133,9 @@ Friends</h2></td></tr>
 <tr class="separator:aaebeae6c9db91b5c4f066e2681a8fd04"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a8ddee68e111eb70d3e0ab0ae81087022" id="r_a8ddee68e111eb70d3e0ab0ae81087022"><td class="memItemLeft" align="right" valign="top"><a class="el" href="yubihsm__pkcs11_8c.html#a5c230edcb923568000cb7982cf84dfce">class</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a8ddee68e111eb70d3e0ab0ae81087022">RunContext</a></td></tr>
 <tr class="separator:a8ddee68e111eb70d3e0ab0ae81087022"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aa01086581cab2fcd2d4580b8fa787dfc" id="r_aa01086581cab2fcd2d4580b8fa787dfc"><td class="memItemLeft" align="right" valign="top">auto&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aa01086581cab2fcd2d4580b8fa787dfc">operator&lt;&lt;</a> (std::ostream &amp;os, <a class="el" href="class_catch_1_1_lazy_expression.html">LazyExpression</a> const &amp;lazyExpr) -&gt; std::ostream &amp;</td></tr>
+<tr class="memitem:aa01086581cab2fcd2d4580b8fa787dfc" id="r_aa01086581cab2fcd2d4580b8fa787dfc"><td class="memItemLeft" align="right" valign="top">auto&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aa01086581cab2fcd2d4580b8fa787dfc">operator&lt;&lt;</a> (std::ostream &amp;<a class="el" href="environment_8hpp.html#a3951483d0b31c29ca95336206cd35238">os</a>, <a class="el" href="class_catch_1_1_lazy_expression.html">LazyExpression</a> const &amp;lazyExpr) -&gt; std::ostream &amp;</td></tr>
 <tr class="separator:aa01086581cab2fcd2d4580b8fa787dfc"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aa01086581cab2fcd2d4580b8fa787dfc" id="r_aa01086581cab2fcd2d4580b8fa787dfc"><td class="memItemLeft" align="right" valign="top">auto&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aa01086581cab2fcd2d4580b8fa787dfc">operator&lt;&lt;</a> (std::ostream &amp;os, <a class="el" href="class_catch_1_1_lazy_expression.html">LazyExpression</a> const &amp;lazyExpr) -&gt; std::ostream &amp;</td></tr>
+<tr class="memitem:aa01086581cab2fcd2d4580b8fa787dfc" id="r_aa01086581cab2fcd2d4580b8fa787dfc"><td class="memItemLeft" align="right" valign="top">auto&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aa01086581cab2fcd2d4580b8fa787dfc">operator&lt;&lt;</a> (std::ostream &amp;<a class="el" href="environment_8hpp.html#a3951483d0b31c29ca95336206cd35238">os</a>, <a class="el" href="class_catch_1_1_lazy_expression.html">LazyExpression</a> const &amp;lazyExpr) -&gt; std::ostream &amp;</td></tr>
 <tr class="separator:aa01086581cab2fcd2d4580b8fa787dfc"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
@@ -403,16 +403,16 @@ Friends</h2></td></tr>
 <p class="definition">Definition at line <a class="el" href="catch__assertionhandler_8cpp_source.html#l00038">38</a> of file <a class="el" href="catch__assertionhandler_8cpp_source.html">catch_assertionhandler.cpp</a>.</p>
 <div class="fragment"><div class="line"><span class="lineno">   38</span>                                                                                       {</div>
 <div class="line"><span class="lineno">   39</span>        <span class="keywordflow">if</span>( lazyExpr.m_isNegated )</div>
-<div class="line"><span class="lineno">   40</span>            os &lt;&lt; <span class="stringliteral">&quot;!&quot;</span>;</div>
+<div class="line"><span class="lineno">   40</span>            <a class="code hl_variable" href="environment_8hpp.html#a3951483d0b31c29ca95336206cd35238">os</a> &lt;&lt; <span class="stringliteral">&quot;!&quot;</span>;</div>
 <div class="line"><span class="lineno">   41</span> </div>
 <div class="line"><span class="lineno">   42</span>        <span class="keywordflow">if</span>( lazyExpr ) {</div>
 <div class="line"><span class="lineno">   43</span>            <span class="keywordflow">if</span>( lazyExpr.m_isNegated &amp;&amp; lazyExpr.m_transientExpression-&gt;isBinaryExpression() )</div>
-<div class="line"><span class="lineno">   44</span>                os &lt;&lt; <span class="stringliteral">&quot;(&quot;</span> &lt;&lt; *lazyExpr.m_transientExpression &lt;&lt; <span class="stringliteral">&quot;)&quot;</span>;</div>
+<div class="line"><span class="lineno">   44</span>                <a class="code hl_variable" href="environment_8hpp.html#a3951483d0b31c29ca95336206cd35238">os</a> &lt;&lt; <span class="stringliteral">&quot;(&quot;</span> &lt;&lt; *lazyExpr.m_transientExpression &lt;&lt; <span class="stringliteral">&quot;)&quot;</span>;</div>
 <div class="line"><span class="lineno">   45</span>            <span class="keywordflow">else</span></div>
-<div class="line"><span class="lineno">   46</span>                os &lt;&lt; *lazyExpr.m_transientExpression;</div>
+<div class="line"><span class="lineno">   46</span>                <a class="code hl_variable" href="environment_8hpp.html#a3951483d0b31c29ca95336206cd35238">os</a> &lt;&lt; *lazyExpr.m_transientExpression;</div>
 <div class="line"><span class="lineno">   47</span>        }</div>
 <div class="line"><span class="lineno">   48</span>        <span class="keywordflow">else</span> {</div>
-<div class="line"><span class="lineno">   49</span>            os &lt;&lt; <span class="stringliteral">&quot;{** error - unchecked empty expression requested **}&quot;</span>;</div>
+<div class="line"><span class="lineno">   49</span>            <a class="code hl_variable" href="environment_8hpp.html#a3951483d0b31c29ca95336206cd35238">os</a> &lt;&lt; <span class="stringliteral">&quot;{** error - unchecked empty expression requested **}&quot;</span>;</div>
 <div class="line"><span class="lineno">   50</span>        }</div>
 <div class="line"><span class="lineno">   51</span>        <span class="keywordflow">return</span> <a class="code hl_variable" href="environment_8hpp.html#a3951483d0b31c29ca95336206cd35238">os</a>;</div>
 <div class="line"><span class="lineno">   52</span>    }</div>
@@ -450,16 +450,16 @@ Friends</h2></td></tr>
 <p class="definition">Definition at line <a class="el" href="catch__assertionhandler_8cpp_source.html#l00038">38</a> of file <a class="el" href="catch__assertionhandler_8cpp_source.html">catch_assertionhandler.cpp</a>.</p>
 <div class="fragment"><div class="line"><span class="lineno">   38</span>                                                                                       {</div>
 <div class="line"><span class="lineno">   39</span>        <span class="keywordflow">if</span>( lazyExpr.m_isNegated )</div>
-<div class="line"><span class="lineno">   40</span>            os &lt;&lt; <span class="stringliteral">&quot;!&quot;</span>;</div>
+<div class="line"><span class="lineno">   40</span>            <a class="code hl_variable" href="environment_8hpp.html#a3951483d0b31c29ca95336206cd35238">os</a> &lt;&lt; <span class="stringliteral">&quot;!&quot;</span>;</div>
 <div class="line"><span class="lineno">   41</span> </div>
 <div class="line"><span class="lineno">   42</span>        <span class="keywordflow">if</span>( lazyExpr ) {</div>
 <div class="line"><span class="lineno">   43</span>            <span class="keywordflow">if</span>( lazyExpr.m_isNegated &amp;&amp; lazyExpr.m_transientExpression-&gt;isBinaryExpression() )</div>
-<div class="line"><span class="lineno">   44</span>                os &lt;&lt; <span class="stringliteral">&quot;(&quot;</span> &lt;&lt; *lazyExpr.m_transientExpression &lt;&lt; <span class="stringliteral">&quot;)&quot;</span>;</div>
+<div class="line"><span class="lineno">   44</span>                <a class="code hl_variable" href="environment_8hpp.html#a3951483d0b31c29ca95336206cd35238">os</a> &lt;&lt; <span class="stringliteral">&quot;(&quot;</span> &lt;&lt; *lazyExpr.m_transientExpression &lt;&lt; <span class="stringliteral">&quot;)&quot;</span>;</div>
 <div class="line"><span class="lineno">   45</span>            <span class="keywordflow">else</span></div>
-<div class="line"><span class="lineno">   46</span>                os &lt;&lt; *lazyExpr.m_transientExpression;</div>
+<div class="line"><span class="lineno">   46</span>                <a class="code hl_variable" href="environment_8hpp.html#a3951483d0b31c29ca95336206cd35238">os</a> &lt;&lt; *lazyExpr.m_transientExpression;</div>
 <div class="line"><span class="lineno">   47</span>        }</div>
 <div class="line"><span class="lineno">   48</span>        <span class="keywordflow">else</span> {</div>
-<div class="line"><span class="lineno">   49</span>            os &lt;&lt; <span class="stringliteral">&quot;{** error - unchecked empty expression requested **}&quot;</span>;</div>
+<div class="line"><span class="lineno">   49</span>            <a class="code hl_variable" href="environment_8hpp.html#a3951483d0b31c29ca95336206cd35238">os</a> &lt;&lt; <span class="stringliteral">&quot;{** error - unchecked empty expression requested **}&quot;</span>;</div>
 <div class="line"><span class="lineno">   50</span>        }</div>
 <div class="line"><span class="lineno">   51</span>        <span class="keywordflow">return</span> <a class="code hl_variable" href="environment_8hpp.html#a3951483d0b31c29ca95336206cd35238">os</a>;</div>
 <div class="line"><span class="lineno">   52</span>    }</div>

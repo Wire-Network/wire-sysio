@@ -528,10 +528,10 @@
 \DoxyCodeLine{\Hypertarget{schema_8h_source_l00533}00533\ }
 \DoxyCodeLine{\Hypertarget{schema_8h_source_l00534}00534\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\textcolor{keyword}{const}\ \mbox{\hyperlink{classinternal_1_1_schema_a2a5fe5fcb1b3987afc624a286243ceeb}{ValueType}}*\ v\ =\ GetMember(\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}},\ GetPatternPropertiesString()))\ \{}
 \DoxyCodeLine{\Hypertarget{schema_8h_source_l00535}00535\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classinternal_1_1_schema_a1a81f639262150869088070b6e8afe5e}{PointerType}}\ q\ =\ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}.Append(GetPatternPropertiesString(),\ allocator\_);}
-\DoxyCodeLine{\Hypertarget{schema_8h_source_l00536}00536\ \ \ \ \ \ \ \ \ \ \ \ \ patternProperties\_\ =\ \textcolor{keyword}{static\_cast<}PatternProperty*\textcolor{keyword}{>}(allocator\_-\/>Malloc(\textcolor{keyword}{sizeof}(PatternProperty)\ *\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}-\/>MemberCount()));}
+\DoxyCodeLine{\Hypertarget{schema_8h_source_l00536}00536\ \ \ \ \ \ \ \ \ \ \ \ \ patternProperties\_\ =\ \textcolor{keyword}{static\_cast<}PatternProperty*\textcolor{keyword}{>}(allocator\_-\/>Malloc(\textcolor{keyword}{sizeof}(PatternProperty)\ *\ v-\/>MemberCount()));}
 \DoxyCodeLine{\Hypertarget{schema_8h_source_l00537}00537\ \ \ \ \ \ \ \ \ \ \ \ \ patternPropertyCount\_\ =\ 0;}
 \DoxyCodeLine{\Hypertarget{schema_8h_source_l00538}00538\ }
-\DoxyCodeLine{\Hypertarget{schema_8h_source_l00539}00539\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (ConstMemberIterator\ itr\ =\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}-\/>MemberBegin();\ itr\ !=\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}-\/>MemberEnd();\ ++itr)\ \{}
+\DoxyCodeLine{\Hypertarget{schema_8h_source_l00539}00539\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (ConstMemberIterator\ itr\ =\ v-\/>MemberBegin();\ itr\ !=\ v-\/>MemberEnd();\ ++itr)\ \{}
 \DoxyCodeLine{\Hypertarget{schema_8h_source_l00540}00540\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{new}\ (\&patternProperties\_[patternPropertyCount\_])\ PatternProperty();}
 \DoxyCodeLine{\Hypertarget{schema_8h_source_l00541}00541\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ patternProperties\_[patternPropertyCount\_].pattern\ =\ CreatePattern(itr-\/>name);}
 \DoxyCodeLine{\Hypertarget{schema_8h_source_l00542}00542\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ schemaDocument-\/>CreateSchema(\&patternProperties\_[patternPropertyCount\_].schema,\ q.Append(itr-\/>name,\ allocator\_),\ itr-\/>value,\ document);}
@@ -575,9 +575,9 @@
 \DoxyCodeLine{\Hypertarget{schema_8h_source_l00580}00580\ \ \ \ \ \ \ \ \ \}}
 \DoxyCodeLine{\Hypertarget{schema_8h_source_l00581}00581\ }
 \DoxyCodeLine{\Hypertarget{schema_8h_source_l00582}00582\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\textcolor{keyword}{const}\ \mbox{\hyperlink{classinternal_1_1_schema_a2a5fe5fcb1b3987afc624a286243ceeb}{ValueType}}*\ v\ =\ GetMember(\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}},\ GetAdditionalPropertiesString()))\ \{}
-\DoxyCodeLine{\Hypertarget{schema_8h_source_l00583}00583\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}-\/>IsBool())}
-\DoxyCodeLine{\Hypertarget{schema_8h_source_l00584}00584\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ additionalProperties\_\ =\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}-\/>GetBool();}
-\DoxyCodeLine{\Hypertarget{schema_8h_source_l00585}00585\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}-\/>IsObject())}
+\DoxyCodeLine{\Hypertarget{schema_8h_source_l00583}00583\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (v-\/>IsBool())}
+\DoxyCodeLine{\Hypertarget{schema_8h_source_l00584}00584\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ additionalProperties\_\ =\ v-\/>GetBool();}
+\DoxyCodeLine{\Hypertarget{schema_8h_source_l00585}00585\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}\ (v-\/>IsObject())}
 \DoxyCodeLine{\Hypertarget{schema_8h_source_l00586}00586\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ schemaDocument-\/>CreateSchema(\&additionalPropertiesSchema\_,\ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}.Append(GetAdditionalPropertiesString(),\ allocator\_),\ *v,\ document);}
 \DoxyCodeLine{\Hypertarget{schema_8h_source_l00587}00587\ \ \ \ \ \ \ \ \ \}}
 \DoxyCodeLine{\Hypertarget{schema_8h_source_l00588}00588\ }
@@ -587,12 +587,12 @@
 \DoxyCodeLine{\Hypertarget{schema_8h_source_l00592}00592\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Array}}
 \DoxyCodeLine{\Hypertarget{schema_8h_source_l00593}00593\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\textcolor{keyword}{const}\ \mbox{\hyperlink{classinternal_1_1_schema_a2a5fe5fcb1b3987afc624a286243ceeb}{ValueType}}*\ v\ =\ GetMember(\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}},\ GetItemsString()))\ \{}
 \DoxyCodeLine{\Hypertarget{schema_8h_source_l00594}00594\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classinternal_1_1_schema_a1a81f639262150869088070b6e8afe5e}{PointerType}}\ q\ =\ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}.Append(GetItemsString(),\ allocator\_);}
-\DoxyCodeLine{\Hypertarget{schema_8h_source_l00595}00595\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}-\/>IsObject())\ \textcolor{comment}{//\ List\ validation}}
+\DoxyCodeLine{\Hypertarget{schema_8h_source_l00595}00595\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (v-\/>IsObject())\ \textcolor{comment}{//\ List\ validation}}
 \DoxyCodeLine{\Hypertarget{schema_8h_source_l00596}00596\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ schemaDocument-\/>CreateSchema(\&itemsList\_,\ q,\ *v,\ document);}
-\DoxyCodeLine{\Hypertarget{schema_8h_source_l00597}00597\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}-\/>IsArray())\ \{\ \textcolor{comment}{//\ Tuple\ validation}}
-\DoxyCodeLine{\Hypertarget{schema_8h_source_l00598}00598\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ itemsTuple\_\ =\ \textcolor{keyword}{static\_cast<}\textcolor{keyword}{const\ }\mbox{\hyperlink{class_schema}{Schema}}**\textcolor{keyword}{>}(allocator\_-\/>Malloc(\textcolor{keyword}{sizeof}(\textcolor{keyword}{const}\ \mbox{\hyperlink{class_schema}{Schema}}*)\ *\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}-\/>Size()));}
+\DoxyCodeLine{\Hypertarget{schema_8h_source_l00597}00597\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}\ (v-\/>IsArray())\ \{\ \textcolor{comment}{//\ Tuple\ validation}}
+\DoxyCodeLine{\Hypertarget{schema_8h_source_l00598}00598\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ itemsTuple\_\ =\ \textcolor{keyword}{static\_cast<}\textcolor{keyword}{const\ }\mbox{\hyperlink{class_schema}{Schema}}**\textcolor{keyword}{>}(allocator\_-\/>Malloc(\textcolor{keyword}{sizeof}(\textcolor{keyword}{const}\ \mbox{\hyperlink{class_schema}{Schema}}*)\ *\ v-\/>Size()));}
 \DoxyCodeLine{\Hypertarget{schema_8h_source_l00599}00599\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{rapidjson_8h_a5ed6e6e67250fadbd041127e6386dcb5}{SizeType}}\ index\ =\ 0;}
-\DoxyCodeLine{\Hypertarget{schema_8h_source_l00600}00600\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (ConstValueIterator\ itr\ =\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}-\/>Begin();\ itr\ !=\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}-\/>End();\ ++itr,\ index++)}
+\DoxyCodeLine{\Hypertarget{schema_8h_source_l00600}00600\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (ConstValueIterator\ itr\ =\ v-\/>Begin();\ itr\ !=\ v-\/>End();\ ++itr,\ index++)}
 \DoxyCodeLine{\Hypertarget{schema_8h_source_l00601}00601\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ schemaDocument-\/>CreateSchema(\&itemsTuple\_[itemsTupleCount\_++],\ q.Append(index,\ allocator\_),\ *itr,\ document);}
 \DoxyCodeLine{\Hypertarget{schema_8h_source_l00602}00602\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
 \DoxyCodeLine{\Hypertarget{schema_8h_source_l00603}00603\ \ \ \ \ \ \ \ \ \}}
@@ -601,9 +601,9 @@
 \DoxyCodeLine{\Hypertarget{schema_8h_source_l00606}00606\ \ \ \ \ \ \ \ \ AssignIfExist(maxItems\_,\ \mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}},\ GetMaxItemsString());}
 \DoxyCodeLine{\Hypertarget{schema_8h_source_l00607}00607\ }
 \DoxyCodeLine{\Hypertarget{schema_8h_source_l00608}00608\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\textcolor{keyword}{const}\ \mbox{\hyperlink{classinternal_1_1_schema_a2a5fe5fcb1b3987afc624a286243ceeb}{ValueType}}*\ v\ =\ GetMember(\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}},\ GetAdditionalItemsString()))\ \{}
-\DoxyCodeLine{\Hypertarget{schema_8h_source_l00609}00609\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}-\/>IsBool())}
-\DoxyCodeLine{\Hypertarget{schema_8h_source_l00610}00610\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ additionalItems\_\ =\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}-\/>GetBool();}
-\DoxyCodeLine{\Hypertarget{schema_8h_source_l00611}00611\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}-\/>IsObject())}
+\DoxyCodeLine{\Hypertarget{schema_8h_source_l00609}00609\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (v-\/>IsBool())}
+\DoxyCodeLine{\Hypertarget{schema_8h_source_l00610}00610\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ additionalItems\_\ =\ v-\/>GetBool();}
+\DoxyCodeLine{\Hypertarget{schema_8h_source_l00611}00611\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}\ (v-\/>IsObject())}
 \DoxyCodeLine{\Hypertarget{schema_8h_source_l00612}00612\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ schemaDocument-\/>CreateSchema(\&additionalItemsSchema\_,\ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}.Append(GetAdditionalItemsString(),\ allocator\_),\ *v,\ document);}
 \DoxyCodeLine{\Hypertarget{schema_8h_source_l00613}00613\ \ \ \ \ \ \ \ \ \}}
 \DoxyCodeLine{\Hypertarget{schema_8h_source_l00614}00614\ }
@@ -618,24 +618,24 @@
 \DoxyCodeLine{\Hypertarget{schema_8h_source_l00623}00623\ }
 \DoxyCodeLine{\Hypertarget{schema_8h_source_l00624}00624\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Number}}
 \DoxyCodeLine{\Hypertarget{schema_8h_source_l00625}00625\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\textcolor{keyword}{const}\ \mbox{\hyperlink{classinternal_1_1_schema_a2a5fe5fcb1b3987afc624a286243ceeb}{ValueType}}*\ v\ =\ GetMember(\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}},\ GetMinimumString()))}
-\DoxyCodeLine{\Hypertarget{schema_8h_source_l00626}00626\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}-\/>IsNumber())}
+\DoxyCodeLine{\Hypertarget{schema_8h_source_l00626}00626\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (v-\/>IsNumber())}
 \DoxyCodeLine{\Hypertarget{schema_8h_source_l00627}00627\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ minimum\_.CopyFrom(*v,\ *allocator\_);}
 \DoxyCodeLine{\Hypertarget{schema_8h_source_l00628}00628\ }
 \DoxyCodeLine{\Hypertarget{schema_8h_source_l00629}00629\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\textcolor{keyword}{const}\ \mbox{\hyperlink{classinternal_1_1_schema_a2a5fe5fcb1b3987afc624a286243ceeb}{ValueType}}*\ v\ =\ GetMember(\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}},\ GetMaximumString()))}
-\DoxyCodeLine{\Hypertarget{schema_8h_source_l00630}00630\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}-\/>IsNumber())}
+\DoxyCodeLine{\Hypertarget{schema_8h_source_l00630}00630\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (v-\/>IsNumber())}
 \DoxyCodeLine{\Hypertarget{schema_8h_source_l00631}00631\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ maximum\_.CopyFrom(*v,\ *allocator\_);}
 \DoxyCodeLine{\Hypertarget{schema_8h_source_l00632}00632\ }
 \DoxyCodeLine{\Hypertarget{schema_8h_source_l00633}00633\ \ \ \ \ \ \ \ \ AssignIfExist(exclusiveMinimum\_,\ \mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}},\ GetExclusiveMinimumString());}
 \DoxyCodeLine{\Hypertarget{schema_8h_source_l00634}00634\ \ \ \ \ \ \ \ \ AssignIfExist(exclusiveMaximum\_,\ \mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}},\ GetExclusiveMaximumString());}
 \DoxyCodeLine{\Hypertarget{schema_8h_source_l00635}00635\ }
 \DoxyCodeLine{\Hypertarget{schema_8h_source_l00636}00636\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\textcolor{keyword}{const}\ \mbox{\hyperlink{classinternal_1_1_schema_a2a5fe5fcb1b3987afc624a286243ceeb}{ValueType}}*\ v\ =\ GetMember(\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}},\ GetMultipleOfString()))}
-\DoxyCodeLine{\Hypertarget{schema_8h_source_l00637}00637\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}-\/>IsNumber()\ \&\&\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}-\/>GetDouble()\ >\ 0.0)}
+\DoxyCodeLine{\Hypertarget{schema_8h_source_l00637}00637\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (v-\/>IsNumber()\ \&\&\ v-\/>GetDouble()\ >\ 0.0)}
 \DoxyCodeLine{\Hypertarget{schema_8h_source_l00638}00638\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ multipleOf\_.CopyFrom(*v,\ *allocator\_);}
 \DoxyCodeLine{\Hypertarget{schema_8h_source_l00639}00639\ }
 \DoxyCodeLine{\Hypertarget{schema_8h_source_l00640}00640\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Default}}
 \DoxyCodeLine{\Hypertarget{schema_8h_source_l00641}00641\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\textcolor{keyword}{const}\ \mbox{\hyperlink{classinternal_1_1_schema_a2a5fe5fcb1b3987afc624a286243ceeb}{ValueType}}*\ v\ =\ GetMember(\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}},\ GetDefaultValueString()))}
-\DoxyCodeLine{\Hypertarget{schema_8h_source_l00642}00642\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}-\/>IsString())}
-\DoxyCodeLine{\Hypertarget{schema_8h_source_l00643}00643\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ defaultValueLength\_\ =\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}-\/>GetStringLength();}
+\DoxyCodeLine{\Hypertarget{schema_8h_source_l00642}00642\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (v-\/>IsString())}
+\DoxyCodeLine{\Hypertarget{schema_8h_source_l00643}00643\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ defaultValueLength\_\ =\ v-\/>GetStringLength();}
 \DoxyCodeLine{\Hypertarget{schema_8h_source_l00644}00644\ }
 \DoxyCodeLine{\Hypertarget{schema_8h_source_l00645}00645\ \ \ \ \ \}}
 \DoxyCodeLine{\Hypertarget{schema_8h_source_l00646}00646\ }
@@ -1097,21 +1097,21 @@
 \DoxyCodeLine{\Hypertarget{schema_8h_source_l01102}01102\ }
 \DoxyCodeLine{\Hypertarget{schema_8h_source_l01103}01103\ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keywordtype}{void}\ AssignIfExist(\textcolor{keywordtype}{bool}\&\ out,\ \textcolor{keyword}{const}\ ValueType\&\ \mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}},\ \textcolor{keyword}{const}\ ValueType\&\ \mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}})\ \{}
 \DoxyCodeLine{\Hypertarget{schema_8h_source_l01104}01104\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\textcolor{keyword}{const}\ ValueType*\ v\ =\ GetMember(\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}},\ \mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}))}
-\DoxyCodeLine{\Hypertarget{schema_8h_source_l01105}01105\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}-\/>IsBool())}
-\DoxyCodeLine{\Hypertarget{schema_8h_source_l01106}01106\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ out\ =\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}-\/>GetBool();}
+\DoxyCodeLine{\Hypertarget{schema_8h_source_l01105}01105\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (v-\/>IsBool())}
+\DoxyCodeLine{\Hypertarget{schema_8h_source_l01106}01106\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ out\ =\ v-\/>GetBool();}
 \DoxyCodeLine{\Hypertarget{schema_8h_source_l01107}01107\ \ \ \ \ \}}
 \DoxyCodeLine{\Hypertarget{schema_8h_source_l01108}01108\ }
 \DoxyCodeLine{\Hypertarget{schema_8h_source_l01109}01109\ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keywordtype}{void}\ AssignIfExist(\mbox{\hyperlink{rapidjson_8h_a5ed6e6e67250fadbd041127e6386dcb5}{SizeType}}\&\ out,\ \textcolor{keyword}{const}\ ValueType\&\ \mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}},\ \textcolor{keyword}{const}\ ValueType\&\ \mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}})\ \{}
 \DoxyCodeLine{\Hypertarget{schema_8h_source_l01110}01110\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\textcolor{keyword}{const}\ ValueType*\ v\ =\ GetMember(\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}},\ \mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}))}
-\DoxyCodeLine{\Hypertarget{schema_8h_source_l01111}01111\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}-\/>IsUint64()\ \&\&\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}-\/>GetUint64()\ <=\ \mbox{\hyperlink{rapidjson_8h_a5ed6e6e67250fadbd041127e6386dcb5}{SizeType}}(\string~0))}
-\DoxyCodeLine{\Hypertarget{schema_8h_source_l01112}01112\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ out\ =\ \textcolor{keyword}{static\_cast<}\mbox{\hyperlink{rapidjson_8h_a5ed6e6e67250fadbd041127e6386dcb5}{SizeType}}\textcolor{keyword}{>}(\mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}-\/>GetUint64());}
+\DoxyCodeLine{\Hypertarget{schema_8h_source_l01111}01111\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (v-\/>IsUint64()\ \&\&\ v-\/>GetUint64()\ <=\ \mbox{\hyperlink{rapidjson_8h_a5ed6e6e67250fadbd041127e6386dcb5}{SizeType}}(\string~0))}
+\DoxyCodeLine{\Hypertarget{schema_8h_source_l01112}01112\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ out\ =\ \textcolor{keyword}{static\_cast<}\mbox{\hyperlink{rapidjson_8h_a5ed6e6e67250fadbd041127e6386dcb5}{SizeType}}\textcolor{keyword}{>}(v-\/>GetUint64());}
 \DoxyCodeLine{\Hypertarget{schema_8h_source_l01113}01113\ \ \ \ \ \}}
 \DoxyCodeLine{\Hypertarget{schema_8h_source_l01114}01114\ }
 \DoxyCodeLine{\Hypertarget{schema_8h_source_l01115}01115\ \ \ \ \ \textcolor{keywordtype}{void}\ AssignIfExist(SchemaArray\&\ out,\ SchemaDocumentType\&\ schemaDocument,\ \textcolor{keyword}{const}\ PointerType\&\ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}},\ \textcolor{keyword}{const}\ ValueType\&\ \mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}},\ \textcolor{keyword}{const}\ ValueType\&\ \mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}},\ \textcolor{keyword}{const}\ ValueType\&\ document)\ \{}
 \DoxyCodeLine{\Hypertarget{schema_8h_source_l01116}01116\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\textcolor{keyword}{const}\ ValueType*\ v\ =\ GetMember(\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}},\ \mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}))\ \{}
-\DoxyCodeLine{\Hypertarget{schema_8h_source_l01117}01117\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}-\/>IsArray()\ \&\&\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}-\/>Size()\ >\ 0)\ \{}
+\DoxyCodeLine{\Hypertarget{schema_8h_source_l01117}01117\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (v-\/>IsArray()\ \&\&\ v-\/>Size()\ >\ 0)\ \{}
 \DoxyCodeLine{\Hypertarget{schema_8h_source_l01118}01118\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ PointerType\ q\ =\ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}.Append(\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}},\ allocator\_);}
-\DoxyCodeLine{\Hypertarget{schema_8h_source_l01119}01119\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ out.count\ =\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}-\/>Size();}
+\DoxyCodeLine{\Hypertarget{schema_8h_source_l01119}01119\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ out.count\ =\ v-\/>Size();}
 \DoxyCodeLine{\Hypertarget{schema_8h_source_l01120}01120\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ out.schemas\ =\ \textcolor{keyword}{static\_cast<}\textcolor{keyword}{const\ }\mbox{\hyperlink{class_schema}{Schema}}**\textcolor{keyword}{>}(allocator\_-\/>Malloc(out.count\ *\ \textcolor{keyword}{sizeof}(\textcolor{keyword}{const}\ \mbox{\hyperlink{class_schema}{Schema}}*)));}
 \DoxyCodeLine{\Hypertarget{schema_8h_source_l01121}01121\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_adc4bd59a60361844aa0e852efa210105}{memset}}(out.schemas,\ 0,\ \textcolor{keyword}{sizeof}(\mbox{\hyperlink{class_schema}{Schema}}*)*\ out.count);}
 \DoxyCodeLine{\Hypertarget{schema_8h_source_l01122}01122\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\mbox{\hyperlink{rapidjson_8h_a5ed6e6e67250fadbd041127e6386dcb5}{SizeType}}\ i\ =\ 0;\ i\ <\ out.count;\ i++)}
@@ -1606,22 +1606,22 @@
 \DoxyCodeLine{\Hypertarget{schema_8h_source_l01635}01635\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (schema)}
 \DoxyCodeLine{\Hypertarget{schema_8h_source_l01636}01636\ \ \ \ \ \ \ \ \ \ \ \ \ *schema\ =\ typeless\_;}
 \DoxyCodeLine{\Hypertarget{schema_8h_source_l01637}01637\ }
-\DoxyCodeLine{\Hypertarget{schema_8h_source_l01638}01638\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.GetType()\ ==\ \mbox{\hyperlink{rapidjson_8h_a1d1cfd8ffb84e947f82999c682b666a7a146f46700e905e8df96a6a90b5c7640f}{kObjectType}})\ \{}
+\DoxyCodeLine{\Hypertarget{schema_8h_source_l01638}01638\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (v.GetType()\ ==\ \mbox{\hyperlink{rapidjson_8h_a1d1cfd8ffb84e947f82999c682b666a7a146f46700e905e8df96a6a90b5c7640f}{kObjectType}})\ \{}
 \DoxyCodeLine{\Hypertarget{schema_8h_source_l01639}01639\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{class_generic_schema_document_a4b4026539c87dc3bea7bc4801d60c95d}{SchemaType}}*\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}\ =\ GetSchema(\mbox{\hyperlink{pointer_8h_aae1f8d263916ad71bd415381591549c0}{pointer}});}
 \DoxyCodeLine{\Hypertarget{schema_8h_source_l01640}01640\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}})}
 \DoxyCodeLine{\Hypertarget{schema_8h_source_l01641}01641\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ CreateSchema(schema,\ \mbox{\hyperlink{pointer_8h_aae1f8d263916ad71bd415381591549c0}{pointer}},\ v,\ document);}
 \DoxyCodeLine{\Hypertarget{schema_8h_source_l01642}01642\ }
-\DoxyCodeLine{\Hypertarget{schema_8h_source_l01643}01643\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keyword}{typename}\ ValueType::ConstMemberIterator\ itr\ =\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.MemberBegin();\ itr\ !=\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.MemberEnd();\ ++itr)}
+\DoxyCodeLine{\Hypertarget{schema_8h_source_l01643}01643\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keyword}{typename}\ ValueType::ConstMemberIterator\ itr\ =\ v.MemberBegin();\ itr\ !=\ v.MemberEnd();\ ++itr)}
 \DoxyCodeLine{\Hypertarget{schema_8h_source_l01644}01644\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ CreateSchemaRecursive(0,\ \mbox{\hyperlink{pointer_8h_aae1f8d263916ad71bd415381591549c0}{pointer}}.Append(itr-\/>name,\ allocator\_),\ itr-\/>value,\ document);}
 \DoxyCodeLine{\Hypertarget{schema_8h_source_l01645}01645\ \ \ \ \ \ \ \ \ \}}
-\DoxyCodeLine{\Hypertarget{schema_8h_source_l01646}01646\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.GetType()\ ==\ \mbox{\hyperlink{rapidjson_8h_a1d1cfd8ffb84e947f82999c682b666a7af41527d6925efa3c5c3dadb23dfef7c8}{kArrayType}})}
-\DoxyCodeLine{\Hypertarget{schema_8h_source_l01647}01647\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\mbox{\hyperlink{rapidjson_8h_a5ed6e6e67250fadbd041127e6386dcb5}{SizeType}}\ i\ =\ 0;\ i\ <\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.Size();\ i++)}
+\DoxyCodeLine{\Hypertarget{schema_8h_source_l01646}01646\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}\ (v.GetType()\ ==\ \mbox{\hyperlink{rapidjson_8h_a1d1cfd8ffb84e947f82999c682b666a7af41527d6925efa3c5c3dadb23dfef7c8}{kArrayType}})}
+\DoxyCodeLine{\Hypertarget{schema_8h_source_l01647}01647\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\mbox{\hyperlink{rapidjson_8h_a5ed6e6e67250fadbd041127e6386dcb5}{SizeType}}\ i\ =\ 0;\ i\ <\ v.Size();\ i++)}
 \DoxyCodeLine{\Hypertarget{schema_8h_source_l01648}01648\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ CreateSchemaRecursive(0,\ \mbox{\hyperlink{pointer_8h_aae1f8d263916ad71bd415381591549c0}{pointer}}.Append(i,\ allocator\_),\ v[i],\ document);}
 \DoxyCodeLine{\Hypertarget{schema_8h_source_l01649}01649\ \ \ \ \ \}}
 \DoxyCodeLine{\Hypertarget{schema_8h_source_l01650}01650\ }
 \DoxyCodeLine{\Hypertarget{schema_8h_source_l01651}01651\ \ \ \ \ \textcolor{keywordtype}{void}\ CreateSchema(\textcolor{keyword}{const}\ \mbox{\hyperlink{class_generic_schema_document_a4b4026539c87dc3bea7bc4801d60c95d}{SchemaType}}**\ schema,\ \textcolor{keyword}{const}\ \mbox{\hyperlink{class_generic_schema_document_a5910bbc88c52120b283efc4c09e48e1d}{PointerType}}\&\ \mbox{\hyperlink{pointer_8h_aae1f8d263916ad71bd415381591549c0}{pointer}},\ \textcolor{keyword}{const}\ \mbox{\hyperlink{class_generic_schema_document_a5bbb37f0f1b77684bb171a1fe6ee6d3d}{ValueType}}\&\ v,\ \textcolor{keyword}{const}\ \mbox{\hyperlink{class_generic_schema_document_a5bbb37f0f1b77684bb171a1fe6ee6d3d}{ValueType}}\&\ document)\ \{}
 \DoxyCodeLine{\Hypertarget{schema_8h_source_l01652}01652\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g_gabeba18d612187bad2ac62aed9276d47c}{RAPIDJSON\_ASSERT}}(\mbox{\hyperlink{pointer_8h_aae1f8d263916ad71bd415381591549c0}{pointer}}.IsValid());}
-\DoxyCodeLine{\Hypertarget{schema_8h_source_l01653}01653\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.IsObject())\ \{}
+\DoxyCodeLine{\Hypertarget{schema_8h_source_l01653}01653\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (v.IsObject())\ \{}
 \DoxyCodeLine{\Hypertarget{schema_8h_source_l01654}01654\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!HandleRefSchema(\mbox{\hyperlink{pointer_8h_aae1f8d263916ad71bd415381591549c0}{pointer}},\ schema,\ v,\ document))\ \{}
 \DoxyCodeLine{\Hypertarget{schema_8h_source_l01655}01655\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_generic_schema_document_a4b4026539c87dc3bea7bc4801d60c95d}{SchemaType}}*\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}\ =\ \textcolor{keyword}{new}\ (allocator\_-\/>Malloc(\textcolor{keyword}{sizeof}(\mbox{\hyperlink{class_generic_schema_document_a4b4026539c87dc3bea7bc4801d60c95d}{SchemaType}})))\ \mbox{\hyperlink{class_generic_schema_document_a4b4026539c87dc3bea7bc4801d60c95d}{SchemaType}}(\textcolor{keyword}{this},\ \mbox{\hyperlink{pointer_8h_aae1f8d263916ad71bd415381591549c0}{pointer}},\ v,\ document,\ allocator\_);}
 \DoxyCodeLine{\Hypertarget{schema_8h_source_l01656}01656\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{new}\ (schemaMap\_.template\ Push<SchemaEntry>())\ SchemaEntry(\mbox{\hyperlink{pointer_8h_aae1f8d263916ad71bd415381591549c0}{pointer}},\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}},\ \textcolor{keyword}{true},\ allocator\_);}
@@ -1635,8 +1635,8 @@
 \DoxyCodeLine{\Hypertarget{schema_8h_source_l01664}01664\ \ \ \ \ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{const}\ \mbox{\hyperlink{class_generic_schema_document_a6b332c3539416c99a72b1e6866f8f9c4}{Ch}}\ kRefString[]\ =\ \{\ \textcolor{charliteral}{'\$'},\ \textcolor{charliteral}{'r'},\ \textcolor{charliteral}{'e'},\ \textcolor{charliteral}{'f'},\ \textcolor{charliteral}{'\(\backslash\)0'}\ \};}
 \DoxyCodeLine{\Hypertarget{schema_8h_source_l01665}01665\ \ \ \ \ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{const}\ \mbox{\hyperlink{class_generic_schema_document_a5bbb37f0f1b77684bb171a1fe6ee6d3d}{ValueType}}\ kRefValue(kRefString,\ 4);}
 \DoxyCodeLine{\Hypertarget{schema_8h_source_l01666}01666\ }
-\DoxyCodeLine{\Hypertarget{schema_8h_source_l01667}01667\ \ \ \ \ \ \ \ \ \textcolor{keyword}{typename}\ ValueType::ConstMemberIterator\ itr\ =\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.FindMember(kRefValue);}
-\DoxyCodeLine{\Hypertarget{schema_8h_source_l01668}01668\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (itr\ ==\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.MemberEnd())}
+\DoxyCodeLine{\Hypertarget{schema_8h_source_l01667}01667\ \ \ \ \ \ \ \ \ \textcolor{keyword}{typename}\ ValueType::ConstMemberIterator\ itr\ =\ v.FindMember(kRefValue);}
+\DoxyCodeLine{\Hypertarget{schema_8h_source_l01668}01668\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (itr\ ==\ v.MemberEnd())}
 \DoxyCodeLine{\Hypertarget{schema_8h_source_l01669}01669\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
 \DoxyCodeLine{\Hypertarget{schema_8h_source_l01670}01670\ }
 \DoxyCodeLine{\Hypertarget{schema_8h_source_l01671}01671\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (itr-\/>value.IsString())\ \{}
@@ -2100,7 +2100,7 @@
 \DoxyCodeLine{\Hypertarget{schema_8h_source_l02162}02162\ }
 \DoxyCodeLine{\Hypertarget{schema_8h_source_l02163}\mbox{\hyperlink{class_generic_schema_validator_ae24fa298e328f1fd7dda2ef6267156d2}{02163}}\ \ \ \ \ \textcolor{keyword}{virtual}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{class_generic_schema_validator_ae24fa298e328f1fd7dda2ef6267156d2}{DestroySchemaValidator}}(ISchemaValidator*\ validator)\ \{}
 \DoxyCodeLine{\Hypertarget{schema_8h_source_l02164}02164\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_generic_schema_validator}{GenericSchemaValidator}}*\ v\ =\ \textcolor{keyword}{static\_cast<}\mbox{\hyperlink{class_generic_schema_validator}{GenericSchemaValidator}}*\textcolor{keyword}{>}(validator);}
-\DoxyCodeLine{\Hypertarget{schema_8h_source_l02165}02165\ \ \ \ \ \ \ \ \ v-\/>\string~GenericSchemaValidator();}
+\DoxyCodeLine{\Hypertarget{schema_8h_source_l02165}02165\ \ \ \ \ \ \ \ \ v-\/>\mbox{\hyperlink{class_generic_schema_validator_a3eab83d483a50efb0c0390adf3291963}{\string~GenericSchemaValidator}}();}
 \DoxyCodeLine{\Hypertarget{schema_8h_source_l02166}02166\ \ \ \ \ \ \ \ \ StateAllocator::Free(v);}
 \DoxyCodeLine{\Hypertarget{schema_8h_source_l02167}02167\ \ \ \ \ \}}
 \DoxyCodeLine{\Hypertarget{schema_8h_source_l02168}02168\ }

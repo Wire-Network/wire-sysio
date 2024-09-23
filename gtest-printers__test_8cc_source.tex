@@ -85,8 +85,8 @@
 \DoxyCodeLine{\Hypertarget{gtest-printers__test_8cc_source_l00081}00081\ \ \ \mbox{\hyperlink{gtest-printers__test_8cc_a52d9f846ca7a081ba3acf88dd6cd46dca8d4bcf477f5a23ce8569a2a404327839}{kEWS1}}\ =\ 10}
 \DoxyCodeLine{\Hypertarget{gtest-printers__test_8cc_source_l00082}\mbox{\hyperlink{gtest-printers__test_8cc_a52d9f846ca7a081ba3acf88dd6cd46dca8d4bcf477f5a23ce8569a2a404327839}{00082}}\ \};}
 \DoxyCodeLine{\Hypertarget{gtest-printers__test_8cc_source_l00083}00083\ }
-\DoxyCodeLine{\Hypertarget{gtest-printers__test_8cc_source_l00084}\mbox{\hyperlink{gtest-printers__test_8cc_a73b9778fdddae7a6a312022b9f393419}{00084}}\ std::ostream\&\ \mbox{\hyperlink{gtest-printers__test_8cc_a73b9778fdddae7a6a312022b9f393419}{operator<<}}(std::ostream\&\ os,\ \mbox{\hyperlink{gtest-printers__test_8cc_a52d9f846ca7a081ba3acf88dd6cd46dc}{EnumWithStreaming}}\ e)\ \{}
-\DoxyCodeLine{\Hypertarget{gtest-printers__test_8cc_source_l00085}00085\ \ \ \textcolor{keywordflow}{return}\ os\ <<\ (e\ ==\ \mbox{\hyperlink{gtest-printers__test_8cc_a52d9f846ca7a081ba3acf88dd6cd46dca8d4bcf477f5a23ce8569a2a404327839}{kEWS1}}\ ?\ \textcolor{stringliteral}{"{}kEWS1"{}}\ :\ \textcolor{stringliteral}{"{}invalid"{}});}
+\DoxyCodeLine{\Hypertarget{gtest-printers__test_8cc_source_l00084}\mbox{\hyperlink{gtest-printers__test_8cc_a73b9778fdddae7a6a312022b9f393419}{00084}}\ std::ostream\&\ \mbox{\hyperlink{gtest-printers__test_8cc_a73b9778fdddae7a6a312022b9f393419}{operator<<}}(std::ostream\&\ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}},\ \mbox{\hyperlink{gtest-printers__test_8cc_a52d9f846ca7a081ba3acf88dd6cd46dc}{EnumWithStreaming}}\ e)\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-printers__test_8cc_source_l00085}00085\ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}\ <<\ (e\ ==\ \mbox{\hyperlink{gtest-printers__test_8cc_a52d9f846ca7a081ba3acf88dd6cd46dca8d4bcf477f5a23ce8569a2a404327839}{kEWS1}}\ ?\ \textcolor{stringliteral}{"{}kEWS1"{}}\ :\ \textcolor{stringliteral}{"{}invalid"{}});}
 \DoxyCodeLine{\Hypertarget{gtest-printers__test_8cc_source_l00086}00086\ \}}
 \DoxyCodeLine{\Hypertarget{gtest-printers__test_8cc_source_l00087}00087\ }
 \DoxyCodeLine{\Hypertarget{gtest-printers__test_8cc_source_l00088}00088\ \textcolor{comment}{//\ An\ enum\ with\ a\ PrintTo()\ function.}}
@@ -94,8 +94,8 @@
 \DoxyCodeLine{\Hypertarget{gtest-printers__test_8cc_source_l00090}00090\ \ \ \mbox{\hyperlink{gtest-printers__test_8cc_a904d619d593201ed509be794aed041eca72ccaf1f38be3cad8d1d6b0811467125}{kEWPT1}}\ =\ 1}
 \DoxyCodeLine{\Hypertarget{gtest-printers__test_8cc_source_l00091}\mbox{\hyperlink{gtest-printers__test_8cc_a904d619d593201ed509be794aed041eca72ccaf1f38be3cad8d1d6b0811467125}{00091}}\ \};}
 \DoxyCodeLine{\Hypertarget{gtest-printers__test_8cc_source_l00092}00092\ }
-\DoxyCodeLine{\Hypertarget{gtest-printers__test_8cc_source_l00093}\mbox{\hyperlink{gtest-printers__test_8cc_aad8245a4b48cd65607b86153d0f9dbe6}{00093}}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{gtest-printers__test_8cc_aad8245a4b48cd65607b86153d0f9dbe6}{PrintTo}}(\mbox{\hyperlink{gtest-printers__test_8cc_a904d619d593201ed509be794aed041ec}{EnumWithPrintTo}}\ e,\ std::ostream*\ os)\ \{}
-\DoxyCodeLine{\Hypertarget{gtest-printers__test_8cc_source_l00094}00094\ \ \ *os\ <<\ (e\ ==\ \mbox{\hyperlink{gtest-printers__test_8cc_a904d619d593201ed509be794aed041eca72ccaf1f38be3cad8d1d6b0811467125}{kEWPT1}}\ ?\ \textcolor{stringliteral}{"{}kEWPT1"{}}\ :\ \textcolor{stringliteral}{"{}invalid"{}});}
+\DoxyCodeLine{\Hypertarget{gtest-printers__test_8cc_source_l00093}\mbox{\hyperlink{gtest-printers__test_8cc_aad8245a4b48cd65607b86153d0f9dbe6}{00093}}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{gtest-printers__test_8cc_aad8245a4b48cd65607b86153d0f9dbe6}{PrintTo}}(\mbox{\hyperlink{gtest-printers__test_8cc_a904d619d593201ed509be794aed041ec}{EnumWithPrintTo}}\ e,\ std::ostream*\ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}})\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-printers__test_8cc_source_l00094}00094\ \ \ *\mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}\ <<\ (e\ ==\ \mbox{\hyperlink{gtest-printers__test_8cc_a904d619d593201ed509be794aed041eca72ccaf1f38be3cad8d1d6b0811467125}{kEWPT1}}\ ?\ \textcolor{stringliteral}{"{}kEWPT1"{}}\ :\ \textcolor{stringliteral}{"{}invalid"{}});}
 \DoxyCodeLine{\Hypertarget{gtest-printers__test_8cc_source_l00095}00095\ \}}
 \DoxyCodeLine{\Hypertarget{gtest-printers__test_8cc_source_l00096}00096\ }
 \DoxyCodeLine{\Hypertarget{gtest-printers__test_8cc_source_l00097}00097\ \textcolor{comment}{//\ A\ class\ implicitly\ convertible\ to\ BiggestInt.}}
@@ -119,12 +119,12 @@
 \DoxyCodeLine{\Hypertarget{gtest-printers__test_8cc_source_l00115}\mbox{\hyperlink{class_streamable_in_global_a20cd7676e22a7a8bbad17c42681d46bf}{00115}}\ \ \ \textcolor{keyword}{virtual}\ \mbox{\hyperlink{class_streamable_in_global_a20cd7676e22a7a8bbad17c42681d46bf}{\string~StreamableInGlobal}}()\ \{\}}
 \DoxyCodeLine{\Hypertarget{gtest-printers__test_8cc_source_l00116}00116\ \};}
 \DoxyCodeLine{\Hypertarget{gtest-printers__test_8cc_source_l00117}00117\ }
-\DoxyCodeLine{\Hypertarget{gtest-printers__test_8cc_source_l00118}\mbox{\hyperlink{gtest-printers__test_8cc_a7b9d893679e433b9a70f15a9c9d6446c}{00118}}\ \textcolor{keyword}{inline}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{gtest-printers__test_8cc_a73b9778fdddae7a6a312022b9f393419}{operator<<}}(::std::ostream\&\ os,\ \textcolor{keyword}{const}\ \mbox{\hyperlink{class_streamable_in_global}{StreamableInGlobal}}\&\ \textcolor{comment}{/*\ x\ */})\ \{}
-\DoxyCodeLine{\Hypertarget{gtest-printers__test_8cc_source_l00119}00119\ \ \ os\ <<\ \textcolor{stringliteral}{"{}StreamableInGlobal"{}};}
+\DoxyCodeLine{\Hypertarget{gtest-printers__test_8cc_source_l00118}\mbox{\hyperlink{gtest-printers__test_8cc_a7b9d893679e433b9a70f15a9c9d6446c}{00118}}\ \textcolor{keyword}{inline}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{gtest-printers__test_8cc_a73b9778fdddae7a6a312022b9f393419}{operator<<}}(::std::ostream\&\ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}},\ \textcolor{keyword}{const}\ \mbox{\hyperlink{class_streamable_in_global}{StreamableInGlobal}}\&\ \textcolor{comment}{/*\ x\ */})\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-printers__test_8cc_source_l00119}00119\ \ \ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}\ <<\ \textcolor{stringliteral}{"{}StreamableInGlobal"{}};}
 \DoxyCodeLine{\Hypertarget{gtest-printers__test_8cc_source_l00120}00120\ \}}
 \DoxyCodeLine{\Hypertarget{gtest-printers__test_8cc_source_l00121}00121\ }
-\DoxyCodeLine{\Hypertarget{gtest-printers__test_8cc_source_l00122}\mbox{\hyperlink{gtest-printers__test_8cc_a0794c66a458fe922bfb717080d047311}{00122}}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{gtest-printers__test_8cc_a73b9778fdddae7a6a312022b9f393419}{operator<<}}(::std::ostream\&\ os,\ \textcolor{keyword}{const}\ \mbox{\hyperlink{class_streamable_in_global}{StreamableInGlobal}}*\ \textcolor{comment}{/*\ x\ */})\ \{}
-\DoxyCodeLine{\Hypertarget{gtest-printers__test_8cc_source_l00123}00123\ \ \ os\ <<\ \textcolor{stringliteral}{"{}StreamableInGlobal*"{}};}
+\DoxyCodeLine{\Hypertarget{gtest-printers__test_8cc_source_l00122}\mbox{\hyperlink{gtest-printers__test_8cc_a0794c66a458fe922bfb717080d047311}{00122}}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{gtest-printers__test_8cc_a73b9778fdddae7a6a312022b9f393419}{operator<<}}(::std::ostream\&\ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}},\ \textcolor{keyword}{const}\ \mbox{\hyperlink{class_streamable_in_global}{StreamableInGlobal}}*\ \textcolor{comment}{/*\ x\ */})\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-printers__test_8cc_source_l00123}00123\ \ \ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}\ <<\ \textcolor{stringliteral}{"{}StreamableInGlobal*"{}};}
 \DoxyCodeLine{\Hypertarget{gtest-printers__test_8cc_source_l00124}00124\ \}}
 \DoxyCodeLine{\Hypertarget{gtest-printers__test_8cc_source_l00125}00125\ }
 \DoxyCodeLine{\Hypertarget{gtest-printers__test_8cc_source_l00126}\mbox{\hyperlink{namespacefoo}{00126}}\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacefoo}{foo}}\ \{}
@@ -145,17 +145,17 @@
 \DoxyCodeLine{\Hypertarget{gtest-printers__test_8cc_source_l00141}\mbox{\hyperlink{structfoo_1_1_printable_via_print_to_a16f8c6420275d86f0d0112ca5a41bca2}{00141}}\ \ \ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{structfoo_1_1_printable_via_print_to_a16f8c6420275d86f0d0112ca5a41bca2}{value}};}
 \DoxyCodeLine{\Hypertarget{gtest-printers__test_8cc_source_l00142}00142\ \};}
 \DoxyCodeLine{\Hypertarget{gtest-printers__test_8cc_source_l00143}00143\ }
-\DoxyCodeLine{\Hypertarget{gtest-printers__test_8cc_source_l00144}\mbox{\hyperlink{namespacefoo_ac435de653934c97045bbdba8c8afbe3f}{00144}}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespacefoo_ac435de653934c97045bbdba8c8afbe3f}{PrintTo}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{structfoo_1_1_printable_via_print_to}{PrintableViaPrintTo}}\&\ x,\ ::std::ostream*\ os)\ \{}
-\DoxyCodeLine{\Hypertarget{gtest-printers__test_8cc_source_l00145}00145\ \ \ *os\ <<\ \textcolor{stringliteral}{"{}PrintableViaPrintTo:\ "{}}\ <<\ x.\mbox{\hyperlink{structfoo_1_1_printable_via_print_to_a16f8c6420275d86f0d0112ca5a41bca2}{value}};}
+\DoxyCodeLine{\Hypertarget{gtest-printers__test_8cc_source_l00144}\mbox{\hyperlink{namespacefoo_ac435de653934c97045bbdba8c8afbe3f}{00144}}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespacefoo_ac435de653934c97045bbdba8c8afbe3f}{PrintTo}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{structfoo_1_1_printable_via_print_to}{PrintableViaPrintTo}}\&\ x,\ ::std::ostream*\ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}})\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-printers__test_8cc_source_l00145}00145\ \ \ *\mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}\ <<\ \textcolor{stringliteral}{"{}PrintableViaPrintTo:\ "{}}\ <<\ x.\mbox{\hyperlink{structfoo_1_1_printable_via_print_to_a16f8c6420275d86f0d0112ca5a41bca2}{value}};}
 \DoxyCodeLine{\Hypertarget{gtest-printers__test_8cc_source_l00146}00146\ \}}
 \DoxyCodeLine{\Hypertarget{gtest-printers__test_8cc_source_l00147}00147\ }
 \DoxyCodeLine{\Hypertarget{gtest-printers__test_8cc_source_l00148}00148\ \textcolor{comment}{//\ A\ type\ with\ a\ user-\/defined\ <<\ for\ printing\ its\ pointer.}}
 \DoxyCodeLine{\Hypertarget{gtest-printers__test_8cc_source_l00149}\mbox{\hyperlink{structfoo_1_1_pointer_printable}{00149}}\ \textcolor{keyword}{struct\ }\mbox{\hyperlink{structfoo_1_1_pointer_printable}{PointerPrintable}}\ \{}
 \DoxyCodeLine{\Hypertarget{gtest-printers__test_8cc_source_l00150}\mbox{\hyperlink{namespacefoo_aaa854bf85744e6ec2ffa474ce15e36fe}{00150}}\ \};}
 \DoxyCodeLine{\Hypertarget{gtest-printers__test_8cc_source_l00151}00151\ }
-\DoxyCodeLine{\Hypertarget{gtest-printers__test_8cc_source_l00152}00152\ ::std::ostream\&\ \mbox{\hyperlink{namespacefoo_aaa854bf85744e6ec2ffa474ce15e36fe}{operator<<}}(::std::ostream\&\ os,}
+\DoxyCodeLine{\Hypertarget{gtest-printers__test_8cc_source_l00152}00152\ ::std::ostream\&\ \mbox{\hyperlink{namespacefoo_aaa854bf85744e6ec2ffa474ce15e36fe}{operator<<}}(::std::ostream\&\ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}},}
 \DoxyCodeLine{\Hypertarget{gtest-printers__test_8cc_source_l00153}00153\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ PointerPrintable*\ \textcolor{comment}{/*\ x\ */})\ \{}
-\DoxyCodeLine{\Hypertarget{gtest-printers__test_8cc_source_l00154}00154\ \ \ \textcolor{keywordflow}{return}\ os\ <<\ \textcolor{stringliteral}{"{}PointerPrintable*"{}};}
+\DoxyCodeLine{\Hypertarget{gtest-printers__test_8cc_source_l00154}00154\ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}\ <<\ \textcolor{stringliteral}{"{}PointerPrintable*"{}};}
 \DoxyCodeLine{\Hypertarget{gtest-printers__test_8cc_source_l00155}00155\ \}}
 \DoxyCodeLine{\Hypertarget{gtest-printers__test_8cc_source_l00156}00156\ }
 \DoxyCodeLine{\Hypertarget{gtest-printers__test_8cc_source_l00157}00157\ \textcolor{comment}{//\ A\ user-\/defined\ printable\ class\ template\ in\ a\ user-\/chosen\ namespace.}}
@@ -170,8 +170,8 @@
 \DoxyCodeLine{\Hypertarget{gtest-printers__test_8cc_source_l00166}00166\ \};}
 \DoxyCodeLine{\Hypertarget{gtest-printers__test_8cc_source_l00167}00167\ }
 \DoxyCodeLine{\Hypertarget{gtest-printers__test_8cc_source_l00168}00168\ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ T>}
-\DoxyCodeLine{\Hypertarget{gtest-printers__test_8cc_source_l00169}\mbox{\hyperlink{namespacefoo_a7b78eba501ea7ff1226a8cb40b6e3d92}{00169}}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespacefoo_ac435de653934c97045bbdba8c8afbe3f}{PrintTo}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{classfoo_1_1_printable_via_print_to_template}{PrintableViaPrintToTemplate<T>}}\&\ x,\ ::std::ostream*\ os)\ \{}
-\DoxyCodeLine{\Hypertarget{gtest-printers__test_8cc_source_l00170}00170\ \ \ *os\ <<\ \textcolor{stringliteral}{"{}PrintableViaPrintToTemplate:\ "{}}\ <<\ x.\mbox{\hyperlink{classfoo_1_1_printable_via_print_to_template_abf729e1562cdea4257fbb35b1eab486c}{value}}();}
+\DoxyCodeLine{\Hypertarget{gtest-printers__test_8cc_source_l00169}\mbox{\hyperlink{namespacefoo_a7b78eba501ea7ff1226a8cb40b6e3d92}{00169}}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespacefoo_ac435de653934c97045bbdba8c8afbe3f}{PrintTo}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{classfoo_1_1_printable_via_print_to_template}{PrintableViaPrintToTemplate<T>}}\&\ x,\ ::std::ostream*\ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}})\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-printers__test_8cc_source_l00170}00170\ \ \ *\mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}\ <<\ \textcolor{stringliteral}{"{}PrintableViaPrintToTemplate:\ "{}}\ <<\ x.\mbox{\hyperlink{classfoo_1_1_printable_via_print_to_template_abf729e1562cdea4257fbb35b1eab486c}{value}}();}
 \DoxyCodeLine{\Hypertarget{gtest-printers__test_8cc_source_l00171}00171\ \}}
 \DoxyCodeLine{\Hypertarget{gtest-printers__test_8cc_source_l00172}00172\ }
 \DoxyCodeLine{\Hypertarget{gtest-printers__test_8cc_source_l00173}00173\ \textcolor{comment}{//\ A\ user-\/defined\ streamable\ class\ template\ in\ a\ user\ namespace.}}
@@ -186,9 +186,9 @@
 \DoxyCodeLine{\Hypertarget{gtest-printers__test_8cc_source_l00182}00182\ \};}
 \DoxyCodeLine{\Hypertarget{gtest-printers__test_8cc_source_l00183}00183\ }
 \DoxyCodeLine{\Hypertarget{gtest-printers__test_8cc_source_l00184}00184\ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ T>}
-\DoxyCodeLine{\Hypertarget{gtest-printers__test_8cc_source_l00185}\mbox{\hyperlink{namespacefoo_a4a4d839c73d5476881324336467fdfd3}{00185}}\ inline\ ::std::ostream\&\ \mbox{\hyperlink{namespacefoo_aaa854bf85744e6ec2ffa474ce15e36fe}{operator<<}}(::std::ostream\&\ os,}
+\DoxyCodeLine{\Hypertarget{gtest-printers__test_8cc_source_l00185}\mbox{\hyperlink{namespacefoo_a4a4d839c73d5476881324336467fdfd3}{00185}}\ inline\ ::std::ostream\&\ \mbox{\hyperlink{namespacefoo_aaa854bf85744e6ec2ffa474ce15e36fe}{operator<<}}(::std::ostream\&\ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}},}
 \DoxyCodeLine{\Hypertarget{gtest-printers__test_8cc_source_l00186}00186\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{classfoo_1_1_streamable_template_in_foo}{StreamableTemplateInFoo<T>}}\&\ x)\ \{}
-\DoxyCodeLine{\Hypertarget{gtest-printers__test_8cc_source_l00187}00187\ \ \ \textcolor{keywordflow}{return}\ os\ <<\ \textcolor{stringliteral}{"{}StreamableTemplateInFoo:\ "{}}\ <<\ x.\mbox{\hyperlink{classfoo_1_1_streamable_template_in_foo_acb166eea328a1354a6b10ac519b2a77d}{value}}();}
+\DoxyCodeLine{\Hypertarget{gtest-printers__test_8cc_source_l00187}00187\ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}\ <<\ \textcolor{stringliteral}{"{}StreamableTemplateInFoo:\ "{}}\ <<\ x.\mbox{\hyperlink{classfoo_1_1_streamable_template_in_foo_acb166eea328a1354a6b10ac519b2a77d}{value}}();}
 \DoxyCodeLine{\Hypertarget{gtest-printers__test_8cc_source_l00188}00188\ \}}
 \DoxyCodeLine{\Hypertarget{gtest-printers__test_8cc_source_l00189}00189\ }
 \DoxyCodeLine{\Hypertarget{gtest-printers__test_8cc_source_l00190}00190\ \textcolor{comment}{//\ A\ user-\/defined\ streamable\ but\ recursivly-\/defined\ container\ type\ in}}
@@ -205,8 +205,8 @@
 \DoxyCodeLine{\Hypertarget{gtest-printers__test_8cc_source_l00201}\mbox{\hyperlink{classfoo_1_1_path_like_a7ca8b63139fd6fcada55fbf13ccf9c83}{00201}}\ \ \ \mbox{\hyperlink{structfoo_1_1_path_like_1_1iterator}{iterator}}\ \mbox{\hyperlink{classfoo_1_1_path_like_a7ca8b63139fd6fcada55fbf13ccf9c83}{begin}}()\textcolor{keyword}{\ const\ }\{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{structfoo_1_1_path_like_1_1iterator}{iterator}}();\ \}}
 \DoxyCodeLine{\Hypertarget{gtest-printers__test_8cc_source_l00202}\mbox{\hyperlink{classfoo_1_1_path_like_aca85cd005890f1d19f416ca7e2c95f02}{00202}}\ \ \ \mbox{\hyperlink{structfoo_1_1_path_like_1_1iterator}{iterator}}\ \mbox{\hyperlink{classfoo_1_1_path_like_aca85cd005890f1d19f416ca7e2c95f02}{end}}()\textcolor{keyword}{\ const\ }\{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{structfoo_1_1_path_like_1_1iterator}{iterator}}();\ \}}
 \DoxyCodeLine{\Hypertarget{gtest-printers__test_8cc_source_l00203}00203\ }
-\DoxyCodeLine{\Hypertarget{gtest-printers__test_8cc_source_l00204}\mbox{\hyperlink{classfoo_1_1_path_like_ae5c45340864c81d313a2f09ab70651a7}{00204}}\ \ \ friend\ ::std::ostream\&\ \mbox{\hyperlink{classfoo_1_1_path_like_ae5c45340864c81d313a2f09ab70651a7}{operator<<}}(::std::ostream\&\ os,\ \textcolor{keyword}{const}\ \mbox{\hyperlink{classfoo_1_1_path_like}{PathLike}}\&)\ \{}
-\DoxyCodeLine{\Hypertarget{gtest-printers__test_8cc_source_l00205}00205\ \ \ \ \ \textcolor{keywordflow}{return}\ os\ <<\ \textcolor{stringliteral}{"{}Streamable-\/PathLike"{}};}
+\DoxyCodeLine{\Hypertarget{gtest-printers__test_8cc_source_l00204}\mbox{\hyperlink{classfoo_1_1_path_like_ae5c45340864c81d313a2f09ab70651a7}{00204}}\ \ \ friend\ ::std::ostream\&\ \mbox{\hyperlink{classfoo_1_1_path_like_ae5c45340864c81d313a2f09ab70651a7}{operator<<}}(::std::ostream\&\ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}},\ \textcolor{keyword}{const}\ \mbox{\hyperlink{classfoo_1_1_path_like}{PathLike}}\&)\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-printers__test_8cc_source_l00205}00205\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}\ <<\ \textcolor{stringliteral}{"{}Streamable-\/PathLike"{}};}
 \DoxyCodeLine{\Hypertarget{gtest-printers__test_8cc_source_l00206}00206\ \ \ \}}
 \DoxyCodeLine{\Hypertarget{gtest-printers__test_8cc_source_l00207}00207\ \};}
 \DoxyCodeLine{\Hypertarget{gtest-printers__test_8cc_source_l00208}00208\ }
@@ -743,9 +743,9 @@
 \DoxyCodeLine{\Hypertarget{gtest-printers__test_8cc_source_l00739}00739\ }
 \DoxyCodeLine{\Hypertarget{gtest-printers__test_8cc_source_l00740}00740\ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ Char,\ \textcolor{keyword}{typename}\ CharTraits>}
 \DoxyCodeLine{\Hypertarget{gtest-printers__test_8cc_source_l00741}00741\ std::basic\_ostream<Char,\ CharTraits>\&\ \mbox{\hyperlink{namespacetesting_1_1gtest__printers__test_a55578d45fb44ffa9660db56546150889}{operator<<}}(}
-\DoxyCodeLine{\Hypertarget{gtest-printers__test_8cc_source_l00742}00742\ \ \ \ \ std::basic\_ostream<Char,\ CharTraits>\&\ os,}
+\DoxyCodeLine{\Hypertarget{gtest-printers__test_8cc_source_l00742}00742\ \ \ \ \ std::basic\_ostream<Char,\ CharTraits>\&\ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}},}
 \DoxyCodeLine{\Hypertarget{gtest-printers__test_8cc_source_l00743}00743\ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{classtesting_1_1gtest__printers__test_1_1_allows_generic_streaming}{AllowsGenericStreaming}}\&\ \textcolor{comment}{/*\ a\ */})\ \{}
-\DoxyCodeLine{\Hypertarget{gtest-printers__test_8cc_source_l00744}00744\ \ \ \textcolor{keywordflow}{return}\ os\ <<\ \textcolor{stringliteral}{"{}AllowsGenericStreaming"{}};}
+\DoxyCodeLine{\Hypertarget{gtest-printers__test_8cc_source_l00744}00744\ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}\ <<\ \textcolor{stringliteral}{"{}AllowsGenericStreaming"{}};}
 \DoxyCodeLine{\Hypertarget{gtest-printers__test_8cc_source_l00745}00745\ \}}
 \DoxyCodeLine{\Hypertarget{gtest-printers__test_8cc_source_l00746}00746\ }
 \DoxyCodeLine{\Hypertarget{gtest-printers__test_8cc_source_l00747}\mbox{\hyperlink{namespacetesting_1_1gtest__printers__test_a4f5bb6b21a29bf99df1e27a1876d921c}{00747}}\ \mbox{\hyperlink{gtest_8h_ad8b332753515c0ab8baada563c2547eb}{TEST}}(PrintTypeWithGenericStreamingTest,\ NonTemplateType)\ \{}
@@ -760,9 +760,9 @@
 \DoxyCodeLine{\Hypertarget{gtest-printers__test_8cc_source_l00756}00756\ }
 \DoxyCodeLine{\Hypertarget{gtest-printers__test_8cc_source_l00757}00757\ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ Char,\ \textcolor{keyword}{typename}\ CharTraits,\ \textcolor{keyword}{typename}\ T>}
 \DoxyCodeLine{\Hypertarget{gtest-printers__test_8cc_source_l00758}00758\ std::basic\_ostream<Char,\ CharTraits>\&\ \mbox{\hyperlink{namespacetesting_1_1gtest__printers__test_a55578d45fb44ffa9660db56546150889}{operator<<}}(}
-\DoxyCodeLine{\Hypertarget{gtest-printers__test_8cc_source_l00759}00759\ \ \ \ \ std::basic\_ostream<Char,\ CharTraits>\&\ os,}
+\DoxyCodeLine{\Hypertarget{gtest-printers__test_8cc_source_l00759}00759\ \ \ \ \ std::basic\_ostream<Char,\ CharTraits>\&\ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}},}
 \DoxyCodeLine{\Hypertarget{gtest-printers__test_8cc_source_l00760}00760\ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{classtesting_1_1gtest__printers__test_1_1_allows_generic_streaming_template}{AllowsGenericStreamingTemplate<T>}}\&\ \textcolor{comment}{/*\ a\ */})\ \{}
-\DoxyCodeLine{\Hypertarget{gtest-printers__test_8cc_source_l00761}00761\ \ \ \textcolor{keywordflow}{return}\ os\ <<\ \textcolor{stringliteral}{"{}AllowsGenericStreamingTemplate"{}};}
+\DoxyCodeLine{\Hypertarget{gtest-printers__test_8cc_source_l00761}00761\ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}\ <<\ \textcolor{stringliteral}{"{}AllowsGenericStreamingTemplate"{}};}
 \DoxyCodeLine{\Hypertarget{gtest-printers__test_8cc_source_l00762}00762\ \}}
 \DoxyCodeLine{\Hypertarget{gtest-printers__test_8cc_source_l00763}00763\ }
 \DoxyCodeLine{\Hypertarget{gtest-printers__test_8cc_source_l00764}\mbox{\hyperlink{namespacetesting_1_1gtest__printers__test_aa9c63d8e146c98f3277ffba8b29b3c5e}{00764}}\ \mbox{\hyperlink{gtest_8h_ad8b332753515c0ab8baada563c2547eb}{TEST}}(PrintTypeWithGenericStreamingTest,\ TemplateType)\ \{}
@@ -781,9 +781,9 @@
 \DoxyCodeLine{\Hypertarget{gtest-printers__test_8cc_source_l00777}00777\ }
 \DoxyCodeLine{\Hypertarget{gtest-printers__test_8cc_source_l00778}00778\ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ Char,\ \textcolor{keyword}{typename}\ CharTraits,\ \textcolor{keyword}{typename}\ T>}
 \DoxyCodeLine{\Hypertarget{gtest-printers__test_8cc_source_l00779}00779\ std::basic\_ostream<Char,\ CharTraits>\&\ \mbox{\hyperlink{namespacetesting_1_1gtest__printers__test_a55578d45fb44ffa9660db56546150889}{operator<<}}(}
-\DoxyCodeLine{\Hypertarget{gtest-printers__test_8cc_source_l00780}00780\ \ \ \ \ std::basic\_ostream<Char,\ CharTraits>\&\ os,}
+\DoxyCodeLine{\Hypertarget{gtest-printers__test_8cc_source_l00780}00780\ \ \ \ \ std::basic\_ostream<Char,\ CharTraits>\&\ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}},}
 \DoxyCodeLine{\Hypertarget{gtest-printers__test_8cc_source_l00781}00781\ \ \ \ \ \textcolor{keyword}{const}\ AllowsGenericStreamingAndImplicitConversionTemplate<T>\&\ \textcolor{comment}{/*\ a\ */})\ \{}
-\DoxyCodeLine{\Hypertarget{gtest-printers__test_8cc_source_l00782}00782\ \ \ \textcolor{keywordflow}{return}\ os\ <<\ \textcolor{stringliteral}{"{}AllowsGenericStreamingAndImplicitConversionTemplate"{}};}
+\DoxyCodeLine{\Hypertarget{gtest-printers__test_8cc_source_l00782}00782\ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}\ <<\ \textcolor{stringliteral}{"{}AllowsGenericStreamingAndImplicitConversionTemplate"{}};}
 \DoxyCodeLine{\Hypertarget{gtest-printers__test_8cc_source_l00783}00783\ \}}
 \DoxyCodeLine{\Hypertarget{gtest-printers__test_8cc_source_l00784}00784\ }
 \DoxyCodeLine{\Hypertarget{gtest-printers__test_8cc_source_l00785}\mbox{\hyperlink{namespacetesting_1_1gtest__printers__test_a68877c5e1ec7a53281798310c30e1776}{00785}}\ \mbox{\hyperlink{gtest_8h_ad8b332753515c0ab8baada563c2547eb}{TEST}}(PrintTypeWithGenericStreamingTest,\ TypeImplicitlyConvertible)\ \{}

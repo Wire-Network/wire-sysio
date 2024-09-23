@@ -17,7 +17,7 @@ typedef Char\+Type \mbox{\hyperlink{class_auto_u_t_f_output_stream_ad1603abe0887
 \doxysubsubsection*{Public Member Functions}
 \begin{DoxyCompactItemize}
 \item 
-\mbox{\hyperlink{class_auto_u_t_f_output_stream_a2fe7dbc8e43d11295f66df5653148137}{Auto\+UTFOutput\+Stream}} (Output\+Byte\+Stream \&os, \mbox{\hyperlink{encodings_8h_ac9448aedf514a5bb509bae73a9ce4e58}{UTFType}} type, bool put\+BOM)
+\mbox{\hyperlink{class_auto_u_t_f_output_stream_a2fe7dbc8e43d11295f66df5653148137}{Auto\+UTFOutput\+Stream}} (Output\+Byte\+Stream \&\mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}, \mbox{\hyperlink{encodings_8h_ac9448aedf514a5bb509bae73a9ce4e58}{UTFType}} type, bool put\+BOM)
 \begin{DoxyCompactList}\small\item\em Constructor. \end{DoxyCompactList}\item 
 \mbox{\hyperlink{encodings_8h_ac9448aedf514a5bb509bae73a9ce4e58}{UTFType}} \mbox{\hyperlink{class_auto_u_t_f_output_stream_a62091565a8103d69002be2e2f4f0ba2c}{Get\+Type}} () const
 \item 
@@ -90,7 +90,7 @@ Definition at line \mbox{\hyperlink{encodedstream_8h_source_l00244}{244}} of fil
 
 
 \begin{DoxyCode}{0}
-\DoxyCodeLine{00244\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ :\ os\_(\&os),\ type\_(type)\ \{}
+\DoxyCodeLine{00244\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ :\ os\_(\&\mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}),\ type\_(type)\ \{}
 \DoxyCodeLine{00245\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g_gabeba18d612187bad2ac62aed9276d47c}{RAPIDJSON\_ASSERT}}(type\ >=\ \mbox{\hyperlink{encodings_8h_ac9448aedf514a5bb509bae73a9ce4e58a7fd9945f1c494a4a4ee9446017e790f1}{kUTF8}}\ \&\&\ type\ <=\ \mbox{\hyperlink{encodings_8h_ac9448aedf514a5bb509bae73a9ce4e58a14da8da33c9f9aa904bf0d1aac3fa76e}{kUTF32BE}});}
 \DoxyCodeLine{00246\ }
 \DoxyCodeLine{00247\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Runtime\ check\ whether\ the\ size\ of\ character\ type\ is\ sufficient.\ It\ only\ perform\ checks\ with\ assertion.}}
@@ -105,7 +105,8 @@ Definition at line \mbox{\hyperlink{encodedstream_8h_source_l00244}{244}} of fil
 \DoxyCodeLine{00256\ \ \ \ \ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -131,7 +132,8 @@ Definition at line \mbox{\hyperlink{encodedstream_8h_source_l00261}{261}} of fil
 \DoxyCodeLine{00261\ \{\ os\_-\/>Flush();\ \}\ }
 
 \end{DoxyCode}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -186,7 +188,8 @@ Definition at line \mbox{\hyperlink{encodedstream_8h_source_l00260}{260}} of fil
 \DoxyCodeLine{00260\ \{\ putFunc\_(*os\_,\ c);\ \}}
 
 \end{DoxyCode}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode

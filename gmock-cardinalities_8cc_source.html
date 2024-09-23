@@ -183,7 +183,7 @@ $(function(){initNavTree('gmock-cardinalities_8cc_source.html',''); initResizabl
 <div class="line"><a id="l00082" name="l00082"></a><span class="lineno">   82</span>    <span class="keywordflow">return</span> call_count &gt;= max_;</div>
 <div class="line"><a id="l00083" name="l00083"></a><span class="lineno">   83</span>  }</div>
 <div class="line"><a id="l00084" name="l00084"></a><span class="lineno">   84</span> </div>
-<div class="line"><a id="l00085" name="l00085"></a><span class="lineno">   85</span>  <span class="keyword">virtual</span> <span class="keywordtype">void</span> DescribeTo(::std::ostream* os) <span class="keyword">const</span>;</div>
+<div class="line"><a id="l00085" name="l00085"></a><span class="lineno">   85</span>  <span class="keyword">virtual</span> <span class="keywordtype">void</span> DescribeTo(::std::ostream* <a class="code hl_variable" href="environment_8hpp.html#a3951483d0b31c29ca95336206cd35238">os</a>) <span class="keyword">const</span>;</div>
 <div class="line"><a id="l00086" name="l00086"></a><span class="lineno">   86</span> </div>
 <div class="line"><a id="l00087" name="l00087"></a><span class="lineno">   87</span> <span class="keyword">private</span>:</div>
 <div class="line"><a id="l00088" name="l00088"></a><span class="lineno">   88</span>  <span class="keyword">const</span> <span class="keywordtype">int</span> min_;</div>
@@ -206,22 +206,22 @@ $(function(){initNavTree('gmock-cardinalities_8cc_source.html',''); initResizabl
 <div class="line"><a id="l00105" name="l00105"></a><span class="lineno">  105</span>}</div>
 <div class="line"><a id="l00106" name="l00106"></a><span class="lineno">  106</span> </div>
 <div class="line"><a id="l00107" name="l00107"></a><span class="lineno">  107</span><span class="comment">// Describes the Between(m, n) cardinality in human-friendly text.</span></div>
-<div class="line"><a id="l00108" name="l00108"></a><span class="lineno">  108</span><span class="keywordtype">void</span> BetweenCardinalityImpl::DescribeTo(::std::ostream* os)<span class="keyword"> const </span>{</div>
+<div class="line"><a id="l00108" name="l00108"></a><span class="lineno">  108</span><span class="keywordtype">void</span> BetweenCardinalityImpl::DescribeTo(::std::ostream* <a class="code hl_variable" href="environment_8hpp.html#a3951483d0b31c29ca95336206cd35238">os</a>)<span class="keyword"> const </span>{</div>
 <div class="line"><a id="l00109" name="l00109"></a><span class="lineno">  109</span>  <span class="keywordflow">if</span> (min_ == 0) {</div>
 <div class="line"><a id="l00110" name="l00110"></a><span class="lineno">  110</span>    <span class="keywordflow">if</span> (max_ == 0) {</div>
-<div class="line"><a id="l00111" name="l00111"></a><span class="lineno">  111</span>      *os &lt;&lt; <span class="stringliteral">&quot;never called&quot;</span>;</div>
+<div class="line"><a id="l00111" name="l00111"></a><span class="lineno">  111</span>      *<a class="code hl_variable" href="environment_8hpp.html#a3951483d0b31c29ca95336206cd35238">os</a> &lt;&lt; <span class="stringliteral">&quot;never called&quot;</span>;</div>
 <div class="line"><a id="l00112" name="l00112"></a><span class="lineno">  112</span>    } <span class="keywordflow">else</span> <span class="keywordflow">if</span> (max_ == INT_MAX) {</div>
-<div class="line"><a id="l00113" name="l00113"></a><span class="lineno">  113</span>      *os &lt;&lt; <span class="stringliteral">&quot;called any number of times&quot;</span>;</div>
+<div class="line"><a id="l00113" name="l00113"></a><span class="lineno">  113</span>      *<a class="code hl_variable" href="environment_8hpp.html#a3951483d0b31c29ca95336206cd35238">os</a> &lt;&lt; <span class="stringliteral">&quot;called any number of times&quot;</span>;</div>
 <div class="line"><a id="l00114" name="l00114"></a><span class="lineno">  114</span>    } <span class="keywordflow">else</span> {</div>
-<div class="line"><a id="l00115" name="l00115"></a><span class="lineno">  115</span>      *os &lt;&lt; <span class="stringliteral">&quot;called at most &quot;</span> &lt;&lt; FormatTimes(max_);</div>
+<div class="line"><a id="l00115" name="l00115"></a><span class="lineno">  115</span>      *<a class="code hl_variable" href="environment_8hpp.html#a3951483d0b31c29ca95336206cd35238">os</a> &lt;&lt; <span class="stringliteral">&quot;called at most &quot;</span> &lt;&lt; FormatTimes(max_);</div>
 <div class="line"><a id="l00116" name="l00116"></a><span class="lineno">  116</span>    }</div>
 <div class="line"><a id="l00117" name="l00117"></a><span class="lineno">  117</span>  } <span class="keywordflow">else</span> <span class="keywordflow">if</span> (min_ == max_) {</div>
-<div class="line"><a id="l00118" name="l00118"></a><span class="lineno">  118</span>    *os &lt;&lt; <span class="stringliteral">&quot;called &quot;</span> &lt;&lt; FormatTimes(min_);</div>
+<div class="line"><a id="l00118" name="l00118"></a><span class="lineno">  118</span>    *<a class="code hl_variable" href="environment_8hpp.html#a3951483d0b31c29ca95336206cd35238">os</a> &lt;&lt; <span class="stringliteral">&quot;called &quot;</span> &lt;&lt; FormatTimes(min_);</div>
 <div class="line"><a id="l00119" name="l00119"></a><span class="lineno">  119</span>  } <span class="keywordflow">else</span> <span class="keywordflow">if</span> (max_ == INT_MAX) {</div>
-<div class="line"><a id="l00120" name="l00120"></a><span class="lineno">  120</span>    *os &lt;&lt; <span class="stringliteral">&quot;called at least &quot;</span> &lt;&lt; FormatTimes(min_);</div>
+<div class="line"><a id="l00120" name="l00120"></a><span class="lineno">  120</span>    *<a class="code hl_variable" href="environment_8hpp.html#a3951483d0b31c29ca95336206cd35238">os</a> &lt;&lt; <span class="stringliteral">&quot;called at least &quot;</span> &lt;&lt; FormatTimes(min_);</div>
 <div class="line"><a id="l00121" name="l00121"></a><span class="lineno">  121</span>  } <span class="keywordflow">else</span> {</div>
 <div class="line"><a id="l00122" name="l00122"></a><span class="lineno">  122</span>    <span class="comment">// 0 &lt; min_ &lt; max_ &lt; INT_MAX</span></div>
-<div class="line"><a id="l00123" name="l00123"></a><span class="lineno">  123</span>    *os &lt;&lt; <span class="stringliteral">&quot;called between &quot;</span> &lt;&lt; min_ &lt;&lt; <span class="stringliteral">&quot; and &quot;</span> &lt;&lt; max_ &lt;&lt; <span class="stringliteral">&quot; times&quot;</span>;</div>
+<div class="line"><a id="l00123" name="l00123"></a><span class="lineno">  123</span>    *<a class="code hl_variable" href="environment_8hpp.html#a3951483d0b31c29ca95336206cd35238">os</a> &lt;&lt; <span class="stringliteral">&quot;called between &quot;</span> &lt;&lt; min_ &lt;&lt; <span class="stringliteral">&quot; and &quot;</span> &lt;&lt; max_ &lt;&lt; <span class="stringliteral">&quot; times&quot;</span>;</div>
 <div class="line"><a id="l00124" name="l00124"></a><span class="lineno">  124</span>  }</div>
 <div class="line"><a id="l00125" name="l00125"></a><span class="lineno">  125</span>}</div>
 <div class="line"><a id="l00126" name="l00126"></a><span class="lineno">  126</span> </div>
@@ -230,11 +230,11 @@ $(function(){initNavTree('gmock-cardinalities_8cc_source.html',''); initResizabl
 <div class="line"><a id="l00129" name="l00129"></a><span class="lineno">  129</span><span class="comment">// Describes the given call count to an ostream.</span></div>
 <div class="foldopen" id="foldopen00130" data-start="{" data-end="}">
 <div class="line"><a id="l00130" name="l00130"></a><span class="lineno"><a class="line" href="classtesting_1_1_cardinality.html#a7cbea339e2f3072a98367e087aa296e8">  130</a></span><span class="keywordtype">void</span> <a class="code hl_function" href="classtesting_1_1_cardinality.html#a7cbea339e2f3072a98367e087aa296e8">Cardinality::DescribeActualCallCountTo</a>(<span class="keywordtype">int</span> actual_call_count,</div>
-<div class="line"><a id="l00131" name="l00131"></a><span class="lineno">  131</span>                                            ::std::ostream* os) {</div>
+<div class="line"><a id="l00131" name="l00131"></a><span class="lineno">  131</span>                                            ::std::ostream* <a class="code hl_variable" href="environment_8hpp.html#a3951483d0b31c29ca95336206cd35238">os</a>) {</div>
 <div class="line"><a id="l00132" name="l00132"></a><span class="lineno">  132</span>  <span class="keywordflow">if</span> (actual_call_count &gt; 0) {</div>
-<div class="line"><a id="l00133" name="l00133"></a><span class="lineno">  133</span>    *os &lt;&lt; <span class="stringliteral">&quot;called &quot;</span> &lt;&lt; FormatTimes(actual_call_count);</div>
+<div class="line"><a id="l00133" name="l00133"></a><span class="lineno">  133</span>    *<a class="code hl_variable" href="environment_8hpp.html#a3951483d0b31c29ca95336206cd35238">os</a> &lt;&lt; <span class="stringliteral">&quot;called &quot;</span> &lt;&lt; FormatTimes(actual_call_count);</div>
 <div class="line"><a id="l00134" name="l00134"></a><span class="lineno">  134</span>  } <span class="keywordflow">else</span> {</div>
-<div class="line"><a id="l00135" name="l00135"></a><span class="lineno">  135</span>    *os &lt;&lt; <span class="stringliteral">&quot;never called&quot;</span>;</div>
+<div class="line"><a id="l00135" name="l00135"></a><span class="lineno">  135</span>    *<a class="code hl_variable" href="environment_8hpp.html#a3951483d0b31c29ca95336206cd35238">os</a> &lt;&lt; <span class="stringliteral">&quot;never called&quot;</span>;</div>
 <div class="line"><a id="l00136" name="l00136"></a><span class="lineno">  136</span>  }</div>
 <div class="line"><a id="l00137" name="l00137"></a><span class="lineno">  137</span>}</div>
 </div>
@@ -261,6 +261,7 @@ $(function(){initNavTree('gmock-cardinalities_8cc_source.html',''); initResizabl
 <div class="line"><a id="l00156" name="l00156"></a><span class="lineno">  156</span>}  <span class="comment">// namespace testing</span></div>
 <div class="ttc" id="aclasstesting_1_1_cardinality_html"><div class="ttname"><a href="classtesting_1_1_cardinality.html">testing::Cardinality</a></div><div class="ttdef"><b>Definition</b> <a href="gmock-cardinalities_8h_source.html#l00083">gmock-cardinalities.h:83</a></div></div>
 <div class="ttc" id="aclasstesting_1_1_cardinality_html_a7cbea339e2f3072a98367e087aa296e8"><div class="ttname"><a href="classtesting_1_1_cardinality.html#a7cbea339e2f3072a98367e087aa296e8">testing::Cardinality::DescribeActualCallCountTo</a></div><div class="ttdeci">static void DescribeActualCallCountTo(int actual_call_count, ::std::ostream *os)</div><div class="ttdef"><b>Definition</b> <a href="#l00130">gmock-cardinalities.cc:130</a></div></div>
+<div class="ttc" id="aenvironment_8hpp_html_a3951483d0b31c29ca95336206cd35238"><div class="ttname"><a href="environment_8hpp.html#a3951483d0b31c29ca95336206cd35238">os</a></div><div class="ttdeci">os_t os</div><div class="ttdef"><b>Definition</b> <a href="environment_8hpp_source.html#l00023">environment.hpp:23</a></div></div>
 <div class="ttc" id="agmock-cardinalities_8h_html"><div class="ttname"><a href="gmock-cardinalities_8h.html">gmock-cardinalities.h</a></div></div>
 <div class="ttc" id="agmock-internal-utils_8h_html"><div class="ttname"><a href="gmock-internal-utils_8h.html">gmock-internal-utils.h</a></div></div>
 <div class="ttc" id="agtest-port_8h_html_aa73be6f0ba4a7456180a94904ce17790"><div class="ttname"><a href="gtest-port_8h.html#aa73be6f0ba4a7456180a94904ce17790">GTEST_API_</a></div><div class="ttdeci">#define GTEST_API_</div><div class="ttdef"><b>Definition</b> <a href="gtest-port_8h_source.html#l00984">gtest-port.h:984</a></div></div>

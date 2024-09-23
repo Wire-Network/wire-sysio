@@ -7,7 +7,8 @@
 {\ttfamily \#include "{}rapidjson/error/en.\+h"{}}\newline
 {\ttfamily \#include $<$vector$>$}\newline
 {\ttfamily \#include $<$cctype$>$}\newline
-Include dependency graph for capitalize.\+cpp\+:\nopagebreak
+Include dependency graph for capitalize.\+cpp\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -48,7 +49,7 @@ Definition at line \mbox{\hyperlink{capitalize_8cpp_source_l00048}{48}} of file 
 \DoxyCodeLine{00054\ \ \ \ \ \textcolor{comment}{//\ Prepare\ JSON\ writer\ and\ output\ stream.}}
 \DoxyCodeLine{00055\ \ \ \ \ \textcolor{keywordtype}{char}\ writeBuffer[65536];}
 \DoxyCodeLine{00056\ \ \ \ \ \mbox{\hyperlink{class_file_write_stream}{FileWriteStream}}\ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}(stdout,\ writeBuffer,\ \textcolor{keyword}{sizeof}(writeBuffer));}
-\DoxyCodeLine{00057\ \ \ \ \ \mbox{\hyperlink{class_writer}{Writer<FileWriteStream>}}\ writer(os);}
+\DoxyCodeLine{00057\ \ \ \ \ \mbox{\hyperlink{class_writer}{Writer<FileWriteStream>}}\ writer(\mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}});}
 \DoxyCodeLine{00058\ }
 \DoxyCodeLine{00059\ \ \ \ \ \textcolor{comment}{//\ JSON\ reader\ parse\ from\ the\ input\ stream\ and\ let\ writer\ generate\ the\ output.}}
 \DoxyCodeLine{00060\ \ \ \ \ \mbox{\hyperlink{struct_capitalize_filter}{CapitalizeFilter<Writer<FileWriteStream>}}\ >\ filter(writer);}
@@ -61,7 +62,8 @@ Definition at line \mbox{\hyperlink{capitalize_8cpp_source_l00048}{48}} of file 
 \DoxyCodeLine{00067\ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode

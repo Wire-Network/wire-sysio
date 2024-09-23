@@ -348,7 +348,7 @@ Here is the call graph for this function:</div>
 <div class="line"><span class="lineno">  105</span>        <span class="keywordflow">if</span> (devSerial != backend-&gt;<a class="code hl_variable" href="structstate.html#a427c87eb42b2a735f1ac44b76aba1664">serial</a>) {</div>
 <div class="line"><span class="lineno">  106</span>          <a class="code hl_define" href="debug__lib_8h.html#a8c4742440a149ad8bcb5d58ae76c5ed3">DBG_INFO</a>(<span class="stringliteral">&quot;Device %zd has serial %lu, not matching searched %lu&quot;</span>, i,</div>
 <div class="line"><span class="lineno">  107</span>                   devSerial, backend-&gt;<a class="code hl_variable" href="structstate.html#a427c87eb42b2a735f1ac44b76aba1664">serial</a>);</div>
-<div class="line"><span class="lineno">  108</span>          <span class="keywordflow">goto</span> <a class="code hl_function" href="namespacecpp_1_1ast.html#a25b104cfd21fb8487a07063b6ce62062">next</a>;</div>
+<div class="line"><span class="lineno">  108</span>          <span class="keywordflow">goto</span> <a class="code hl_function" href="namespaceutf8.html#afc093dfde66a6f52cb4a5caefe0e580d">next</a>;</div>
 <div class="line"><span class="lineno">  109</span>        }</div>
 <div class="line"><span class="lineno">  110</span>      }</div>
 <div class="line"><span class="lineno">  111</span> </div>
@@ -356,11 +356,11 @@ Here is the call graph for this function:</div>
 <div class="line"><span class="lineno">  113</span>      <span class="keywordflow">if</span> (<a class="code hl_variable" href="yubihsm__pkcs11_8c.html#a3d854b6efad16a16e4d7b4539d4fc71f">ret</a> != 0) {</div>
 <div class="line"><span class="lineno">  114</span>        <a class="code hl_define" href="debug__lib_8h.html#a2e3ed21e5ffba18d940d164aaec64a2a">DBG_ERR</a>(<span class="stringliteral">&quot;Failed to claim interface: %s of device %zd&quot;</span>,</div>
 <div class="line"><span class="lineno">  115</span>                libusb_strerror(<a class="code hl_variable" href="yubihsm__pkcs11_8c.html#a3d854b6efad16a16e4d7b4539d4fc71f">ret</a>), i);</div>
-<div class="line"><span class="lineno">  116</span>        <span class="keywordflow">goto</span> <a class="code hl_function" href="namespacecpp_1_1ast.html#a25b104cfd21fb8487a07063b6ce62062">next</a>;</div>
+<div class="line"><span class="lineno">  116</span>        <span class="keywordflow">goto</span> <a class="code hl_function" href="namespaceutf8.html#afc093dfde66a6f52cb4a5caefe0e580d">next</a>;</div>
 <div class="line"><span class="lineno">  117</span>      }</div>
 <div class="line"><span class="lineno">  118</span> </div>
 <div class="line"><span class="lineno">  119</span>      <span class="keywordflow">break</span>;</div>
-<div class="line"><span class="lineno">  120</span>    <a class="code hl_function" href="namespacecpp_1_1ast.html#a25b104cfd21fb8487a07063b6ce62062">next</a>:</div>
+<div class="line"><span class="lineno">  120</span>    <a class="code hl_function" href="namespaceutf8.html#afc093dfde66a6f52cb4a5caefe0e580d">next</a>:</div>
 <div class="line"><span class="lineno">  121</span>      libusb_close(h);</div>
 <div class="line"><span class="lineno">  122</span>      h = NULL;</div>
 <div class="line"><span class="lineno">  123</span>    }</div>
@@ -384,7 +384,7 @@ Here is the call graph for this function:</div>
 <div class="line"><span class="lineno">  141</span>}</div>
 <div class="ttc" id="adebug__lib_8h_html_a2e3ed21e5ffba18d940d164aaec64a2a"><div class="ttname"><a href="debug__lib_8h.html#a2e3ed21e5ffba18d940d164aaec64a2a">DBG_ERR</a></div><div class="ttdeci">#define DBG_ERR(...)</div><div class="ttdef"><b>Definition</b> <a href="debug__lib_8h_source.html#l00076">debug_lib.h:76</a></div></div>
 <div class="ttc" id="adebug__lib_8h_html_a8c4742440a149ad8bcb5d58ae76c5ed3"><div class="ttname"><a href="debug__lib_8h.html#a8c4742440a149ad8bcb5d58ae76c5ed3">DBG_INFO</a></div><div class="ttdeci">#define DBG_INFO(...)</div><div class="ttdef"><b>Definition</b> <a href="debug__lib_8h_source.html#l00063">debug_lib.h:63</a></div></div>
-<div class="ttc" id="anamespacecpp_1_1ast_html_a25b104cfd21fb8487a07063b6ce62062"><div class="ttname"><a href="namespacecpp_1_1ast.html#a25b104cfd21fb8487a07063b6ce62062">cpp.ast.next</a></div><div class="ttdeci">next(obj)</div><div class="ttdef"><b>Definition</b> <a href="ast_8py_source.html#l00058">ast.py:58</a></div></div>
+<div class="ttc" id="anamespaceutf8_html_afc093dfde66a6f52cb4a5caefe0e580d"><div class="ttname"><a href="namespaceutf8.html#afc093dfde66a6f52cb4a5caefe0e580d">utf8::next</a></div><div class="ttdeci">uint32_t next(octet_iterator &amp;it, octet_iterator end)</div><div class="ttdef"><b>Definition</b> <a href="checked_8h_source.html#l00137">checked.h:137</a></div></div>
 <div class="ttc" id="astructstate_html_a427c87eb42b2a735f1ac44b76aba1664"><div class="ttname"><a href="structstate.html#a427c87eb42b2a735f1ac44b76aba1664">state::serial</a></div><div class="ttdeci">unsigned long serial</div><div class="ttdef"><b>Definition</b> <a href="yubihsm__libusb_8c_source.html#l00033">yubihsm_libusb.c:33</a></div></div>
 <div class="ttc" id="ayubihsm_8h_html_a33d2946f7c95cc44ac153d0013b6b203"><div class="ttname"><a href="yubihsm_8h.html#a33d2946f7c95cc44ac153d0013b6b203">YH_PID</a></div><div class="ttdeci">#define YH_PID</div><div class="ttdoc">Device product ID.</div><div class="ttdef"><b>Definition</b> <a href="yubihsm_8h_source.html#l00099">yubihsm.h:99</a></div></div>
 <div class="ttc" id="ayubihsm_8h_html_a706bd8e7adf0de85e6cfb0efc8981d3f"><div class="ttname"><a href="yubihsm_8h.html#a706bd8e7adf0de85e6cfb0efc8981d3f">YH_MSG_BUF_SIZE</a></div><div class="ttdeci">#define YH_MSG_BUF_SIZE</div><div class="ttdoc">Maximum length of message buffer.</div><div class="ttdef"><b>Definition</b> <a href="yubihsm_8h_source.html#l00093">yubihsm.h:93</a></div></div>

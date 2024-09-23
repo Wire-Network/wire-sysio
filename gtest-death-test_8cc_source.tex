@@ -642,7 +642,7 @@
 \DoxyCodeLine{\Hypertarget{gtest-death-test_8cc_source_l00638}00638\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ RE*\ a\_regex,}
 \DoxyCodeLine{\Hypertarget{gtest-death-test_8cc_source_l00639}00639\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ file,}
 \DoxyCodeLine{\Hypertarget{gtest-death-test_8cc_source_l00640}00640\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ line)}
-\DoxyCodeLine{\Hypertarget{gtest-death-test_8cc_source_l00641}00641\ \ \ \ \ \ \ :\ DeathTestImpl(a\_statement,\ a\_regex),\ file\_(file),\ line\_(\mbox{\hyperlink{namespacevalidate__reflection_a54d4e98ade8417b88a7e3859a693630a}{line}})\ \{\}}
+\DoxyCodeLine{\Hypertarget{gtest-death-test_8cc_source_l00641}00641\ \ \ \ \ \ \ :\ DeathTestImpl(a\_statement,\ a\_regex),\ file\_(file),\ line\_(line)\ \{\}}
 \DoxyCodeLine{\Hypertarget{gtest-death-test_8cc_source_l00642}00642\ }
 \DoxyCodeLine{\Hypertarget{gtest-death-test_8cc_source_l00643}00643\ \ \ \textcolor{comment}{//\ All\ of\ these\ virtual\ functions\ are\ inherited\ from\ DeathTest.}}
 \DoxyCodeLine{\Hypertarget{gtest-death-test_8cc_source_l00644}00644\ \ \ \textcolor{keyword}{virtual}\ \textcolor{keywordtype}{int}\ Wait();}
@@ -808,7 +808,7 @@
 \DoxyCodeLine{\Hypertarget{gtest-death-test_8cc_source_l00804}00804\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ RE*\ a\_regex,}
 \DoxyCodeLine{\Hypertarget{gtest-death-test_8cc_source_l00805}00805\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ file,}
 \DoxyCodeLine{\Hypertarget{gtest-death-test_8cc_source_l00806}00806\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ line)}
-\DoxyCodeLine{\Hypertarget{gtest-death-test_8cc_source_l00807}00807\ \ \ \ \ \ \ :\ DeathTestImpl(a\_statement,\ a\_regex),\ file\_(file),\ line\_(\mbox{\hyperlink{namespacevalidate__reflection_a54d4e98ade8417b88a7e3859a693630a}{line}})\ \{\}}
+\DoxyCodeLine{\Hypertarget{gtest-death-test_8cc_source_l00807}00807\ \ \ \ \ \ \ :\ DeathTestImpl(a\_statement,\ a\_regex),\ file\_(file),\ line\_(line)\ \{\}}
 \DoxyCodeLine{\Hypertarget{gtest-death-test_8cc_source_l00808}00808\ }
 \DoxyCodeLine{\Hypertarget{gtest-death-test_8cc_source_l00809}00809\ \ \ \textcolor{comment}{//\ All\ of\ these\ virtual\ functions\ are\ inherited\ from\ DeathTest.}}
 \DoxyCodeLine{\Hypertarget{gtest-death-test_8cc_source_l00810}00810\ \ \ \textcolor{keyword}{virtual}\ \textcolor{keywordtype}{int}\ Wait();}
@@ -926,10 +926,10 @@
 \DoxyCodeLine{\Hypertarget{gtest-death-test_8cc_source_l00922}00922\ \ \ \ \ \ \ +\ file\_\ +\ \textcolor{stringliteral}{"{}|"{}}}
 \DoxyCodeLine{\Hypertarget{gtest-death-test_8cc_source_l00923}00923\ \ \ \ \ \ \ +\ \mbox{\hyperlink{namespacetesting_1_1internal_aad4beed95d0846e6ffc5da0978ef3bb9}{StreamableToString}}(line\_)\ +\ \textcolor{stringliteral}{"{}|"{}}}
 \DoxyCodeLine{\Hypertarget{gtest-death-test_8cc_source_l00924}00924\ \ \ \ \ \ \ +\ \mbox{\hyperlink{namespacetesting_1_1internal_aad4beed95d0846e6ffc5da0978ef3bb9}{StreamableToString}}(death\_test\_index);}
-\DoxyCodeLine{\Hypertarget{gtest-death-test_8cc_source_l00925}00925\ \ \ Arguments\ \mbox{\hyperlink{namespacebenchmark_compile_ad0ed96ae1454e4347ca61ac3887c379e}{args}};}
-\DoxyCodeLine{\Hypertarget{gtest-death-test_8cc_source_l00926}00926\ \ \ \mbox{\hyperlink{namespacebenchmark_compile_ad0ed96ae1454e4347ca61ac3887c379e}{args}}.AddArguments(GetInjectableArgvs());}
-\DoxyCodeLine{\Hypertarget{gtest-death-test_8cc_source_l00927}00927\ \ \ \mbox{\hyperlink{namespacebenchmark_compile_ad0ed96ae1454e4347ca61ac3887c379e}{args}}.AddArgument(filter\_flag.c\_str());}
-\DoxyCodeLine{\Hypertarget{gtest-death-test_8cc_source_l00928}00928\ \ \ \mbox{\hyperlink{namespacebenchmark_compile_ad0ed96ae1454e4347ca61ac3887c379e}{args}}.AddArgument(internal\_flag.c\_str());}
+\DoxyCodeLine{\Hypertarget{gtest-death-test_8cc_source_l00925}00925\ \ \ Arguments\ args;}
+\DoxyCodeLine{\Hypertarget{gtest-death-test_8cc_source_l00926}00926\ \ \ args.AddArguments(GetInjectableArgvs());}
+\DoxyCodeLine{\Hypertarget{gtest-death-test_8cc_source_l00927}00927\ \ \ args.AddArgument(filter\_flag.c\_str());}
+\DoxyCodeLine{\Hypertarget{gtest-death-test_8cc_source_l00928}00928\ \ \ args.AddArgument(internal\_flag.c\_str());}
 \DoxyCodeLine{\Hypertarget{gtest-death-test_8cc_source_l00929}00929\ }
 \DoxyCodeLine{\Hypertarget{gtest-death-test_8cc_source_l00930}00930\ \ \ \textcolor{comment}{//\ Build\ the\ pipe\ for\ communication\ with\ the\ child.}}
 \DoxyCodeLine{\Hypertarget{gtest-death-test_8cc_source_l00931}00931\ \ \ zx\_status\_t\ status;}
@@ -950,7 +950,7 @@
 \DoxyCodeLine{\Hypertarget{gtest-death-test_8cc_source_l00946}00946\ }
 \DoxyCodeLine{\Hypertarget{gtest-death-test_8cc_source_l00947}00947\ \ \ \textcolor{comment}{//\ Spawn\ the\ child\ process.}}
 \DoxyCodeLine{\Hypertarget{gtest-death-test_8cc_source_l00948}00948\ \ \ status\ =\ fdio\_spawn\_etc(ZX\_HANDLE\_INVALID,\ FDIO\_SPAWN\_CLONE\_ALL,}
-\DoxyCodeLine{\Hypertarget{gtest-death-test_8cc_source_l00949}00949\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacebenchmark_compile_ad0ed96ae1454e4347ca61ac3887c379e}{args}}.Argv()[0],\ \mbox{\hyperlink{namespacebenchmark_compile_ad0ed96ae1454e4347ca61ac3887c379e}{args}}.Argv(),\ \textcolor{keyword}{nullptr},\ 1,}
+\DoxyCodeLine{\Hypertarget{gtest-death-test_8cc_source_l00949}00949\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ args.Argv()[0],\ args.Argv(),\ \textcolor{keyword}{nullptr},\ 1,}
 \DoxyCodeLine{\Hypertarget{gtest-death-test_8cc_source_l00950}00950\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \&add\_handle\_action,\ \&child\_process\_,\ \textcolor{keyword}{nullptr});}
 \DoxyCodeLine{\Hypertarget{gtest-death-test_8cc_source_l00951}00951\ \ \ GTEST\_DEATH\_TEST\_CHECK\_(status\ ==\ ZX\_OK);}
 \DoxyCodeLine{\Hypertarget{gtest-death-test_8cc_source_l00952}00952\ }
@@ -1059,17 +1059,17 @@
 \DoxyCodeLine{\Hypertarget{gtest-death-test_8cc_source_l01055}01055\ \ \textcolor{keyword}{public}:}
 \DoxyCodeLine{\Hypertarget{gtest-death-test_8cc_source_l01056}01056\ \ \ ExecDeathTest(\textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ a\_statement,\ \textcolor{keyword}{const}\ RE*\ a\_regex,}
 \DoxyCodeLine{\Hypertarget{gtest-death-test_8cc_source_l01057}01057\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ file,\ \textcolor{keywordtype}{int}\ line)\ :}
-\DoxyCodeLine{\Hypertarget{gtest-death-test_8cc_source_l01058}01058\ \ \ \ \ \ \ ForkingDeathTest(a\_statement,\ a\_regex),\ file\_(file),\ line\_(\mbox{\hyperlink{namespacevalidate__reflection_a54d4e98ade8417b88a7e3859a693630a}{line}})\ \{\ \}}
+\DoxyCodeLine{\Hypertarget{gtest-death-test_8cc_source_l01058}01058\ \ \ \ \ \ \ ForkingDeathTest(a\_statement,\ a\_regex),\ file\_(file),\ line\_(line)\ \{\ \}}
 \DoxyCodeLine{\Hypertarget{gtest-death-test_8cc_source_l01059}01059\ \ \ \textcolor{keyword}{virtual}\ TestRole\ AssumeRole();}
 \DoxyCodeLine{\Hypertarget{gtest-death-test_8cc_source_l01060}01060\ \ \textcolor{keyword}{private}:}
 \DoxyCodeLine{\Hypertarget{gtest-death-test_8cc_source_l01061}01061\ \ \ static\ ::std::vector<std::string>\ GetArgvsForDeathTestChildProcess()\ \{}
-\DoxyCodeLine{\Hypertarget{gtest-death-test_8cc_source_l01062}01062\ \ \ \ \ ::std::vector<std::string>\ \mbox{\hyperlink{namespacebenchmark_compile_ad0ed96ae1454e4347ca61ac3887c379e}{args}}\ =\ GetInjectableArgvs();}
+\DoxyCodeLine{\Hypertarget{gtest-death-test_8cc_source_l01062}01062\ \ \ \ \ ::std::vector<std::string>\ args\ =\ GetInjectableArgvs();}
 \DoxyCodeLine{\Hypertarget{gtest-death-test_8cc_source_l01063}01063\ \textcolor{preprocessor}{\#\ \ if\ defined(GTEST\_EXTRA\_DEATH\_TEST\_COMMAND\_LINE\_ARGS\_)}}
 \DoxyCodeLine{\Hypertarget{gtest-death-test_8cc_source_l01064}01064\ \ \ \ \ ::std::vector<std::string>\ extra\_args\ =}
 \DoxyCodeLine{\Hypertarget{gtest-death-test_8cc_source_l01065}01065\ \ \ \ \ \ \ \ \ GTEST\_EXTRA\_DEATH\_TEST\_COMMAND\_LINE\_ARGS\_();}
-\DoxyCodeLine{\Hypertarget{gtest-death-test_8cc_source_l01066}01066\ \ \ \ \ \mbox{\hyperlink{namespacebenchmark_compile_ad0ed96ae1454e4347ca61ac3887c379e}{args}}.insert(\mbox{\hyperlink{namespacebenchmark_compile_ad0ed96ae1454e4347ca61ac3887c379e}{args}}.end(),\ extra\_args.begin(),\ extra\_args.end());}
+\DoxyCodeLine{\Hypertarget{gtest-death-test_8cc_source_l01066}01066\ \ \ \ \ args.insert(args.end(),\ extra\_args.begin(),\ extra\_args.end());}
 \DoxyCodeLine{\Hypertarget{gtest-death-test_8cc_source_l01067}01067\ \textcolor{preprocessor}{\#\ \ endif\ \ }\textcolor{comment}{//\ defined(GTEST\_EXTRA\_DEATH\_TEST\_COMMAND\_LINE\_ARGS\_)}}
-\DoxyCodeLine{\Hypertarget{gtest-death-test_8cc_source_l01068}01068\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespacebenchmark_compile_ad0ed96ae1454e4347ca61ac3887c379e}{args}};}
+\DoxyCodeLine{\Hypertarget{gtest-death-test_8cc_source_l01068}01068\ \ \ \ \ \textcolor{keywordflow}{return}\ args;}
 \DoxyCodeLine{\Hypertarget{gtest-death-test_8cc_source_l01069}01069\ \ \ \}}
 \DoxyCodeLine{\Hypertarget{gtest-death-test_8cc_source_l01070}01070\ \ \ \textcolor{comment}{//\ The\ name\ of\ the\ file\ in\ which\ the\ death\ test\ is\ located.}}
 \DoxyCodeLine{\Hypertarget{gtest-death-test_8cc_source_l01071}01071\ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ \textcolor{keyword}{const}\ file\_;}
@@ -1127,8 +1127,8 @@
 \DoxyCodeLine{\Hypertarget{gtest-death-test_8cc_source_l01123}01123\ \textcolor{preprocessor}{\#\ \ else}}
 \DoxyCodeLine{\Hypertarget{gtest-death-test_8cc_source_l01124}01124\ \textcolor{comment}{//\ Some\ POSIX\ platforms\ expect\ you\ to\ declare\ environ.\ extern\ "{}C"{}\ makes}}
 \DoxyCodeLine{\Hypertarget{gtest-death-test_8cc_source_l01125}01125\ \textcolor{comment}{//\ it\ reside\ in\ the\ global\ namespace.}}
-\DoxyCodeLine{\Hypertarget{gtest-death-test_8cc_source_l01126}01126\ \textcolor{keyword}{extern}\ \textcolor{stringliteral}{"{}C"{}}\ \textcolor{keywordtype}{char}**\ \mbox{\hyperlink{namespacegmock__leak__test_a9437a2d2e3bde77354e5c6443ef129f8}{environ}};}
-\DoxyCodeLine{\Hypertarget{gtest-death-test_8cc_source_l01127}01127\ \textcolor{keyword}{inline}\ \textcolor{keywordtype}{char}**\ GetEnviron()\ \{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespacegmock__leak__test_a9437a2d2e3bde77354e5c6443ef129f8}{environ}};\ \}}
+\DoxyCodeLine{\Hypertarget{gtest-death-test_8cc_source_l01126}01126\ \textcolor{keyword}{extern}\ \textcolor{stringliteral}{"{}C"{}}\ \textcolor{keywordtype}{char}**\ environ;}
+\DoxyCodeLine{\Hypertarget{gtest-death-test_8cc_source_l01127}01127\ \textcolor{keyword}{inline}\ \textcolor{keywordtype}{char}**\ GetEnviron()\ \{\ \textcolor{keywordflow}{return}\ environ;\ \}}
 \DoxyCodeLine{\Hypertarget{gtest-death-test_8cc_source_l01128}01128\ \textcolor{preprocessor}{\#\ \ endif\ \ }\textcolor{comment}{//\ GTEST\_OS\_MAC}}
 \DoxyCodeLine{\Hypertarget{gtest-death-test_8cc_source_l01129}01129\ }
 \DoxyCodeLine{\Hypertarget{gtest-death-test_8cc_source_l01130}01130\ \textcolor{preprocessor}{\#\ \ if\ !GTEST\_OS\_QNX}}
@@ -1136,8 +1136,8 @@
 \DoxyCodeLine{\Hypertarget{gtest-death-test_8cc_source_l01132}01132\ \textcolor{comment}{//\ This\ function\ is\ called\ in\ a\ clone()-\/ed\ process\ and\ thus\ must\ avoid}}
 \DoxyCodeLine{\Hypertarget{gtest-death-test_8cc_source_l01133}01133\ \textcolor{comment}{//\ any\ potentially\ unsafe\ operations\ like\ malloc\ or\ libc\ functions.}}
 \DoxyCodeLine{\Hypertarget{gtest-death-test_8cc_source_l01134}01134\ \textcolor{keyword}{static}\ \textcolor{keywordtype}{int}\ ExecDeathTestChildMain(\textcolor{keywordtype}{void}*\ child\_arg)\ \{}
-\DoxyCodeLine{\Hypertarget{gtest-death-test_8cc_source_l01135}01135\ \ \ ExecDeathTestArgs*\ \textcolor{keyword}{const}\ \mbox{\hyperlink{namespacebenchmark_compile_ad0ed96ae1454e4347ca61ac3887c379e}{args}}\ =\ \textcolor{keyword}{static\_cast<}ExecDeathTestArgs*\textcolor{keyword}{>}(child\_arg);}
-\DoxyCodeLine{\Hypertarget{gtest-death-test_8cc_source_l01136}01136\ \ \ GTEST\_DEATH\_TEST\_CHECK\_SYSCALL\_(\mbox{\hyperlink{integration_8cpp_af5b66d867a040d002fb57d645cae3fb4}{close}}(\mbox{\hyperlink{namespacebenchmark_compile_ad0ed96ae1454e4347ca61ac3887c379e}{args}}-\/>close\_fd));}
+\DoxyCodeLine{\Hypertarget{gtest-death-test_8cc_source_l01135}01135\ \ \ ExecDeathTestArgs*\ \textcolor{keyword}{const}\ args\ =\ \textcolor{keyword}{static\_cast<}ExecDeathTestArgs*\textcolor{keyword}{>}(child\_arg);}
+\DoxyCodeLine{\Hypertarget{gtest-death-test_8cc_source_l01136}01136\ \ \ GTEST\_DEATH\_TEST\_CHECK\_SYSCALL\_(\mbox{\hyperlink{integration_8cpp_af5b66d867a040d002fb57d645cae3fb4}{close}}(args-\/>close\_fd));}
 \DoxyCodeLine{\Hypertarget{gtest-death-test_8cc_source_l01137}01137\ }
 \DoxyCodeLine{\Hypertarget{gtest-death-test_8cc_source_l01138}01138\ \ \ \textcolor{comment}{//\ We\ need\ to\ execute\ the\ test\ program\ in\ the\ same\ environment\ where}}
 \DoxyCodeLine{\Hypertarget{gtest-death-test_8cc_source_l01139}01139\ \ \ \textcolor{comment}{//\ it\ was\ originally\ invoked.\ \ Therefore\ we\ change\ to\ the\ original}}
@@ -1156,8 +1156,8 @@
 \DoxyCodeLine{\Hypertarget{gtest-death-test_8cc_source_l01152}01152\ \ \ \textcolor{comment}{//\ unsafe.\ \ Since\ execve()\ doesn't\ search\ the\ PATH,\ the\ user\ must}}
 \DoxyCodeLine{\Hypertarget{gtest-death-test_8cc_source_l01153}01153\ \ \ \textcolor{comment}{//\ invoke\ the\ test\ program\ via\ a\ valid\ path\ that\ contains\ at\ least}}
 \DoxyCodeLine{\Hypertarget{gtest-death-test_8cc_source_l01154}01154\ \ \ \textcolor{comment}{//\ one\ path\ separator.}}
-\DoxyCodeLine{\Hypertarget{gtest-death-test_8cc_source_l01155}01155\ \ \ execve(\mbox{\hyperlink{namespacebenchmark_compile_ad0ed96ae1454e4347ca61ac3887c379e}{args}}-\/>argv[0],\ \mbox{\hyperlink{namespacebenchmark_compile_ad0ed96ae1454e4347ca61ac3887c379e}{args}}-\/>argv,\ GetEnviron());}
-\DoxyCodeLine{\Hypertarget{gtest-death-test_8cc_source_l01156}01156\ \ \ DeathTestAbort(std::string(\textcolor{stringliteral}{"{}execve("{}})\ +\ \mbox{\hyperlink{namespacebenchmark_compile_ad0ed96ae1454e4347ca61ac3887c379e}{args}}-\/>argv[0]\ +\ \textcolor{stringliteral}{"{},\ ...)\ in\ "{}}\ +}
+\DoxyCodeLine{\Hypertarget{gtest-death-test_8cc_source_l01155}01155\ \ \ execve(args-\/>argv[0],\ args-\/>argv,\ GetEnviron());}
+\DoxyCodeLine{\Hypertarget{gtest-death-test_8cc_source_l01156}01156\ \ \ DeathTestAbort(std::string(\textcolor{stringliteral}{"{}execve("{}})\ +\ args-\/>argv[0]\ +\ \textcolor{stringliteral}{"{},\ ...)\ in\ "{}}\ +}
 \DoxyCodeLine{\Hypertarget{gtest-death-test_8cc_source_l01157}01157\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ original\_dir\ +\ \textcolor{stringliteral}{"{}\ failed:\ "{}}\ +}
 \DoxyCodeLine{\Hypertarget{gtest-death-test_8cc_source_l01158}01158\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ GetLastErrnoDescription());}
 \DoxyCodeLine{\Hypertarget{gtest-death-test_8cc_source_l01159}01159\ \ \ \textcolor{keywordflow}{return}\ EXIT\_FAILURE;}
@@ -1199,7 +1199,7 @@
 \DoxyCodeLine{\Hypertarget{gtest-death-test_8cc_source_l01195}01195\ \textcolor{comment}{//\ spawn(2)\ there\ instead.\ \ The\ function\ dies\ with\ an\ error\ message\ if}}
 \DoxyCodeLine{\Hypertarget{gtest-death-test_8cc_source_l01196}01196\ \textcolor{comment}{//\ anything\ goes\ wrong.}}
 \DoxyCodeLine{\Hypertarget{gtest-death-test_8cc_source_l01197}01197\ \textcolor{keyword}{static}\ pid\_t\ ExecDeathTestSpawnChild(\textcolor{keywordtype}{char}*\ \textcolor{keyword}{const}*\ \mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}},\ \textcolor{keywordtype}{int}\ close\_fd)\ \{}
-\DoxyCodeLine{\Hypertarget{gtest-death-test_8cc_source_l01198}01198\ \ \ ExecDeathTestArgs\ \mbox{\hyperlink{namespacebenchmark_compile_ad0ed96ae1454e4347ca61ac3887c379e}{args}}\ =\ \{\ \mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}},\ close\_fd\ \};}
+\DoxyCodeLine{\Hypertarget{gtest-death-test_8cc_source_l01198}01198\ \ \ ExecDeathTestArgs\ args\ =\ \{\ \mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}},\ close\_fd\ \};}
 \DoxyCodeLine{\Hypertarget{gtest-death-test_8cc_source_l01199}01199\ \ \ pid\_t\ child\_pid\ =\ -\/1;}
 \DoxyCodeLine{\Hypertarget{gtest-death-test_8cc_source_l01200}01200\ }
 \DoxyCodeLine{\Hypertarget{gtest-death-test_8cc_source_l01201}01201\ \textcolor{preprocessor}{\#\ \ if\ GTEST\_OS\_QNX}}
@@ -1227,7 +1227,7 @@
 \DoxyCodeLine{\Hypertarget{gtest-death-test_8cc_source_l01223}01223\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ fd\_flags\ |\ FD\_CLOEXEC));}
 \DoxyCodeLine{\Hypertarget{gtest-death-test_8cc_source_l01224}01224\ \ \ \textcolor{keyword}{struct\ }inheritance\ inherit\ =\ \{0\};}
 \DoxyCodeLine{\Hypertarget{gtest-death-test_8cc_source_l01225}01225\ \ \ \textcolor{comment}{//\ spawn\ is\ a\ system\ call.}}
-\DoxyCodeLine{\Hypertarget{gtest-death-test_8cc_source_l01226}01226\ \ \ child\_pid\ =\ spawn(\mbox{\hyperlink{namespacebenchmark_compile_ad0ed96ae1454e4347ca61ac3887c379e}{args}}.argv[0],\ 0,\ NULL,\ \&inherit,\ \mbox{\hyperlink{namespacebenchmark_compile_ad0ed96ae1454e4347ca61ac3887c379e}{args}}.argv,\ GetEnviron());}
+\DoxyCodeLine{\Hypertarget{gtest-death-test_8cc_source_l01226}01226\ \ \ child\_pid\ =\ spawn(args.argv[0],\ 0,\ NULL,\ \&inherit,\ args.argv,\ GetEnviron());}
 \DoxyCodeLine{\Hypertarget{gtest-death-test_8cc_source_l01227}01227\ \ \ \textcolor{comment}{//\ Restores\ the\ current\ working\ directory.}}
 \DoxyCodeLine{\Hypertarget{gtest-death-test_8cc_source_l01228}01228\ \ \ GTEST\_DEATH\_TEST\_CHECK\_(fchdir(cwd\_fd)\ !=\ -\/1);}
 \DoxyCodeLine{\Hypertarget{gtest-death-test_8cc_source_l01229}01229\ \ \ GTEST\_DEATH\_TEST\_CHECK\_SYSCALL\_(\mbox{\hyperlink{integration_8cpp_af5b66d867a040d002fb57d645cae3fb4}{close}}(cwd\_fd));}
@@ -1322,10 +1322,10 @@
 \DoxyCodeLine{\Hypertarget{gtest-death-test_8cc_source_l01318}01318\ \ \ \ \ \ \ +\ file\_\ +\ \textcolor{stringliteral}{"{}|"{}}\ +\ StreamableToString(line\_)\ +\ \textcolor{stringliteral}{"{}|"{}}}
 \DoxyCodeLine{\Hypertarget{gtest-death-test_8cc_source_l01319}01319\ \ \ \ \ \ \ +\ StreamableToString(death\_test\_index)\ +\ \textcolor{stringliteral}{"{}|"{}}}
 \DoxyCodeLine{\Hypertarget{gtest-death-test_8cc_source_l01320}01320\ \ \ \ \ \ \ +\ StreamableToString(pipe\_fd[1]);}
-\DoxyCodeLine{\Hypertarget{gtest-death-test_8cc_source_l01321}01321\ \ \ Arguments\ \mbox{\hyperlink{namespacebenchmark_compile_ad0ed96ae1454e4347ca61ac3887c379e}{args}};}
-\DoxyCodeLine{\Hypertarget{gtest-death-test_8cc_source_l01322}01322\ \ \ \mbox{\hyperlink{namespacebenchmark_compile_ad0ed96ae1454e4347ca61ac3887c379e}{args}}.AddArguments(GetArgvsForDeathTestChildProcess());}
-\DoxyCodeLine{\Hypertarget{gtest-death-test_8cc_source_l01323}01323\ \ \ \mbox{\hyperlink{namespacebenchmark_compile_ad0ed96ae1454e4347ca61ac3887c379e}{args}}.AddArgument(filter\_flag.c\_str());}
-\DoxyCodeLine{\Hypertarget{gtest-death-test_8cc_source_l01324}01324\ \ \ \mbox{\hyperlink{namespacebenchmark_compile_ad0ed96ae1454e4347ca61ac3887c379e}{args}}.AddArgument(internal\_flag.c\_str());}
+\DoxyCodeLine{\Hypertarget{gtest-death-test_8cc_source_l01321}01321\ \ \ Arguments\ args;}
+\DoxyCodeLine{\Hypertarget{gtest-death-test_8cc_source_l01322}01322\ \ \ args.AddArguments(GetArgvsForDeathTestChildProcess());}
+\DoxyCodeLine{\Hypertarget{gtest-death-test_8cc_source_l01323}01323\ \ \ args.AddArgument(filter\_flag.c\_str());}
+\DoxyCodeLine{\Hypertarget{gtest-death-test_8cc_source_l01324}01324\ \ \ args.AddArgument(internal\_flag.c\_str());}
 \DoxyCodeLine{\Hypertarget{gtest-death-test_8cc_source_l01325}01325\ }
 \DoxyCodeLine{\Hypertarget{gtest-death-test_8cc_source_l01326}01326\ \ \ DeathTest::set\_last\_death\_test\_message(\textcolor{stringliteral}{"{}"{}});}
 \DoxyCodeLine{\Hypertarget{gtest-death-test_8cc_source_l01327}01327\ }
@@ -1334,7 +1334,7 @@
 \DoxyCodeLine{\Hypertarget{gtest-death-test_8cc_source_l01330}01330\ \ \ \textcolor{comment}{//\ is\ necessary.}}
 \DoxyCodeLine{\Hypertarget{gtest-death-test_8cc_source_l01331}01331\ \ \ \mbox{\hyperlink{namespacetesting_1_1internal_a2135f223bf6b527729aeaa651115183b}{FlushInfoLog}}();}
 \DoxyCodeLine{\Hypertarget{gtest-death-test_8cc_source_l01332}01332\ }
-\DoxyCodeLine{\Hypertarget{gtest-death-test_8cc_source_l01333}01333\ \ \ \textcolor{keyword}{const}\ pid\_t\ child\_pid\ =\ ExecDeathTestSpawnChild(\mbox{\hyperlink{namespacebenchmark_compile_ad0ed96ae1454e4347ca61ac3887c379e}{args}}.Argv(),\ pipe\_fd[0]);}
+\DoxyCodeLine{\Hypertarget{gtest-death-test_8cc_source_l01333}01333\ \ \ \textcolor{keyword}{const}\ pid\_t\ child\_pid\ =\ ExecDeathTestSpawnChild(args.Argv(),\ pipe\_fd[0]);}
 \DoxyCodeLine{\Hypertarget{gtest-death-test_8cc_source_l01334}01334\ \ \ GTEST\_DEATH\_TEST\_CHECK\_SYSCALL\_(\mbox{\hyperlink{integration_8cpp_af5b66d867a040d002fb57d645cae3fb4}{close}}(pipe\_fd[1]));}
 \DoxyCodeLine{\Hypertarget{gtest-death-test_8cc_source_l01335}01335\ \ \ set\_child\_pid(child\_pid);}
 \DoxyCodeLine{\Hypertarget{gtest-death-test_8cc_source_l01336}01336\ \ \ set\_read\_fd(pipe\_fd[0]);}
@@ -1484,7 +1484,7 @@
 \DoxyCodeLine{\Hypertarget{gtest-death-test_8cc_source_l01480}01480\ }
 \DoxyCodeLine{\Hypertarget{gtest-death-test_8cc_source_l01481}01481\ \ \ \textcolor{comment}{//\ GTEST\_HAS\_DEATH\_TEST\ implies\ that\ we\ have\ ::std::string,\ so\ we}}
 \DoxyCodeLine{\Hypertarget{gtest-death-test_8cc_source_l01482}01482\ \ \ \textcolor{comment}{//\ can\ use\ it\ here.}}
-\DoxyCodeLine{\Hypertarget{gtest-death-test_8cc_source_l01483}01483\ \ \ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{namespacevalidate__reflection_a54d4e98ade8417b88a7e3859a693630a}{line}}\ =\ -\/1;}
+\DoxyCodeLine{\Hypertarget{gtest-death-test_8cc_source_l01483}01483\ \ \ \textcolor{keywordtype}{int}\ line\ =\ -\/1;}
 \DoxyCodeLine{\Hypertarget{gtest-death-test_8cc_source_l01484}01484\ \ \ \textcolor{keywordtype}{int}\ index\ =\ -\/1;}
 \DoxyCodeLine{\Hypertarget{gtest-death-test_8cc_source_l01485}01485\ \ \ ::std::vector<\ ::std::string>\ fields;}
 \DoxyCodeLine{\Hypertarget{gtest-death-test_8cc_source_l01486}01486\ \ \ \mbox{\hyperlink{namespacetesting_1_1internal_a8eb8eddf760375a490e007b20777ec56}{SplitString}}(\mbox{\hyperlink{gtest-port_8h_a828f4e34a1c4b510da50ec1563e3562a}{GTEST\_FLAG}}(internal\_run\_death\_test).c\_str(),\ \textcolor{charliteral}{'|'},\ \&fields);}

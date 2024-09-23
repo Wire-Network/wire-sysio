@@ -1,9 +1,5 @@
 <map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
-<area shape="rect" id="Node000000" href="$structfc_1_1visitor.html" title=" " alt="" coords="5,13,163,38"/>
-<area shape="rect" id="Node000001" href="$structsysio_1_1async__result__visitor.html" title=" " alt="" coords="234,5,368,46"/>
-<area shape="poly" id="edge405_Node000000_Node000001" title=" " alt="" coords="179,23,233,23,233,28,179,28"/>
-<area shape="rect" id="Node000002" href="$structfc_1_1visitor.html" title=" " alt="" coords="5,73,163,98"/>
-<area shape="poly" id="edge407_Node000002_Node000001" title=" " alt="" coords="147,65,233,42,234,47,149,71"/>
-<area shape="rect" id="Node000003" href="$structfc_1_1crypto_1_1base58str__visitor.html" title=" " alt="" coords="211,70,391,126"/>
-<area shape="poly" id="edge406_Node000002_Node000003" title=" " alt="" coords="179,88,210,90,210,95,178,94"/>
+<area shape="rect" id="Node000000" href="$structfc_1_1visitor.html" title=" " alt="" coords="5,13,147,38"/>
+<area shape="rect" id="Node000001" href="$structfc_1_1crypto_1_1generate__shared__secret__visitor.html" title=" " alt="" coords="195,5,347,46"/>
+<area shape="poly" id="edge409_Node000000_Node000001" title=" " alt="" coords="163,23,194,23,194,28,163,28"/>
 </map>

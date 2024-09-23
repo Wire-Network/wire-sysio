@@ -1849,7 +1849,7 @@ $(function(){initNavTree('gtest-port_8h_source.html',''); initResizable(true); }
 <div class="line"><a id="l01684" name="l01684"></a><span class="lineno"> 1684</span><span class="keyword">class </span>ThreadWithParamBase {</div>
 <div class="line"><a id="l01685" name="l01685"></a><span class="lineno"> 1685</span> <span class="keyword">public</span>:</div>
 <div class="line"><a id="l01686" name="l01686"></a><span class="lineno"> 1686</span>  <span class="keyword">virtual</span> ~ThreadWithParamBase() {}</div>
-<div class="line"><a id="l01687" name="l01687"></a><span class="lineno"> 1687</span>  <span class="keyword">virtual</span> <span class="keywordtype">void</span> <a class="code hl_function" href="namespacegtest__break__on__failure__unittest.html#a79d81fcd2832c8f582e494ed9b27396c">Run</a>() = 0;</div>
+<div class="line"><a id="l01687" name="l01687"></a><span class="lineno"> 1687</span>  <span class="keyword">virtual</span> <span class="keywordtype">void</span> Run() = 0;</div>
 <div class="line"><a id="l01688" name="l01688"></a><span class="lineno"> 1688</span>};</div>
 <div class="line"><a id="l01689" name="l01689"></a><span class="lineno"> 1689</span> </div>
 <div class="line"><a id="l01690" name="l01690"></a><span class="lineno"> 1690</span><span class="comment">// pthread_create() accepts a pointer to a function type with the C linkage.</span></div>
@@ -1859,7 +1859,7 @@ $(function(){initNavTree('gtest-port_8h_source.html',''); initResizable(true); }
 <div class="line"><a id="l01694" name="l01694"></a><span class="lineno"> 1694</span><span class="comment">// cannot be defined with C-linkage we need to define a free C-function to</span></div>
 <div class="line"><a id="l01695" name="l01695"></a><span class="lineno"> 1695</span><span class="comment">// pass into pthread_create().</span></div>
 <div class="line"><a id="l01696" name="l01696"></a><span class="lineno"> 1696</span><span class="keyword">extern</span> <span class="stringliteral">&quot;C&quot;</span> <span class="keyword">inline</span> <span class="keywordtype">void</span>* ThreadFuncWithCLinkage(<span class="keywordtype">void</span>* thread) {</div>
-<div class="line"><a id="l01697" name="l01697"></a><span class="lineno"> 1697</span>  <span class="keyword">static_cast&lt;</span>ThreadWithParamBase*<span class="keyword">&gt;</span>(thread)-&gt;<a class="code hl_function" href="namespacegtest__break__on__failure__unittest.html#a79d81fcd2832c8f582e494ed9b27396c">Run</a>();</div>
+<div class="line"><a id="l01697" name="l01697"></a><span class="lineno"> 1697</span>  <span class="keyword">static_cast&lt;</span>ThreadWithParamBase*<span class="keyword">&gt;</span>(thread)-&gt;Run();</div>
 <div class="line"><a id="l01698" name="l01698"></a><span class="lineno"> 1698</span>  <span class="keywordflow">return</span> NULL;</div>
 <div class="line"><a id="l01699" name="l01699"></a><span class="lineno"> 1699</span>}</div>
 <div class="line"><a id="l01700" name="l01700"></a><span class="lineno"> 1700</span> </div>
@@ -1900,7 +1900,7 @@ $(function(){initNavTree('gtest-port_8h_source.html',''); initResizable(true); }
 <div class="line"><a id="l01735" name="l01735"></a><span class="lineno"> 1735</span>    }</div>
 <div class="line"><a id="l01736" name="l01736"></a><span class="lineno"> 1736</span>  }</div>
 <div class="line"><a id="l01737" name="l01737"></a><span class="lineno"> 1737</span> </div>
-<div class="line"><a id="l01738" name="l01738"></a><span class="lineno"> 1738</span>  <span class="keyword">virtual</span> <span class="keywordtype">void</span> <a class="code hl_function" href="namespacegtest__break__on__failure__unittest.html#a79d81fcd2832c8f582e494ed9b27396c">Run</a>() {</div>
+<div class="line"><a id="l01738" name="l01738"></a><span class="lineno"> 1738</span>  <span class="keyword">virtual</span> <span class="keywordtype">void</span> Run() {</div>
 <div class="line"><a id="l01739" name="l01739"></a><span class="lineno"> 1739</span>    <span class="keywordflow">if</span> (thread_can_start_ != NULL)</div>
 <div class="line"><a id="l01740" name="l01740"></a><span class="lineno"> 1740</span>      thread_can_start_-&gt;WaitForNotification();</div>
 <div class="line"><a id="l01741" name="l01741"></a><span class="lineno"> 1741</span>    func_(param_);</div>
@@ -2055,7 +2055,7 @@ $(function(){initNavTree('gtest-port_8h_source.html',''); initResizable(true); }
 <div class="line"><a id="l01890" name="l01890"></a><span class="lineno"> 1890</span>  <span class="keyword">class </span>Runnable {</div>
 <div class="line"><a id="l01891" name="l01891"></a><span class="lineno"> 1891</span>   <span class="keyword">public</span>:</div>
 <div class="line"><a id="l01892" name="l01892"></a><span class="lineno"> 1892</span>    <span class="keyword">virtual</span> ~Runnable() {}</div>
-<div class="line"><a id="l01893" name="l01893"></a><span class="lineno"> 1893</span>    <span class="keyword">virtual</span> <span class="keywordtype">void</span> <a class="code hl_function" href="namespacegtest__break__on__failure__unittest.html#a79d81fcd2832c8f582e494ed9b27396c">Run</a>() = 0;</div>
+<div class="line"><a id="l01893" name="l01893"></a><span class="lineno"> 1893</span>    <span class="keyword">virtual</span> <span class="keywordtype">void</span> Run() = 0;</div>
 <div class="line"><a id="l01894" name="l01894"></a><span class="lineno"> 1894</span>  };</div>
 <div class="line"><a id="l01895" name="l01895"></a><span class="lineno"> 1895</span> </div>
 <div class="line"><a id="l01896" name="l01896"></a><span class="lineno"> 1896</span>  ThreadWithParamBase(Runnable *runnable, Notification* thread_can_start);</div>
@@ -2084,7 +2084,7 @@ $(function(){initNavTree('gtest-port_8h_source.html',''); initResizable(true); }
 <div class="line"><a id="l01919" name="l01919"></a><span class="lineno"> 1919</span>          param_(param) {</div>
 <div class="line"><a id="l01920" name="l01920"></a><span class="lineno"> 1920</span>    }</div>
 <div class="line"><a id="l01921" name="l01921"></a><span class="lineno"> 1921</span>    <span class="keyword">virtual</span> ~RunnableImpl() {}</div>
-<div class="line"><a id="l01922" name="l01922"></a><span class="lineno"> 1922</span>    <span class="keyword">virtual</span> <span class="keywordtype">void</span> <a class="code hl_function" href="namespacegtest__break__on__failure__unittest.html#a79d81fcd2832c8f582e494ed9b27396c">Run</a>() {</div>
+<div class="line"><a id="l01922" name="l01922"></a><span class="lineno"> 1922</span>    <span class="keyword">virtual</span> <span class="keywordtype">void</span> Run() {</div>
 <div class="line"><a id="l01923" name="l01923"></a><span class="lineno"> 1923</span>      func_(param_);</div>
 <div class="line"><a id="l01924" name="l01924"></a><span class="lineno"> 1924</span>    }</div>
 <div class="line"><a id="l01925" name="l01925"></a><span class="lineno"> 1925</span> </div>
@@ -2982,7 +2982,6 @@ $(function(){initNavTree('gtest-port_8h_source.html',''); initResizable(true); }
 <div class="ttc" id="agtest-tuple_8h_html"><div class="ttname"><a href="gtest-tuple_8h.html">gtest-tuple.h</a></div></div>
 <div class="ttc" id="aintegration_8cpp_html_af5b66d867a040d002fb57d645cae3fb4"><div class="ttname"><a href="integration_8cpp.html#af5b66d867a040d002fb57d645cae3fb4">close</a></div><div class="ttdeci">void close(T *e, websocketpp::connection_hdl hdl)</div><div class="ttdef"><b>Definition</b> <a href="integration_8cpp_source.html#l00353">integration.cpp:353</a></div></div>
 <div class="ttc" id="anamespace_c_l_i_html_a991a3264d3459575fc7e83eb54d73d2baa286d9991c6a547ae25a5f5216164b8f"><div class="ttname"><a href="namespace_c_l_i.html#a991a3264d3459575fc7e83eb54d73d2baa286d9991c6a547ae25a5f5216164b8f">CLI::MultiOptionPolicy::Join</a></div><div class="ttdeci">@ Join</div><div class="ttdoc">merge all the arguments together into a single string via the delimiter character default(' ')</div></div>
-<div class="ttc" id="anamespacegtest__break__on__failure__unittest_html_a79d81fcd2832c8f582e494ed9b27396c"><div class="ttname"><a href="namespacegtest__break__on__failure__unittest.html#a79d81fcd2832c8f582e494ed9b27396c">gtest_break_on_failure_unittest.Run</a></div><div class="ttdeci">Run(command)</div><div class="ttdef"><b>Definition</b> <a href="gtest__break__on__failure__unittest_8py_source.html#l00078">gtest_break_on_failure_unittest.py:78</a></div></div>
 <div class="ttc" id="anamespaceinternal_html"><div class="ttname"><a href="namespaceinternal.html">internal</a></div><div class="ttdef"><b>Definition</b> <a href="document_8h_source.html#l00409">document.h:409</a></div></div>
 <div class="ttc" id="anamespacestd_html_abb7e41c7063536ff6eeee4bb5f66de6c"><div class="ttname"><a href="namespacestd.html#abb7e41c7063536ff6eeee4bb5f66de6c">std::swap</a></div><div class="ttdeci">void swap(picojson::value &amp;x, picojson::value &amp;y)</div><div class="ttdef"><b>Definition</b> <a href="spec__test__generator_8cpp_source.html#l01094">spec_test_generator.cpp:1094</a></div></div>
 <div class="ttc" id="anamespacesysio_1_1vm_html_aea2b0c85e98f4073b07115a97b46ae55a6b56c53a1b24e55124ff7f71bb9817d2"><div class="ttname"><a href="namespacesysio_1_1vm.html#aea2b0c85e98f4073b07115a97b46ae55a6b56c53a1b24e55124ff7f71bb9817d2">sysio::vm::func</a></div><div class="ttdeci">@ func</div><div class="ttdef"><b>Definition</b> <a href="sys-vm_2include_2sysio_2sysio_2vm_2types_8hpp_source.html#l00020">types.hpp:20</a></div></div>

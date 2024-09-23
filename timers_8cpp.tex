@@ -11,7 +11,8 @@
 {\ttfamily \#include $<$websocketpp/http/response.\+hpp$>$}\newline
 {\ttfamily \#include $<$websocketpp/logger/stub.\+hpp$>$}\newline
 {\ttfamily \#include $<$boost/asio.\+hpp$>$}\newline
-Include dependency graph for timers.\+cpp\+:\nopagebreak
+Include dependency graph for timers.\+cpp\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -126,7 +127,8 @@ Definition at line \mbox{\hyperlink{timers_8cpp_source_l00177}{177}} of file \mb
 \DoxyCodeLine{00187\ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -150,7 +152,8 @@ Definition at line \mbox{\hyperlink{timers_8cpp_source_l00110}{110}} of file \mb
 \DoxyCodeLine{00112\ \}}
 
 \end{DoxyCode}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -175,13 +178,13 @@ Definition at line \mbox{\hyperlink{timers_8cpp_source_l00053}{53}} of file \mbo
 \DoxyCodeLine{00056\ \ \ \ \ \textcolor{keywordflow}{try}\ \{}
 \DoxyCodeLine{00057\ \ \ \ \ \ \ \ \ boost::asio::io\_service\ io\_service;}
 \DoxyCodeLine{00058\ \ \ \ \ \ \ \ \ tcp::acceptor\ acceptor(io\_service,\ tcp::endpoint(tcp::v6(),\ port));}
-\DoxyCodeLine{00059\ \ \ \ \ \ \ \ \ tcp::socket\ socket(io\_service);}
+\DoxyCodeLine{00059\ \ \ \ \ \ \ \ \ tcp::socket\ \mbox{\hyperlink{namespacewebsocketpp_1_1transport_1_1asio_1_1socket_1_1error_a828ddaa5ed63a761e1b557465a35f05aa0c31b356014843e1d09514e794a539a7}{socket}}(io\_service);}
 \DoxyCodeLine{00060\ }
 \DoxyCodeLine{00061\ \ \ \ \ \ \ \ \ acceptor.accept(socket);}
 \DoxyCodeLine{00062\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (;;)\ \{}
 \DoxyCodeLine{00063\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{char}\ data[512];}
 \DoxyCodeLine{00064\ \ \ \ \ \ \ \ \ \ \ \ \ boost::system::error\_code\ ec;}
-\DoxyCodeLine{00065\ \ \ \ \ \ \ \ \ \ \ \ \ socket.read\_some(boost::asio::buffer(data),\ ec);}
+\DoxyCodeLine{00065\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacewebsocketpp_1_1transport_1_1asio_1_1socket_1_1error_a828ddaa5ed63a761e1b557465a35f05aa0c31b356014843e1d09514e794a539a7}{socket}}.read\_some(boost::asio::buffer(data),\ ec);}
 \DoxyCodeLine{00066\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (ec\ ==\ boost::asio::error::eof)\ \{}
 \DoxyCodeLine{00067\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
 \DoxyCodeLine{00068\ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}\ (ec)\ \{}
@@ -197,7 +200,8 @@ Definition at line \mbox{\hyperlink{timers_8cpp_source_l00053}{53}} of file \mbo
 \DoxyCodeLine{00078\ \}}
 
 \end{DoxyCode}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -225,7 +229,8 @@ Definition at line \mbox{\hyperlink{timers_8cpp_source_l00081}{81}} of file \mbo
 \DoxyCodeLine{00087\ \}}
 
 \end{DoxyCode}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode

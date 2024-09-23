@@ -178,14 +178,16 @@ Definition at line \mbox{\hyperlink{httpc_8cpp_source_l00043}{43}} of file \mbox
 \DoxyCodeLine{00045\ \ \ \ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
 \includegraphics[width=188pt]{namespacesysio_1_1client_1_1http_a787b918b0b4400f958bc44011a2bd226_cgraph}
 \end{center}
 \end{figure}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -215,14 +217,16 @@ Definition at line \mbox{\hyperlink{httpc_8cpp_source_l00047}{47}} of file \mbox
 \DoxyCodeLine{00055\ \ \ \ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
 \includegraphics[width=171pt]{namespacesysio_1_1client_1_1http_a4d32eca0ecac32376ce5478f3d8f9f98_cgraph}
 \end{center}
 \end{figure}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -284,7 +288,7 @@ Definition at line \mbox{\hyperlink{httpc_8cpp_source_l00184}{184}} of file \mbo
 \DoxyCodeLine{00227\ \ \ \ \ \ \ \ \ \ re\ =\ do\_txrx(unix\_socket,\ request,\ status\_code);}
 \DoxyCodeLine{00228\ \ \ \ \ \ \ \}}
 \DoxyCodeLine{00229\ \ \ \ \ \ \ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}(\mbox{\hyperlink{classfc_1_1url}{url}}.scheme\ ==\ \textcolor{stringliteral}{"{}http"{}})\ \{}
-\DoxyCodeLine{00230\ \ \ \ \ \ \ \ \ \ tcp::socket\ socket(cp.\mbox{\hyperlink{structsysio_1_1client_1_1http_1_1connection__param_ad03d61e756db857262de7656156207cf}{context}}-\/>ios);}
+\DoxyCodeLine{00230\ \ \ \ \ \ \ \ \ \ tcp::socket\ \mbox{\hyperlink{namespacewebsocketpp_1_1transport_1_1asio_1_1socket_1_1error_a828ddaa5ed63a761e1b557465a35f05aa0c31b356014843e1d09514e794a539a7}{socket}}(cp.\mbox{\hyperlink{structsysio_1_1client_1_1http_1_1connection__param_ad03d61e756db857262de7656156207cf}{context}}-\/>ios);}
 \DoxyCodeLine{00231\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacesysio_1_1client_1_1http_a4d32eca0ecac32376ce5478f3d8f9f98}{do\_connect}}(socket,\ \mbox{\hyperlink{classfc_1_1url}{url}});}
 \DoxyCodeLine{00232\ \ \ \ \ \ \ \ \ \ re\ =\ \mbox{\hyperlink{namespacesysio_1_1client_1_1http_a162de4256c3fbe69ad6a62bc40b444b2}{do\_txrx}}(socket,\ request,\ status\_code);}
 \DoxyCodeLine{00233\ \ \ \ \ \ \ \}}
@@ -292,17 +296,17 @@ Definition at line \mbox{\hyperlink{httpc_8cpp_source_l00184}{184}} of file \mbo
 \DoxyCodeLine{00235\ \ \ \ \ \ \ \ \ \ boost::asio::ssl::context\ ssl\_context(boost::asio::ssl::context::sslv23\_client);}
 \DoxyCodeLine{00236\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacefc_af7aa87352b9164f6299f4300a2c85b05}{fc::add\_platform\_root\_cas\_to\_context}}(ssl\_context);}
 \DoxyCodeLine{00237\ }
-\DoxyCodeLine{00238\ \ \ \ \ \ \ \ \ \ boost::asio::ssl::stream<boost::asio::ip::tcp::socket>\ socket(cp.\mbox{\hyperlink{structsysio_1_1client_1_1http_1_1connection__param_ad03d61e756db857262de7656156207cf}{context}}-\/>ios,\ ssl\_context);}
-\DoxyCodeLine{00239\ \ \ \ \ \ \ \ \ \ SSL\_set\_tlsext\_host\_name(socket.native\_handle(),\ \mbox{\hyperlink{classfc_1_1url}{url}}.server.c\_str());}
+\DoxyCodeLine{00238\ \ \ \ \ \ \ \ \ \ boost::asio::ssl::stream<boost::asio::ip::tcp::socket>\ \mbox{\hyperlink{namespacewebsocketpp_1_1transport_1_1asio_1_1socket_1_1error_a828ddaa5ed63a761e1b557465a35f05aa0c31b356014843e1d09514e794a539a7}{socket}}(cp.\mbox{\hyperlink{structsysio_1_1client_1_1http_1_1connection__param_ad03d61e756db857262de7656156207cf}{context}}-\/>ios,\ ssl\_context);}
+\DoxyCodeLine{00239\ \ \ \ \ \ \ \ \ \ SSL\_set\_tlsext\_host\_name(\mbox{\hyperlink{namespacewebsocketpp_1_1transport_1_1asio_1_1socket_1_1error_a828ddaa5ed63a761e1b557465a35f05aa0c31b356014843e1d09514e794a539a7}{socket}}.native\_handle(),\ \mbox{\hyperlink{classfc_1_1url}{url}}.server.c\_str());}
 \DoxyCodeLine{00240\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(cp.\mbox{\hyperlink{structsysio_1_1client_1_1http_1_1connection__param_a6ecee51e3d44bb243beaf2e6eff43057}{verify\_cert}})\ \{}
-\DoxyCodeLine{00241\ \ \ \ \ \ \ \ \ \ \ \ \ socket.set\_verify\_mode(boost::asio::ssl::verify\_peer);}
-\DoxyCodeLine{00242\ \ \ \ \ \ \ \ \ \ \ \ \ socket.set\_verify\_callback(boost::asio::ssl::rfc2818\_verification(\mbox{\hyperlink{classfc_1_1url}{url}}.server));}
+\DoxyCodeLine{00241\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacewebsocketpp_1_1transport_1_1asio_1_1socket_1_1error_a828ddaa5ed63a761e1b557465a35f05aa0c31b356014843e1d09514e794a539a7}{socket}}.set\_verify\_mode(boost::asio::ssl::verify\_peer);}
+\DoxyCodeLine{00242\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacewebsocketpp_1_1transport_1_1asio_1_1socket_1_1error_a828ddaa5ed63a761e1b557465a35f05aa0c31b356014843e1d09514e794a539a7}{socket}}.set\_verify\_callback(boost::asio::ssl::rfc2818\_verification(\mbox{\hyperlink{classfc_1_1url}{url}}.server));}
 \DoxyCodeLine{00243\ \ \ \ \ \ \ \ \ \ \}}
-\DoxyCodeLine{00244\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacesysio_1_1client_1_1http_a4d32eca0ecac32376ce5478f3d8f9f98}{do\_connect}}(socket.next\_layer(),\ \mbox{\hyperlink{classfc_1_1url}{url}});}
-\DoxyCodeLine{00245\ \ \ \ \ \ \ \ \ \ socket.handshake(boost::asio::ssl::stream\_base::client);}
+\DoxyCodeLine{00244\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacesysio_1_1client_1_1http_a4d32eca0ecac32376ce5478f3d8f9f98}{do\_connect}}(\mbox{\hyperlink{namespacewebsocketpp_1_1transport_1_1asio_1_1socket_1_1error_a828ddaa5ed63a761e1b557465a35f05aa0c31b356014843e1d09514e794a539a7}{socket}}.next\_layer(),\ \mbox{\hyperlink{classfc_1_1url}{url}});}
+\DoxyCodeLine{00245\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacewebsocketpp_1_1transport_1_1asio_1_1socket_1_1error_a828ddaa5ed63a761e1b557465a35f05aa0c31b356014843e1d09514e794a539a7}{socket}}.handshake(boost::asio::ssl::stream\_base::client);}
 \DoxyCodeLine{00246\ \ \ \ \ \ \ \ \ \ re\ =\ \mbox{\hyperlink{namespacesysio_1_1client_1_1http_a162de4256c3fbe69ad6a62bc40b444b2}{do\_txrx}}(socket,\ request,\ status\_code);}
 \DoxyCodeLine{00247\ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//try\ and\ do\ a\ clean\ shutdown;\ but\ swallow\ if\ this\ fails\ (other\ side\ could\ have\ already\ gave\ TCP\ the\ ax)}}
-\DoxyCodeLine{00248\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{try}\ \{socket.shutdown();\}\ \textcolor{keywordflow}{catch}(...)\ \{\}}
+\DoxyCodeLine{00248\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{try}\ \{\mbox{\hyperlink{namespacewebsocketpp_1_1transport_1_1asio_1_1socket_1_1error_a828ddaa5ed63a761e1b557465a35f05aa0c31b356014843e1d09514e794a539a7}{socket}}.shutdown();\}\ \textcolor{keywordflow}{catch}(...)\ \{\}}
 \DoxyCodeLine{00249\ \ \ \ \ \ \ \}}
 \DoxyCodeLine{00250\ \ \ \ \}\ \textcolor{keywordflow}{catch}\ (\ invalid\_http\_request\&\ e\ )\ \{}
 \DoxyCodeLine{00251\ \ \ \ \ \ \ e.append\_log(\ \mbox{\hyperlink{log__message_8hpp_a4a4df4bb5cffbe07aadf7d29fd44c75e}{FC\_LOG\_MESSAGE}}(\ info,\ \textcolor{stringliteral}{"{}Please\ verify\ this\ url\ is\ valid:\ \$\{url\}"{}},\ (\textcolor{stringliteral}{"{}url"{}},\ \mbox{\hyperlink{classfc_1_1url}{url}}.scheme\ +\ \textcolor{stringliteral}{"{}://"{}}\ +\ \mbox{\hyperlink{classfc_1_1url}{url}}.server\ +\ \textcolor{stringliteral}{"{}:"{}}\ +\ \mbox{\hyperlink{classfc_1_1url}{url}}.\mbox{\hyperlink{classfc_1_1url_ad51c6edfcf040bbaac94de66393214ed}{port}}\ +\ \mbox{\hyperlink{classfc_1_1url}{url}}.\mbox{\hyperlink{classfc_1_1url_a10ff9ce7fa8d6bfb6eec81652c4f0df9}{path}})\ )\ );}
@@ -353,14 +357,16 @@ Definition at line \mbox{\hyperlink{httpc_8cpp_source_l00184}{184}} of file \mbo
 \DoxyCodeLine{00296\ \ \ \ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
 \includegraphics[width=350pt]{namespacesysio_1_1client_1_1http_a1f247437c0bb15fa7286d76c8139d41c_cgraph}
 \end{center}
 \end{figure}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -431,14 +437,16 @@ Definition at line \mbox{\hyperlink{httpc_8cpp_source_l00058}{58}} of file \mbox
 \DoxyCodeLine{00106\ \ \ \ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
 \includegraphics[width=171pt]{namespacesysio_1_1client_1_1http_a162de4256c3fbe69ad6a62bc40b444b2_cgraph}
 \end{center}
 \end{figure}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -476,14 +484,16 @@ Definition at line \mbox{\hyperlink{httpc_8cpp_source_l00172}{172}} of file \mbo
 \DoxyCodeLine{00182\ \ \ \ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
 \includegraphics[width=288pt]{namespacesysio_1_1client_1_1http_ad1b87692ec6218b59d58a092106040f9_cgraph}
 \end{center}
 \end{figure}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -533,14 +543,16 @@ Definition at line \mbox{\hyperlink{httpc_8cpp_source_l00108}{108}} of file \mbo
 \DoxyCodeLine{00136\ \ \ \ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
 \includegraphics[width=171pt]{namespacesysio_1_1client_1_1http_aa22792d25e080a60a880b433d1ef8933_cgraph}
 \end{center}
 \end{figure}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -594,14 +606,16 @@ Definition at line \mbox{\hyperlink{httpc_8cpp_source_l00138}{138}} of file \mbo
 \DoxyCodeLine{00170\ \ \ \ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
 \includegraphics[width=270pt]{namespacesysio_1_1client_1_1http_af9d5ab19d85cb83ea8b32e8ccea594b1_cgraph}
 \end{center}
 \end{figure}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode

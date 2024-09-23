@@ -686,9 +686,8 @@ Functions</h2></td></tr>
 <div class="fragment"><div class="line"><span class="lineno"> 1945</span>                       {</div>
 <div class="line"><span class="lineno"> 1946</span>    rapidjson::Document <a class="code hl_variable" href="yubihsm__pkcs11_8c.html#a107648633008a7f2d872b4b3d98c2f96">d</a>;</div>
 <div class="line"><span class="lineno"> 1947</span>    rapidjson::SchemaDocument <a class="code hl_variable" href="yubihsm__pkcs11_8c.html#a506da415c9307c897ca9be93acfe1d0f">s</a>(d);</div>
-<div class="line"><span class="lineno"> 1948</span>    rapidjson::GenericSchemaValidator&lt;rapidjson::SchemaDocument, rapidjson::Document&gt; <a class="code hl_variable" href="namespacedevelop_build.html#ade64cd34608f9442ef3049116a2da428">v</a>(<a class="code hl_variable" href="yubihsm__pkcs11_8c.html#a506da415c9307c897ca9be93acfe1d0f">s</a>);</div>
+<div class="line"><span class="lineno"> 1948</span>    rapidjson::GenericSchemaValidator&lt;rapidjson::SchemaDocument, rapidjson::Document&gt; v(<a class="code hl_variable" href="yubihsm__pkcs11_8c.html#a506da415c9307c897ca9be93acfe1d0f">s</a>);</div>
 <div class="line"><span class="lineno"> 1949</span>}</div>
-<div class="ttc" id="anamespacedevelop_build_html_ade64cd34608f9442ef3049116a2da428"><div class="ttname"><a href="namespacedevelop_build.html#ade64cd34608f9442ef3049116a2da428">developBuild.v</a></div><div class="ttdeci">v</div><div class="ttdef"><b>Definition</b> <a href="develop_build_8py_source.html#l00006">developBuild.py:6</a></div></div>
 <div class="ttc" id="ayubihsm__pkcs11_8c_html_a506da415c9307c897ca9be93acfe1d0f"><div class="ttname"><a href="yubihsm__pkcs11_8c.html#a506da415c9307c897ca9be93acfe1d0f">s</a></div><div class="ttdeci">char * s</div><div class="ttdef"><b>Definition</b> <a href="yubihsm__pkcs11_8c_source.html#l00524">yubihsm_pkcs11.c:524</a></div></div>
 </div><!-- fragment -->
 </div>
@@ -5352,7 +5351,7 @@ Here is the call graph for this function:</div>
 <div class="line"><span class="lineno"> 1818</span>    <a class="code hl_class" href="class_memory_pool_allocator.html">MemoryPoolAllocator&lt;&gt;</a> validatorAllocator(validatorBuffer, <span class="keyword">sizeof</span>(validatorBuffer));</div>
 <div class="line"><span class="lineno"> 1819</span> </div>
 <div class="line"><span class="lineno"> 1820</span>    <span class="keywordflow">for</span> (<span class="keywordtype">size_t</span> i = 0; i &lt; <span class="keyword">sizeof</span>(filenames) / <span class="keyword">sizeof</span>(filenames[0]); i++) {</div>
-<div class="line"><span class="lineno"> 1821</span>        <span class="keywordtype">char</span> <a class="code hl_variable" href="namespaceembed_clara.html#a1e1bd594f85f58f5dca6c41c0ac720fb">filename</a>[FILENAME_MAX];</div>
+<div class="line"><span class="lineno"> 1821</span>        <span class="keywordtype">char</span> filename[FILENAME_MAX];</div>
 <div class="line"><span class="lineno"> 1822</span>        sprintf(filename, <span class="stringliteral">&quot;jsonschema/tests/draft4/%s&quot;</span>, filenames[i]);</div>
 <div class="line"><span class="lineno"> 1823</span>        <span class="keywordtype">char</span>* json = ReadFile(filename, jsonAllocator);</div>
 <div class="line"><span class="lineno"> 1824</span>        <span class="keywordflow">if</span> (!json) {</div>
@@ -5404,7 +5403,6 @@ Here is the call graph for this function:</div>
 <div class="line"><span class="lineno"> 1870</span>}</div>
 <div class="ttc" id="aclass_memory_pool_allocator_html_a6b180eb150451b4df8b70d827cd1191c"><div class="ttname"><a href="class_memory_pool_allocator.html#a6b180eb150451b4df8b70d827cd1191c">MemoryPoolAllocator::Free</a></div><div class="ttdeci">static void Free(void *ptr)</div><div class="ttdoc">Frees a memory block (concept Allocator)</div><div class="ttdef"><b>Definition</b> <a href="allocators_8h_source.html#l00238">allocators.h:238</a></div></div>
 <div class="ttc" id="anamespace_log_html_a83926634a3916d0927abca4aca58a60a"><div class="ttname"><a href="namespace_log.html#a83926634a3916d0927abca4aca58a60a">Log::printf</a></div><div class="ttdeci">LOGGING_API void printf(Category category, const char *format,...)</div><div class="ttdef"><b>Definition</b> <a href="_logging_8cpp_source.html#l00030">Logging.cpp:30</a></div></div>
-<div class="ttc" id="anamespaceembed_clara_html_a1e1bd594f85f58f5dca6c41c0ac720fb"><div class="ttname"><a href="namespaceembed_clara.html#a1e1bd594f85f58f5dca6c41c0ac720fb">embedClara.filename</a></div><div class="ttdeci">filename</div><div class="ttdef"><b>Definition</b> <a href="embed_clara_8py_source.html#l00010">embedClara.py:10</a></div></div>
 </div><!-- fragment --><div class="dynheader">
 Here is the call graph for this function:</div>
 <div class="dyncontent">

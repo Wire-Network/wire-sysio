@@ -11,7 +11,7 @@ void \mbox{\hyperlink{class_canvas_a5cf12ec3c89b0e8b63c50317e056ebc3}{Clear}} ()
 \item 
 void \mbox{\hyperlink{class_canvas_a277e4e60f5ec3ea16efd7ce9e1fb654b}{Add\+Shape}} (\mbox{\hyperlink{class_shape}{Shape}} \texorpdfstring{$\ast$}{*}shape)
 \item 
-void \mbox{\hyperlink{class_canvas_acf5c8e6bbc490927df36e3c30583800e}{Print}} (std\+::ostream \&os)
+void \mbox{\hyperlink{class_canvas_acf5c8e6bbc490927df36e3c30583800e}{Print}} (std\+::ostream \&\mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}})
 \end{DoxyCompactItemize}
 \doxysubsubsection*{Friends}
 \begin{DoxyCompactItemize}
@@ -58,7 +58,8 @@ Definition at line \mbox{\hyperlink{archivertest_8cpp_source_l00205}{205}} of fi
 \DoxyCodeLine{00205\ \{\ \mbox{\hyperlink{class_canvas_a5cf12ec3c89b0e8b63c50317e056ebc3}{Clear}}();\ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -83,7 +84,8 @@ Definition at line \mbox{\hyperlink{archivertest_8cpp_source_l00212}{212}} of fi
 \DoxyCodeLine{00212\ \{\ shapes\_.push\_back(shape);\ \}}
 
 \end{DoxyCode}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -108,7 +110,8 @@ Definition at line \mbox{\hyperlink{archivertest_8cpp_source_l00207}{207}} of fi
 \DoxyCodeLine{00210\ \ \ \ \ \}}
 
 \end{DoxyCode}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -129,13 +132,14 @@ Definition at line \mbox{\hyperlink{archivertest_8cpp_source_l00214}{214}} of fi
 \begin{DoxyCode}{0}
 \DoxyCodeLine{00214\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
 \DoxyCodeLine{00215\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (std::vector<Shape*>::iterator\ itr\ =\ shapes\_.begin();\ itr\ !=\ shapes\_.end();\ ++itr)\ \{}
-\DoxyCodeLine{00216\ \ \ \ \ \ \ \ \ \ \ \ \ (*itr)-\/>Print(os);}
+\DoxyCodeLine{00216\ \ \ \ \ \ \ \ \ \ \ \ \ (*itr)-\/>Print(\mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}});}
 \DoxyCodeLine{00217\ \ \ \ \ \ \ \ \ \ \ \ \ std::cout\ <<\ std::endl;}
 \DoxyCodeLine{00218\ \ \ \ \ \ \ \ \ \}}
 \DoxyCodeLine{00219\ \ \ \ \ \}}
 
 \end{DoxyCode}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode

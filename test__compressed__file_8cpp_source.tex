@@ -29,18 +29,18 @@
 \DoxyCodeLine{\Hypertarget{test__compressed__file_8cpp_source_l00025}00025\ }
 \DoxyCodeLine{\Hypertarget{test__compressed__file_8cpp_source_l00026}\mbox{\hyperlink{structtemp__file__fixture_a21628eec6c32716a967c1f8a50ade61f}{00026}}\ \ \ \ std::string\ \mbox{\hyperlink{structtemp__file__fixture_a21628eec6c32716a967c1f8a50ade61f}{create\_temp\_file}}(\ \textcolor{keyword}{const}\ std::string\&\ contents\ )\ \{}
 \DoxyCodeLine{\Hypertarget{test__compressed__file_8cpp_source_l00027}00027\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ \mbox{\hyperlink{classfc_1_1path}{path}}\ =\ bfs::temp\_directory\_path()\ /\ bfs::unique\_path();}
-\DoxyCodeLine{\Hypertarget{test__compressed__file_8cpp_source_l00028}00028\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ os\ =\ bfs::ofstream(\mbox{\hyperlink{classfc_1_1path}{path}},\ std::ios\_base::out);}
-\DoxyCodeLine{\Hypertarget{test__compressed__file_8cpp_source_l00029}00029\ \ \ \ \ \ \ os\ <<\ contents;}
-\DoxyCodeLine{\Hypertarget{test__compressed__file_8cpp_source_l00030}00030\ \ \ \ \ \ \ os.close();}
+\DoxyCodeLine{\Hypertarget{test__compressed__file_8cpp_source_l00028}00028\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}\ =\ bfs::ofstream(\mbox{\hyperlink{classfc_1_1path}{path}},\ std::ios\_base::out);}
+\DoxyCodeLine{\Hypertarget{test__compressed__file_8cpp_source_l00029}00029\ \ \ \ \ \ \ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}\ <<\ contents;}
+\DoxyCodeLine{\Hypertarget{test__compressed__file_8cpp_source_l00030}00030\ \ \ \ \ \ \ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}.close();}
 \DoxyCodeLine{\Hypertarget{test__compressed__file_8cpp_source_l00031}00031\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{structtemp__file__fixture_a8641500328301e32a05bce0f9d737560}{paths}}.emplace\_back(std::move(\mbox{\hyperlink{classfc_1_1path}{path}})).generic\_string();}
 \DoxyCodeLine{\Hypertarget{test__compressed__file_8cpp_source_l00032}00032\ \ \ \ \}}
 \DoxyCodeLine{\Hypertarget{test__compressed__file_8cpp_source_l00033}00033\ }
 \DoxyCodeLine{\Hypertarget{test__compressed__file_8cpp_source_l00034}\mbox{\hyperlink{structtemp__file__fixture_a75984461592089af0b7acbb206bc362f}{00034}}\ \ \ \ std::string\ \mbox{\hyperlink{structtemp__file__fixture_a75984461592089af0b7acbb206bc362f}{create\_temp\_file}}(\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{void}*\ data,\ \textcolor{keywordtype}{size\_t}\ size\ )\ \{}
 \DoxyCodeLine{\Hypertarget{test__compressed__file_8cpp_source_l00035}00035\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ \mbox{\hyperlink{classfc_1_1path}{path}}\ =\ bfs::temp\_directory\_path()\ /\ bfs::unique\_path();}
-\DoxyCodeLine{\Hypertarget{test__compressed__file_8cpp_source_l00036}00036\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ os\ =\ bfs::ofstream(\mbox{\hyperlink{classfc_1_1path}{path}},\ std::ios\_base::out|std::ios\_base::binary);}
+\DoxyCodeLine{\Hypertarget{test__compressed__file_8cpp_source_l00036}00036\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}\ =\ bfs::ofstream(\mbox{\hyperlink{classfc_1_1path}{path}},\ std::ios\_base::out|std::ios\_base::binary);}
 \DoxyCodeLine{\Hypertarget{test__compressed__file_8cpp_source_l00037}00037\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (data\ \&\&\ size)}
-\DoxyCodeLine{\Hypertarget{test__compressed__file_8cpp_source_l00038}00038\ \ \ \ \ \ \ \ \ \ os.write(\textcolor{keyword}{reinterpret\_cast<}\textcolor{keyword}{const\ }\textcolor{keywordtype}{char}*\textcolor{keyword}{>}(data),\ size);}
-\DoxyCodeLine{\Hypertarget{test__compressed__file_8cpp_source_l00039}00039\ \ \ \ \ \ \ os.close();}
+\DoxyCodeLine{\Hypertarget{test__compressed__file_8cpp_source_l00038}00038\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}.write(\textcolor{keyword}{reinterpret\_cast<}\textcolor{keyword}{const\ }\textcolor{keywordtype}{char}*\textcolor{keyword}{>}(data),\ size);}
+\DoxyCodeLine{\Hypertarget{test__compressed__file_8cpp_source_l00039}00039\ \ \ \ \ \ \ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}.close();}
 \DoxyCodeLine{\Hypertarget{test__compressed__file_8cpp_source_l00040}00040\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{structtemp__file__fixture_a8641500328301e32a05bce0f9d737560}{paths}}.emplace\_back(std::move(\mbox{\hyperlink{classfc_1_1path}{path}})).generic\_string();}
 \DoxyCodeLine{\Hypertarget{test__compressed__file_8cpp_source_l00041}00041\ \ \ \ \}}
 \DoxyCodeLine{\Hypertarget{test__compressed__file_8cpp_source_l00042}00042\ }
@@ -97,7 +97,7 @@
 \DoxyCodeLine{\Hypertarget{test__compressed__file_8cpp_source_l00093}00093\ }
 \DoxyCodeLine{\Hypertarget{test__compressed__file_8cpp_source_l00094}00094\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacestd}{std}}\ \{}
 \DoxyCodeLine{\Hypertarget{test__compressed__file_8cpp_source_l00095}00095\ \ \ \ \textcolor{keyword}{template}<\textcolor{keyword}{typename}\ T,\ \textcolor{keywordtype}{size\_t}\ S>}
-\DoxyCodeLine{\Hypertarget{test__compressed__file_8cpp_source_l00096}\mbox{\hyperlink{namespacestd_a1e05ee53dd61c7e8a09ac2ec6dd412dd}{00096}}\ \ \ \ std::ostream\&\ \mbox{\hyperlink{namespacestd_aa723876b3fe465de1898817742c90b93}{operator<<}}(std::ostream\ \&os,\ \textcolor{keyword}{const}\ std::array<T,S>\ \&\mbox{\hyperlink{classfc_1_1array}{array}})\ \{}
+\DoxyCodeLine{\Hypertarget{test__compressed__file_8cpp_source_l00096}\mbox{\hyperlink{namespacestd_a1e05ee53dd61c7e8a09ac2ec6dd412dd}{00096}}\ \ \ \ std::ostream\&\ \mbox{\hyperlink{namespacestd_aa723876b3fe465de1898817742c90b93}{operator<<}}(std::ostream\ \&\mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}},\ \textcolor{keyword}{const}\ std::array<T,S>\ \&\mbox{\hyperlink{classfc_1_1array}{array}})\ \{}
 \DoxyCodeLine{\Hypertarget{test__compressed__file_8cpp_source_l00097}00097\ \ \ \ \ \ \ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os\ <<\ fc::to\_hex(reinterpret\_cast<const\ char*>}}(\mbox{\hyperlink{classfc_1_1array}{array}}.\mbox{\hyperlink{classfc_1_1array_ad01e4627be17148ee922c37944c48626}{data}}()),\ \mbox{\hyperlink{struct_s}{S}}\ *\ \textcolor{keyword}{sizeof}(\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}));}
 \DoxyCodeLine{\Hypertarget{test__compressed__file_8cpp_source_l00098}00098\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}};}
 \DoxyCodeLine{\Hypertarget{test__compressed__file_8cpp_source_l00099}00099\ \ \ \ \}}

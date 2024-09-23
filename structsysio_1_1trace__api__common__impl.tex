@@ -57,7 +57,7 @@ Definition at line \mbox{\hyperlink{trace__api__plugin_8cpp_source_l00118}{118}}
 
 \begin{DoxyCode}{0}
 \DoxyCodeLine{00118\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
-\DoxyCodeLine{00119\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ dir\_option\ =\ \mbox{\hyperlink{namespacebenchmark_compile_acf738bbf3b8391aa78929ceeceb8a03b}{options}}.at(\textcolor{stringliteral}{"{}trace-\/dir"{}}).as<bfs::path>();}
+\DoxyCodeLine{00119\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ dir\_option\ =\ options.at(\textcolor{stringliteral}{"{}trace-\/dir"{}}).as<bfs::path>();}
 \DoxyCodeLine{00120\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (dir\_option.is\_relative())}
 \DoxyCodeLine{00121\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1trace__api__common__impl_a6c8f6a4b4719e204dc70e64c4c5823ad}{trace\_dir}}\ =\ \mbox{\hyperlink{namespaceappbase_a99374dc23934f008a09f2f79be9eae40}{app}}().\mbox{\hyperlink{classappbase_1_1application_a5dfd3cfb1124c57963fa17b3f4aabbe1}{data\_dir}}()\ /\ dir\_option;}
 \DoxyCodeLine{00122\ \ \ \ \ \ \ \textcolor{keywordflow}{else}}
@@ -65,16 +65,16 @@ Definition at line \mbox{\hyperlink{trace__api__plugin_8cpp_source_l00118}{118}}
 \DoxyCodeLine{00124\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\textcolor{keyword}{auto}\ resmon\_plugin\ =\ \mbox{\hyperlink{namespaceappbase_a99374dc23934f008a09f2f79be9eae40}{app}}().find\_plugin<resource\_monitor\_plugin>())}
 \DoxyCodeLine{00125\ \ \ \ \ \ \ \ \ resmon\_plugin-\/>monitor\_directory(\mbox{\hyperlink{structsysio_1_1trace__api__common__impl_a6c8f6a4b4719e204dc70e64c4c5823ad}{trace\_dir}});}
 \DoxyCodeLine{00126\ }
-\DoxyCodeLine{00127\ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1trace__api__common__impl_ad89b66423c70b5df35338f8098ffe6d3}{slice\_stride}}\ =\ \mbox{\hyperlink{namespacebenchmark_compile_acf738bbf3b8391aa78929ceeceb8a03b}{options}}.at(\textcolor{stringliteral}{"{}trace-\/slice-\/stride"{}}).as<\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}>();}
+\DoxyCodeLine{00127\ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1trace__api__common__impl_ad89b66423c70b5df35338f8098ffe6d3}{slice\_stride}}\ =\ options.at(\textcolor{stringliteral}{"{}trace-\/slice-\/stride"{}}).as<\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}>();}
 \DoxyCodeLine{00128\ }
-\DoxyCodeLine{00129\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{stdint_8h_ab1967d8591af1a4e48c37fd2b0f184d0}{int32\_t}}\ blocks\ =\ \mbox{\hyperlink{namespacebenchmark_compile_acf738bbf3b8391aa78929ceeceb8a03b}{options}}.at(\textcolor{stringliteral}{"{}trace-\/minimum-\/irreversible-\/history-\/blocks"{}}).as<\mbox{\hyperlink{stdint_8h_ab1967d8591af1a4e48c37fd2b0f184d0}{int32\_t}}>();}
+\DoxyCodeLine{00129\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{stdint_8h_ab1967d8591af1a4e48c37fd2b0f184d0}{int32\_t}}\ blocks\ =\ options.at(\textcolor{stringliteral}{"{}trace-\/minimum-\/irreversible-\/history-\/blocks"{}}).as<\mbox{\hyperlink{stdint_8h_ab1967d8591af1a4e48c37fd2b0f184d0}{int32\_t}}>();}
 \DoxyCodeLine{00130\ \ \ \ \ \ \ \mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp_a40c2826a6fba35c1ffbf912bdf559792}{SYS\_ASSERT}}(blocks\ >=\ -\/1,\ chain::plugin\_config\_exception,}
 \DoxyCodeLine{00131\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}\(\backslash\)"{}trace-\/minimum-\/irreversible-\/history-\/blocks\(\backslash\)"{}\ must\ be\ greater\ to\ or\ equal\ to\ -\/1."{}});}
 \DoxyCodeLine{00132\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (blocks\ >\ \mbox{\hyperlink{structsysio_1_1trace__api__common__impl_a54b8e8dc9344a6cb6dc7174688e9ff8d}{manual\_slice\_file\_value}})\ \{}
 \DoxyCodeLine{00133\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1trace__api__common__impl_a70cc145eb64076882d31e5bf42b3ed7c}{minimum\_irreversible\_history\_blocks}}\ =\ blocks;}
 \DoxyCodeLine{00134\ \ \ \ \ \ \ \}}
 \DoxyCodeLine{00135\ }
-\DoxyCodeLine{00136\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{stdint_8h_ab1967d8591af1a4e48c37fd2b0f184d0}{int32\_t}}\ uncompressed\_blocks\ =\ \mbox{\hyperlink{namespacebenchmark_compile_acf738bbf3b8391aa78929ceeceb8a03b}{options}}.at(\textcolor{stringliteral}{"{}trace-\/minimum-\/uncompressed-\/irreversible-\/history-\/blocks"{}}).as<\mbox{\hyperlink{stdint_8h_ab1967d8591af1a4e48c37fd2b0f184d0}{int32\_t}}>();}
+\DoxyCodeLine{00136\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{stdint_8h_ab1967d8591af1a4e48c37fd2b0f184d0}{int32\_t}}\ uncompressed\_blocks\ =\ options.at(\textcolor{stringliteral}{"{}trace-\/minimum-\/uncompressed-\/irreversible-\/history-\/blocks"{}}).as<\mbox{\hyperlink{stdint_8h_ab1967d8591af1a4e48c37fd2b0f184d0}{int32\_t}}>();}
 \DoxyCodeLine{00137\ \ \ \ \ \ \ \mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp_a40c2826a6fba35c1ffbf912bdf559792}{SYS\_ASSERT}}(uncompressed\_blocks\ >=\ -\/1,\ chain::plugin\_config\_exception,}
 \DoxyCodeLine{00138\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}\(\backslash\)"{}trace-\/minimum-\/uncompressed-\/irreversible-\/history-\/blocks\(\backslash\)"{}\ must\ be\ greater\ to\ or\ equal\ to\ -\/1."{}});}
 \DoxyCodeLine{00139\ }
@@ -92,7 +92,8 @@ Definition at line \mbox{\hyperlink{trace__api__plugin_8cpp_source_l00118}{118}}
 \DoxyCodeLine{00151\ \ \ \ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -162,7 +163,8 @@ Definition at line \mbox{\hyperlink{trace__api__plugin_8cpp_source_l00104}{104}}
 \DoxyCodeLine{00116\ \ \ \ \}}
 
 \end{DoxyCode}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode

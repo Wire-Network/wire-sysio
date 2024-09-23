@@ -1,5 +1,5 @@
 <map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
-<area shape="rect" id="Node000000" href="$structchainbase_1_1object.html" title=" " alt="" coords="5,5,154,61"/>
-<area shape="rect" id="Node000001" href="$classsysio_1_1chain_1_1table__id__object.html" title="The table_id_object class tracks the mapping of (scope, code, table) to an opaque identifier." alt="" coords="202,13,329,54"/>
-<area shape="poly" id="edge226_Node000000_Node000001" title=" " alt="" coords="169,30,201,30,201,36,169,36"/>
+<area shape="rect" id="Node000000" href="$structchainbase_1_1object.html" title=" " alt="" coords="5,5,185,61"/>
+<area shape="rect" id="Node000001" href="$classsysio_1_1chain_1_1transaction__object.html" title=" " alt="" coords="233,13,396,54"/>
+<area shape="poly" id="edge227_Node000000_Node000001" title=" " alt="" coords="200,30,232,30,232,36,200,36"/>
 </map>

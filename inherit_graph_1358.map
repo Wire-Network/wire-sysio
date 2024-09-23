@@ -1,13 +1,5 @@
 <map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
-<area shape="rect" id="Node000000" title=" " alt="" coords="5,120,113,145"/>
-<area shape="rect" id="Node000001" href="$struct_c_l_i_1_1detail_1_1pair__adaptor.html" title="Adaptor for set&#45;like structure: This just wraps a normal container in a few utilities that do almost ..." alt="" coords="167,5,327,46"/>
-<area shape="poly" id="edge583_Node000000_Node000001" title=" " alt="" coords="85,107,119,81,159,55,183,44,185,49,162,60,122,85,88,112"/>
-<area shape="rect" id="Node000002" href="$struct_c_l_i_1_1is__bool.html" title="Check to see if something is bool (fail check by default)" alt="" coords="185,70,308,96"/>
-<area shape="poly" id="edge584_Node000000_Node000002" title=" " alt="" coords="125,112,194,94,196,99,126,118"/>
-<area shape="rect" id="Node000003" href="$struct_c_l_i_1_1is__shared__ptr.html" title="Check to see if something is a shared pointer." alt="" coords="167,120,327,145"/>
-<area shape="poly" id="edge585_Node000000_Node000003" title=" " alt="" coords="128,130,166,130,166,135,128,135"/>
-<area shape="rect" id="Node000004" href="$struct_c_l_i_1_1is__vector.html" title="Check to see if something is a vector (fail check by default)" alt="" coords="179,169,314,194"/>
-<area shape="poly" id="edge586_Node000000_Node000004" title=" " alt="" coords="126,147,196,166,194,171,125,152"/>
-<area shape="rect" id="Node000005" href="$struct_catch_1_1always__false.html" title=" " alt="" coords="161,218,333,244"/>
-<area shape="poly" id="edge587_Node000000_Node000005" title=" " alt="" coords="87,153,121,180,162,205,188,215,186,220,159,209,118,184,84,157"/>
+<area shape="rect" id="Node000000" title=" " alt="" coords="5,5,103,31"/>
+<area shape="rect" id="Node000001" href="$classout__buff.html" title=" " alt="" coords="151,5,219,31"/>
+<area shape="poly" id="edge571_Node000000_Node000001" title=" " alt="" coords="118,16,150,16,150,21,118,21"/>
 </map>

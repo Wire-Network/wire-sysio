@@ -4,7 +4,8 @@
 {\ttfamily \#include "{}rapidjson/filereadstream.\+h"{}}\newline
 {\ttfamily \#include "{}rapidjson/filewritestream.\+h"{}}\newline
 {\ttfamily \#include "{}rapidjson/encodedstream.\+h"{}}\newline
-Include dependency graph for filestreamtest.\+cpp\+:\nopagebreak
+Include dependency graph for filestreamtest.\+cpp\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -109,14 +110,14 @@ Definition at line \mbox{\hyperlink{filestreamtest_8cpp_source_l00132}{132}} of 
 
 \begin{DoxyCode}{0}
 \DoxyCodeLine{00132\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
-\DoxyCodeLine{00133\ \ \ \ \ \textcolor{keywordtype}{char}\ \mbox{\hyperlink{namespaceembed_clara_a1e1bd594f85f58f5dca6c41c0ac720fb}{filename}}[L\_tmpnam];}
+\DoxyCodeLine{00133\ \ \ \ \ \textcolor{keywordtype}{char}\ filename[L\_tmpnam];}
 \DoxyCodeLine{00134\ \ \ \ \ FILE*\ fp\ =\ \mbox{\hyperlink{unittest_8h_acb6251ae9b44050f1fcabf8d3c2e792b}{TempFile}}(filename);}
 \DoxyCodeLine{00135\ }
 \DoxyCodeLine{00136\ \ \ \ \ \textcolor{keywordtype}{char}\ buffer[65536];}
 \DoxyCodeLine{00137\ \ \ \ \ \mbox{\hyperlink{class_file_write_stream}{FileWriteStream}}\ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}(fp,\ buffer,\ \textcolor{keyword}{sizeof}(buffer));}
 \DoxyCodeLine{00138\ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{size\_t}\ i\ =\ 0;\ i\ <\ length\_;\ i++)}
-\DoxyCodeLine{00139\ \ \ \ \ \ \ \ \ os.Put(json\_[i]);}
-\DoxyCodeLine{00140\ \ \ \ \ os.Flush();}
+\DoxyCodeLine{00139\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}.Put(json\_[i]);}
+\DoxyCodeLine{00140\ \ \ \ \ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}.Flush();}
 \DoxyCodeLine{00141\ \ \ \ \ fclose(fp);}
 \DoxyCodeLine{00142\ }
 \DoxyCodeLine{00143\ \ \ \ \ \textcolor{comment}{//\ Read\ it\ back\ to\ verify}}
@@ -134,7 +135,8 @@ Definition at line \mbox{\hyperlink{filestreamtest_8cpp_source_l00132}{132}} of 
 \DoxyCodeLine{00155\ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode

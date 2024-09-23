@@ -1,43 +1,5 @@
 <map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
-<area shape="rect" id="Node000000" href="$structtesting_1_1internal_1_1bool__constant.html" title=" " alt="" coords="5,792,144,848"/>
-<area shape="rect" id="Node000001" href="$structtesting_1_1internal_1_1_has_value_type.html" title=" " alt="" coords="225,5,426,46"/>
-<area shape="poly" id="edge740_Node000000_Node000001" title=" " alt="" coords="74,777,79,618,96,402,110,293,130,194,156,112,172,80,190,56,206,43,224,33,226,38,208,47,194,59,177,83,161,114,135,195,116,294,101,403,84,618,79,777"/>
-<area shape="rect" id="Node000002" href="$structtesting_1_1internal_1_1_has_value_type_3_01_t_00_01_void_t_3_01typename_01_t_1_1value__type_01_4_01_4.html" title=" " alt="" coords="228,70,423,126"/>
-<area shape="poly" id="edge741_Node000000_Node000002" title=" " alt="" coords="75,777,83,633,102,442,117,346,136,258,160,186,174,158,190,136,206,121,226,111,228,115,210,126,194,139,179,161,165,188,141,260,122,347,108,443,88,634,80,777"/>
-<area shape="rect" id="Node000003" href="$structtesting_1_1internal_1_1_is_recursive_container_impl_3_01_c_00_01false_00_01_h_v_01_4.html" title=" " alt="" coords="239,150,412,206"/>
-<area shape="poly" id="edge742_Node000000_Node000003" title=" " alt="" coords="76,776,87,648,108,481,123,398,141,322,163,259,190,216,212,198,237,186,240,191,215,203,194,219,168,262,146,323,128,399,113,482,92,649,81,777"/>
-<area shape="rect" id="Node000004" href="$structtesting_1_1internal_1_1_is_recursive_container_impl_3_01_c_00_01true_00_01false_01_4.html" title=" " alt="" coords="239,230,412,286"/>
-<area shape="poly" id="edge743_Node000000_Node000004" title=" " alt="" coords="77,777,90,664,113,521,128,450,146,386,166,333,190,296,212,278,238,267,240,272,215,283,194,299,171,335,151,387,133,451,118,522,96,665,83,777"/>
-<area shape="rect" id="Node000005" href="$structtesting_1_1internal_1_1_lossless_arithmetic_convertible_impl.html" title=" " alt="" coords="201,310,450,366"/>
-<area shape="poly" id="edge744_Node000000_Node000005" title=" " alt="" coords="79,777,94,680,118,560,150,448,169,405,190,375,202,364,205,368,194,378,174,407,155,450,124,562,100,681,84,778"/>
-<area shape="rect" id="Node000006" href="$structtesting_1_1internal_1_1_lossless_arithmetic_convertible_impl_3_01k_bool_00_01bool_00_01k_bool_00_01bool_01_4.html" title=" " alt="" coords="226,389,424,460"/>
-<area shape="poly" id="edge745_Node000000_Node000006" title=" " alt="" coords="76,777,84,710,103,628,118,585,137,543,161,504,190,469,224,445,227,449,193,473,165,507,142,546,123,587,108,629,90,711,81,777"/>
-<area shape="rect" id="Node000007" href="$structtesting_1_1internal_1_1_lossless_arithmetic_convertible_impl_3_01k_bool_00_01bool_00_01k_floating_point_00_01_to_01_4.html" title=" " alt="" coords="201,483,450,539"/>
-<area shape="poly" id="edge746_Node000000_Node000007" title=" " alt="" coords="80,777,93,725,114,664,146,602,166,574,190,549,206,537,209,542,193,553,170,577,150,605,119,666,98,726,85,778"/>
-<area shape="rect" id="Node000008" href="$structtesting_1_1internal_1_1_lossless_arithmetic_convertible_impl_3_01k_bool_00_01bool_00_01k_integer_00_01_to_01_4.html" title=" " alt="" coords="220,563,431,619"/>
-<area shape="poly" id="edge747_Node000000_Node000008" title=" " alt="" coords="88,777,104,741,127,701,155,661,190,628,218,611,221,616,193,632,159,665,131,704,109,743,93,779"/>
-<area shape="rect" id="Node000009" href="$structtesting_1_1internal_1_1_lossless_arithmetic_convertible_impl_3_01k_floating_point_00_01_from_00_01k_bool_00_01bool_01_4.html" title=" " alt="" coords="226,642,424,713"/>
-<area shape="poly" id="edge748_Node000000_Node000009" title=" " alt="" coords="114,780,149,750,190,722,225,705,227,710,193,727,153,754,117,784"/>
-<area shape="rect" id="Node000010" href="$structtesting_1_1internal_1_1_lossless_arithmetic_convertible_impl_3_01k_floating_point_00_01_from_00_01k_integer_00_01_to_01_4.html" title=" " alt="" coords="226,737,424,808"/>
-<area shape="poly" id="edge749_Node000000_Node000010" title=" " alt="" coords="158,802,225,789,226,794,159,807"/>
-<area shape="rect" id="Node000011" href="$structtesting_1_1internal_1_1_lossless_arithmetic_convertible_impl_3_01k_integer_00_01_from_00_01k_bool_00_01bool_01_4.html" title=" " alt="" coords="226,832,424,902"/>
-<area shape="poly" id="edge750_Node000000_Node000011" title=" " alt="" coords="159,833,226,846,225,851,158,839"/>
-<area shape="rect" id="Node000012" href="$structtesting_1_1internal_1_1_lossless_arithmetic_convertible_impl_3_01k_integer_00_01_from_00_01k_floating_point_00_01_to_01_4.html" title=" " alt="" coords="192,926,459,982"/>
-<area shape="poly" id="edge751_Node000000_Node000012" title=" " alt="" coords="117,857,153,886,193,911,218,923,216,928,190,916,150,890,114,861"/>
-<area shape="rect" id="Node000013" href="$structtesting_1_1internal_1_1is__pointer.html" title=" " alt="" coords="266,1005,384,1046"/>
-<area shape="poly" id="edge752_Node000000_Node000013" title=" " alt="" coords="95,861,134,929,161,963,193,991,229,1009,267,1018,265,1024,227,1014,190,996,157,967,129,932,91,864"/>
-<area shape="rect" id="Node000014" href="$structtesting_1_1internal_1_1is__pointer_3_01_t_01_5_01_4.html" title=" " alt="" coords="266,1071,384,1111"/>
-<area shape="poly" id="edge753_Node000000_Node000014" title=" " alt="" coords="88,863,101,908,123,961,153,1012,172,1035,193,1056,228,1075,266,1085,265,1090,226,1080,190,1060,168,1039,149,1015,118,963,96,910,83,864"/>
-<area shape="rect" id="Node000015" href="$structtesting_1_1internal_1_1is__reference.html" title=" " alt="" coords="263,1136,388,1177"/>
-<area shape="poly" id="edge754_Node000000_Node000015" title=" " alt="" coords="83,863,93,922,113,992,127,1027,145,1062,167,1093,193,1121,226,1140,263,1150,262,1156,224,1145,190,1125,163,1097,141,1064,122,1029,108,993,88,923,77,864"/>
-<area shape="rect" id="Node000016" href="$structtesting_1_1internal_1_1is__reference_3_01_t_01_6_01_4.html" title=" " alt="" coords="257,1201,394,1242"/>
-<area shape="poly" id="edge755_Node000000_Node000016" title=" " alt="" coords="79,863,86,934,103,1021,118,1067,137,1110,162,1151,193,1186,223,1205,257,1215,255,1220,221,1210,190,1190,158,1154,133,1113,113,1068,98,1023,80,935,74,864"/>
-<area shape="rect" id="Node000017" href="$structtesting_1_1internal_1_1is__same.html" title=" " alt="" coords="266,1267,384,1307"/>
-<area shape="poly" id="edge756_Node000000_Node000017" title=" " alt="" coords="84,863,100,958,124,1074,155,1182,174,1224,194,1252,209,1264,227,1273,266,1283,265,1288,225,1278,206,1268,190,1256,169,1226,150,1184,119,1076,95,959,79,864"/>
-<area shape="rect" id="Node000018" href="$structtesting_1_1internal_1_1is__same_3_01_t_00_01_t_01_4.html" title=" " alt="" coords="266,1332,384,1373"/>
-<area shape="poly" id="edge757_Node000000_Node000018" title=" " alt="" coords="83,863,96,971,119,1107,134,1174,151,1235,171,1284,194,1317,209,1330,227,1338,266,1348,265,1354,225,1343,206,1334,190,1321,167,1286,146,1237,129,1176,114,1108,91,972,78,864"/>
-<area shape="rect" id="Node000019" href="$structtesting_1_1internal_1_1type__equals.html" title=" " alt="" coords="249,1397,402,1438"/>
-<area shape="poly" id="edge758_Node000000_Node000019" title=" " alt="" coords="82,863,93,984,114,1140,129,1217,148,1287,169,1344,194,1382,219,1400,249,1411,247,1416,216,1405,190,1386,164,1346,142,1289,124,1218,109,1141,88,985,76,864"/>
-<area shape="rect" id="Node000020" href="$structtesting_1_1internal_1_1type__equals_3_01_t_00_01_t_01_4.html" title=" " alt="" coords="257,1463,394,1503"/>
-<area shape="poly" id="edge759_Node000000_Node000020" title=" " alt="" coords="81,863,90,997,110,1172,125,1260,144,1339,166,1404,179,1429,194,1448,223,1468,257,1478,255,1483,220,1473,190,1452,175,1432,162,1406,138,1341,120,1261,105,1173,85,997,75,864"/>
+<area shape="rect" id="Node000000" href="$classtesting_1_1internal_1_1_comparison_base.html" title=" " alt="" coords="5,5,200,61"/>
+<area shape="rect" id="Node000001" href="$classtesting_1_1internal_1_1_le_matcher.html" title=" " alt="" coords="248,13,378,54"/>
+<area shape="poly" id="edge711_Node000000_Node000001" title=" " alt="" coords="215,30,247,30,247,36,215,36"/>
 </map>

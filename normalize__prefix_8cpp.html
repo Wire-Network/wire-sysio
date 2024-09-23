@@ -172,13 +172,12 @@ Functions</h2></td></tr>
 
 <p class="definition">Definition at line <a class="el" href="normalize__prefix_8cpp_source.html#l00038">38</a> of file <a class="el" href="normalize__prefix_8cpp_source.html">normalize_prefix.cpp</a>.</p>
 <div class="fragment"><div class="line"><span class="lineno">   39</span>{</div>
-<div class="line"><span class="lineno">   40</span>    std::string <a class="code hl_variable" href="namespacevalidate__reflection.html#a54d4e98ade8417b88a7e3859a693630a">line</a>;</div>
+<div class="line"><span class="lineno">   40</span>    std::string line;</div>
 <div class="line"><span class="lineno">   41</span>    <span class="keywordflow">while</span> (std::getline(std::cin, line)) {</div>
 <div class="line"><span class="lineno">   42</span>        std::string normalizedLine = <a class="code hl_function" href="#a359b1f30b0a9553a0e1ce551ddb7e9a6">normalize</a>(line);</div>
 <div class="line"><span class="lineno">   43</span>        std::cout &lt;&lt; normalizedLine &lt;&lt; <span class="charliteral">&#39;\n&#39;</span>;<span class="comment">//std::endl;</span></div>
 <div class="line"><span class="lineno">   44</span>    }</div>
 <div class="line"><span class="lineno">   45</span>}</div>
-<div class="ttc" id="anamespacevalidate__reflection_html_a54d4e98ade8417b88a7e3859a693630a"><div class="ttname"><a href="namespacevalidate__reflection.html#a54d4e98ade8417b88a7e3859a693630a">validate_reflection.line</a></div><div class="ttdeci">line</div><div class="ttdef"><b>Definition</b> <a href="validate__reflection_8py_source.html#l00735">validate_reflection.py:735</a></div></div>
 <div class="ttc" id="anormalize__prefix_8cpp_html_a359b1f30b0a9553a0e1ce551ddb7e9a6"><div class="ttname"><a href="#a359b1f30b0a9553a0e1ce551ddb7e9a6">normalize</a></div><div class="ttdeci">std::string normalize(const std::string &amp;line)</div><div class="ttdef"><b>Definition</b> <a href="normalize__prefix_8cpp_source.html#l00011">normalize_prefix.cpp:11</a></div></div>
 </div><!-- fragment --><div class="dynheader">
 Here is the call graph for this function:</div>
@@ -216,7 +215,7 @@ Here is the call graph for this function:</div>
 <div class="line"><span class="lineno">   16</span>    StringSet suf;</div>
 <div class="line"><span class="lineno">   17</span> </div>
 <div class="line"><span class="lineno">   18</span>    <span class="keywordtype">size_t</span> pos = 0;</div>
-<div class="line"><span class="lineno">   19</span>    <span class="keywordflow">for</span> (; pos &lt; <a class="code hl_variable" href="namespacevalidate__reflection.html#a54d4e98ade8417b88a7e3859a693630a">line</a>.size(); pos += 2) {</div>
+<div class="line"><span class="lineno">   19</span>    <span class="keywordflow">for</span> (; pos &lt; line.size(); pos += 2) {</div>
 <div class="line"><span class="lineno">   20</span>        <span class="keywordtype">bool</span> found = <span class="keyword">false</span>;</div>
 <div class="line"><span class="lineno">   21</span>        <span class="keywordflow">for</span> (<span class="keywordtype">size_t</span> i = 0; i &lt; tblNum; i++) {</div>
 <div class="line"><span class="lineno">   22</span>            <span class="keywordflow">if</span> (::memcmp(&amp;line[pos], <a class="code hl_variable" href="cvt__test_8cpp.html#af73a49a9258b274934a51f5b17b0d1be">tbl</a>[i], 2) == 0) {</div>
@@ -231,7 +230,7 @@ Here is the call graph for this function:</div>
 <div class="line"><span class="lineno">   31</span>    <span class="keywordflow">for</span> (StringSet::const_iterator i = suf.begin(), e = suf.end(); i != e; ++i) {</div>
 <div class="line"><span class="lineno">   32</span>        <a class="code hl_variable" href="yubihsm__pkcs11_8c.html#a3d854b6efad16a16e4d7b4539d4fc71f">ret</a> += *i;</div>
 <div class="line"><span class="lineno">   33</span>    }</div>
-<div class="line"><span class="lineno">   34</span>    <a class="code hl_variable" href="yubihsm__pkcs11_8c.html#a3d854b6efad16a16e4d7b4539d4fc71f">ret</a> += &amp;<a class="code hl_variable" href="namespacevalidate__reflection.html#a54d4e98ade8417b88a7e3859a693630a">line</a>[pos];</div>
+<div class="line"><span class="lineno">   34</span>    <a class="code hl_variable" href="yubihsm__pkcs11_8c.html#a3d854b6efad16a16e4d7b4539d4fc71f">ret</a> += &amp;line[pos];</div>
 <div class="line"><span class="lineno">   35</span>    <span class="keywordflow">return</span> <a class="code hl_variable" href="yubihsm__pkcs11_8c.html#a3d854b6efad16a16e4d7b4539d4fc71f">ret</a>;</div>
 <div class="line"><span class="lineno">   36</span>}</div>
 <div class="ttc" id="acvt__test_8cpp_html_af73a49a9258b274934a51f5b17b0d1be"><div class="ttname"><a href="cvt__test_8cpp.html#af73a49a9258b274934a51f5b17b0d1be">tbl</a></div><div class="ttdeci">const struct Ptn tbl[]</div></div>

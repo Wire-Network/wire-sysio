@@ -1,0 +1,13 @@
+<map id="websocketpp::extensions::permessage_deflate::enabled::set_client_max_window_bits" name="websocketpp::extensions::permessage_deflate::enabled::set_client_max_window_bits">
+<area shape="rect" id="Node000001" title="Limit client LZ77 sliding window size." alt="" coords="250,82,419,152"/>
+<area shape="rect" id="Node000002" href="$permessage__deflate_8cpp.html#a3e00f4fd25358a12420335d5ab2c9677" title=" " alt="" coords="5,5,202,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="264,76,201,45,169,34,171,29,203,40,266,71"/>
+<area shape="rect" id="Node000003" href="$permessage__deflate_8cpp.html#a939579452e7f936f83009ce2fb347207" title=" " alt="" coords="5,55,202,80"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="234,98,166,84,168,78,235,93"/>
+<area shape="rect" id="Node000004" href="$permessage__deflate_8cpp.html#a58999e295854f178bd61ef4722976a7a" title=" " alt="" coords="5,104,202,130"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="234,120,202,120,202,114,234,114"/>
+<area shape="rect" id="Node000005" href="$permessage__deflate_8cpp.html#a5cc5e123c421c8770c06a0f9832886a8" title=" " alt="" coords="5,153,202,179"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="235,141,168,155,166,150,234,136"/>
+<area shape="rect" id="Node000006" href="$permessage__deflate_8cpp.html#a80dd194417464d3cde1ed1f96fdfa73a" title=" " alt="" coords="5,203,202,228"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="266,163,203,194,171,205,169,200,201,189,264,158"/>
+</map>

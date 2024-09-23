@@ -191,13 +191,13 @@
 \DoxyCodeLine{\Hypertarget{bench__ecmult_8c_source_l00187}00187\ }
 \DoxyCodeLine{\Hypertarget{bench__ecmult_8c_source_l00188}00188\ \textcolor{keyword}{static}\ \textcolor{keywordtype}{int}\ bench\_ecmult\_multi\_callback(\mbox{\hyperlink{structsecp256k1__scalar}{secp256k1\_scalar}}*\ sc,\ \mbox{\hyperlink{structsecp256k1__ge}{secp256k1\_ge}}*\ ge,\ \textcolor{keywordtype}{size\_t}\ idx,\ \textcolor{keywordtype}{void}*\ arg)\ \{}
 \DoxyCodeLine{\Hypertarget{bench__ecmult_8c_source_l00189}00189\ \ \ \ \ \mbox{\hyperlink{structbench__data}{bench\_data}}*\ data\ =\ (\mbox{\hyperlink{structbench__data}{bench\_data}}*)arg;}
-\DoxyCodeLine{\Hypertarget{bench__ecmult_8c_source_l00190}00190\ \ \ \ \ \textcolor{keywordflow}{if}\ (data-\/>includes\_g)\ ++\mbox{\hyperlink{namespacehost__functions__tests__1_a8496a24b5236a2dc07bb4f2930d88342}{idx}};}
+\DoxyCodeLine{\Hypertarget{bench__ecmult_8c_source_l00190}00190\ \ \ \ \ \textcolor{keywordflow}{if}\ (data-\/>includes\_g)\ ++idx;}
 \DoxyCodeLine{\Hypertarget{bench__ecmult_8c_source_l00191}00191\ \ \ \ \ \textcolor{keywordflow}{if}\ (idx\ ==\ 0)\ \{}
 \DoxyCodeLine{\Hypertarget{bench__ecmult_8c_source_l00192}00192\ \ \ \ \ \ \ \ \ *sc\ =\ data-\/>scalars[data-\/>offset1];}
 \DoxyCodeLine{\Hypertarget{bench__ecmult_8c_source_l00193}00193\ \ \ \ \ \ \ \ \ *ge\ =\ secp256k1\_ge\_const\_g;}
 \DoxyCodeLine{\Hypertarget{bench__ecmult_8c_source_l00194}00194\ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
-\DoxyCodeLine{\Hypertarget{bench__ecmult_8c_source_l00195}00195\ \ \ \ \ \ \ \ \ *sc\ =\ data-\/>scalars[(data-\/>offset1\ +\ \mbox{\hyperlink{namespacehost__functions__tests__1_a8496a24b5236a2dc07bb4f2930d88342}{idx}})\ \%\ \mbox{\hyperlink{bench__ecmult_8c_ae6910994a90091fe877b021c590c894e}{POINTS}}];}
-\DoxyCodeLine{\Hypertarget{bench__ecmult_8c_source_l00196}00196\ \ \ \ \ \ \ \ \ *ge\ =\ data-\/>pubkeys[(data-\/>offset2\ +\ \mbox{\hyperlink{namespacehost__functions__tests__1_a8496a24b5236a2dc07bb4f2930d88342}{idx}}\ -\/\ 1)\ \%\ \mbox{\hyperlink{bench__ecmult_8c_ae6910994a90091fe877b021c590c894e}{POINTS}}];}
+\DoxyCodeLine{\Hypertarget{bench__ecmult_8c_source_l00195}00195\ \ \ \ \ \ \ \ \ *sc\ =\ data-\/>scalars[(data-\/>offset1\ +\ idx)\ \%\ \mbox{\hyperlink{bench__ecmult_8c_ae6910994a90091fe877b021c590c894e}{POINTS}}];}
+\DoxyCodeLine{\Hypertarget{bench__ecmult_8c_source_l00196}00196\ \ \ \ \ \ \ \ \ *ge\ =\ data-\/>pubkeys[(data-\/>offset2\ +\ idx\ -\/\ 1)\ \%\ \mbox{\hyperlink{bench__ecmult_8c_ae6910994a90091fe877b021c590c894e}{POINTS}}];}
 \DoxyCodeLine{\Hypertarget{bench__ecmult_8c_source_l00197}00197\ \ \ \ \ \}}
 \DoxyCodeLine{\Hypertarget{bench__ecmult_8c_source_l00198}00198\ \ \ \ \ \textcolor{keywordflow}{return}\ 1;}
 \DoxyCodeLine{\Hypertarget{bench__ecmult_8c_source_l00199}00199\ \}}

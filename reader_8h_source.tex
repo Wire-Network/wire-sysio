@@ -848,7 +848,7 @@
 \DoxyCodeLine{\Hypertarget{reader_8h_source_l00986}00986\ \ \ \ \ \textcolor{comment}{//\ Parse\ string\ to\ an\ output\ is}}
 \DoxyCodeLine{\Hypertarget{reader_8h_source_l00987}00987\ \ \ \ \ \textcolor{comment}{//\ This\ function\ handles\ the\ prefix/suffix\ double\ quotes,\ escaping,\ and\ optional\ encoding\ validation.}}
 \DoxyCodeLine{\Hypertarget{reader_8h_source_l00988}00988\ \ \ \ \ \textcolor{keyword}{template}<\textcolor{keywordtype}{unsigned}\ parseFlags,\ \textcolor{keyword}{typename}\ SEncoding,\ \textcolor{keyword}{typename}\ TEncoding,\ \textcolor{keyword}{typename}\ InputStream,\ \textcolor{keyword}{typename}\ OutputStream>}
-\DoxyCodeLine{\Hypertarget{reader_8h_source_l00989}00989\ \ \ \ \ RAPIDJSON\_FORCEINLINE\ \textcolor{keywordtype}{void}\ ParseStringToStream(InputStream\&\ is,\ OutputStream\&\ os)\ \{}
+\DoxyCodeLine{\Hypertarget{reader_8h_source_l00989}00989\ \ \ \ \ RAPIDJSON\_FORCEINLINE\ \textcolor{keywordtype}{void}\ ParseStringToStream(InputStream\&\ is,\ OutputStream\&\ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}})\ \{}
 \DoxyCodeLine{\Hypertarget{reader_8h_source_l00991}00991\ \textcolor{preprocessor}{\#define\ Z16\ 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0}}
 \DoxyCodeLine{\Hypertarget{reader_8h_source_l00992}00992\ \ \ \ \ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ escape[256]\ =\ \{}
 \DoxyCodeLine{\Hypertarget{reader_8h_source_l00993}00993\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{writer_8h_ae2c492a0a464591893d4255ea26d5e3a}{Z16}},\ \mbox{\hyperlink{writer_8h_ae2c492a0a464591893d4255ea26d5e3a}{Z16}},\ 0,\ 0,\textcolor{charliteral}{'\(\backslash\)"{}'},\ 0,\ 0,\ 0,\ 0,\ 0,\ 0,\ 0,\ 0,\ 0,\ 0,\ 0,\ 0,\textcolor{charliteral}{'/'},}
@@ -862,7 +862,7 @@
 \DoxyCodeLine{\Hypertarget{reader_8h_source_l01002}01002\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (;;)\ \{}
 \DoxyCodeLine{\Hypertarget{reader_8h_source_l01003}01003\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Scan\ and\ copy\ string\ before\ "{}\(\backslash\)\(\backslash\)\(\backslash\)"{}"{}\ or\ <\ 0x20.\ This\ is\ an\ optional\ optimzation.}}
 \DoxyCodeLine{\Hypertarget{reader_8h_source_l01004}01004\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!(parseFlags\ \&\ \mbox{\hyperlink{reader_8h_ab7be7dabe6ffcba60fad441505583450a9b3baa16346575d2dc072b23a88e1928}{kParseValidateEncodingFlag}}))}
-\DoxyCodeLine{\Hypertarget{reader_8h_source_l01005}01005\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ScanCopyUnescapedString(is,\ os);}
+\DoxyCodeLine{\Hypertarget{reader_8h_source_l01005}01005\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ScanCopyUnescapedString(is,\ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}});}
 \DoxyCodeLine{\Hypertarget{reader_8h_source_l01006}01006\ }
 \DoxyCodeLine{\Hypertarget{reader_8h_source_l01007}01007\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_generic_reader_a8b72321110aa5823db0a989602f6c6ec}{Ch}}\ c\ =\ is.Peek();}
 \DoxyCodeLine{\Hypertarget{reader_8h_source_l01008}01008\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g_ga6a2b1695c13e77ae425e3cbac980ccb5}{RAPIDJSON\_UNLIKELY}}(c\ ==\ \textcolor{charliteral}{'\(\backslash\)\(\backslash\)'}))\ \{\ \ \ \ \textcolor{comment}{//\ Escape}}
@@ -871,7 +871,7 @@
 \DoxyCodeLine{\Hypertarget{reader_8h_source_l01011}01011\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_generic_reader_a8b72321110aa5823db0a989602f6c6ec}{Ch}}\ e\ =\ is.Peek();}
 \DoxyCodeLine{\Hypertarget{reader_8h_source_l01012}01012\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ ((\textcolor{keyword}{sizeof}(\mbox{\hyperlink{class_generic_reader_a8b72321110aa5823db0a989602f6c6ec}{Ch}})\ ==\ 1\ ||\ \textcolor{keywordtype}{unsigned}(e)\ <\ 256)\ \&\&\ \mbox{\hyperlink{group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g_ga5dc14176a9e71ace282404b0bcda57a1}{RAPIDJSON\_LIKELY}}(escape[\textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}\textcolor{keyword}{>}(e)]))\ \{}
 \DoxyCodeLine{\Hypertarget{reader_8h_source_l01013}01013\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ is.Take();}
-\DoxyCodeLine{\Hypertarget{reader_8h_source_l01014}01014\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ os.Put(\textcolor{keyword}{static\_cast<}typename\ TEncoding::Ch\textcolor{keyword}{>}(escape[\textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}\textcolor{keyword}{>}(e)]));}
+\DoxyCodeLine{\Hypertarget{reader_8h_source_l01014}01014\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}.Put(\textcolor{keyword}{static\_cast<}typename\ TEncoding::Ch\textcolor{keyword}{>}(escape[\textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}\textcolor{keyword}{>}(e)]));}
 \DoxyCodeLine{\Hypertarget{reader_8h_source_l01015}01015\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
 \DoxyCodeLine{\Hypertarget{reader_8h_source_l01016}01016\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g_ga5dc14176a9e71ace282404b0bcda57a1}{RAPIDJSON\_LIKELY}}(e\ ==\ \textcolor{charliteral}{'u'}))\ \{\ \ \ \ \textcolor{comment}{//\ Unicode}}
 \DoxyCodeLine{\Hypertarget{reader_8h_source_l01017}01017\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ is.Take();}
@@ -887,14 +887,14 @@
 \DoxyCodeLine{\Hypertarget{reader_8h_source_l01027}01027\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s_gae3689840fa6e89a241313f33b602f865}{RAPIDJSON\_PARSE\_ERROR}}(\mbox{\hyperlink{group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s_gga8d4b32dfc45840bca189ade2bbcb6ba7ad9fced6763a06435ca448626c74e5c72}{kParseErrorStringUnicodeSurrogateInvalid}},\ escapeOffset);}
 \DoxyCodeLine{\Hypertarget{reader_8h_source_l01028}01028\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ codepoint\ =\ (((codepoint\ -\/\ 0xD800)\ <<\ 10)\ |\ (codepoint2\ -\/\ 0xDC00))\ +\ 0x10000;}
 \DoxyCodeLine{\Hypertarget{reader_8h_source_l01029}01029\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
-\DoxyCodeLine{\Hypertarget{reader_8h_source_l01030}01030\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ TEncoding::Encode(os,\ codepoint);}
+\DoxyCodeLine{\Hypertarget{reader_8h_source_l01030}01030\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ TEncoding::Encode(\mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}},\ codepoint);}
 \DoxyCodeLine{\Hypertarget{reader_8h_source_l01031}01031\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
 \DoxyCodeLine{\Hypertarget{reader_8h_source_l01032}01032\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}}
 \DoxyCodeLine{\Hypertarget{reader_8h_source_l01033}01033\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s_gae3689840fa6e89a241313f33b602f865}{RAPIDJSON\_PARSE\_ERROR}}(\mbox{\hyperlink{group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s_gga8d4b32dfc45840bca189ade2bbcb6ba7a98bb3f3b1e12fdb7f278b9fa4029306f}{kParseErrorStringEscapeInvalid}},\ escapeOffset);}
 \DoxyCodeLine{\Hypertarget{reader_8h_source_l01034}01034\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
 \DoxyCodeLine{\Hypertarget{reader_8h_source_l01035}01035\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g_ga6a2b1695c13e77ae425e3cbac980ccb5}{RAPIDJSON\_UNLIKELY}}(c\ ==\ \textcolor{charliteral}{'"{}'}))\ \{\ \ \ \ \textcolor{comment}{//\ Closing\ double\ quote}}
 \DoxyCodeLine{\Hypertarget{reader_8h_source_l01036}01036\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ is.Take();}
-\DoxyCodeLine{\Hypertarget{reader_8h_source_l01037}01037\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ os.Put(\textcolor{charliteral}{'\(\backslash\)0'});\ \ \ \textcolor{comment}{//\ null-\/terminate\ the\ string}}
+\DoxyCodeLine{\Hypertarget{reader_8h_source_l01037}01037\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}.Put(\textcolor{charliteral}{'\(\backslash\)0'});\ \ \ \textcolor{comment}{//\ null-\/terminate\ the\ string}}
 \DoxyCodeLine{\Hypertarget{reader_8h_source_l01038}01038\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return};}
 \DoxyCodeLine{\Hypertarget{reader_8h_source_l01039}01039\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
 \DoxyCodeLine{\Hypertarget{reader_8h_source_l01040}01040\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g_ga6a2b1695c13e77ae425e3cbac980ccb5}{RAPIDJSON\_UNLIKELY}}(\textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{unsigned}\textcolor{keyword}{>}(c)\ <\ 0x20))\ \{\ \textcolor{comment}{//\ RFC\ 4627:\ unescaped\ =\ \%x20-\/21\ /\ \%x23-\/5B\ /\ \%x5D-\/10FFFF}}
@@ -906,8 +906,8 @@
 \DoxyCodeLine{\Hypertarget{reader_8h_source_l01046}01046\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}\ \{}
 \DoxyCodeLine{\Hypertarget{reader_8h_source_l01047}01047\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{size\_t}\ offset\ =\ is.Tell();}
 \DoxyCodeLine{\Hypertarget{reader_8h_source_l01048}01048\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g_ga6a2b1695c13e77ae425e3cbac980ccb5}{RAPIDJSON\_UNLIKELY}}((parseFlags\ \&\ \mbox{\hyperlink{reader_8h_ab7be7dabe6ffcba60fad441505583450a9b3baa16346575d2dc072b23a88e1928}{kParseValidateEncodingFlag}}\ ?}
-\DoxyCodeLine{\Hypertarget{reader_8h_source_l01049}01049\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ !\mbox{\hyperlink{struct_transcoder}{Transcoder<SEncoding,\ TEncoding>::Validate}}(is,\ os)\ :}
-\DoxyCodeLine{\Hypertarget{reader_8h_source_l01050}01050\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ !\mbox{\hyperlink{struct_transcoder}{Transcoder<SEncoding,\ TEncoding>::Transcode}}(is,\ os))))}
+\DoxyCodeLine{\Hypertarget{reader_8h_source_l01049}01049\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ !\mbox{\hyperlink{struct_transcoder}{Transcoder<SEncoding,\ TEncoding>::Validate}}(is,\ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}})\ :}
+\DoxyCodeLine{\Hypertarget{reader_8h_source_l01050}01050\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ !\mbox{\hyperlink{struct_transcoder}{Transcoder<SEncoding,\ TEncoding>::Transcode}}(is,\ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}))))}
 \DoxyCodeLine{\Hypertarget{reader_8h_source_l01051}01051\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s_gae3689840fa6e89a241313f33b602f865}{RAPIDJSON\_PARSE\_ERROR}}(\mbox{\hyperlink{group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s_gga8d4b32dfc45840bca189ade2bbcb6ba7a17ecb2ed1524b513d64a93f4a7a8b456}{kParseErrorStringInvalidEncoding}},\ offset);}
 \DoxyCodeLine{\Hypertarget{reader_8h_source_l01052}01052\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
 \DoxyCodeLine{\Hypertarget{reader_8h_source_l01053}01053\ \ \ \ \ \ \ \ \ \}}
@@ -920,7 +920,7 @@
 \DoxyCodeLine{\Hypertarget{reader_8h_source_l01060}01060\ }
 \DoxyCodeLine{\Hypertarget{reader_8h_source_l01061}01061\ \textcolor{preprocessor}{\#if\ defined(RAPIDJSON\_SSE2)\ ||\ defined(RAPIDJSON\_SSE42)}}
 \DoxyCodeLine{\Hypertarget{reader_8h_source_l01062}01062\ \ \ \ \ \textcolor{comment}{//\ StringStream\ -\/>\ StackStream<char>}}
-\DoxyCodeLine{\Hypertarget{reader_8h_source_l01063}01063\ \ \ \ \ \textcolor{keyword}{static}\ RAPIDJSON\_FORCEINLINE\ \textcolor{keywordtype}{void}\ ScanCopyUnescapedString(\mbox{\hyperlink{struct_generic_string_stream}{StringStream}}\&\ is,\ StackStream<char>\&\ os)\ \{}
+\DoxyCodeLine{\Hypertarget{reader_8h_source_l01063}01063\ \ \ \ \ \textcolor{keyword}{static}\ RAPIDJSON\_FORCEINLINE\ \textcolor{keywordtype}{void}\ ScanCopyUnescapedString(\mbox{\hyperlink{struct_generic_string_stream}{StringStream}}\&\ is,\ StackStream<char>\&\ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}})\ \{}
 \DoxyCodeLine{\Hypertarget{reader_8h_source_l01064}01064\ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}\ =\ is.src\_;}
 \DoxyCodeLine{\Hypertarget{reader_8h_source_l01065}01065\ }
 \DoxyCodeLine{\Hypertarget{reader_8h_source_l01066}01066\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Scan\ one\ by\ one\ until\ alignment\ (unaligned\ load\ may\ cross\ page\ boundary\ and\ cause\ crash)}}
@@ -931,7 +931,7 @@
 \DoxyCodeLine{\Hypertarget{reader_8h_source_l01071}01071\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return};}
 \DoxyCodeLine{\Hypertarget{reader_8h_source_l01072}01072\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
 \DoxyCodeLine{\Hypertarget{reader_8h_source_l01073}01073\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}}
-\DoxyCodeLine{\Hypertarget{reader_8h_source_l01074}01074\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ os.Put(*\mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}++);}
+\DoxyCodeLine{\Hypertarget{reader_8h_source_l01074}01074\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}.Put(*\mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}++);}
 \DoxyCodeLine{\Hypertarget{reader_8h_source_l01075}01075\ }
 \DoxyCodeLine{\Hypertarget{reader_8h_source_l01076}01076\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ The\ rest\ of\ string\ using\ SIMD}}
 \DoxyCodeLine{\Hypertarget{reader_8h_source_l01077}01077\ \ \ \ \ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ dquote[16]\ =\ \{\ \textcolor{charliteral}{'\(\backslash\)"{}'},\ \textcolor{charliteral}{'\(\backslash\)"{}'},\ \textcolor{charliteral}{'\(\backslash\)"{}'},\ \textcolor{charliteral}{'\(\backslash\)"{}'},\ \textcolor{charliteral}{'\(\backslash\)"{}'},\ \textcolor{charliteral}{'\(\backslash\)"{}'},\ \textcolor{charliteral}{'\(\backslash\)"{}'},\ \textcolor{charliteral}{'\(\backslash\)"{}'},\ \textcolor{charliteral}{'\(\backslash\)"{}'},\ \textcolor{charliteral}{'\(\backslash\)"{}'},\ \textcolor{charliteral}{'\(\backslash\)"{}'},\ \textcolor{charliteral}{'\(\backslash\)"{}'},\ \textcolor{charliteral}{'\(\backslash\)"{}'},\ \textcolor{charliteral}{'\(\backslash\)"{}'},\ \textcolor{charliteral}{'\(\backslash\)"{}'},\ \textcolor{charliteral}{'\(\backslash\)"{}'}\ \};}
@@ -958,7 +958,7 @@
 \DoxyCodeLine{\Hypertarget{reader_8h_source_l01098}01098\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ length\ =\ \textcolor{keyword}{static\_cast<}\mbox{\hyperlink{rapidjson_8h_a5ed6e6e67250fadbd041127e6386dcb5}{SizeType}}\textcolor{keyword}{>}(\_\_builtin\_ffs(\mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}})\ -\/\ 1);}
 \DoxyCodeLine{\Hypertarget{reader_8h_source_l01099}01099\ \textcolor{preprocessor}{\ \ \ \ \#endif}}
 \DoxyCodeLine{\Hypertarget{reader_8h_source_l01100}01100\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (length\ !=\ 0)\ \{}
-\DoxyCodeLine{\Hypertarget{reader_8h_source_l01101}01101\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{char}*\ q\ =\ \textcolor{keyword}{reinterpret\_cast<}\textcolor{keywordtype}{char}*\textcolor{keyword}{>}(os.Push(length));}
+\DoxyCodeLine{\Hypertarget{reader_8h_source_l01101}01101\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{char}*\ q\ =\ \textcolor{keyword}{reinterpret\_cast<}\textcolor{keywordtype}{char}*\textcolor{keyword}{>}(\mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}.Push(length));}
 \DoxyCodeLine{\Hypertarget{reader_8h_source_l01102}01102\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{size\_t}\ i\ =\ 0;\ i\ <\ length;\ i++)}
 \DoxyCodeLine{\Hypertarget{reader_8h_source_l01103}01103\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ q[i]\ =\ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}[i];}
 \DoxyCodeLine{\Hypertarget{reader_8h_source_l01104}01104\ }
@@ -966,16 +966,16 @@
 \DoxyCodeLine{\Hypertarget{reader_8h_source_l01106}01106\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
 \DoxyCodeLine{\Hypertarget{reader_8h_source_l01107}01107\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
 \DoxyCodeLine{\Hypertarget{reader_8h_source_l01108}01108\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
-\DoxyCodeLine{\Hypertarget{reader_8h_source_l01109}01109\ \ \ \ \ \ \ \ \ \ \ \ \ \_mm\_storeu\_si128(\textcolor{keyword}{reinterpret\_cast<}\_\_m128i\ *\textcolor{keyword}{>}(os.Push(16)),\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}});}
+\DoxyCodeLine{\Hypertarget{reader_8h_source_l01109}01109\ \ \ \ \ \ \ \ \ \ \ \ \ \_mm\_storeu\_si128(\textcolor{keyword}{reinterpret\_cast<}\_\_m128i\ *\textcolor{keyword}{>}(\mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}.Push(16)),\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}});}
 \DoxyCodeLine{\Hypertarget{reader_8h_source_l01110}01110\ \ \ \ \ \ \ \ \ \}}
 \DoxyCodeLine{\Hypertarget{reader_8h_source_l01111}01111\ }
 \DoxyCodeLine{\Hypertarget{reader_8h_source_l01112}01112\ \ \ \ \ \ \ \ \ is.src\_\ =\ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}};}
 \DoxyCodeLine{\Hypertarget{reader_8h_source_l01113}01113\ \ \ \ \ \}}
 \DoxyCodeLine{\Hypertarget{reader_8h_source_l01114}01114\ }
 \DoxyCodeLine{\Hypertarget{reader_8h_source_l01115}01115\ \ \ \ \ \textcolor{comment}{//\ InsituStringStream\ -\/>\ InsituStringStream}}
-\DoxyCodeLine{\Hypertarget{reader_8h_source_l01116}01116\ \ \ \ \ \textcolor{keyword}{static}\ RAPIDJSON\_FORCEINLINE\ \textcolor{keywordtype}{void}\ ScanCopyUnescapedString(\mbox{\hyperlink{struct_generic_insitu_string_stream}{InsituStringStream}}\&\ is,\ \mbox{\hyperlink{struct_generic_insitu_string_stream}{InsituStringStream}}\&\ os)\ \{}
-\DoxyCodeLine{\Hypertarget{reader_8h_source_l01117}01117\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g_gabeba18d612187bad2ac62aed9276d47c}{RAPIDJSON\_ASSERT}}(\&is\ ==\ \&os);}
-\DoxyCodeLine{\Hypertarget{reader_8h_source_l01118}01118\ \ \ \ \ \ \ \ \ (void)os;}
+\DoxyCodeLine{\Hypertarget{reader_8h_source_l01116}01116\ \ \ \ \ \textcolor{keyword}{static}\ RAPIDJSON\_FORCEINLINE\ \textcolor{keywordtype}{void}\ ScanCopyUnescapedString(\mbox{\hyperlink{struct_generic_insitu_string_stream}{InsituStringStream}}\&\ is,\ \mbox{\hyperlink{struct_generic_insitu_string_stream}{InsituStringStream}}\&\ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}})\ \{}
+\DoxyCodeLine{\Hypertarget{reader_8h_source_l01117}01117\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g_gabeba18d612187bad2ac62aed9276d47c}{RAPIDJSON\_ASSERT}}(\&is\ ==\ \&\mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}});}
+\DoxyCodeLine{\Hypertarget{reader_8h_source_l01118}01118\ \ \ \ \ \ \ \ \ (void)\mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}};}
 \DoxyCodeLine{\Hypertarget{reader_8h_source_l01119}01119\ }
 \DoxyCodeLine{\Hypertarget{reader_8h_source_l01120}01120\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (is.src\_\ ==\ is.dst\_)\ \{}
 \DoxyCodeLine{\Hypertarget{reader_8h_source_l01121}01121\ \ \ \ \ \ \ \ \ \ \ \ \ SkipUnescapedString(is);}
@@ -1077,7 +1077,7 @@
 \DoxyCodeLine{\Hypertarget{reader_8h_source_l01217}01217\ \ \ \ \ \}}
 \DoxyCodeLine{\Hypertarget{reader_8h_source_l01218}01218\ \textcolor{preprocessor}{\#elif\ defined(RAPIDJSON\_NEON)}}
 \DoxyCodeLine{\Hypertarget{reader_8h_source_l01219}01219\ \ \ \ \ \textcolor{comment}{//\ StringStream\ -\/>\ StackStream<char>}}
-\DoxyCodeLine{\Hypertarget{reader_8h_source_l01220}01220\ \ \ \ \ \textcolor{keyword}{static}\ RAPIDJSON\_FORCEINLINE\ \textcolor{keywordtype}{void}\ ScanCopyUnescapedString(\mbox{\hyperlink{struct_generic_string_stream}{StringStream}}\&\ is,\ StackStream<char>\&\ os)\ \{}
+\DoxyCodeLine{\Hypertarget{reader_8h_source_l01220}01220\ \ \ \ \ \textcolor{keyword}{static}\ RAPIDJSON\_FORCEINLINE\ \textcolor{keywordtype}{void}\ ScanCopyUnescapedString(\mbox{\hyperlink{struct_generic_string_stream}{StringStream}}\&\ is,\ StackStream<char>\&\ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}})\ \{}
 \DoxyCodeLine{\Hypertarget{reader_8h_source_l01221}01221\ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}\ =\ is.src\_;}
 \DoxyCodeLine{\Hypertarget{reader_8h_source_l01222}01222\ }
 \DoxyCodeLine{\Hypertarget{reader_8h_source_l01223}01223\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Scan\ one\ by\ one\ until\ alignment\ (unaligned\ load\ may\ cross\ page\ boundary\ and\ cause\ crash)}}
@@ -1088,7 +1088,7 @@
 \DoxyCodeLine{\Hypertarget{reader_8h_source_l01228}01228\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return};}
 \DoxyCodeLine{\Hypertarget{reader_8h_source_l01229}01229\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
 \DoxyCodeLine{\Hypertarget{reader_8h_source_l01230}01230\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}}
-\DoxyCodeLine{\Hypertarget{reader_8h_source_l01231}01231\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ os.Put(*\mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}++);}
+\DoxyCodeLine{\Hypertarget{reader_8h_source_l01231}01231\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}.Put(*\mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}++);}
 \DoxyCodeLine{\Hypertarget{reader_8h_source_l01232}01232\ }
 \DoxyCodeLine{\Hypertarget{reader_8h_source_l01233}01233\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ The\ rest\ of\ string\ using\ SIMD}}
 \DoxyCodeLine{\Hypertarget{reader_8h_source_l01234}01234\ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ uint8x16\_t\ s0\ =\ vmovq\_n\_u8(\textcolor{charliteral}{'"{}'});}
@@ -1122,7 +1122,7 @@
 \DoxyCodeLine{\Hypertarget{reader_8h_source_l01262}01262\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
 \DoxyCodeLine{\Hypertarget{reader_8h_source_l01263}01263\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g_ga6a2b1695c13e77ae425e3cbac980ccb5}{RAPIDJSON\_UNLIKELY}}(escaped))\ \{\ \ \ \textcolor{comment}{//\ some\ of\ characters\ is\ escaped}}
 \DoxyCodeLine{\Hypertarget{reader_8h_source_l01264}01264\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (length\ !=\ 0)\ \{}
-\DoxyCodeLine{\Hypertarget{reader_8h_source_l01265}01265\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{char}*\ q\ =\ \textcolor{keyword}{reinterpret\_cast<}\textcolor{keywordtype}{char}*\textcolor{keyword}{>}(os.Push(length));}
+\DoxyCodeLine{\Hypertarget{reader_8h_source_l01265}01265\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{char}*\ q\ =\ \textcolor{keyword}{reinterpret\_cast<}\textcolor{keywordtype}{char}*\textcolor{keyword}{>}(\mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}.Push(length));}
 \DoxyCodeLine{\Hypertarget{reader_8h_source_l01266}01266\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{size\_t}\ i\ =\ 0;\ i\ <\ length;\ i++)}
 \DoxyCodeLine{\Hypertarget{reader_8h_source_l01267}01267\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ q[i]\ =\ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}[i];}
 \DoxyCodeLine{\Hypertarget{reader_8h_source_l01268}01268\ }
@@ -1130,16 +1130,16 @@
 \DoxyCodeLine{\Hypertarget{reader_8h_source_l01270}01270\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
 \DoxyCodeLine{\Hypertarget{reader_8h_source_l01271}01271\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
 \DoxyCodeLine{\Hypertarget{reader_8h_source_l01272}01272\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
-\DoxyCodeLine{\Hypertarget{reader_8h_source_l01273}01273\ \ \ \ \ \ \ \ \ \ \ \ \ vst1q\_u8(\textcolor{keyword}{reinterpret\_cast<}\mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\ *\textcolor{keyword}{>}(os.Push(16)),\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}});}
+\DoxyCodeLine{\Hypertarget{reader_8h_source_l01273}01273\ \ \ \ \ \ \ \ \ \ \ \ \ vst1q\_u8(\textcolor{keyword}{reinterpret\_cast<}\mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\ *\textcolor{keyword}{>}(\mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}.Push(16)),\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}});}
 \DoxyCodeLine{\Hypertarget{reader_8h_source_l01274}01274\ \ \ \ \ \ \ \ \ \}}
 \DoxyCodeLine{\Hypertarget{reader_8h_source_l01275}01275\ }
 \DoxyCodeLine{\Hypertarget{reader_8h_source_l01276}01276\ \ \ \ \ \ \ \ \ is.src\_\ =\ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}};}
 \DoxyCodeLine{\Hypertarget{reader_8h_source_l01277}01277\ \ \ \ \ \}}
 \DoxyCodeLine{\Hypertarget{reader_8h_source_l01278}01278\ }
 \DoxyCodeLine{\Hypertarget{reader_8h_source_l01279}01279\ \ \ \ \ \textcolor{comment}{//\ InsituStringStream\ -\/>\ InsituStringStream}}
-\DoxyCodeLine{\Hypertarget{reader_8h_source_l01280}01280\ \ \ \ \ \textcolor{keyword}{static}\ RAPIDJSON\_FORCEINLINE\ \textcolor{keywordtype}{void}\ ScanCopyUnescapedString(\mbox{\hyperlink{struct_generic_insitu_string_stream}{InsituStringStream}}\&\ is,\ \mbox{\hyperlink{struct_generic_insitu_string_stream}{InsituStringStream}}\&\ os)\ \{}
-\DoxyCodeLine{\Hypertarget{reader_8h_source_l01281}01281\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g_gabeba18d612187bad2ac62aed9276d47c}{RAPIDJSON\_ASSERT}}(\&is\ ==\ \&os);}
-\DoxyCodeLine{\Hypertarget{reader_8h_source_l01282}01282\ \ \ \ \ \ \ \ \ (void)os;}
+\DoxyCodeLine{\Hypertarget{reader_8h_source_l01280}01280\ \ \ \ \ \textcolor{keyword}{static}\ RAPIDJSON\_FORCEINLINE\ \textcolor{keywordtype}{void}\ ScanCopyUnescapedString(\mbox{\hyperlink{struct_generic_insitu_string_stream}{InsituStringStream}}\&\ is,\ \mbox{\hyperlink{struct_generic_insitu_string_stream}{InsituStringStream}}\&\ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}})\ \{}
+\DoxyCodeLine{\Hypertarget{reader_8h_source_l01281}01281\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g_gabeba18d612187bad2ac62aed9276d47c}{RAPIDJSON\_ASSERT}}(\&is\ ==\ \&\mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}});}
+\DoxyCodeLine{\Hypertarget{reader_8h_source_l01282}01282\ \ \ \ \ \ \ \ \ (void)\mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}};}
 \DoxyCodeLine{\Hypertarget{reader_8h_source_l01283}01283\ }
 \DoxyCodeLine{\Hypertarget{reader_8h_source_l01284}01284\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (is.src\_\ ==\ is.dst\_)\ \{}
 \DoxyCodeLine{\Hypertarget{reader_8h_source_l01285}01285\ \ \ \ \ \ \ \ \ \ \ \ \ SkipUnescapedString(is);}
@@ -1601,7 +1601,7 @@
 \DoxyCodeLine{\Hypertarget{reader_8h_source_l01741}01741\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'"{}'}:\ ParseString<parseFlags>(is,\ handler);\ \textcolor{keywordflow}{break};}
 \DoxyCodeLine{\Hypertarget{reader_8h_source_l01742}01742\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'\{'}:\ ParseObject<parseFlags>(is,\ handler);\ \textcolor{keywordflow}{break};}
 \DoxyCodeLine{\Hypertarget{reader_8h_source_l01743}01743\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'['}:\ ParseArray\ <parseFlags>(is,\ handler);\ \textcolor{keywordflow}{break};}
-\DoxyCodeLine{\Hypertarget{reader_8h_source_l01744}01744\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespaceupload_af4be925d9a50d5ad134d86400509d0f2}{default}}\ :}
+\DoxyCodeLine{\Hypertarget{reader_8h_source_l01744}01744\ \ \ \ \ \ \ \ \ \ \ \ \ default\ :}
 \DoxyCodeLine{\Hypertarget{reader_8h_source_l01745}01745\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ParseNumber<parseFlags>(is,\ handler);}
 \DoxyCodeLine{\Hypertarget{reader_8h_source_l01746}01746\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
 \DoxyCodeLine{\Hypertarget{reader_8h_source_l01747}01747\ }

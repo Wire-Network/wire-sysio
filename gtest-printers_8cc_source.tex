@@ -66,7 +66,7 @@
 \DoxyCodeLine{\Hypertarget{gtest-printers_8cc_source_l00062}00062\ \mbox{\hyperlink{gtest-port_8h_af18b465f4ba6e36eea7a8d2d79521873}{GTEST\_ATTRIBUTE\_NO\_SANITIZE\_ADDRESS\_}}}
 \DoxyCodeLine{\Hypertarget{gtest-printers_8cc_source_l00063}00063\ \mbox{\hyperlink{gtest-port_8h_abf30a6b1b3a12ecb2cc1bc1a6f5f9646}{GTEST\_ATTRIBUTE\_NO\_SANITIZE\_THREAD\_}}}
 \DoxyCodeLine{\Hypertarget{gtest-printers_8cc_source_l00064}00064\ \textcolor{keywordtype}{void}\ PrintByteSegmentInObjectTo(\textcolor{keyword}{const}\ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}*\ obj\_bytes,\ \textcolor{keywordtype}{size\_t}\ start,}
-\DoxyCodeLine{\Hypertarget{gtest-printers_8cc_source_l00065}00065\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{size\_t}\ \mbox{\hyperlink{gmock__stress__test_8cc_afd9db40e3361ae09188795e8cbe19752}{count}},\ ostream*\ os)\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-printers_8cc_source_l00065}00065\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{size\_t}\ \mbox{\hyperlink{gmock__stress__test_8cc_afd9db40e3361ae09188795e8cbe19752}{count}},\ ostream*\ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}})\ \{}
 \DoxyCodeLine{\Hypertarget{gtest-printers_8cc_source_l00066}00066\ \ \ \textcolor{keywordtype}{char}\ \mbox{\hyperlink{namespacewebsocketpp_1_1frame_1_1opcode_ae68711643096dfc4af6d66ade3f9fd5ea6b65f28626b19b2eef447744c564e727}{text}}[5]\ =\ \textcolor{stringliteral}{"{}"{}};}
 \DoxyCodeLine{\Hypertarget{gtest-printers_8cc_source_l00067}00067\ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{size\_t}\ i\ =\ 0;\ i\ !=\ \mbox{\hyperlink{gmock__stress__test_8cc_afd9db40e3361ae09188795e8cbe19752}{count}};\ i++)\ \{}
 \DoxyCodeLine{\Hypertarget{gtest-printers_8cc_source_l00068}00068\ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{size\_t}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a538d097420e725c4dad63c3caa9e55bd}{j}}\ =\ \mbox{\hyperlink{namespace_w_a_s_m_a9690a14428419003297ae35f505b5103aea2b2676c28c0db26d39331a336c6b92}{start}}\ +\ i;}
@@ -74,20 +74,20 @@
 \DoxyCodeLine{\Hypertarget{gtest-printers_8cc_source_l00070}00070\ \ \ \ \ \ \ \textcolor{comment}{//\ Organizes\ the\ bytes\ into\ groups\ of\ 2\ for\ easy\ parsing\ by}}
 \DoxyCodeLine{\Hypertarget{gtest-printers_8cc_source_l00071}00071\ \ \ \ \ \ \ \textcolor{comment}{//\ human.}}
 \DoxyCodeLine{\Hypertarget{gtest-printers_8cc_source_l00072}00072\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ ((\mbox{\hyperlink{yubihsm__pkcs11_8c_a538d097420e725c4dad63c3caa9e55bd}{j}}\ \%\ 2)\ ==\ 0)}
-\DoxyCodeLine{\Hypertarget{gtest-printers_8cc_source_l00073}00073\ \ \ \ \ \ \ \ \ *os\ <<\ \textcolor{charliteral}{'\ '};}
+\DoxyCodeLine{\Hypertarget{gtest-printers_8cc_source_l00073}00073\ \ \ \ \ \ \ \ \ *\mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}\ <<\ \textcolor{charliteral}{'\ '};}
 \DoxyCodeLine{\Hypertarget{gtest-printers_8cc_source_l00074}00074\ \ \ \ \ \ \ \textcolor{keywordflow}{else}}
-\DoxyCodeLine{\Hypertarget{gtest-printers_8cc_source_l00075}00075\ \ \ \ \ \ \ \ \ *os\ <<\ \textcolor{charliteral}{'-\/'};}
+\DoxyCodeLine{\Hypertarget{gtest-printers_8cc_source_l00075}00075\ \ \ \ \ \ \ \ \ *\mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}\ <<\ \textcolor{charliteral}{'-\/'};}
 \DoxyCodeLine{\Hypertarget{gtest-printers_8cc_source_l00076}00076\ \ \ \ \ \}}
 \DoxyCodeLine{\Hypertarget{gtest-printers_8cc_source_l00077}00077\ \ \ \ \ \mbox{\hyperlink{gtest-port_8h_aed1cc8143222d7a845a1269448ec203e}{GTEST\_SNPRINTF\_}}(text,\ \textcolor{keyword}{sizeof}(text),\ \textcolor{stringliteral}{"{}\%02X"{}},\ obj\_bytes[\mbox{\hyperlink{yubihsm__pkcs11_8c_a538d097420e725c4dad63c3caa9e55bd}{j}}]);}
-\DoxyCodeLine{\Hypertarget{gtest-printers_8cc_source_l00078}00078\ \ \ \ \ *os\ <<\ \mbox{\hyperlink{namespacewebsocketpp_1_1frame_1_1opcode_ae68711643096dfc4af6d66ade3f9fd5ea6b65f28626b19b2eef447744c564e727}{text}};}
+\DoxyCodeLine{\Hypertarget{gtest-printers_8cc_source_l00078}00078\ \ \ \ \ *\mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}\ <<\ \mbox{\hyperlink{namespacewebsocketpp_1_1frame_1_1opcode_ae68711643096dfc4af6d66ade3f9fd5ea6b65f28626b19b2eef447744c564e727}{text}};}
 \DoxyCodeLine{\Hypertarget{gtest-printers_8cc_source_l00079}00079\ \ \ \}}
 \DoxyCodeLine{\Hypertarget{gtest-printers_8cc_source_l00080}00080\ \}}
 \DoxyCodeLine{\Hypertarget{gtest-printers_8cc_source_l00081}00081\ }
 \DoxyCodeLine{\Hypertarget{gtest-printers_8cc_source_l00082}00082\ \textcolor{comment}{//\ Prints\ the\ bytes\ in\ the\ given\ value\ to\ the\ given\ ostream.}}
 \DoxyCodeLine{\Hypertarget{gtest-printers_8cc_source_l00083}00083\ \textcolor{keywordtype}{void}\ PrintBytesInObjectToImpl(\textcolor{keyword}{const}\ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}*\ obj\_bytes,\ \textcolor{keywordtype}{size\_t}\ \mbox{\hyperlink{gmock__stress__test_8cc_afd9db40e3361ae09188795e8cbe19752}{count}},}
-\DoxyCodeLine{\Hypertarget{gtest-printers_8cc_source_l00084}00084\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ostream*\ os)\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-printers_8cc_source_l00084}00084\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ostream*\ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}})\ \{}
 \DoxyCodeLine{\Hypertarget{gtest-printers_8cc_source_l00085}00085\ \ \ \textcolor{comment}{//\ Tells\ the\ user\ how\ big\ the\ object\ is.}}
-\DoxyCodeLine{\Hypertarget{gtest-printers_8cc_source_l00086}00086\ \ \ *os\ <<\ \mbox{\hyperlink{gmock__stress__test_8cc_afd9db40e3361ae09188795e8cbe19752}{count}}\ <<\ \textcolor{stringliteral}{"{}-\/byte\ object\ <"{}};}
+\DoxyCodeLine{\Hypertarget{gtest-printers_8cc_source_l00086}00086\ \ \ *\mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}\ <<\ \mbox{\hyperlink{gmock__stress__test_8cc_afd9db40e3361ae09188795e8cbe19752}{count}}\ <<\ \textcolor{stringliteral}{"{}-\/byte\ object\ <"{}};}
 \DoxyCodeLine{\Hypertarget{gtest-printers_8cc_source_l00087}00087\ }
 \DoxyCodeLine{\Hypertarget{gtest-printers_8cc_source_l00088}00088\ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{size\_t}\ kThreshold\ =\ 132;}
 \DoxyCodeLine{\Hypertarget{gtest-printers_8cc_source_l00089}00089\ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{size\_t}\ kChunkSize\ =\ 64;}
@@ -96,15 +96,15 @@
 \DoxyCodeLine{\Hypertarget{gtest-printers_8cc_source_l00092}00092\ \ \ \textcolor{comment}{//\ bytes.}}
 \DoxyCodeLine{\Hypertarget{gtest-printers_8cc_source_l00093}00093\ \ \ \textcolor{comment}{//\ TODO(wan):\ let\ the\ user\ control\ the\ threshold\ using\ a\ flag.}}
 \DoxyCodeLine{\Hypertarget{gtest-printers_8cc_source_l00094}00094\ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{gmock__stress__test_8cc_afd9db40e3361ae09188795e8cbe19752}{count}}\ <\ kThreshold)\ \{}
-\DoxyCodeLine{\Hypertarget{gtest-printers_8cc_source_l00095}00095\ \ \ \ \ PrintByteSegmentInObjectTo(obj\_bytes,\ 0,\ \mbox{\hyperlink{gmock__stress__test_8cc_afd9db40e3361ae09188795e8cbe19752}{count}},\ os);}
+\DoxyCodeLine{\Hypertarget{gtest-printers_8cc_source_l00095}00095\ \ \ \ \ PrintByteSegmentInObjectTo(obj\_bytes,\ 0,\ \mbox{\hyperlink{gmock__stress__test_8cc_afd9db40e3361ae09188795e8cbe19752}{count}},\ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}});}
 \DoxyCodeLine{\Hypertarget{gtest-printers_8cc_source_l00096}00096\ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
-\DoxyCodeLine{\Hypertarget{gtest-printers_8cc_source_l00097}00097\ \ \ \ \ PrintByteSegmentInObjectTo(obj\_bytes,\ 0,\ kChunkSize,\ os);}
-\DoxyCodeLine{\Hypertarget{gtest-printers_8cc_source_l00098}00098\ \ \ \ \ *os\ <<\ \textcolor{stringliteral}{"{}\ ...\ "{}};}
+\DoxyCodeLine{\Hypertarget{gtest-printers_8cc_source_l00097}00097\ \ \ \ \ PrintByteSegmentInObjectTo(obj\_bytes,\ 0,\ kChunkSize,\ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}});}
+\DoxyCodeLine{\Hypertarget{gtest-printers_8cc_source_l00098}00098\ \ \ \ \ *\mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}\ <<\ \textcolor{stringliteral}{"{}\ ...\ "{}};}
 \DoxyCodeLine{\Hypertarget{gtest-printers_8cc_source_l00099}00099\ \ \ \ \ \textcolor{comment}{//\ Rounds\ up\ to\ 2-\/byte\ boundary.}}
 \DoxyCodeLine{\Hypertarget{gtest-printers_8cc_source_l00100}00100\ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{size\_t}\ resume\_pos\ =\ (\mbox{\hyperlink{gmock__stress__test_8cc_afd9db40e3361ae09188795e8cbe19752}{count}}\ -\/\ kChunkSize\ +\ 1)/2*2;}
-\DoxyCodeLine{\Hypertarget{gtest-printers_8cc_source_l00101}00101\ \ \ \ \ PrintByteSegmentInObjectTo(obj\_bytes,\ resume\_pos,\ \mbox{\hyperlink{gmock__stress__test_8cc_afd9db40e3361ae09188795e8cbe19752}{count}}\ -\/\ resume\_pos,\ os);}
+\DoxyCodeLine{\Hypertarget{gtest-printers_8cc_source_l00101}00101\ \ \ \ \ PrintByteSegmentInObjectTo(obj\_bytes,\ resume\_pos,\ \mbox{\hyperlink{gmock__stress__test_8cc_afd9db40e3361ae09188795e8cbe19752}{count}}\ -\/\ resume\_pos,\ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}});}
 \DoxyCodeLine{\Hypertarget{gtest-printers_8cc_source_l00102}00102\ \ \ \}}
-\DoxyCodeLine{\Hypertarget{gtest-printers_8cc_source_l00103}00103\ \ \ *os\ <<\ \textcolor{stringliteral}{"{}>"{}};}
+\DoxyCodeLine{\Hypertarget{gtest-printers_8cc_source_l00103}00103\ \ \ *\mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}\ <<\ \textcolor{stringliteral}{"{}>"{}};}
 \DoxyCodeLine{\Hypertarget{gtest-printers_8cc_source_l00104}00104\ \}}
 \DoxyCodeLine{\Hypertarget{gtest-printers_8cc_source_l00105}00105\ }
 \DoxyCodeLine{\Hypertarget{gtest-printers_8cc_source_l00106}00106\ \}\ \ \textcolor{comment}{//\ namespace}}
@@ -117,8 +117,8 @@
 \DoxyCodeLine{\Hypertarget{gtest-printers_8cc_source_l00113}00113\ \textcolor{comment}{//\ ::testing::internal\ namespace,\ which\ contains\ a\ <<\ operator\ that}}
 \DoxyCodeLine{\Hypertarget{gtest-printers_8cc_source_l00114}00114\ \textcolor{comment}{//\ sometimes\ conflicts\ with\ the\ one\ in\ STL.}}
 \DoxyCodeLine{\Hypertarget{gtest-printers_8cc_source_l00115}\mbox{\hyperlink{namespacetesting_1_1internal2_abfb9aa80365f93b952e9a4bea09947a8}{00115}}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespacetesting_1_1internal2_a9fbf8e07c0f94dc74d6ef5e56cd3c553}{PrintBytesInObjectTo}}(\textcolor{keyword}{const}\ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}*\ obj\_bytes,\ \textcolor{keywordtype}{size\_t}\ \mbox{\hyperlink{gmock__stress__test_8cc_afd9db40e3361ae09188795e8cbe19752}{count}},}
-\DoxyCodeLine{\Hypertarget{gtest-printers_8cc_source_l00116}00116\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ostream*\ os)\ \{}
-\DoxyCodeLine{\Hypertarget{gtest-printers_8cc_source_l00117}00117\ \ \ PrintBytesInObjectToImpl(obj\_bytes,\ \mbox{\hyperlink{gmock__stress__test_8cc_afd9db40e3361ae09188795e8cbe19752}{count}},\ os);}
+\DoxyCodeLine{\Hypertarget{gtest-printers_8cc_source_l00116}00116\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ostream*\ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}})\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-printers_8cc_source_l00117}00117\ \ \ PrintBytesInObjectToImpl(obj\_bytes,\ \mbox{\hyperlink{gmock__stress__test_8cc_afd9db40e3361ae09188795e8cbe19752}{count}},\ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}});}
 \DoxyCodeLine{\Hypertarget{gtest-printers_8cc_source_l00118}00118\ \}}
 \DoxyCodeLine{\Hypertarget{gtest-printers_8cc_source_l00119}00119\ }
 \DoxyCodeLine{\Hypertarget{gtest-printers_8cc_source_l00120}00120\ \}\ \ \textcolor{comment}{//\ namespace\ internal2}}
@@ -148,47 +148,47 @@
 \DoxyCodeLine{\Hypertarget{gtest-printers_8cc_source_l00144}00144\ \textcolor{comment}{//\ The\ template\ argument\ UnsignedChar\ is\ the\ unsigned\ version\ of\ Char,}}
 \DoxyCodeLine{\Hypertarget{gtest-printers_8cc_source_l00145}00145\ \textcolor{comment}{//\ which\ is\ the\ type\ of\ c.}}
 \DoxyCodeLine{\Hypertarget{gtest-printers_8cc_source_l00146}00146\ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ Un\textcolor{keywordtype}{signed}Char,\ \textcolor{keyword}{typename}\ Char>}
-\DoxyCodeLine{\Hypertarget{gtest-printers_8cc_source_l00147}00147\ \textcolor{keyword}{static}\ \mbox{\hyperlink{namespacetesting_1_1internal_ae2ef98247c76a50cdc80ceb4a6c81793}{CharFormat}}\ PrintAsCharLiteralTo(Char\ c,\ ostream*\ os)\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-printers_8cc_source_l00147}00147\ \textcolor{keyword}{static}\ \mbox{\hyperlink{namespacetesting_1_1internal_ae2ef98247c76a50cdc80ceb4a6c81793}{CharFormat}}\ PrintAsCharLiteralTo(Char\ c,\ ostream*\ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}})\ \{}
 \DoxyCodeLine{\Hypertarget{gtest-printers_8cc_source_l00148}00148\ \ \ \textcolor{keywordflow}{switch}\ (\textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{wchar\_t}\textcolor{keyword}{>}(c))\ \{}
 \DoxyCodeLine{\Hypertarget{gtest-printers_8cc_source_l00149}00149\ \ \ \ \ \textcolor{keywordflow}{case}\ L\textcolor{charliteral}{'\(\backslash\)0'}:}
-\DoxyCodeLine{\Hypertarget{gtest-printers_8cc_source_l00150}00150\ \ \ \ \ \ \ *os\ <<\ \textcolor{stringliteral}{"{}\(\backslash\)\(\backslash\)0"{}};}
+\DoxyCodeLine{\Hypertarget{gtest-printers_8cc_source_l00150}00150\ \ \ \ \ \ \ *\mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}\ <<\ \textcolor{stringliteral}{"{}\(\backslash\)\(\backslash\)0"{}};}
 \DoxyCodeLine{\Hypertarget{gtest-printers_8cc_source_l00151}00151\ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
 \DoxyCodeLine{\Hypertarget{gtest-printers_8cc_source_l00152}00152\ \ \ \ \ \textcolor{keywordflow}{case}\ L\textcolor{charliteral}{'\(\backslash\)''}:}
-\DoxyCodeLine{\Hypertarget{gtest-printers_8cc_source_l00153}00153\ \ \ \ \ \ \ *os\ <<\ \textcolor{stringliteral}{"{}\(\backslash\)\(\backslash\)'"{}};}
+\DoxyCodeLine{\Hypertarget{gtest-printers_8cc_source_l00153}00153\ \ \ \ \ \ \ *\mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}\ <<\ \textcolor{stringliteral}{"{}\(\backslash\)\(\backslash\)'"{}};}
 \DoxyCodeLine{\Hypertarget{gtest-printers_8cc_source_l00154}00154\ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
 \DoxyCodeLine{\Hypertarget{gtest-printers_8cc_source_l00155}00155\ \ \ \ \ \textcolor{keywordflow}{case}\ L\textcolor{charliteral}{'\(\backslash\)\(\backslash\)'}:}
-\DoxyCodeLine{\Hypertarget{gtest-printers_8cc_source_l00156}00156\ \ \ \ \ \ \ *os\ <<\ \textcolor{stringliteral}{"{}\(\backslash\)\(\backslash\)\(\backslash\)\(\backslash\)"{}};}
+\DoxyCodeLine{\Hypertarget{gtest-printers_8cc_source_l00156}00156\ \ \ \ \ \ \ *\mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}\ <<\ \textcolor{stringliteral}{"{}\(\backslash\)\(\backslash\)\(\backslash\)\(\backslash\)"{}};}
 \DoxyCodeLine{\Hypertarget{gtest-printers_8cc_source_l00157}00157\ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
 \DoxyCodeLine{\Hypertarget{gtest-printers_8cc_source_l00158}00158\ \ \ \ \ \textcolor{keywordflow}{case}\ L\textcolor{charliteral}{'\(\backslash\)a'}:}
-\DoxyCodeLine{\Hypertarget{gtest-printers_8cc_source_l00159}00159\ \ \ \ \ \ \ *os\ <<\ \textcolor{stringliteral}{"{}\(\backslash\)\(\backslash\)a"{}};}
+\DoxyCodeLine{\Hypertarget{gtest-printers_8cc_source_l00159}00159\ \ \ \ \ \ \ *\mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}\ <<\ \textcolor{stringliteral}{"{}\(\backslash\)\(\backslash\)a"{}};}
 \DoxyCodeLine{\Hypertarget{gtest-printers_8cc_source_l00160}00160\ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
 \DoxyCodeLine{\Hypertarget{gtest-printers_8cc_source_l00161}00161\ \ \ \ \ \textcolor{keywordflow}{case}\ L\textcolor{charliteral}{'\(\backslash\)b'}:}
-\DoxyCodeLine{\Hypertarget{gtest-printers_8cc_source_l00162}00162\ \ \ \ \ \ \ *os\ <<\ \textcolor{stringliteral}{"{}\(\backslash\)\(\backslash\)b"{}};}
+\DoxyCodeLine{\Hypertarget{gtest-printers_8cc_source_l00162}00162\ \ \ \ \ \ \ *\mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}\ <<\ \textcolor{stringliteral}{"{}\(\backslash\)\(\backslash\)b"{}};}
 \DoxyCodeLine{\Hypertarget{gtest-printers_8cc_source_l00163}00163\ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
 \DoxyCodeLine{\Hypertarget{gtest-printers_8cc_source_l00164}00164\ \ \ \ \ \textcolor{keywordflow}{case}\ L\textcolor{charliteral}{'\(\backslash\)f'}:}
-\DoxyCodeLine{\Hypertarget{gtest-printers_8cc_source_l00165}00165\ \ \ \ \ \ \ *os\ <<\ \textcolor{stringliteral}{"{}\(\backslash\)\(\backslash\)f"{}};}
+\DoxyCodeLine{\Hypertarget{gtest-printers_8cc_source_l00165}00165\ \ \ \ \ \ \ *\mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}\ <<\ \textcolor{stringliteral}{"{}\(\backslash\)\(\backslash\)f"{}};}
 \DoxyCodeLine{\Hypertarget{gtest-printers_8cc_source_l00166}00166\ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
 \DoxyCodeLine{\Hypertarget{gtest-printers_8cc_source_l00167}00167\ \ \ \ \ \textcolor{keywordflow}{case}\ L\textcolor{charliteral}{'\(\backslash\)n'}:}
-\DoxyCodeLine{\Hypertarget{gtest-printers_8cc_source_l00168}00168\ \ \ \ \ \ \ *os\ <<\ \textcolor{stringliteral}{"{}\(\backslash\)\(\backslash\)n"{}};}
+\DoxyCodeLine{\Hypertarget{gtest-printers_8cc_source_l00168}00168\ \ \ \ \ \ \ *\mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}\ <<\ \textcolor{stringliteral}{"{}\(\backslash\)\(\backslash\)n"{}};}
 \DoxyCodeLine{\Hypertarget{gtest-printers_8cc_source_l00169}00169\ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
 \DoxyCodeLine{\Hypertarget{gtest-printers_8cc_source_l00170}00170\ \ \ \ \ \textcolor{keywordflow}{case}\ L\textcolor{charliteral}{'\(\backslash\)r'}:}
-\DoxyCodeLine{\Hypertarget{gtest-printers_8cc_source_l00171}00171\ \ \ \ \ \ \ *os\ <<\ \textcolor{stringliteral}{"{}\(\backslash\)\(\backslash\)r"{}};}
+\DoxyCodeLine{\Hypertarget{gtest-printers_8cc_source_l00171}00171\ \ \ \ \ \ \ *\mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}\ <<\ \textcolor{stringliteral}{"{}\(\backslash\)\(\backslash\)r"{}};}
 \DoxyCodeLine{\Hypertarget{gtest-printers_8cc_source_l00172}00172\ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
 \DoxyCodeLine{\Hypertarget{gtest-printers_8cc_source_l00173}00173\ \ \ \ \ \textcolor{keywordflow}{case}\ L\textcolor{charliteral}{'\(\backslash\)t'}:}
-\DoxyCodeLine{\Hypertarget{gtest-printers_8cc_source_l00174}00174\ \ \ \ \ \ \ *os\ <<\ \textcolor{stringliteral}{"{}\(\backslash\)\(\backslash\)t"{}};}
+\DoxyCodeLine{\Hypertarget{gtest-printers_8cc_source_l00174}00174\ \ \ \ \ \ \ *\mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}\ <<\ \textcolor{stringliteral}{"{}\(\backslash\)\(\backslash\)t"{}};}
 \DoxyCodeLine{\Hypertarget{gtest-printers_8cc_source_l00175}00175\ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
 \DoxyCodeLine{\Hypertarget{gtest-printers_8cc_source_l00176}00176\ \ \ \ \ \textcolor{keywordflow}{case}\ L\textcolor{charliteral}{'\(\backslash\)v'}:}
-\DoxyCodeLine{\Hypertarget{gtest-printers_8cc_source_l00177}00177\ \ \ \ \ \ \ *os\ <<\ \textcolor{stringliteral}{"{}\(\backslash\)\(\backslash\)v"{}};}
+\DoxyCodeLine{\Hypertarget{gtest-printers_8cc_source_l00177}00177\ \ \ \ \ \ \ *\mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}\ <<\ \textcolor{stringliteral}{"{}\(\backslash\)\(\backslash\)v"{}};}
 \DoxyCodeLine{\Hypertarget{gtest-printers_8cc_source_l00178}00178\ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
 \DoxyCodeLine{\Hypertarget{gtest-printers_8cc_source_l00179}00179\ \ \ \ \ \textcolor{keywordflow}{default}:}
 \DoxyCodeLine{\Hypertarget{gtest-printers_8cc_source_l00180}00180\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{namespacetesting_1_1internal_a744a6dd74c12d1e2c16b3c03e14ed4d4}{IsPrintableAscii}}(c))\ \{}
 \DoxyCodeLine{\Hypertarget{gtest-printers_8cc_source_l00181}00181\ \ \ \ \ \ \ \ \ *\mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os\ <<\ static\_cast<char>}}(c);}
 \DoxyCodeLine{\Hypertarget{gtest-printers_8cc_source_l00182}00182\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespacetesting_1_1internal_ae2ef98247c76a50cdc80ceb4a6c81793af7038866be92e9978360b831e376ffaa}{kAsIs}};}
 \DoxyCodeLine{\Hypertarget{gtest-printers_8cc_source_l00183}00183\ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
-\DoxyCodeLine{\Hypertarget{gtest-printers_8cc_source_l00184}00184\ \ \ \ \ \ \ \ \ ostream::fmtflags\ \mbox{\hyperlink{yubihsm__pkcs11_8c_ae0ed371842ace71a7886a6134ecbcb62}{flags}}\ =\ os-\/>flags();}
-\DoxyCodeLine{\Hypertarget{gtest-printers_8cc_source_l00185}00185\ \ \ \ \ \ \ \ \ *os\ <<\ \textcolor{stringliteral}{"{}\(\backslash\)\(\backslash\)x"{}}\ <<\ std::hex\ <<\ std::uppercase}
+\DoxyCodeLine{\Hypertarget{gtest-printers_8cc_source_l00184}00184\ \ \ \ \ \ \ \ \ ostream::fmtflags\ \mbox{\hyperlink{yubihsm__pkcs11_8c_ae0ed371842ace71a7886a6134ecbcb62}{flags}}\ =\ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}-\/>flags();}
+\DoxyCodeLine{\Hypertarget{gtest-printers_8cc_source_l00185}00185\ \ \ \ \ \ \ \ \ *\mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}\ <<\ \textcolor{stringliteral}{"{}\(\backslash\)\(\backslash\)x"{}}\ <<\ std::hex\ <<\ std::uppercase}
 \DoxyCodeLine{\Hypertarget{gtest-printers_8cc_source_l00186}00186\ \ \ \ \ \ \ \ \ \ \ \ \ <<\ \textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{int}\textcolor{keyword}{>}(\textcolor{keyword}{static\_cast<}UnsignedChar\textcolor{keyword}{>}(c));}
-\DoxyCodeLine{\Hypertarget{gtest-printers_8cc_source_l00187}00187\ \ \ \ \ \ \ \ \ os-\/>flags(\mbox{\hyperlink{yubihsm__pkcs11_8c_ae0ed371842ace71a7886a6134ecbcb62}{flags}});}
+\DoxyCodeLine{\Hypertarget{gtest-printers_8cc_source_l00187}00187\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}-\/>flags(\mbox{\hyperlink{yubihsm__pkcs11_8c_ae0ed371842ace71a7886a6134ecbcb62}{flags}});}
 \DoxyCodeLine{\Hypertarget{gtest-printers_8cc_source_l00188}00188\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespacetesting_1_1internal_ae2ef98247c76a50cdc80ceb4a6c81793aebfa5293302338a8e8678744c103f113}{kHexEscape}};}
 \DoxyCodeLine{\Hypertarget{gtest-printers_8cc_source_l00189}00189\ \ \ \ \ \ \ \}}
 \DoxyCodeLine{\Hypertarget{gtest-printers_8cc_source_l00190}00190\ \ \ \}}
@@ -197,24 +197,24 @@
 \DoxyCodeLine{\Hypertarget{gtest-printers_8cc_source_l00193}00193\ }
 \DoxyCodeLine{\Hypertarget{gtest-printers_8cc_source_l00194}00194\ \textcolor{comment}{//\ Prints\ a\ wchar\_t\ c\ as\ if\ it's\ part\ of\ a\ string\ literal,\ escaping\ it\ when}}
 \DoxyCodeLine{\Hypertarget{gtest-printers_8cc_source_l00195}00195\ \textcolor{comment}{//\ necessary;\ returns\ how\ c\ was\ formatted.}}
-\DoxyCodeLine{\Hypertarget{gtest-printers_8cc_source_l00196}00196\ \textcolor{keyword}{static}\ \mbox{\hyperlink{namespacetesting_1_1internal_ae2ef98247c76a50cdc80ceb4a6c81793}{CharFormat}}\ PrintAsStringLiteralTo(\textcolor{keywordtype}{wchar\_t}\ c,\ ostream*\ os)\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-printers_8cc_source_l00196}00196\ \textcolor{keyword}{static}\ \mbox{\hyperlink{namespacetesting_1_1internal_ae2ef98247c76a50cdc80ceb4a6c81793}{CharFormat}}\ PrintAsStringLiteralTo(\textcolor{keywordtype}{wchar\_t}\ c,\ ostream*\ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}})\ \{}
 \DoxyCodeLine{\Hypertarget{gtest-printers_8cc_source_l00197}00197\ \ \ \textcolor{keywordflow}{switch}\ (c)\ \{}
 \DoxyCodeLine{\Hypertarget{gtest-printers_8cc_source_l00198}00198\ \ \ \ \ \textcolor{keywordflow}{case}\ L\textcolor{charliteral}{'\(\backslash\)''}:}
-\DoxyCodeLine{\Hypertarget{gtest-printers_8cc_source_l00199}00199\ \ \ \ \ \ \ *os\ <<\ \textcolor{stringliteral}{"{}'"{}};}
+\DoxyCodeLine{\Hypertarget{gtest-printers_8cc_source_l00199}00199\ \ \ \ \ \ \ *\mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}\ <<\ \textcolor{stringliteral}{"{}'"{}};}
 \DoxyCodeLine{\Hypertarget{gtest-printers_8cc_source_l00200}00200\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespacetesting_1_1internal_ae2ef98247c76a50cdc80ceb4a6c81793af7038866be92e9978360b831e376ffaa}{kAsIs}};}
 \DoxyCodeLine{\Hypertarget{gtest-printers_8cc_source_l00201}00201\ \ \ \ \ \textcolor{keywordflow}{case}\ L\textcolor{charliteral}{'"{}'}:}
-\DoxyCodeLine{\Hypertarget{gtest-printers_8cc_source_l00202}00202\ \ \ \ \ \ \ *os\ <<\ \textcolor{stringliteral}{"{}\(\backslash\)\(\backslash\)\(\backslash\)"{}"{}};}
+\DoxyCodeLine{\Hypertarget{gtest-printers_8cc_source_l00202}00202\ \ \ \ \ \ \ *\mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}\ <<\ \textcolor{stringliteral}{"{}\(\backslash\)\(\backslash\)\(\backslash\)"{}"{}};}
 \DoxyCodeLine{\Hypertarget{gtest-printers_8cc_source_l00203}00203\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespacetesting_1_1internal_ae2ef98247c76a50cdc80ceb4a6c81793ae1211108e9f35f891d9951da64794d03}{kSpecialEscape}};}
 \DoxyCodeLine{\Hypertarget{gtest-printers_8cc_source_l00204}00204\ \ \ \ \ \textcolor{keywordflow}{default}:}
-\DoxyCodeLine{\Hypertarget{gtest-printers_8cc_source_l00205}00205\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ PrintAsCharLiteralTo<wchar\_t>(c,\ os);}
+\DoxyCodeLine{\Hypertarget{gtest-printers_8cc_source_l00205}00205\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ PrintAsCharLiteralTo<wchar\_t>(c,\ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}});}
 \DoxyCodeLine{\Hypertarget{gtest-printers_8cc_source_l00206}00206\ \ \ \}}
 \DoxyCodeLine{\Hypertarget{gtest-printers_8cc_source_l00207}00207\ \}}
 \DoxyCodeLine{\Hypertarget{gtest-printers_8cc_source_l00208}00208\ }
 \DoxyCodeLine{\Hypertarget{gtest-printers_8cc_source_l00209}00209\ \textcolor{comment}{//\ Prints\ a\ char\ c\ as\ if\ it's\ part\ of\ a\ string\ literal,\ escaping\ it\ when}}
 \DoxyCodeLine{\Hypertarget{gtest-printers_8cc_source_l00210}00210\ \textcolor{comment}{//\ necessary;\ returns\ how\ c\ was\ formatted.}}
-\DoxyCodeLine{\Hypertarget{gtest-printers_8cc_source_l00211}00211\ \textcolor{keyword}{static}\ \mbox{\hyperlink{namespacetesting_1_1internal_ae2ef98247c76a50cdc80ceb4a6c81793}{CharFormat}}\ PrintAsStringLiteralTo(\textcolor{keywordtype}{char}\ c,\ ostream*\ os)\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-printers_8cc_source_l00211}00211\ \textcolor{keyword}{static}\ \mbox{\hyperlink{namespacetesting_1_1internal_ae2ef98247c76a50cdc80ceb4a6c81793}{CharFormat}}\ PrintAsStringLiteralTo(\textcolor{keywordtype}{char}\ c,\ ostream*\ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}})\ \{}
 \DoxyCodeLine{\Hypertarget{gtest-printers_8cc_source_l00212}00212\ \ \ \textcolor{keywordflow}{return}\ PrintAsStringLiteralTo(}
-\DoxyCodeLine{\Hypertarget{gtest-printers_8cc_source_l00213}00213\ \ \ \ \ \ \ \textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{wchar\_t}\textcolor{keyword}{>}(\textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}\textcolor{keyword}{>}(c)),\ os);}
+\DoxyCodeLine{\Hypertarget{gtest-printers_8cc_source_l00213}00213\ \ \ \ \ \ \ \textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{wchar\_t}\textcolor{keyword}{>}(\textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}\textcolor{keyword}{>}(c)),\ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}});}
 \DoxyCodeLine{\Hypertarget{gtest-printers_8cc_source_l00214}00214\ \}}
 \DoxyCodeLine{\Hypertarget{gtest-printers_8cc_source_l00215}00215\ }
 \DoxyCodeLine{\Hypertarget{gtest-printers_8cc_source_l00216}00216\ \textcolor{comment}{//\ Prints\ a\ wide\ or\ narrow\ character\ c\ and\ its\ code.\ \ '\(\backslash\)0'\ is\ printed}}
@@ -222,18 +222,18 @@
 \DoxyCodeLine{\Hypertarget{gtest-printers_8cc_source_l00218}00218\ \textcolor{comment}{//\ using\ the\ standard\ C++\ escape\ sequence.\ \ The\ template\ argument}}
 \DoxyCodeLine{\Hypertarget{gtest-printers_8cc_source_l00219}00219\ \textcolor{comment}{//\ UnsignedChar\ is\ the\ unsigned\ version\ of\ Char,\ which\ is\ the\ type\ of\ c.}}
 \DoxyCodeLine{\Hypertarget{gtest-printers_8cc_source_l00220}00220\ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ Un\textcolor{keywordtype}{signed}Char,\ \textcolor{keyword}{typename}\ Char>}
-\DoxyCodeLine{\Hypertarget{gtest-printers_8cc_source_l00221}\mbox{\hyperlink{namespacetesting_1_1internal_a0c577e598e61d339ba45dd6643fb1969}{00221}}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespacetesting_1_1internal_a0c577e598e61d339ba45dd6643fb1969}{PrintCharAndCodeTo}}(Char\ c,\ ostream*\ os)\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-printers_8cc_source_l00221}\mbox{\hyperlink{namespacetesting_1_1internal_a0c577e598e61d339ba45dd6643fb1969}{00221}}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespacetesting_1_1internal_a0c577e598e61d339ba45dd6643fb1969}{PrintCharAndCodeTo}}(Char\ c,\ ostream*\ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}})\ \{}
 \DoxyCodeLine{\Hypertarget{gtest-printers_8cc_source_l00222}00222\ \ \ \textcolor{comment}{//\ First,\ print\ c\ as\ a\ literal\ in\ the\ most\ readable\ form\ we\ can\ find.}}
-\DoxyCodeLine{\Hypertarget{gtest-printers_8cc_source_l00223}00223\ \ \ *os\ <<\ ((\textcolor{keyword}{sizeof}(c)\ >\ 1)\ ?\ \textcolor{stringliteral}{"{}L'"{}}\ :\ \textcolor{stringliteral}{"{}'"{}});}
-\DoxyCodeLine{\Hypertarget{gtest-printers_8cc_source_l00224}00224\ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{namespacetesting_1_1internal_ae2ef98247c76a50cdc80ceb4a6c81793}{CharFormat}}\ \mbox{\hyperlink{yubihsm-shell_8h_ae425c09a4c40409de33790765339cb97}{format}}\ =\ PrintAsCharLiteralTo<UnsignedChar>(c,\ os);}
-\DoxyCodeLine{\Hypertarget{gtest-printers_8cc_source_l00225}00225\ \ \ *os\ <<\ \textcolor{stringliteral}{"{}'"{}};}
+\DoxyCodeLine{\Hypertarget{gtest-printers_8cc_source_l00223}00223\ \ \ *\mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}\ <<\ ((\textcolor{keyword}{sizeof}(c)\ >\ 1)\ ?\ \textcolor{stringliteral}{"{}L'"{}}\ :\ \textcolor{stringliteral}{"{}'"{}});}
+\DoxyCodeLine{\Hypertarget{gtest-printers_8cc_source_l00224}00224\ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{namespacetesting_1_1internal_ae2ef98247c76a50cdc80ceb4a6c81793}{CharFormat}}\ \mbox{\hyperlink{yubihsm-shell_8h_ae425c09a4c40409de33790765339cb97}{format}}\ =\ PrintAsCharLiteralTo<UnsignedChar>(c,\ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}});}
+\DoxyCodeLine{\Hypertarget{gtest-printers_8cc_source_l00225}00225\ \ \ *\mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}\ <<\ \textcolor{stringliteral}{"{}'"{}};}
 \DoxyCodeLine{\Hypertarget{gtest-printers_8cc_source_l00226}00226\ }
 \DoxyCodeLine{\Hypertarget{gtest-printers_8cc_source_l00227}00227\ \ \ \textcolor{comment}{//\ To\ aid\ user\ debugging,\ we\ also\ print\ c's\ code\ in\ decimal,\ unless}}
 \DoxyCodeLine{\Hypertarget{gtest-printers_8cc_source_l00228}00228\ \ \ \textcolor{comment}{//\ it's\ 0\ (in\ which\ case\ c\ was\ printed\ as\ '\(\backslash\)\(\backslash\)0',\ making\ the\ code}}
 \DoxyCodeLine{\Hypertarget{gtest-printers_8cc_source_l00229}00229\ \ \ \textcolor{comment}{//\ obvious).}}
 \DoxyCodeLine{\Hypertarget{gtest-printers_8cc_source_l00230}00230\ \ \ \textcolor{keywordflow}{if}\ (c\ ==\ 0)}
 \DoxyCodeLine{\Hypertarget{gtest-printers_8cc_source_l00231}00231\ \ \ \ \ \textcolor{keywordflow}{return};}
-\DoxyCodeLine{\Hypertarget{gtest-printers_8cc_source_l00232}00232\ \ \ *os\ <<\ \textcolor{stringliteral}{"{}\ ("{}}\ <<\ \textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{int}\textcolor{keyword}{>}(c);}
+\DoxyCodeLine{\Hypertarget{gtest-printers_8cc_source_l00232}00232\ \ \ *\mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}\ <<\ \textcolor{stringliteral}{"{}\ ("{}}\ <<\ \textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{int}\textcolor{keyword}{>}(c);}
 \DoxyCodeLine{\Hypertarget{gtest-printers_8cc_source_l00233}00233\ }
 \DoxyCodeLine{\Hypertarget{gtest-printers_8cc_source_l00234}00234\ \ \ \textcolor{comment}{//\ For\ more\ convenience,\ we\ print\ c's\ code\ again\ in\ hexadecimal,}}
 \DoxyCodeLine{\Hypertarget{gtest-printers_8cc_source_l00235}00235\ \ \ \textcolor{comment}{//\ unless\ c\ was\ already\ printed\ in\ the\ form\ '\(\backslash\)x\#\#'\ or\ the\ code\ is\ in}}
@@ -241,22 +241,22 @@
 \DoxyCodeLine{\Hypertarget{gtest-printers_8cc_source_l00237}00237\ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{yubihsm-shell_8h_ae425c09a4c40409de33790765339cb97}{format}}\ ==\ \mbox{\hyperlink{namespacetesting_1_1internal_ae2ef98247c76a50cdc80ceb4a6c81793aebfa5293302338a8e8678744c103f113}{kHexEscape}}\ ||\ (1\ <=\ c\ \&\&\ c\ <=\ 9))\ \{}
 \DoxyCodeLine{\Hypertarget{gtest-printers_8cc_source_l00238}00238\ \ \ \ \ \textcolor{comment}{//\ Do\ nothing.}}
 \DoxyCodeLine{\Hypertarget{gtest-printers_8cc_source_l00239}00239\ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
-\DoxyCodeLine{\Hypertarget{gtest-printers_8cc_source_l00240}00240\ \ \ \ \ *os\ <<\ \textcolor{stringliteral}{"{},\ 0x"{}}\ <<\ \mbox{\hyperlink{classtesting_1_1internal_1_1_string_affe59102e49092fc0684388e9b0c5c1e}{String::FormatHexInt}}(\textcolor{keyword}{static\_cast<}UnsignedChar\textcolor{keyword}{>}(c));}
+\DoxyCodeLine{\Hypertarget{gtest-printers_8cc_source_l00240}00240\ \ \ \ \ *\mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}\ <<\ \textcolor{stringliteral}{"{},\ 0x"{}}\ <<\ \mbox{\hyperlink{classtesting_1_1internal_1_1_string_affe59102e49092fc0684388e9b0c5c1e}{String::FormatHexInt}}(\textcolor{keyword}{static\_cast<}UnsignedChar\textcolor{keyword}{>}(c));}
 \DoxyCodeLine{\Hypertarget{gtest-printers_8cc_source_l00241}00241\ \ \ \}}
-\DoxyCodeLine{\Hypertarget{gtest-printers_8cc_source_l00242}00242\ \ \ *os\ <<\ \textcolor{stringliteral}{"{})"{}};}
+\DoxyCodeLine{\Hypertarget{gtest-printers_8cc_source_l00242}00242\ \ \ *\mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}\ <<\ \textcolor{stringliteral}{"{})"{}};}
 \DoxyCodeLine{\Hypertarget{gtest-printers_8cc_source_l00243}00243\ \}}
 \DoxyCodeLine{\Hypertarget{gtest-printers_8cc_source_l00244}00244\ }
-\DoxyCodeLine{\Hypertarget{gtest-printers_8cc_source_l00245}\mbox{\hyperlink{namespacetesting_1_1internal_ab7524d6d3ab8c31b1deea88bf61783bb}{00245}}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespacetesting_1_1internal_a8fd10cc30084c36a89c74868c8bd53f8}{PrintTo}}(\textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}\ c,\ ::std::ostream*\ os)\ \{}
-\DoxyCodeLine{\Hypertarget{gtest-printers_8cc_source_l00246}00246\ \ \ \mbox{\hyperlink{namespacetesting_1_1internal_a0c577e598e61d339ba45dd6643fb1969}{PrintCharAndCodeTo<unsigned\ char>}}(c,\ os);}
+\DoxyCodeLine{\Hypertarget{gtest-printers_8cc_source_l00245}\mbox{\hyperlink{namespacetesting_1_1internal_ab7524d6d3ab8c31b1deea88bf61783bb}{00245}}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespacetesting_1_1internal_a8fd10cc30084c36a89c74868c8bd53f8}{PrintTo}}(\textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}\ c,\ ::std::ostream*\ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}})\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-printers_8cc_source_l00246}00246\ \ \ \mbox{\hyperlink{namespacetesting_1_1internal_a0c577e598e61d339ba45dd6643fb1969}{PrintCharAndCodeTo<unsigned\ char>}}(c,\ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}});}
 \DoxyCodeLine{\Hypertarget{gtest-printers_8cc_source_l00247}00247\ \}}
-\DoxyCodeLine{\Hypertarget{gtest-printers_8cc_source_l00248}\mbox{\hyperlink{namespacetesting_1_1internal_ad453af399370e394881079c243abacb4}{00248}}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespacetesting_1_1internal_a8fd10cc30084c36a89c74868c8bd53f8}{PrintTo}}(\textcolor{keywordtype}{signed}\ \textcolor{keywordtype}{char}\ c,\ ::std::ostream*\ os)\ \{}
-\DoxyCodeLine{\Hypertarget{gtest-printers_8cc_source_l00249}00249\ \ \ \mbox{\hyperlink{namespacetesting_1_1internal_a0c577e598e61d339ba45dd6643fb1969}{PrintCharAndCodeTo<unsigned\ char>}}(c,\ os);}
+\DoxyCodeLine{\Hypertarget{gtest-printers_8cc_source_l00248}\mbox{\hyperlink{namespacetesting_1_1internal_ad453af399370e394881079c243abacb4}{00248}}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespacetesting_1_1internal_a8fd10cc30084c36a89c74868c8bd53f8}{PrintTo}}(\textcolor{keywordtype}{signed}\ \textcolor{keywordtype}{char}\ c,\ ::std::ostream*\ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}})\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-printers_8cc_source_l00249}00249\ \ \ \mbox{\hyperlink{namespacetesting_1_1internal_a0c577e598e61d339ba45dd6643fb1969}{PrintCharAndCodeTo<unsigned\ char>}}(c,\ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}});}
 \DoxyCodeLine{\Hypertarget{gtest-printers_8cc_source_l00250}00250\ \}}
 \DoxyCodeLine{\Hypertarget{gtest-printers_8cc_source_l00251}00251\ }
 \DoxyCodeLine{\Hypertarget{gtest-printers_8cc_source_l00252}00252\ \textcolor{comment}{//\ Prints\ a\ wchar\_t\ as\ a\ symbol\ if\ it\ is\ printable\ or\ as\ its\ internal}}
 \DoxyCodeLine{\Hypertarget{gtest-printers_8cc_source_l00253}00253\ \textcolor{comment}{//\ code\ otherwise\ and\ also\ as\ its\ code.\ \ L'\(\backslash\)0'\ is\ printed\ as\ "{}L'\(\backslash\)\(\backslash\)0'"{}.}}
-\DoxyCodeLine{\Hypertarget{gtest-printers_8cc_source_l00254}\mbox{\hyperlink{namespacetesting_1_1internal_aa74ea9d64f76ce69eceb225ca5ebef58}{00254}}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespacetesting_1_1internal_a8fd10cc30084c36a89c74868c8bd53f8}{PrintTo}}(\textcolor{keywordtype}{wchar\_t}\ wc,\ ostream*\ os)\ \{}
-\DoxyCodeLine{\Hypertarget{gtest-printers_8cc_source_l00255}00255\ \ \ \mbox{\hyperlink{namespacetesting_1_1internal_a0c577e598e61d339ba45dd6643fb1969}{PrintCharAndCodeTo<wchar\_t>}}(wc,\ os);}
+\DoxyCodeLine{\Hypertarget{gtest-printers_8cc_source_l00254}\mbox{\hyperlink{namespacetesting_1_1internal_aa74ea9d64f76ce69eceb225ca5ebef58}{00254}}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespacetesting_1_1internal_a8fd10cc30084c36a89c74868c8bd53f8}{PrintTo}}(\textcolor{keywordtype}{wchar\_t}\ wc,\ ostream*\ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}})\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-printers_8cc_source_l00255}00255\ \ \ \mbox{\hyperlink{namespacetesting_1_1internal_a0c577e598e61d339ba45dd6643fb1969}{PrintCharAndCodeTo<wchar\_t>}}(wc,\ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}});}
 \DoxyCodeLine{\Hypertarget{gtest-printers_8cc_source_l00256}00256\ \}}
 \DoxyCodeLine{\Hypertarget{gtest-printers_8cc_source_l00257}00257\ }
 \DoxyCodeLine{\Hypertarget{gtest-printers_8cc_source_l00258}00258\ \textcolor{comment}{//\ Prints\ the\ given\ array\ of\ characters\ to\ the\ ostream.\ \ CharType\ must\ be\ either}}
@@ -268,9 +268,9 @@
 \DoxyCodeLine{\Hypertarget{gtest-printers_8cc_source_l00264}00264\ \mbox{\hyperlink{gtest-port_8h_af18b465f4ba6e36eea7a8d2d79521873}{GTEST\_ATTRIBUTE\_NO\_SANITIZE\_ADDRESS\_}}}
 \DoxyCodeLine{\Hypertarget{gtest-printers_8cc_source_l00265}00265\ \mbox{\hyperlink{gtest-port_8h_abf30a6b1b3a12ecb2cc1bc1a6f5f9646}{GTEST\_ATTRIBUTE\_NO\_SANITIZE\_THREAD\_}}}
 \DoxyCodeLine{\Hypertarget{gtest-printers_8cc_source_l00266}00266\ \textcolor{keyword}{static}\ \mbox{\hyperlink{namespacetesting_1_1internal_ae2ef98247c76a50cdc80ceb4a6c81793}{CharFormat}}\ PrintCharsAsStringTo(}
-\DoxyCodeLine{\Hypertarget{gtest-printers_8cc_source_l00267}00267\ \ \ \ \ \textcolor{keyword}{const}\ CharType*\ begin,\ \textcolor{keywordtype}{size\_t}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}},\ ostream*\ os)\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-printers_8cc_source_l00267}00267\ \ \ \ \ \textcolor{keyword}{const}\ CharType*\ begin,\ \textcolor{keywordtype}{size\_t}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}},\ ostream*\ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}})\ \{}
 \DoxyCodeLine{\Hypertarget{gtest-printers_8cc_source_l00268}00268\ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ \textcolor{keyword}{const}\ kQuoteBegin\ =\ \textcolor{keyword}{sizeof}(CharType)\ ==\ 1\ ?\ \textcolor{stringliteral}{"{}\(\backslash\)"{}"{}}\ :\ \textcolor{stringliteral}{"{}L\(\backslash\)"{}"{}};}
-\DoxyCodeLine{\Hypertarget{gtest-printers_8cc_source_l00269}00269\ \ \ *os\ <<\ kQuoteBegin;}
+\DoxyCodeLine{\Hypertarget{gtest-printers_8cc_source_l00269}00269\ \ \ *\mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}\ <<\ kQuoteBegin;}
 \DoxyCodeLine{\Hypertarget{gtest-printers_8cc_source_l00270}00270\ \ \ \textcolor{keywordtype}{bool}\ is\_previous\_hex\ =\ \textcolor{keyword}{false};}
 \DoxyCodeLine{\Hypertarget{gtest-printers_8cc_source_l00271}00271\ \ \ \mbox{\hyperlink{namespacetesting_1_1internal_ae2ef98247c76a50cdc80ceb4a6c81793}{CharFormat}}\ print\_format\ =\ \mbox{\hyperlink{namespacetesting_1_1internal_ae2ef98247c76a50cdc80ceb4a6c81793af7038866be92e9978360b831e376ffaa}{kAsIs}};}
 \DoxyCodeLine{\Hypertarget{gtest-printers_8cc_source_l00272}00272\ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{size\_t}\ index\ =\ 0;\ index\ <\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}};\ ++index)\ \{}
@@ -279,15 +279,15 @@
 \DoxyCodeLine{\Hypertarget{gtest-printers_8cc_source_l00275}00275\ \ \ \ \ \ \ \textcolor{comment}{//\ Previous\ character\ is\ of\ '\(\backslash\)x..'\ form\ and\ this\ character\ can\ be}}
 \DoxyCodeLine{\Hypertarget{gtest-printers_8cc_source_l00276}00276\ \ \ \ \ \ \ \textcolor{comment}{//\ interpreted\ as\ another\ hexadecimal\ digit\ in\ its\ number.\ Break\ string\ to}}
 \DoxyCodeLine{\Hypertarget{gtest-printers_8cc_source_l00277}00277\ \ \ \ \ \ \ \textcolor{comment}{//\ disambiguate.}}
-\DoxyCodeLine{\Hypertarget{gtest-printers_8cc_source_l00278}00278\ \ \ \ \ \ \ *os\ <<\ \textcolor{stringliteral}{"{}\(\backslash\)"{}\ "{}}\ <<\ kQuoteBegin;}
+\DoxyCodeLine{\Hypertarget{gtest-printers_8cc_source_l00278}00278\ \ \ \ \ \ \ *\mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}\ <<\ \textcolor{stringliteral}{"{}\(\backslash\)"{}\ "{}}\ <<\ kQuoteBegin;}
 \DoxyCodeLine{\Hypertarget{gtest-printers_8cc_source_l00279}00279\ \ \ \ \ \}}
-\DoxyCodeLine{\Hypertarget{gtest-printers_8cc_source_l00280}00280\ \ \ \ \ is\_previous\_hex\ =\ PrintAsStringLiteralTo(cur,\ os)\ ==\ \mbox{\hyperlink{namespacetesting_1_1internal_ae2ef98247c76a50cdc80ceb4a6c81793aebfa5293302338a8e8678744c103f113}{kHexEscape}};}
+\DoxyCodeLine{\Hypertarget{gtest-printers_8cc_source_l00280}00280\ \ \ \ \ is\_previous\_hex\ =\ PrintAsStringLiteralTo(cur,\ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}})\ ==\ \mbox{\hyperlink{namespacetesting_1_1internal_ae2ef98247c76a50cdc80ceb4a6c81793aebfa5293302338a8e8678744c103f113}{kHexEscape}};}
 \DoxyCodeLine{\Hypertarget{gtest-printers_8cc_source_l00281}00281\ \ \ \ \ \textcolor{comment}{//\ Remember\ if\ any\ characters\ required\ hex\ escaping.}}
 \DoxyCodeLine{\Hypertarget{gtest-printers_8cc_source_l00282}00282\ \ \ \ \ \textcolor{keywordflow}{if}\ (is\_previous\_hex)\ \{}
 \DoxyCodeLine{\Hypertarget{gtest-printers_8cc_source_l00283}00283\ \ \ \ \ \ \ print\_format\ =\ \mbox{\hyperlink{namespacetesting_1_1internal_ae2ef98247c76a50cdc80ceb4a6c81793aebfa5293302338a8e8678744c103f113}{kHexEscape}};}
 \DoxyCodeLine{\Hypertarget{gtest-printers_8cc_source_l00284}00284\ \ \ \ \ \}}
 \DoxyCodeLine{\Hypertarget{gtest-printers_8cc_source_l00285}00285\ \ \ \}}
-\DoxyCodeLine{\Hypertarget{gtest-printers_8cc_source_l00286}00286\ \ \ *os\ <<\ \textcolor{stringliteral}{"{}\(\backslash\)"{}"{}};}
+\DoxyCodeLine{\Hypertarget{gtest-printers_8cc_source_l00286}00286\ \ \ *\mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}\ <<\ \textcolor{stringliteral}{"{}\(\backslash\)"{}"{}};}
 \DoxyCodeLine{\Hypertarget{gtest-printers_8cc_source_l00287}00287\ \ \ \textcolor{keywordflow}{return}\ print\_format;}
 \DoxyCodeLine{\Hypertarget{gtest-printers_8cc_source_l00288}00288\ \}}
 \DoxyCodeLine{\Hypertarget{gtest-printers_8cc_source_l00289}00289\ }
@@ -298,7 +298,7 @@
 \DoxyCodeLine{\Hypertarget{gtest-printers_8cc_source_l00294}00294\ \mbox{\hyperlink{gtest-port_8h_af18b465f4ba6e36eea7a8d2d79521873}{GTEST\_ATTRIBUTE\_NO\_SANITIZE\_ADDRESS\_}}}
 \DoxyCodeLine{\Hypertarget{gtest-printers_8cc_source_l00295}00295\ \mbox{\hyperlink{gtest-port_8h_abf30a6b1b3a12ecb2cc1bc1a6f5f9646}{GTEST\_ATTRIBUTE\_NO\_SANITIZE\_THREAD\_}}}
 \DoxyCodeLine{\Hypertarget{gtest-printers_8cc_source_l00296}00296\ \textcolor{keyword}{static}\ \textcolor{keywordtype}{void}\ UniversalPrintCharArray(}
-\DoxyCodeLine{\Hypertarget{gtest-printers_8cc_source_l00297}00297\ \ \ \ \ \textcolor{keyword}{const}\ CharType*\ begin,\ \textcolor{keywordtype}{size\_t}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}},\ ostream*\ os)\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-printers_8cc_source_l00297}00297\ \ \ \ \ \textcolor{keyword}{const}\ CharType*\ begin,\ \textcolor{keywordtype}{size\_t}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}},\ ostream*\ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}})\ \{}
 \DoxyCodeLine{\Hypertarget{gtest-printers_8cc_source_l00298}00298\ \ \ \textcolor{comment}{//\ The\ code}}
 \DoxyCodeLine{\Hypertarget{gtest-printers_8cc_source_l00299}00299\ \ \ \textcolor{comment}{//\ \ \ const\ char\ kFoo[]\ =\ "{}foo"{};}}
 \DoxyCodeLine{\Hypertarget{gtest-printers_8cc_source_l00300}00300\ \ \ \textcolor{comment}{//\ generates\ an\ array\ of\ 4,\ not\ 3,\ elements,\ with\ the\ last\ one\ being\ '\(\backslash\)0'.}}
@@ -307,7 +307,7 @@
 \DoxyCodeLine{\Hypertarget{gtest-printers_8cc_source_l00303}00303\ \ \ \textcolor{comment}{//\ it's\ '\(\backslash\)0',\ such\ that\ the\ output\ matches\ the\ string\ literal\ as\ it's}}
 \DoxyCodeLine{\Hypertarget{gtest-printers_8cc_source_l00304}00304\ \ \ \textcolor{comment}{//\ written\ in\ the\ source\ code.}}
 \DoxyCodeLine{\Hypertarget{gtest-printers_8cc_source_l00305}00305\ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}}\ >\ 0\ \&\&\ begin[\mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}}\ -\/\ 1]\ ==\ \textcolor{charliteral}{'\(\backslash\)0'})\ \{}
-\DoxyCodeLine{\Hypertarget{gtest-printers_8cc_source_l00306}00306\ \ \ \ \ PrintCharsAsStringTo(begin,\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}}\ -\/\ 1,\ os);}
+\DoxyCodeLine{\Hypertarget{gtest-printers_8cc_source_l00306}00306\ \ \ \ \ PrintCharsAsStringTo(begin,\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}}\ -\/\ 1,\ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}});}
 \DoxyCodeLine{\Hypertarget{gtest-printers_8cc_source_l00307}00307\ \ \ \ \ \textcolor{keywordflow}{return};}
 \DoxyCodeLine{\Hypertarget{gtest-printers_8cc_source_l00308}00308\ \ \ \}}
 \DoxyCodeLine{\Hypertarget{gtest-printers_8cc_source_l00309}00309\ }
@@ -315,28 +315,28 @@
 \DoxyCodeLine{\Hypertarget{gtest-printers_8cc_source_l00311}00311\ \ \ \textcolor{comment}{//\ \ \ \ const\ char\ kFoo[]\ =\ \{\ 'f',\ 'o',\ 'o'\ \};}}
 \DoxyCodeLine{\Hypertarget{gtest-printers_8cc_source_l00312}00312\ \ \ \textcolor{comment}{//\ we\ must\ print\ the\ entire\ array.\ \ We\ also\ print\ a\ message\ to\ indicate}}
 \DoxyCodeLine{\Hypertarget{gtest-printers_8cc_source_l00313}00313\ \ \ \textcolor{comment}{//\ that\ the\ array\ is\ not\ NUL-\/terminated.}}
-\DoxyCodeLine{\Hypertarget{gtest-printers_8cc_source_l00314}00314\ \ \ PrintCharsAsStringTo(begin,\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}},\ os);}
-\DoxyCodeLine{\Hypertarget{gtest-printers_8cc_source_l00315}00315\ \ \ *os\ <<\ \textcolor{stringliteral}{"{}\ (no\ terminating\ NUL)"{}};}
+\DoxyCodeLine{\Hypertarget{gtest-printers_8cc_source_l00314}00314\ \ \ PrintCharsAsStringTo(begin,\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}},\ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}});}
+\DoxyCodeLine{\Hypertarget{gtest-printers_8cc_source_l00315}00315\ \ \ *\mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}\ <<\ \textcolor{stringliteral}{"{}\ (no\ terminating\ NUL)"{}};}
 \DoxyCodeLine{\Hypertarget{gtest-printers_8cc_source_l00316}00316\ \}}
 \DoxyCodeLine{\Hypertarget{gtest-printers_8cc_source_l00317}00317\ }
 \DoxyCodeLine{\Hypertarget{gtest-printers_8cc_source_l00318}00318\ \textcolor{comment}{//\ Prints\ a\ (const)\ char\ array\ of\ 'len'\ elements,\ starting\ at\ address\ 'begin'.}}
-\DoxyCodeLine{\Hypertarget{gtest-printers_8cc_source_l00319}\mbox{\hyperlink{namespacetesting_1_1internal_a070107e7a8205ad6ec4d538d52b15b38}{00319}}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespacetesting_1_1internal_ad79d71c3110f8eb24ab352d68f29436a}{UniversalPrintArray}}(\textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ begin,\ \textcolor{keywordtype}{size\_t}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}},\ ostream*\ os)\ \{}
-\DoxyCodeLine{\Hypertarget{gtest-printers_8cc_source_l00320}00320\ \ \ UniversalPrintCharArray(begin,\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}},\ os);}
+\DoxyCodeLine{\Hypertarget{gtest-printers_8cc_source_l00319}\mbox{\hyperlink{namespacetesting_1_1internal_a070107e7a8205ad6ec4d538d52b15b38}{00319}}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespacetesting_1_1internal_ad79d71c3110f8eb24ab352d68f29436a}{UniversalPrintArray}}(\textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ begin,\ \textcolor{keywordtype}{size\_t}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}},\ ostream*\ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}})\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-printers_8cc_source_l00320}00320\ \ \ UniversalPrintCharArray(begin,\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}},\ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}});}
 \DoxyCodeLine{\Hypertarget{gtest-printers_8cc_source_l00321}00321\ \}}
 \DoxyCodeLine{\Hypertarget{gtest-printers_8cc_source_l00322}00322\ }
 \DoxyCodeLine{\Hypertarget{gtest-printers_8cc_source_l00323}00323\ \textcolor{comment}{//\ Prints\ a\ (const)\ wchar\_t\ array\ of\ 'len'\ elements,\ starting\ at\ address}}
 \DoxyCodeLine{\Hypertarget{gtest-printers_8cc_source_l00324}00324\ \textcolor{comment}{//\ 'begin'.}}
-\DoxyCodeLine{\Hypertarget{gtest-printers_8cc_source_l00325}\mbox{\hyperlink{namespacetesting_1_1internal_a52394019018eb5079f9f1bcca23dcd60}{00325}}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespacetesting_1_1internal_ad79d71c3110f8eb24ab352d68f29436a}{UniversalPrintArray}}(\textcolor{keyword}{const}\ \textcolor{keywordtype}{wchar\_t}*\ begin,\ \textcolor{keywordtype}{size\_t}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}},\ ostream*\ os)\ \{}
-\DoxyCodeLine{\Hypertarget{gtest-printers_8cc_source_l00326}00326\ \ \ UniversalPrintCharArray(begin,\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}},\ os);}
+\DoxyCodeLine{\Hypertarget{gtest-printers_8cc_source_l00325}\mbox{\hyperlink{namespacetesting_1_1internal_a52394019018eb5079f9f1bcca23dcd60}{00325}}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespacetesting_1_1internal_ad79d71c3110f8eb24ab352d68f29436a}{UniversalPrintArray}}(\textcolor{keyword}{const}\ \textcolor{keywordtype}{wchar\_t}*\ begin,\ \textcolor{keywordtype}{size\_t}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}},\ ostream*\ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}})\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-printers_8cc_source_l00326}00326\ \ \ UniversalPrintCharArray(begin,\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}},\ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}});}
 \DoxyCodeLine{\Hypertarget{gtest-printers_8cc_source_l00327}00327\ \}}
 \DoxyCodeLine{\Hypertarget{gtest-printers_8cc_source_l00328}00328\ }
 \DoxyCodeLine{\Hypertarget{gtest-printers_8cc_source_l00329}00329\ \textcolor{comment}{//\ Prints\ the\ given\ C\ string\ to\ the\ ostream.}}
-\DoxyCodeLine{\Hypertarget{gtest-printers_8cc_source_l00330}\mbox{\hyperlink{namespacetesting_1_1internal_adc6c98306d40b53fd07be4e295102a0a}{00330}}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespacetesting_1_1internal_a8fd10cc30084c36a89c74868c8bd53f8}{PrintTo}}(\textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}},\ ostream*\ os)\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-printers_8cc_source_l00330}\mbox{\hyperlink{namespacetesting_1_1internal_adc6c98306d40b53fd07be4e295102a0a}{00330}}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespacetesting_1_1internal_a8fd10cc30084c36a89c74868c8bd53f8}{PrintTo}}(\textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}},\ ostream*\ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}})\ \{}
 \DoxyCodeLine{\Hypertarget{gtest-printers_8cc_source_l00331}00331\ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}\ ==\ NULL)\ \{}
-\DoxyCodeLine{\Hypertarget{gtest-printers_8cc_source_l00332}00332\ \ \ \ \ *os\ <<\ \textcolor{stringliteral}{"{}NULL"{}};}
+\DoxyCodeLine{\Hypertarget{gtest-printers_8cc_source_l00332}00332\ \ \ \ \ *\mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}\ <<\ \textcolor{stringliteral}{"{}NULL"{}};}
 \DoxyCodeLine{\Hypertarget{gtest-printers_8cc_source_l00333}00333\ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
 \DoxyCodeLine{\Hypertarget{gtest-printers_8cc_source_l00334}00334\ \ \ \ \ *\mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os\ <<\ ImplicitCast\_<const\ void*>}}(\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}})\ <<\ \textcolor{stringliteral}{"{}\ pointing\ to\ "{}};}
-\DoxyCodeLine{\Hypertarget{gtest-printers_8cc_source_l00335}00335\ \ \ \ \ PrintCharsAsStringTo(\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}},\ strlen(\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}),\ os);}
+\DoxyCodeLine{\Hypertarget{gtest-printers_8cc_source_l00335}00335\ \ \ \ \ PrintCharsAsStringTo(\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}},\ strlen(\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}),\ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}});}
 \DoxyCodeLine{\Hypertarget{gtest-printers_8cc_source_l00336}00336\ \ \ \}}
 \DoxyCodeLine{\Hypertarget{gtest-printers_8cc_source_l00337}00337\ \}}
 \DoxyCodeLine{\Hypertarget{gtest-printers_8cc_source_l00338}00338\ }
@@ -348,12 +348,12 @@
 \DoxyCodeLine{\Hypertarget{gtest-printers_8cc_source_l00344}00344\ \textcolor{comment}{//\ wchar\_t\ is\ implemented\ as\ a\ native\ type.}}
 \DoxyCodeLine{\Hypertarget{gtest-printers_8cc_source_l00345}00345\ \textcolor{preprocessor}{\#if\ !defined(\_MSC\_VER)\ ||\ defined(\_NATIVE\_WCHAR\_T\_DEFINED)}}
 \DoxyCodeLine{\Hypertarget{gtest-printers_8cc_source_l00346}00346\ \textcolor{comment}{//\ Prints\ the\ given\ wide\ C\ string\ to\ the\ ostream.}}
-\DoxyCodeLine{\Hypertarget{gtest-printers_8cc_source_l00347}\mbox{\hyperlink{namespacetesting_1_1internal_afc20fb56b2547a8f91f9ff99650f2024}{00347}}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespacetesting_1_1internal_a8fd10cc30084c36a89c74868c8bd53f8}{PrintTo}}(\textcolor{keyword}{const}\ \textcolor{keywordtype}{wchar\_t}*\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}},\ ostream*\ os)\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-printers_8cc_source_l00347}\mbox{\hyperlink{namespacetesting_1_1internal_afc20fb56b2547a8f91f9ff99650f2024}{00347}}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespacetesting_1_1internal_a8fd10cc30084c36a89c74868c8bd53f8}{PrintTo}}(\textcolor{keyword}{const}\ \textcolor{keywordtype}{wchar\_t}*\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}},\ ostream*\ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}})\ \{}
 \DoxyCodeLine{\Hypertarget{gtest-printers_8cc_source_l00348}00348\ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}\ ==\ NULL)\ \{}
-\DoxyCodeLine{\Hypertarget{gtest-printers_8cc_source_l00349}00349\ \ \ \ \ *os\ <<\ \textcolor{stringliteral}{"{}NULL"{}};}
+\DoxyCodeLine{\Hypertarget{gtest-printers_8cc_source_l00349}00349\ \ \ \ \ *\mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}\ <<\ \textcolor{stringliteral}{"{}NULL"{}};}
 \DoxyCodeLine{\Hypertarget{gtest-printers_8cc_source_l00350}00350\ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
 \DoxyCodeLine{\Hypertarget{gtest-printers_8cc_source_l00351}00351\ \ \ \ \ *\mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os\ <<\ ImplicitCast\_<const\ void*>}}(\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}})\ <<\ \textcolor{stringliteral}{"{}\ pointing\ to\ "{}};}
-\DoxyCodeLine{\Hypertarget{gtest-printers_8cc_source_l00352}00352\ \ \ \ \ PrintCharsAsStringTo(\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}},\ std::wcslen(\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}),\ os);}
+\DoxyCodeLine{\Hypertarget{gtest-printers_8cc_source_l00352}00352\ \ \ \ \ PrintCharsAsStringTo(\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}},\ std::wcslen(\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}),\ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}});}
 \DoxyCodeLine{\Hypertarget{gtest-printers_8cc_source_l00353}00353\ \ \ \}}
 \DoxyCodeLine{\Hypertarget{gtest-printers_8cc_source_l00354}00354\ \}}
 \DoxyCodeLine{\Hypertarget{gtest-printers_8cc_source_l00355}00355\ \textcolor{preprocessor}{\#endif\ \ }\textcolor{comment}{//\ wchar\_t\ is\ native}}
@@ -416,10 +416,10 @@
 \DoxyCodeLine{\Hypertarget{gtest-printers_8cc_source_l00412}00412\ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};}
 \DoxyCodeLine{\Hypertarget{gtest-printers_8cc_source_l00413}00413\ \}}
 \DoxyCodeLine{\Hypertarget{gtest-printers_8cc_source_l00414}00414\ }
-\DoxyCodeLine{\Hypertarget{gtest-printers_8cc_source_l00415}00415\ \textcolor{keywordtype}{void}\ ConditionalPrintAsText(\textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ str,\ \textcolor{keywordtype}{size\_t}\ length,\ ostream*\ os)\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-printers_8cc_source_l00415}00415\ \textcolor{keywordtype}{void}\ ConditionalPrintAsText(\textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ str,\ \textcolor{keywordtype}{size\_t}\ length,\ ostream*\ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}})\ \{}
 \DoxyCodeLine{\Hypertarget{gtest-printers_8cc_source_l00416}00416\ \ \ \textcolor{keywordflow}{if}\ (!ContainsUnprintableControlCodes(str,\ length)\ \&\&}
 \DoxyCodeLine{\Hypertarget{gtest-printers_8cc_source_l00417}00417\ \ \ \ \ \ \ IsValidUTF8(str,\ length))\ \{}
-\DoxyCodeLine{\Hypertarget{gtest-printers_8cc_source_l00418}00418\ \ \ \ \ *os\ <<\ \textcolor{stringliteral}{"{}\(\backslash\)n\ \ \ \ As\ Text:\ \(\backslash\)"{}"{}}\ <<\ \mbox{\hyperlink{namespace_c_l_i_1_1detail_ab4542375c903302c3876ce0403d55596}{str}}\ <<\ \textcolor{stringliteral}{"{}\(\backslash\)"{}"{}};}
+\DoxyCodeLine{\Hypertarget{gtest-printers_8cc_source_l00418}00418\ \ \ \ \ *\mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}\ <<\ \textcolor{stringliteral}{"{}\(\backslash\)n\ \ \ \ As\ Text:\ \(\backslash\)"{}"{}}\ <<\ \mbox{\hyperlink{namespace_c_l_i_1_1detail_ab4542375c903302c3876ce0403d55596}{str}}\ <<\ \textcolor{stringliteral}{"{}\(\backslash\)"{}"{}};}
 \DoxyCodeLine{\Hypertarget{gtest-printers_8cc_source_l00419}00419\ \ \ \}}
 \DoxyCodeLine{\Hypertarget{gtest-printers_8cc_source_l00420}00420\ \}}
 \DoxyCodeLine{\Hypertarget{gtest-printers_8cc_source_l00421}00421\ }
@@ -427,33 +427,33 @@
 \DoxyCodeLine{\Hypertarget{gtest-printers_8cc_source_l00423}00423\ }
 \DoxyCodeLine{\Hypertarget{gtest-printers_8cc_source_l00424}00424\ \textcolor{comment}{//\ Prints\ a\ ::string\ object.}}
 \DoxyCodeLine{\Hypertarget{gtest-printers_8cc_source_l00425}00425\ \textcolor{preprocessor}{\#if\ GTEST\_HAS\_GLOBAL\_STRING}}
-\DoxyCodeLine{\Hypertarget{gtest-printers_8cc_source_l00426}00426\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespacetesting_1_1internal_a8b53e46cea3f8bdfc9342057c4f6ba62}{PrintStringTo}}(const\ ::string\&\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}},\ ostream*\ os)\ \{}
-\DoxyCodeLine{\Hypertarget{gtest-printers_8cc_source_l00427}00427\ \ \ \textcolor{keywordflow}{if}\ (PrintCharsAsStringTo(\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}.data(),\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}.size(),\ os)\ ==\ \mbox{\hyperlink{namespacetesting_1_1internal_ae2ef98247c76a50cdc80ceb4a6c81793aebfa5293302338a8e8678744c103f113}{kHexEscape}})\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-printers_8cc_source_l00426}00426\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespacetesting_1_1internal_a8b53e46cea3f8bdfc9342057c4f6ba62}{PrintStringTo}}(const\ ::string\&\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}},\ ostream*\ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}})\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-printers_8cc_source_l00427}00427\ \ \ \textcolor{keywordflow}{if}\ (PrintCharsAsStringTo(\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}.data(),\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}.size(),\ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}})\ ==\ \mbox{\hyperlink{namespacetesting_1_1internal_ae2ef98247c76a50cdc80ceb4a6c81793aebfa5293302338a8e8678744c103f113}{kHexEscape}})\ \{}
 \DoxyCodeLine{\Hypertarget{gtest-printers_8cc_source_l00428}00428\ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{gtest-port_8h_a828f4e34a1c4b510da50ec1563e3562a}{GTEST\_FLAG}}(print\_utf8))\ \{}
-\DoxyCodeLine{\Hypertarget{gtest-printers_8cc_source_l00429}00429\ \ \ \ \ \ \ ConditionalPrintAsText(\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}.data(),\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}.size(),\ os);}
+\DoxyCodeLine{\Hypertarget{gtest-printers_8cc_source_l00429}00429\ \ \ \ \ \ \ ConditionalPrintAsText(\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}.data(),\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}.size(),\ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}});}
 \DoxyCodeLine{\Hypertarget{gtest-printers_8cc_source_l00430}00430\ \ \ \ \ \}}
 \DoxyCodeLine{\Hypertarget{gtest-printers_8cc_source_l00431}00431\ \ \ \}}
 \DoxyCodeLine{\Hypertarget{gtest-printers_8cc_source_l00432}00432\ \}}
 \DoxyCodeLine{\Hypertarget{gtest-printers_8cc_source_l00433}00433\ \textcolor{preprocessor}{\#endif\ \ }\textcolor{comment}{//\ GTEST\_HAS\_GLOBAL\_STRING}}
 \DoxyCodeLine{\Hypertarget{gtest-printers_8cc_source_l00434}00434\ }
-\DoxyCodeLine{\Hypertarget{gtest-printers_8cc_source_l00435}\mbox{\hyperlink{namespacetesting_1_1internal_ad609167d8d6792b0fb186539e0e159bd}{00435}}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespacetesting_1_1internal_a8b53e46cea3f8bdfc9342057c4f6ba62}{PrintStringTo}}(const\ ::std::string\&\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}},\ ostream*\ os)\ \{}
-\DoxyCodeLine{\Hypertarget{gtest-printers_8cc_source_l00436}00436\ \ \ \textcolor{keywordflow}{if}\ (PrintCharsAsStringTo(\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}.data(),\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}.size(),\ os)\ ==\ \mbox{\hyperlink{namespacetesting_1_1internal_ae2ef98247c76a50cdc80ceb4a6c81793aebfa5293302338a8e8678744c103f113}{kHexEscape}})\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-printers_8cc_source_l00435}\mbox{\hyperlink{namespacetesting_1_1internal_ad609167d8d6792b0fb186539e0e159bd}{00435}}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespacetesting_1_1internal_a8b53e46cea3f8bdfc9342057c4f6ba62}{PrintStringTo}}(const\ ::std::string\&\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}},\ ostream*\ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}})\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-printers_8cc_source_l00436}00436\ \ \ \textcolor{keywordflow}{if}\ (PrintCharsAsStringTo(\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}.data(),\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}.size(),\ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}})\ ==\ \mbox{\hyperlink{namespacetesting_1_1internal_ae2ef98247c76a50cdc80ceb4a6c81793aebfa5293302338a8e8678744c103f113}{kHexEscape}})\ \{}
 \DoxyCodeLine{\Hypertarget{gtest-printers_8cc_source_l00437}00437\ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{gtest-port_8h_a828f4e34a1c4b510da50ec1563e3562a}{GTEST\_FLAG}}(print\_utf8))\ \{}
-\DoxyCodeLine{\Hypertarget{gtest-printers_8cc_source_l00438}00438\ \ \ \ \ \ \ ConditionalPrintAsText(\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}.data(),\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}.size(),\ os);}
+\DoxyCodeLine{\Hypertarget{gtest-printers_8cc_source_l00438}00438\ \ \ \ \ \ \ ConditionalPrintAsText(\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}.data(),\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}.size(),\ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}});}
 \DoxyCodeLine{\Hypertarget{gtest-printers_8cc_source_l00439}00439\ \ \ \ \ \}}
 \DoxyCodeLine{\Hypertarget{gtest-printers_8cc_source_l00440}00440\ \ \ \}}
 \DoxyCodeLine{\Hypertarget{gtest-printers_8cc_source_l00441}00441\ \}}
 \DoxyCodeLine{\Hypertarget{gtest-printers_8cc_source_l00442}00442\ }
 \DoxyCodeLine{\Hypertarget{gtest-printers_8cc_source_l00443}00443\ \textcolor{comment}{//\ Prints\ a\ ::wstring\ object.}}
 \DoxyCodeLine{\Hypertarget{gtest-printers_8cc_source_l00444}00444\ \textcolor{preprocessor}{\#if\ GTEST\_HAS\_GLOBAL\_WSTRING}}
-\DoxyCodeLine{\Hypertarget{gtest-printers_8cc_source_l00445}00445\ \textcolor{keywordtype}{void}\ PrintWideStringTo(const\ ::wstring\&\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}},\ ostream*\ os)\ \{}
-\DoxyCodeLine{\Hypertarget{gtest-printers_8cc_source_l00446}00446\ \ \ PrintCharsAsStringTo(\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}.data(),\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}.size(),\ os);}
+\DoxyCodeLine{\Hypertarget{gtest-printers_8cc_source_l00445}00445\ \textcolor{keywordtype}{void}\ PrintWideStringTo(const\ ::wstring\&\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}},\ ostream*\ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}})\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-printers_8cc_source_l00446}00446\ \ \ PrintCharsAsStringTo(\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}.data(),\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}.size(),\ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}});}
 \DoxyCodeLine{\Hypertarget{gtest-printers_8cc_source_l00447}00447\ \}}
 \DoxyCodeLine{\Hypertarget{gtest-printers_8cc_source_l00448}00448\ \textcolor{preprocessor}{\#endif\ \ }\textcolor{comment}{//\ GTEST\_HAS\_GLOBAL\_WSTRING}}
 \DoxyCodeLine{\Hypertarget{gtest-printers_8cc_source_l00449}00449\ }
 \DoxyCodeLine{\Hypertarget{gtest-printers_8cc_source_l00450}00450\ \textcolor{preprocessor}{\#if\ GTEST\_HAS\_STD\_WSTRING}}
-\DoxyCodeLine{\Hypertarget{gtest-printers_8cc_source_l00451}00451\ \textcolor{keywordtype}{void}\ PrintWideStringTo(const\ ::std::wstring\&\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}},\ ostream*\ os)\ \{}
-\DoxyCodeLine{\Hypertarget{gtest-printers_8cc_source_l00452}00452\ \ \ PrintCharsAsStringTo(\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}.data(),\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}.size(),\ os);}
+\DoxyCodeLine{\Hypertarget{gtest-printers_8cc_source_l00451}00451\ \textcolor{keywordtype}{void}\ PrintWideStringTo(const\ ::std::wstring\&\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}},\ ostream*\ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}})\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-printers_8cc_source_l00452}00452\ \ \ PrintCharsAsStringTo(\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}.data(),\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}.size(),\ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}});}
 \DoxyCodeLine{\Hypertarget{gtest-printers_8cc_source_l00453}00453\ \}}
 \DoxyCodeLine{\Hypertarget{gtest-printers_8cc_source_l00454}00454\ \textcolor{preprocessor}{\#endif\ \ }\textcolor{comment}{//\ GTEST\_HAS\_STD\_WSTRING}}
 \DoxyCodeLine{\Hypertarget{gtest-printers_8cc_source_l00455}00455\ }

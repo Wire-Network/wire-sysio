@@ -168,9 +168,10 @@ Public Member Functions</h2></td></tr>
 </div><div class="memdoc">
 
 <p class="definition">Definition at line <a class="el" href="buffered__iostream_8cpp_source.html#l00153">153</a> of file <a class="el" href="buffered__iostream_8cpp_source.html">buffered_iostream.cpp</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">  154</span>    :my( <span class="keyword">new</span> detail::buffered_ostream_impl( fc::move(os) ) )</div>
+<div class="fragment"><div class="line"><span class="lineno">  154</span>    :my( <span class="keyword">new</span> detail::buffered_ostream_impl( fc::move(<a class="code hl_variable" href="environment_8hpp.html#a3951483d0b31c29ca95336206cd35238">os</a>) ) )</div>
 <div class="line"><span class="lineno">  155</span>    {</div>
 <div class="line"><span class="lineno">  156</span>    }</div>
+<div class="ttc" id="aenvironment_8hpp_html_a3951483d0b31c29ca95336206cd35238"><div class="ttname"><a href="environment_8hpp.html#a3951483d0b31c29ca95336206cd35238">os</a></div><div class="ttdeci">os_t os</div><div class="ttdef"><b>Definition</b> <a href="environment_8hpp_source.html#l00023">environment.hpp:23</a></div></div>
 </div><!-- fragment -->
 </div>
 </div>

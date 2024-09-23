@@ -6,7 +6,8 @@
 
 
 
-Inheritance diagram for testing\+::internal\+::Parameterized\+Test\+Case\+Info\texorpdfstring{$<$}{<} Test\+Case \texorpdfstring{$>$}{>}\+:\nopagebreak
+Inheritance diagram for testing\+::internal\+::Parameterized\+Test\+Case\+Info\texorpdfstring{$<$}{<} Test\+Case \texorpdfstring{$>$}{>}\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -15,7 +16,8 @@ Inheritance diagram for testing\+::internal\+::Parameterized\+Test\+Case\+Info\t
 \end{figure}
 
 
-Collaboration diagram for testing\+::internal\+::Parameterized\+Test\+Case\+Info\texorpdfstring{$<$}{<} Test\+Case \texorpdfstring{$>$}{>}\+:\nopagebreak
+Collaboration diagram for testing\+::internal\+::Parameterized\+Test\+Case\+Info\texorpdfstring{$<$}{<} Test\+Case \texorpdfstring{$>$}{>}\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -193,14 +195,16 @@ Definition at line \mbox{\hyperlink{gtest-param-util_8h_source_l00511}{511}} of 
 \DoxyCodeLine{00511\ \{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespacetesting_1_1internal_a6b108e56fdc68ea937ffb3759fb55ab0}{GetTypeId<TestCase>}}();\ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
 \includegraphics[width=342pt]{classtesting_1_1internal_1_1_parameterized_test_case_info_a16ed77e95a6042c722d0029744acfc33_cgraph}
 \end{center}
 \end{figure}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -242,7 +246,7 @@ Definition at line \mbox{\hyperlink{gtest-param-util_8h_source_l00540}{540}} of 
 \DoxyCodeLine{00548\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classtesting_1_1internal_1_1_parameterized_test_case_info_a2f6a423f7ae8c7ac24b468538693aa26}{ParamGenerator<ParamType>}}\ generator((*gen\_it-\/>generator)());}
 \DoxyCodeLine{00549\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classtesting_1_1internal_1_1_parameterized_test_case_info_a69934b21930d71c0b99d10a36ad08306}{ParamNameGeneratorFunc}}*\ name\_func\ =\ gen\_it-\/>name\_func;}
 \DoxyCodeLine{00550\ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ file\ =\ gen\_it-\/>file;}
-\DoxyCodeLine{00551\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{namespacevalidate__reflection_a54d4e98ade8417b88a7e3859a693630a}{line}}\ =\ gen\_it-\/>line;}
+\DoxyCodeLine{00551\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ line\ =\ gen\_it-\/>line;}
 \DoxyCodeLine{00552\ }
 \DoxyCodeLine{00553\ \ \ \ \ \ \ \ \ std::string\ test\_case\_name;}
 \DoxyCodeLine{00554\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\ !instantiation\_name.empty()\ )}
@@ -262,11 +266,11 @@ Definition at line \mbox{\hyperlink{gtest-param-util_8h_source_l00540}{540}} of 
 \DoxyCodeLine{00568\ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{gtest-port_8h_ab54343f0a36dc4cb0ce8a478dd7847b8}{GTEST\_CHECK\_}}(IsValidParamName(param\_name))}
 \DoxyCodeLine{00569\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ <<\ \textcolor{stringliteral}{"{}Parameterized\ test\ name\ '"{}}\ <<\ param\_name}
 \DoxyCodeLine{00570\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ <<\ \textcolor{stringliteral}{"{}'\ is\ invalid,\ in\ "{}}\ <<\ file}
-\DoxyCodeLine{00571\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ <<\ \textcolor{stringliteral}{"{}\ line\ "{}}\ <<\ \mbox{\hyperlink{namespacevalidate__reflection_a54d4e98ade8417b88a7e3859a693630a}{line}}\ <<\ std::endl;}
+\DoxyCodeLine{00571\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ <<\ \textcolor{stringliteral}{"{}\ line\ "{}}\ <<\ line\ <<\ std::endl;}
 \DoxyCodeLine{00572\ }
 \DoxyCodeLine{00573\ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{gtest-port_8h_ab54343f0a36dc4cb0ce8a478dd7847b8}{GTEST\_CHECK\_}}(test\_param\_names.count(param\_name)\ ==\ 0)}
 \DoxyCodeLine{00574\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ <<\ \textcolor{stringliteral}{"{}Duplicate\ parameterized\ test\ name\ '"{}}\ <<\ param\_name}
-\DoxyCodeLine{00575\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ <<\ \textcolor{stringliteral}{"{}',\ in\ "{}}\ <<\ file\ <<\ \textcolor{stringliteral}{"{}\ line\ "{}}\ <<\ \mbox{\hyperlink{namespacevalidate__reflection_a54d4e98ade8417b88a7e3859a693630a}{line}}\ <<\ std::endl;}
+\DoxyCodeLine{00575\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ <<\ \textcolor{stringliteral}{"{}',\ in\ "{}}\ <<\ file\ <<\ \textcolor{stringliteral}{"{}\ line\ "{}}\ <<\ line\ <<\ std::endl;}
 \DoxyCodeLine{00576\ }
 \DoxyCodeLine{00577\ \ \ \ \ \ \ \ \ \ \ test\_param\_names.insert(param\_name);}
 \DoxyCodeLine{00578\ }
@@ -287,7 +291,8 @@ Definition at line \mbox{\hyperlink{gtest-param-util_8h_source_l00540}{540}} of 
 \DoxyCodeLine{00593\ \ \ \}\ \ \textcolor{comment}{//\ RegisterTests}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode

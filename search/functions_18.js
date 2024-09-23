@@ -54,6 +54,5 @@ var searchData=
   ['xxh_5freadle32_5falign_51',['XXH_readLE32_align',['../xxhash_8c.html#aa7bbcded59b6f6fae7f6273d7562ed52',1,'xxhash.c']]],
   ['xxh_5freadle64_52',['XXH_readLE64',['../xxhash_8c.html#a26d6cd67da6e2c732a7e9aecee238ac1',1,'xxhash.c']]],
   ['xxh_5freadle64_5falign_53',['XXH_readLE64_align',['../xxhash_8c.html#a45ae9e30ad4c832112fd2bdc36ce5fc4',1,'xxhash.c']]],
-  ['xxh_5fversionnumber_54',['XXH_versionNumber',['../xxhash_8c.html#af435229c36fbbc6a23a5f187752a6fe4',1,'XXH_versionNumber(void):&#160;xxhash.c'],['../xxhash_8h.html#af435229c36fbbc6a23a5f187752a6fe4',1,'XXH_versionNumber(void):&#160;xxhash.c']]],
-  ['xxx_5f_5fstr_5f_5f_55',['XXX__str__',['../classcpp_1_1ast_1_1_node.html#acceba1aa15a332dd139ba9587d439a51',1,'cpp::ast::Node']]]
+  ['xxh_5fversionnumber_54',['XXH_versionNumber',['../xxhash_8c.html#af435229c36fbbc6a23a5f187752a6fe4',1,'XXH_versionNumber(void):&#160;xxhash.c'],['../xxhash_8h.html#af435229c36fbbc6a23a5f187752a6fe4',1,'XXH_versionNumber(void):&#160;xxhash.c']]]
 ];

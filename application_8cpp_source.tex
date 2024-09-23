@@ -468,7 +468,7 @@
 \DoxyCodeLine{\Hypertarget{application_8cpp_source_l00464}00464\ \ \ \ out\_cfg.close();}
 \DoxyCodeLine{\Hypertarget{application_8cpp_source_l00465}00465\ \}}
 \DoxyCodeLine{\Hypertarget{application_8cpp_source_l00466}00466\ }
-\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00467}00467\ \textcolor{keywordtype}{void}\ application::print\_default\_config(std::ostream\&\ os)\ \{}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00467}00467\ \textcolor{keywordtype}{void}\ application::print\_default\_config(std::ostream\&\ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}})\ \{}
 \DoxyCodeLine{\Hypertarget{application_8cpp_source_l00468}00468\ \ \ \ std::map<std::string,\ std::string>\ option\_to\_plug;}
 \DoxyCodeLine{\Hypertarget{application_8cpp_source_l00469}00469\ \ \ \ \textcolor{keywordflow}{for}(\textcolor{keyword}{auto}\&\ plug\ :\ plugins)\ \{}
 \DoxyCodeLine{\Hypertarget{application_8cpp_source_l00470}00470\ \ \ \ \ \ \ boost::program\_options::options\_description\ plugin\_cli\_opts;}
@@ -484,31 +484,31 @@
 \DoxyCodeLine{\Hypertarget{application_8cpp_source_l00480}00480\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(!od-\/>description().empty())\ \{}
 \DoxyCodeLine{\Hypertarget{application_8cpp_source_l00481}00481\ \ \ \ \ \ \ \ \ \ std::string\ desc\ =\ od-\/>description();}
 \DoxyCodeLine{\Hypertarget{application_8cpp_source_l00482}00482\ \ \ \ \ \ \ \ \ \ boost::replace\_all(desc,\ \textcolor{stringliteral}{"{}\(\backslash\)n"{}},\ \textcolor{stringliteral}{"{}\(\backslash\)n\#\ "{}});}
-\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00483}00483\ \ \ \ \ \ \ \ \ \ os\ <<\ \textcolor{stringliteral}{"{}\#\ "{}}\ <<\ desc;}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00483}00483\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}\ <<\ \textcolor{stringliteral}{"{}\#\ "{}}\ <<\ desc;}
 \DoxyCodeLine{\Hypertarget{application_8cpp_source_l00484}00484\ \ \ \ \ \ \ \ \ \ std::map<std::string,\ std::string>::iterator\ it;}
 \DoxyCodeLine{\Hypertarget{application_8cpp_source_l00485}00485\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}((it\ =\ option\_to\_plug.find(od-\/>long\_name()))\ !=\ option\_to\_plug.end())}
-\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00486}00486\ \ \ \ \ \ \ \ \ \ \ \ \ os\ <<\ \textcolor{stringliteral}{"{}\ ("{}}\ <<\ it-\/>second\ <<\ \textcolor{stringliteral}{"{})"{}};}
-\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00487}00487\ \ \ \ \ \ \ \ \ \ os\ <<\ std::endl;}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00486}00486\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}\ <<\ \textcolor{stringliteral}{"{}\ ("{}}\ <<\ it-\/>second\ <<\ \textcolor{stringliteral}{"{})"{}};}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00487}00487\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}\ <<\ std::endl;}
 \DoxyCodeLine{\Hypertarget{application_8cpp_source_l00488}00488\ \ \ \ \ \ \ \}}
 \DoxyCodeLine{\Hypertarget{application_8cpp_source_l00489}00489\ \ \ \ \ \ \ boost::any\ store;}
 \DoxyCodeLine{\Hypertarget{application_8cpp_source_l00490}00490\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(!od-\/>semantic()-\/>apply\_default(store))}
-\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00491}00491\ \ \ \ \ \ \ \ \ \ os\ <<\ \textcolor{stringliteral}{"{}\#\ "{}}\ <<\ od-\/>long\_name()\ <<\ \textcolor{stringliteral}{"{}\ =\ "{}}\ <<\ std::endl;}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00491}00491\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}\ <<\ \textcolor{stringliteral}{"{}\#\ "{}}\ <<\ od-\/>long\_name()\ <<\ \textcolor{stringliteral}{"{}\ =\ "{}}\ <<\ std::endl;}
 \DoxyCodeLine{\Hypertarget{application_8cpp_source_l00492}00492\ \ \ \ \ \ \ \textcolor{keywordflow}{else}\ \{}
 \DoxyCodeLine{\Hypertarget{application_8cpp_source_l00493}00493\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ example\ =\ od-\/>format\_parameter();}
 \DoxyCodeLine{\Hypertarget{application_8cpp_source_l00494}00494\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(example.empty())}
 \DoxyCodeLine{\Hypertarget{application_8cpp_source_l00495}00495\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ This\ is\ a\ boolean\ switch}}
-\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00496}00496\ \ \ \ \ \ \ \ \ \ \ \ \ os\ <<\ \textcolor{stringliteral}{"{}\#\ "{}}\ <<\ od-\/>long\_name()\ <<\ \textcolor{stringliteral}{"{}\ =\ "{}}\ <<\ \textcolor{stringliteral}{"{}false"{}}\ <<\ std::endl;}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00496}00496\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}\ <<\ \textcolor{stringliteral}{"{}\#\ "{}}\ <<\ od-\/>long\_name()\ <<\ \textcolor{stringliteral}{"{}\ =\ "{}}\ <<\ \textcolor{stringliteral}{"{}false"{}}\ <<\ std::endl;}
 \DoxyCodeLine{\Hypertarget{application_8cpp_source_l00497}00497\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}(store.type()\ ==\ \textcolor{keyword}{typeid}(\textcolor{keywordtype}{bool}))}
-\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00498}00498\ \ \ \ \ \ \ \ \ \ \ \ \ os\ <<\ \textcolor{stringliteral}{"{}\#\ "{}}\ <<\ od-\/>long\_name()\ <<\ \textcolor{stringliteral}{"{}\ =\ "{}}\ <<\ (boost::any\_cast<bool\&>(store)\ ?\ \textcolor{stringliteral}{"{}true"{}}\ :\ \textcolor{stringliteral}{"{}false"{}})\ <<\ std::endl;}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00498}00498\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}\ <<\ \textcolor{stringliteral}{"{}\#\ "{}}\ <<\ od-\/>long\_name()\ <<\ \textcolor{stringliteral}{"{}\ =\ "{}}\ <<\ (boost::any\_cast<bool\&>(store)\ ?\ \textcolor{stringliteral}{"{}true"{}}\ :\ \textcolor{stringliteral}{"{}false"{}})\ <<\ std::endl;}
 \DoxyCodeLine{\Hypertarget{application_8cpp_source_l00499}00499\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}\ \{}
 \DoxyCodeLine{\Hypertarget{application_8cpp_source_l00500}00500\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ The\ string\ is\ formatted\ "{}arg\ (=<interesting\ part>)"{}}}
 \DoxyCodeLine{\Hypertarget{application_8cpp_source_l00501}00501\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ pos\ =\ example.find(\textcolor{stringliteral}{"{}(="{}});}
 \DoxyCodeLine{\Hypertarget{application_8cpp_source_l00502}00502\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(pos\ !=\ string::npos)\ example\ =\ example.substr(pos+2);}
 \DoxyCodeLine{\Hypertarget{application_8cpp_source_l00503}00503\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(!example.empty())\ example.erase(example.length()-\/1);}
-\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00504}00504\ \ \ \ \ \ \ \ \ \ \ \ \ os\ <<\ \textcolor{stringliteral}{"{}\#\ "{}}\ <<\ od-\/>long\_name()\ <<\ \textcolor{stringliteral}{"{}\ =\ "{}}\ <<\ example\ <<\ std::endl;}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00504}00504\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}\ <<\ \textcolor{stringliteral}{"{}\#\ "{}}\ <<\ od-\/>long\_name()\ <<\ \textcolor{stringliteral}{"{}\ =\ "{}}\ <<\ example\ <<\ std::endl;}
 \DoxyCodeLine{\Hypertarget{application_8cpp_source_l00505}00505\ \ \ \ \ \ \ \ \ \ \}}
 \DoxyCodeLine{\Hypertarget{application_8cpp_source_l00506}00506\ \ \ \ \ \ \ \}}
-\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00507}00507\ \ \ \ \ \ \ os\ <<\ std::endl;}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00507}00507\ \ \ \ \ \ \ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}\ <<\ std::endl;}
 \DoxyCodeLine{\Hypertarget{application_8cpp_source_l00508}00508\ \ \ \ \}}
 \DoxyCodeLine{\Hypertarget{application_8cpp_source_l00509}00509\ \}}
 \DoxyCodeLine{\Hypertarget{application_8cpp_source_l00510}00510\ }

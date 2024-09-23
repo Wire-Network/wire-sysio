@@ -70,15 +70,15 @@
 \DoxyCodeLine{\Hypertarget{powerup_8cpp_source_l00072}00072\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\_t}}\&\ cpu\_delta\_available)\ \{}
 \DoxyCodeLine{\Hypertarget{powerup_8cpp_source_l00073}00073\ \ \ \ \mbox{\hyperlink{namespacesysiosystem_a02c0023b5bdc321b157afe535f641c55}{update\_utilization}}(now,\ \mbox{\hyperlink{structstate}{state}}.net);}
 \DoxyCodeLine{\Hypertarget{powerup_8cpp_source_l00074}00074\ \ \ \ \mbox{\hyperlink{namespacesysiosystem_a02c0023b5bdc321b157afe535f641c55}{update\_utilization}}(now,\ \mbox{\hyperlink{structstate}{state}}.cpu);}
-\DoxyCodeLine{\Hypertarget{powerup_8cpp_source_l00075}00075\ \ \ \ \textcolor{keyword}{auto}\ \mbox{\hyperlink{namespacehost__functions__tests__1_a8496a24b5236a2dc07bb4f2930d88342}{idx}}\ =\ orders.get\_index<\textcolor{stringliteral}{"{}byexpires"{}}\_n>();}
+\DoxyCodeLine{\Hypertarget{powerup_8cpp_source_l00075}00075\ \ \ \ \textcolor{keyword}{auto}\ idx\ =\ orders.get\_index<\textcolor{stringliteral}{"{}byexpires"{}}\_n>();}
 \DoxyCodeLine{\Hypertarget{powerup_8cpp_source_l00076}00076\ \ \ \ \textcolor{keywordflow}{while}\ (max\_items-\/-\/)\ \{}
-\DoxyCodeLine{\Hypertarget{powerup_8cpp_source_l00077}00077\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ it\ =\ \mbox{\hyperlink{namespacehost__functions__tests__1_a8496a24b5236a2dc07bb4f2930d88342}{idx}}.begin();}
-\DoxyCodeLine{\Hypertarget{powerup_8cpp_source_l00078}00078\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (it\ ==\ \mbox{\hyperlink{namespacehost__functions__tests__1_a8496a24b5236a2dc07bb4f2930d88342}{idx}}.end()\ ||\ it-\/>expires\ >\ now)}
+\DoxyCodeLine{\Hypertarget{powerup_8cpp_source_l00077}00077\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ it\ =\ idx.begin();}
+\DoxyCodeLine{\Hypertarget{powerup_8cpp_source_l00078}00078\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (it\ ==\ idx.end()\ ||\ it-\/>expires\ >\ now)}
 \DoxyCodeLine{\Hypertarget{powerup_8cpp_source_l00079}00079\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
 \DoxyCodeLine{\Hypertarget{powerup_8cpp_source_l00080}00080\ \ \ \ \ \ \ net\_delta\_available\ +=\ it-\/>net\_weight;}
 \DoxyCodeLine{\Hypertarget{powerup_8cpp_source_l00081}00081\ \ \ \ \ \ \ cpu\_delta\_available\ +=\ it-\/>cpu\_weight;}
 \DoxyCodeLine{\Hypertarget{powerup_8cpp_source_l00082}00082\ \ \ \ \ \ \ adjust\_resources(get\_self(),\ it-\/>owner,\ core\_symbol,\ -\/it-\/>net\_weight,\ -\/it-\/>cpu\_weight);}
-\DoxyCodeLine{\Hypertarget{powerup_8cpp_source_l00083}00083\ \ \ \ \ \ \ \mbox{\hyperlink{namespacehost__functions__tests__1_a8496a24b5236a2dc07bb4f2930d88342}{idx}}.erase(it);}
+\DoxyCodeLine{\Hypertarget{powerup_8cpp_source_l00083}00083\ \ \ \ \ \ \ idx.erase(it);}
 \DoxyCodeLine{\Hypertarget{powerup_8cpp_source_l00084}00084\ \ \ \ \}}
 \DoxyCodeLine{\Hypertarget{powerup_8cpp_source_l00085}00085\ \ \ \ \mbox{\hyperlink{structstate}{state}}.net.utilization\ -\/=\ net\_delta\_available;}
 \DoxyCodeLine{\Hypertarget{powerup_8cpp_source_l00086}00086\ \ \ \ \mbox{\hyperlink{structstate}{state}}.cpu.utilization\ -\/=\ cpu\_delta\_available;}
@@ -220,24 +220,24 @@
 \DoxyCodeLine{\Hypertarget{powerup_8cpp_source_l00222}00222\ \ \ \ \ \ \ \mbox{\hyperlink{structstate}{state}}.max\_price\ \ \ \ \ \ \ \ \ \ \ \ =\ *args.max\_price;}
 \DoxyCodeLine{\Hypertarget{powerup_8cpp_source_l00223}00223\ \ \ \ \};}
 \DoxyCodeLine{\Hypertarget{powerup_8cpp_source_l00224}00224\ }
-\DoxyCodeLine{\Hypertarget{powerup_8cpp_source_l00225}00225\ \ \ \ \textcolor{keywordflow}{if}\ (!args.powerup\_days)\ \{}
-\DoxyCodeLine{\Hypertarget{powerup_8cpp_source_l00226}00226\ \ \ \ \ \ \ *args.powerup\_days\ =\ \mbox{\hyperlink{structstate}{state}}.powerup\_days;}
+\DoxyCodeLine{\Hypertarget{powerup_8cpp_source_l00225}00225\ \ \ \ \textcolor{keywordflow}{if}\ (!args.\mbox{\hyperlink{structsysiosystem_1_1powerup__config_af02cc4500acf99c29a8c57515f92dd7e}{powerup\_days}})\ \{}
+\DoxyCodeLine{\Hypertarget{powerup_8cpp_source_l00226}00226\ \ \ \ \ \ \ *args.\mbox{\hyperlink{structsysiosystem_1_1powerup__config_af02cc4500acf99c29a8c57515f92dd7e}{powerup\_days}}\ =\ \mbox{\hyperlink{structstate}{state}}.powerup\_days;}
 \DoxyCodeLine{\Hypertarget{powerup_8cpp_source_l00227}00227\ \ \ \ \}}
 \DoxyCodeLine{\Hypertarget{powerup_8cpp_source_l00228}00228\ }
-\DoxyCodeLine{\Hypertarget{powerup_8cpp_source_l00229}00229\ \ \ \ \textcolor{keywordflow}{if}\ (!args.min\_powerup\_fee)\ \{}
+\DoxyCodeLine{\Hypertarget{powerup_8cpp_source_l00229}00229\ \ \ \ \textcolor{keywordflow}{if}\ (!args.\mbox{\hyperlink{structsysiosystem_1_1powerup__config_ad71e69fe859592ceafdba9bb7c7df094}{min\_powerup\_fee}})\ \{}
 \DoxyCodeLine{\Hypertarget{powerup_8cpp_source_l00230}00230\ \ \ \ \ \ \ sysio::check(!is\_default\_asset(\mbox{\hyperlink{structstate}{state}}.min\_powerup\_fee),\ \textcolor{stringliteral}{"{}min\_powerup\_fee\ does\ not\ have\ a\ default\ value"{}});}
-\DoxyCodeLine{\Hypertarget{powerup_8cpp_source_l00231}00231\ \ \ \ \ \ \ *args.min\_powerup\_fee\ =\ \mbox{\hyperlink{structstate}{state}}.min\_powerup\_fee;}
+\DoxyCodeLine{\Hypertarget{powerup_8cpp_source_l00231}00231\ \ \ \ \ \ \ *args.\mbox{\hyperlink{structsysiosystem_1_1powerup__config_ad71e69fe859592ceafdba9bb7c7df094}{min\_powerup\_fee}}\ =\ \mbox{\hyperlink{structstate}{state}}.min\_powerup\_fee;}
 \DoxyCodeLine{\Hypertarget{powerup_8cpp_source_l00232}00232\ \ \ \ \}}
 \DoxyCodeLine{\Hypertarget{powerup_8cpp_source_l00233}00233\ }
-\DoxyCodeLine{\Hypertarget{powerup_8cpp_source_l00234}00234\ \ \ \ sysio::check(*args.powerup\_days\ >\ 0,\ \textcolor{stringliteral}{"{}powerup\_days\ must\ be\ >\ 0"{}});}
-\DoxyCodeLine{\Hypertarget{powerup_8cpp_source_l00235}00235\ \ \ \ sysio::check(args.min\_powerup\_fee-\/>symbol\ ==\ core\_symbol,\ \textcolor{stringliteral}{"{}min\_powerup\_fee\ doesn't\ match\ core\ symbol"{}});}
-\DoxyCodeLine{\Hypertarget{powerup_8cpp_source_l00236}00236\ \ \ \ sysio::check(args.min\_powerup\_fee-\/>amount\ >\ 0,\ \textcolor{stringliteral}{"{}min\_powerup\_fee\ must\ be\ positive"{}});}
+\DoxyCodeLine{\Hypertarget{powerup_8cpp_source_l00234}00234\ \ \ \ sysio::check(*args.\mbox{\hyperlink{structsysiosystem_1_1powerup__config_af02cc4500acf99c29a8c57515f92dd7e}{powerup\_days}}\ >\ 0,\ \textcolor{stringliteral}{"{}powerup\_days\ must\ be\ >\ 0"{}});}
+\DoxyCodeLine{\Hypertarget{powerup_8cpp_source_l00235}00235\ \ \ \ sysio::check(args.\mbox{\hyperlink{structsysiosystem_1_1powerup__config_ad71e69fe859592ceafdba9bb7c7df094}{min\_powerup\_fee}}-\/>symbol\ ==\ core\_symbol,\ \textcolor{stringliteral}{"{}min\_powerup\_fee\ doesn't\ match\ core\ symbol"{}});}
+\DoxyCodeLine{\Hypertarget{powerup_8cpp_source_l00236}00236\ \ \ \ sysio::check(args.\mbox{\hyperlink{structsysiosystem_1_1powerup__config_ad71e69fe859592ceafdba9bb7c7df094}{min\_powerup\_fee}}-\/>amount\ >\ 0,\ \textcolor{stringliteral}{"{}min\_powerup\_fee\ must\ be\ positive"{}});}
 \DoxyCodeLine{\Hypertarget{powerup_8cpp_source_l00237}00237\ }
-\DoxyCodeLine{\Hypertarget{powerup_8cpp_source_l00238}00238\ \ \ \ \mbox{\hyperlink{structstate}{state}}.powerup\_days\ \ \ \ =\ *args.powerup\_days;}
-\DoxyCodeLine{\Hypertarget{powerup_8cpp_source_l00239}00239\ \ \ \ \mbox{\hyperlink{structstate}{state}}.min\_powerup\_fee\ =\ *args.min\_powerup\_fee;}
+\DoxyCodeLine{\Hypertarget{powerup_8cpp_source_l00238}00238\ \ \ \ \mbox{\hyperlink{structstate}{state}}.powerup\_days\ \ \ \ =\ *args.\mbox{\hyperlink{structsysiosystem_1_1powerup__config_af02cc4500acf99c29a8c57515f92dd7e}{powerup\_days}};}
+\DoxyCodeLine{\Hypertarget{powerup_8cpp_source_l00239}00239\ \ \ \ \mbox{\hyperlink{structstate}{state}}.min\_powerup\_fee\ =\ *args.\mbox{\hyperlink{structsysiosystem_1_1powerup__config_ad71e69fe859592ceafdba9bb7c7df094}{min\_powerup\_fee}};}
 \DoxyCodeLine{\Hypertarget{powerup_8cpp_source_l00240}00240\ }
-\DoxyCodeLine{\Hypertarget{powerup_8cpp_source_l00241}00241\ \ \ \ update(\mbox{\hyperlink{structstate}{state}}.net,\ args.net);}
-\DoxyCodeLine{\Hypertarget{powerup_8cpp_source_l00242}00242\ \ \ \ update(\mbox{\hyperlink{structstate}{state}}.cpu,\ args.cpu);}
+\DoxyCodeLine{\Hypertarget{powerup_8cpp_source_l00241}00241\ \ \ \ update(\mbox{\hyperlink{structstate}{state}}.net,\ args.\mbox{\hyperlink{structsysiosystem_1_1powerup__config_ad58220790f29a0981e003e5e6eca2cd4}{net}});}
+\DoxyCodeLine{\Hypertarget{powerup_8cpp_source_l00242}00242\ \ \ \ update(\mbox{\hyperlink{structstate}{state}}.cpu,\ args.\mbox{\hyperlink{structsysiosystem_1_1powerup__config_a2634481ba77f5748779b3139279aeaef}{cpu}});}
 \DoxyCodeLine{\Hypertarget{powerup_8cpp_source_l00243}00243\ }
 \DoxyCodeLine{\Hypertarget{powerup_8cpp_source_l00244}00244\ \ \ \ \mbox{\hyperlink{namespacesysiosystem_a3d068598c53a51b1ed1d9782e9732f9e}{update\_weight}}(now,\ \mbox{\hyperlink{structstate}{state}}.net,\ net\_delta\_available);}
 \DoxyCodeLine{\Hypertarget{powerup_8cpp_source_l00245}00245\ \ \ \ \mbox{\hyperlink{namespacesysiosystem_a3d068598c53a51b1ed1d9782e9732f9e}{update\_weight}}(now,\ \mbox{\hyperlink{structstate}{state}}.cpu,\ cpu\_delta\_available);}

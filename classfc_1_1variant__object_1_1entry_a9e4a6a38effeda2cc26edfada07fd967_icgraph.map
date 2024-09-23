@@ -1,10 +1,5 @@
 <map id="fc::variant_object::entry::value" name="fc::variant_object::entry::value">
-<area shape="rect" id="Node000001" title=" " alt="" coords="193,71,314,112"/>
-<area shape="rect" id="Node000002" href="$classpump_1_1_token.html#a1a3dc1ee7b0d66e90f4ab7228b37fc0d" title=" " alt="" coords="5,5,145,31"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="194,67,144,45,116,34,118,29,146,40,196,62"/>
-<area shape="rect" id="Node000003" href="$classpump_1_1_token.html#a808876dd5a7b1bf6c43a3855dc4a8868" title=" " alt="" coords="10,79,140,104"/>
-<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="177,94,141,94,141,89,177,89"/>
-<area shape="rect" id="Node000004" href="$tester_8cpp.html#afd98dd59fe676698874fc546d0dfb574" title=" " alt="" coords="33,128,117,154"/>
-<area shape="poly" id="edge4_Node000001_Node000004" title=" " alt="" coords="178,115,118,132,117,127,177,110"/>
-<area shape="poly" id="edge3_Node000003_Node000003" title=" " alt="" coords="105,66,95,60,75,57,56,59,46,64,44,69,49,77,45,80,39,70,43,60,55,54,75,52,97,55,108,61"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="138,5,259,46"/>
+<area shape="rect" id="Node000002" href="$tester_8cpp.html#afd98dd59fe676698874fc546d0dfb574" title=" " alt="" coords="5,13,90,38"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="122,28,90,28,90,23,122,23"/>
 </map>

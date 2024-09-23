@@ -857,8 +857,8 @@ Here is the caller graph for this function:</div>
 <div class="line"><span class="lineno">  424</span>         result_t result;</div>
 <div class="line"><span class="lineno">  425</span> </div>
 <div class="line"><span class="lineno">  426</span>         <span class="comment">// deduplicate inputs</span></div>
-<div class="line"><span class="lineno">  427</span>         <span class="keyword">auto</span> account_set = std::set&lt;chain::permission_level&gt;(<a class="code hl_variable" href="namespacebenchmark_compile.html#ad0ed96ae1454e4347ca61ac3887c379e">args</a>.accounts.begin(), <a class="code hl_variable" href="namespacebenchmark_compile.html#ad0ed96ae1454e4347ca61ac3887c379e">args</a>.accounts.end());</div>
-<div class="line"><span class="lineno">  428</span>         <span class="keyword">const</span> <span class="keyword">auto</span> key_set = std::set&lt;chain::public_key_type&gt;(<a class="code hl_variable" href="namespacebenchmark_compile.html#ad0ed96ae1454e4347ca61ac3887c379e">args</a>.keys.begin(), <a class="code hl_variable" href="namespacebenchmark_compile.html#ad0ed96ae1454e4347ca61ac3887c379e">args</a>.keys.end());</div>
+<div class="line"><span class="lineno">  427</span>         <span class="keyword">auto</span> account_set = std::set&lt;chain::permission_level&gt;(args.accounts.begin(), args.accounts.end());</div>
+<div class="line"><span class="lineno">  428</span>         <span class="keyword">const</span> <span class="keyword">auto</span> key_set = std::set&lt;chain::public_key_type&gt;(args.keys.begin(), args.keys.end());</div>
 <div class="line"><span class="lineno">  429</span> </div>
 <div class="line"><span class="lineno">  433</span>         <span class="keyword">auto</span> push_results = [&amp;result](<span class="keyword">const</span> <span class="keyword">auto</span>&amp; begin, <span class="keyword">const</span> <span class="keyword">auto</span>&amp; end) {</div>
 <div class="line"><span class="lineno">  434</span>            <span class="keywordflow">for</span> (<span class="keyword">auto</span> itr = begin; itr != end; ++itr) {</div>
@@ -906,7 +906,6 @@ Here is the caller graph for this function:</div>
 <div class="line"><span class="lineno">  476</span>         <span class="keywordflow">return</span> result;</div>
 <div class="line"><span class="lineno">  477</span>      }</div>
 <div class="ttc" id="abn_8cpp_html_a8b0eadcc506862e9d751ab45185053aa"><div class="ttname"><a href="bn_8cpp.html#a8b0eadcc506862e9d751ab45185053aa">p</a></div><div class="ttdeci">const mie::Vuint &amp; p</div><div class="ttdef"><b>Definition</b> <a href="bn_8cpp_source.html#l00027">bn.cpp:27</a></div></div>
-<div class="ttc" id="anamespacebenchmark_compile_html_ad0ed96ae1454e4347ca61ac3887c379e"><div class="ttname"><a href="namespacebenchmark_compile.html#ad0ed96ae1454e4347ca61ac3887c379e">benchmarkCompile.args</a></div><div class="ttdeci">args</div><div class="ttdef"><b>Definition</b> <a href="benchmark_compile_8py_source.html#l00122">benchmarkCompile.py:122</a></div></div>
 <div class="ttc" id="anamespacechainbase_html_af9c751cb717344c32889e0a797c50803"><div class="ttname"><a href="namespacechainbase.html#af9c751cb717344c32889e0a797c50803">chainbase::read_lock</a></div><div class="ttdeci">boost::interprocess::sharable_lock&lt; read_write_mutex &gt; read_lock</div><div class="ttdef"><b>Definition</b> <a href="chainbase_8hpp_source.html#l00064">chainbase.hpp:64</a></div></div>
 </div><!-- fragment -->
 </div>

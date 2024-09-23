@@ -619,11 +619,11 @@ Here is the caller graph for this function:</div>
 <p class="definition">Definition at line <a class="el" href="unittest_8h_source.html#l00080">80</a> of file <a class="el" href="unittest_8h_source.html">unittest.h</a>.</p>
 <div class="fragment"><div class="line"><span class="lineno">   80</span>                                      {</div>
 <div class="line"><span class="lineno">   81</span><span class="preprocessor">#if defined(__WIN32__) || defined(_MSC_VER)</span></div>
-<div class="line"><span class="lineno">   82</span>    <a class="code hl_variable" href="namespaceembed_clara.html#a1e1bd594f85f58f5dca6c41c0ac720fb">filename</a> = tmpnam(filename);</div>
+<div class="line"><span class="lineno">   82</span>    filename = tmpnam(filename);</div>
 <div class="line"><span class="lineno">   83</span> </div>
 <div class="line"><span class="lineno">   84</span>    <span class="comment">// For Visual Studio, tmpnam() adds a backslash in front. Remove it.</span></div>
 <div class="line"><span class="lineno">   85</span>    <span class="keywordflow">if</span> (filename[0] == <span class="charliteral">&#39;\\&#39;</span>)</div>
-<div class="line"><span class="lineno">   86</span>        <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i = 0; <a class="code hl_variable" href="namespaceembed_clara.html#a1e1bd594f85f58f5dca6c41c0ac720fb">filename</a>[i] != <span class="charliteral">&#39;\0&#39;</span>; i++)</div>
+<div class="line"><span class="lineno">   86</span>        <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i = 0; filename[i] != <span class="charliteral">&#39;\0&#39;</span>; i++)</div>
 <div class="line"><span class="lineno">   87</span>            filename[i] = filename[i + 1];</div>
 <div class="line"><span class="lineno">   88</span>        </div>
 <div class="line"><span class="lineno">   89</span>    <span class="keywordflow">return</span> fopen(filename, <span class="stringliteral">&quot;wb&quot;</span>);</div>
@@ -633,7 +633,6 @@ Here is the caller graph for this function:</div>
 <div class="line"><span class="lineno">   93</span>    <span class="keywordflow">return</span> fdopen(fd, <span class="stringliteral">&quot;w&quot;</span>);</div>
 <div class="line"><span class="lineno">   94</span><span class="preprocessor">#endif</span></div>
 <div class="line"><span class="lineno">   95</span>}</div>
-<div class="ttc" id="anamespaceembed_clara_html_a1e1bd594f85f58f5dca6c41c0ac720fb"><div class="ttname"><a href="namespaceembed_clara.html#a1e1bd594f85f58f5dca6c41c0ac720fb">embedClara.filename</a></div><div class="ttdeci">filename</div><div class="ttdef"><b>Definition</b> <a href="embed_clara_8py_source.html#l00010">embedClara.py:10</a></div></div>
 </div><!-- fragment --><div class="dynheader">
 Here is the caller graph for this function:</div>
 <div class="dyncontent">

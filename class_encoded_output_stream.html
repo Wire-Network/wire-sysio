@@ -116,7 +116,7 @@ Public Types</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-methods" name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:ad3360c613a30a6a15526ae9ad63bd004" id="r_ad3360c613a30a6a15526ae9ad63bd004"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ad3360c613a30a6a15526ae9ad63bd004">EncodedOutputStream</a> (OutputByteStream &amp;os, bool putBOM=true)</td></tr>
+<tr class="memitem:ad3360c613a30a6a15526ae9ad63bd004" id="r_ad3360c613a30a6a15526ae9ad63bd004"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ad3360c613a30a6a15526ae9ad63bd004">EncodedOutputStream</a> (OutputByteStream &amp;<a class="el" href="environment_8hpp.html#a3951483d0b31c29ca95336206cd35238">os</a>, bool putBOM=true)</td></tr>
 <tr class="separator:ad3360c613a30a6a15526ae9ad63bd004"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a0f3c00f94c195a38d78c05ecda497481" id="r_a0f3c00f94c195a38d78c05ecda497481"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a0f3c00f94c195a38d78c05ecda497481">Put</a> (<a class="el" href="#a0d712ef1ad976be0bf4b531c4d65b00c">Ch</a> c)</td></tr>
 <tr class="separator:a0f3c00f94c195a38d78c05ecda497481"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -194,10 +194,11 @@ template&lt;typename <a class="el" href="classrapidjson_1_1_encoding.html">Encod
 </div><div class="memdoc">
 
 <p class="definition">Definition at line <a class="el" href="encodedstream_8h_source.html#l00105">105</a> of file <a class="el" href="encodedstream_8h_source.html">encodedstream.h</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">  105</span>                                                                  : os_(os) { </div>
+<div class="fragment"><div class="line"><span class="lineno">  105</span>                                                                  : os_(<a class="code hl_variable" href="environment_8hpp.html#a3951483d0b31c29ca95336206cd35238">os</a>) { </div>
 <div class="line"><span class="lineno">  106</span>        <span class="keywordflow">if</span> (putBOM)</div>
 <div class="line"><span class="lineno">  107</span>            Encoding::PutBOM(os_);</div>
 <div class="line"><span class="lineno">  108</span>    }</div>
+<div class="ttc" id="aenvironment_8hpp_html_a3951483d0b31c29ca95336206cd35238"><div class="ttname"><a href="environment_8hpp.html#a3951483d0b31c29ca95336206cd35238">os</a></div><div class="ttdeci">os_t os</div><div class="ttdef"><b>Definition</b> <a href="environment_8hpp_source.html#l00023">environment.hpp:23</a></div></div>
 </div><!-- fragment -->
 </div>
 </div>

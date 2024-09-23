@@ -1121,7 +1121,7 @@ Functions</h2></td></tr>
 <tr class="separator:a20875d480364a6477be615bb7d4482de"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a92d17ae24c96a4202744eb15a47b0154" id="r_a92d17ae24c96a4202744eb15a47b0154"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a92d17ae24c96a4202744eb15a47b0154">operator!=</a> (const <a class="el" href="structsysio_1_1chain_1_1abi__def.html">abi_def</a> &amp;lhs, const <a class="el" href="structsysio_1_1chain_1_1abi__def.html">abi_def</a> &amp;rhs)</td></tr>
 <tr class="separator:a92d17ae24c96a4202744eb15a47b0154"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a7e68fc39f2de4ef1263f01028aa86790" id="r_a7e68fc39f2de4ef1263f01028aa86790"><td class="memItemLeft" align="right" valign="top">std::ostream &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a7e68fc39f2de4ef1263f01028aa86790">operator&lt;&lt;</a> (std::ostream &amp;os, const <a class="el" href="structsysio_1_1chain_1_1abi__def.html">abi_def</a> &amp;abi)</td></tr>
+<tr class="memitem:a7e68fc39f2de4ef1263f01028aa86790" id="r_a7e68fc39f2de4ef1263f01028aa86790"><td class="memItemLeft" align="right" valign="top">std::ostream &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a7e68fc39f2de4ef1263f01028aa86790">operator&lt;&lt;</a> (std::ostream &amp;<a class="el" href="environment_8hpp.html#a3951483d0b31c29ca95336206cd35238">os</a>, const <a class="el" href="structsysio_1_1chain_1_1abi__def.html">abi_def</a> &amp;abi)</td></tr>
 <tr class="separator:a7e68fc39f2de4ef1263f01028aa86790"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="var-members" name="var-members"></a>
@@ -7479,7 +7479,7 @@ Here is the call graph for this function:</div>
 
 <p class="definition">Definition at line <a class="el" href="test__common_8hpp_source.html#l00270">270</a> of file <a class="el" href="test__common_8hpp_source.html">test_common.hpp</a>.</p>
 <div class="fragment"><div class="line"><span class="lineno">  270</span>                                                              {</div>
-<div class="line"><span class="lineno">  271</span>      os &lt;&lt; <a class="code hl_function" href="classfc_1_1json.html#aa6541960d7f05567559b866cfaf88dfa">fc::json::to_string</a>(abi, <a class="code hl_function" href="classfc_1_1time__point.html#aeccf1b70aa34b132c5269313b8a50573">fc::time_point::maximum</a>());</div>
+<div class="line"><span class="lineno">  271</span>      <a class="code hl_variable" href="environment_8hpp.html#a3951483d0b31c29ca95336206cd35238">os</a> &lt;&lt; <a class="code hl_function" href="classfc_1_1json.html#aa6541960d7f05567559b866cfaf88dfa">fc::json::to_string</a>(abi, <a class="code hl_function" href="classfc_1_1time__point.html#aeccf1b70aa34b132c5269313b8a50573">fc::time_point::maximum</a>());</div>
 <div class="line"><span class="lineno">  272</span>      <span class="keywordflow">return</span> <a class="code hl_variable" href="environment_8hpp.html#a3951483d0b31c29ca95336206cd35238">os</a>;</div>
 <div class="line"><span class="lineno">  273</span>   }</div>
 <div class="ttc" id="aclassfc_1_1json_html_aa6541960d7f05567559b866cfaf88dfa"><div class="ttname"><a href="classfc_1_1json.html#aa6541960d7f05567559b866cfaf88dfa">fc::json::to_string</a></div><div class="ttdeci">static string to_string(const variant &amp;v, const yield_function_t &amp;yield, const output_formatting format=output_formatting::stringify_large_ints_and_doubles)</div><div class="ttdef"><b>Definition</b> <a href="json_8cpp_source.html#l00674">json.cpp:674</a></div></div>
@@ -8798,12 +8798,11 @@ Here is the caller graph for this function:</div>
 <div class="line"><span class="lineno">   83</span>  } <span class="keywordflow">else</span> <span class="keywordflow">if</span> ( <a class="code hl_variable" href="yubihsm__pkcs11_8c.html#a506da415c9307c897ca9be93acfe1d0f">s</a> == <span class="stringliteral">&quot;read-only&quot;</span> ) {</div>
 <div class="line"><span class="lineno">   84</span>     v = boost::any(<a class="code hl_enumvalue" href="#af3e35f3e1b78dd00fa247009a2d9ba5ea47c7e7cb36a953a8c47e02000036bb44">sysio::chain::db_read_mode::READ_ONLY</a>);</div>
 <div class="line"><span class="lineno">   85</span>  } <span class="keywordflow">else</span> <span class="keywordflow">if</span> ( <a class="code hl_variable" href="yubihsm__pkcs11_8c.html#a506da415c9307c897ca9be93acfe1d0f">s</a> == <span class="stringliteral">&quot;irreversible&quot;</span> ) {</div>
-<div class="line"><span class="lineno">   86</span>     <a class="code hl_variable" href="namespacedevelop_build.html#ade64cd34608f9442ef3049116a2da428">v</a> = boost::any(<a class="code hl_enumvalue" href="#af3e35f3e1b78dd00fa247009a2d9ba5ea88537e4e57a14e27d354f8ef6fc03d63">sysio::chain::db_read_mode::IRREVERSIBLE</a>);</div>
+<div class="line"><span class="lineno">   86</span>     v = boost::any(<a class="code hl_enumvalue" href="#af3e35f3e1b78dd00fa247009a2d9ba5ea88537e4e57a14e27d354f8ef6fc03d63">sysio::chain::db_read_mode::IRREVERSIBLE</a>);</div>
 <div class="line"><span class="lineno">   87</span>  } <span class="keywordflow">else</span> {</div>
 <div class="line"><span class="lineno">   88</span>     <span class="keywordflow">throw</span> validation_error(validation_error::invalid_option_value);</div>
 <div class="line"><span class="lineno">   89</span>  }</div>
 <div class="line"><span class="lineno">   90</span>}</div>
-<div class="ttc" id="anamespacedevelop_build_html_ade64cd34608f9442ef3049116a2da428"><div class="ttname"><a href="namespacedevelop_build.html#ade64cd34608f9442ef3049116a2da428">developBuild.v</a></div><div class="ttdeci">v</div><div class="ttdef"><b>Definition</b> <a href="develop_build_8py_source.html#l00006">developBuild.py:6</a></div></div>
 </div><!-- fragment -->
 </div>
 </div>

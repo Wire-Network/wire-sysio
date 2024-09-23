@@ -1,3 +1,17 @@
 <map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
-<area shape="rect" id="Node000000" href="$structstd_1_1tr1_1_1gtest__internal_1_1_tuple_element_3_01true_00_014_00_01_g_t_e_s_t__10___t_u_p_l_e___07_t_08_01_4.html" title=" " alt="" coords="5,5,181,61"/>
+<area shape="rect" id="Node000000" title=" " alt="" coords="5,267,107,292"/>
+<area shape="rect" id="Node000001" href="$struct_c_l_i_1_1detail_1_1pair__adaptor_3_01_t_00_01conditional__t_3_01false_00_01void__t_3_01ty57376c4a6f008b828f6707df132586d8.html" title=" " alt="" coords="155,5,339,106"/>
+<area shape="poly" id="edge572_Node000000_Node000001" title=" " alt="" coords="67,252,101,186,125,149,153,115,164,105,167,108,157,119,129,152,105,189,71,254"/>
+<area shape="rect" id="Node000002" href="$struct_c_l_i_1_1is__bool_3_01bool_01_4.html" title="Check to see if something is bool (true if actually a bool)" alt="" coords="177,130,316,155"/>
+<area shape="poly" id="edge573_Node000000_Node000002" title=" " alt="" coords="71,252,105,208,128,185,153,165,178,153,181,158,156,170,131,189,109,211,75,255"/>
+<area shape="rect" id="Node000003" href="$struct_c_l_i_1_1is__shared__ptr_3_01const_01std_1_1shared__ptr_3_01_t_01_4_01_4.html" title="Check to see if something is a shared pointer (True if really a shared pointer)" alt="" coords="180,180,314,236"/>
+<area shape="poly" id="edge574_Node000000_Node000003" title=" " alt="" coords="105,258,178,231,180,236,107,263"/>
+<area shape="rect" id="Node000004" href="$struct_c_l_i_1_1is__shared__ptr_3_01std_1_1shared__ptr_3_01_t_01_4_01_4.html" title="Check to see if something is a shared pointer (True if really a shared pointer)" alt="" coords="165,259,329,300"/>
+<area shape="poly" id="edge575_Node000000_Node000004" title=" " alt="" coords="123,277,164,277,164,282,123,282"/>
+<area shape="rect" id="Node000005" href="$struct_c_l_i_1_1is__vector_3_01const_01std_1_1vector_3_01_t_00_01_a_01_4_01_4.html" title="Check to see if something is a vector (true if actually a const vector)" alt="" coords="173,325,320,365"/>
+<area shape="poly" id="edge576_Node000000_Node000005" title=" " alt="" coords="111,295,186,322,184,327,109,300"/>
+<area shape="rect" id="Node000006" href="$struct_c_l_i_1_1is__vector_3_01std_1_1vector_3_01_t_00_01_a_01_4_01_4.html" title="Check to see if something is a vector (true if actually a vector)" alt="" coords="180,390,314,431"/>
+<area shape="poly" id="edge577_Node000000_Node000006" title=" " alt="" coords="79,303,113,340,156,375,181,388,179,393,153,379,109,344,75,307"/>
+<area shape="rect" id="Node000007" href="$struct_catch_1_1is__unique.html" title=" " alt="" coords="171,455,322,480"/>
+<area shape="poly" id="edge578_Node000000_Node000007" title=" " alt="" coords="69,306,82,338,101,374,125,410,156,440,177,452,175,457,153,444,121,413,96,377,77,340,64,308"/>
 </map>

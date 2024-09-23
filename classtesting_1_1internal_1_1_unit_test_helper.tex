@@ -34,7 +34,7 @@ Definition at line \mbox{\hyperlink{gtest-unittest-api__test_8cc_source_l00073}{
 \DoxyCodeLine{00073\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
 \DoxyCodeLine{00074\ \ \ \ \ UnitTest\&\ unit\_test\ =\ *\mbox{\hyperlink{classtesting_1_1_unit_test_a24192400b70b3b946746954e9574fb8e}{UnitTest::GetInstance}}();}
 \DoxyCodeLine{00075\ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{int}\ i\ =\ 0;\ i\ <\ unit\_test.total\_test\_case\_count();\ ++i)\ \{}
-\DoxyCodeLine{00076\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{namespacegmock__test__utils_a959c5af591e4d49b6d35745205b64509}{TestCase}}*\ test\_case\ =\ unit\_test.GetTestCase(i);}
+\DoxyCodeLine{00076\ \ \ \ \ \ \ \textcolor{keyword}{const}\ TestCase*\ test\_case\ =\ unit\_test.GetTestCase(i);}
 \DoxyCodeLine{00077\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (0\ ==\ strcmp(test\_case-\/>name(),\ \mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}))}
 \DoxyCodeLine{00078\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ test\_case;}
 \DoxyCodeLine{00079\ \ \ \ \ \}}
@@ -42,14 +42,16 @@ Definition at line \mbox{\hyperlink{gtest-unittest-api__test_8cc_source_l00073}{
 \DoxyCodeLine{00081\ \ \ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
 \includegraphics[width=350pt]{classtesting_1_1internal_1_1_unit_test_helper_ad7a9059a537193d7964606dc344e8669_cgraph}
 \end{center}
 \end{figure}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -70,8 +72,8 @@ Definition at line \mbox{\hyperlink{gtest-unittest-api__test_8cc_source_l00057}{
 \begin{DoxyCode}{0}
 \DoxyCodeLine{00057\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
 \DoxyCodeLine{00058\ \ \ \ \ UnitTest\&\ unit\_test\ =\ *\mbox{\hyperlink{classtesting_1_1_unit_test_a24192400b70b3b946746954e9574fb8e}{UnitTest::GetInstance}}();}
-\DoxyCodeLine{00059\ \ \ \ \ \mbox{\hyperlink{namespacegmock__test__utils_a959c5af591e4d49b6d35745205b64509}{TestCase}}\ \textcolor{keyword}{const}**\ \textcolor{keyword}{const}\ test\_cases\ =}
-\DoxyCodeLine{00060\ \ \ \ \ \ \ \ \ \textcolor{keyword}{new}\ \textcolor{keyword}{const}\ \mbox{\hyperlink{namespacegmock__test__utils_a959c5af591e4d49b6d35745205b64509}{TestCase}}*[unit\_test.total\_test\_case\_count()];}
+\DoxyCodeLine{00059\ \ \ \ \ TestCase\ \textcolor{keyword}{const}**\ \textcolor{keyword}{const}\ test\_cases\ =}
+\DoxyCodeLine{00060\ \ \ \ \ \ \ \ \ \textcolor{keyword}{new}\ \textcolor{keyword}{const}\ TestCase*[unit\_test.total\_test\_case\_count()];}
 \DoxyCodeLine{00061\ }
 \DoxyCodeLine{00062\ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{int}\ i\ =\ 0;\ i\ <\ unit\_test.total\_test\_case\_count();\ ++i)}
 \DoxyCodeLine{00063\ \ \ \ \ \ \ test\_cases[i]\ =\ unit\_test.GetTestCase(i);}
@@ -83,14 +85,16 @@ Definition at line \mbox{\hyperlink{gtest-unittest-api__test_8cc_source_l00057}{
 \DoxyCodeLine{00069\ \ \ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
 \includegraphics[width=350pt]{classtesting_1_1internal_1_1_unit_test_helper_ae810e4ec1f26ebd9f8340c511e68e2a9_cgraph}
 \end{center}
 \end{figure}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -122,14 +126,16 @@ Definition at line \mbox{\hyperlink{gtest-unittest-api__test_8cc_source_l00086}{
 \DoxyCodeLine{00096\ \ \ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
 \includegraphics[width=350pt]{classtesting_1_1internal_1_1_unit_test_helper_aa58fa9a6b07d0409405c21d088899fa4_cgraph}
 \end{center}
 \end{figure}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode

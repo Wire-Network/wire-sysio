@@ -32,9 +32,9 @@ struct \mbox{\hyperlink{class_catch_1_1_lazy_expression_aaebeae6c9db91b5c4f066e2
 \item 
 \mbox{\hyperlink{yubihsm__pkcs11_8c_a5c230edcb923568000cb7982cf84dfce}{class}} \mbox{\hyperlink{class_catch_1_1_lazy_expression_a8ddee68e111eb70d3e0ab0ae81087022}{Run\+Context}}
 \item 
-auto \mbox{\hyperlink{class_catch_1_1_lazy_expression_aa01086581cab2fcd2d4580b8fa787dfc}{operator$<$$<$}} (std\+::ostream \&os, \mbox{\hyperlink{class_catch_1_1_lazy_expression}{Lazy\+Expression}} const \&lazy\+Expr) -\/$>$ std\+::ostream \&
+auto \mbox{\hyperlink{class_catch_1_1_lazy_expression_aa01086581cab2fcd2d4580b8fa787dfc}{operator$<$$<$}} (std\+::ostream \&\mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}, \mbox{\hyperlink{class_catch_1_1_lazy_expression}{Lazy\+Expression}} const \&lazy\+Expr) -\/$>$ std\+::ostream \&
 \item 
-auto \mbox{\hyperlink{class_catch_1_1_lazy_expression_aa01086581cab2fcd2d4580b8fa787dfc}{operator$<$$<$}} (std\+::ostream \&os, \mbox{\hyperlink{class_catch_1_1_lazy_expression}{Lazy\+Expression}} const \&lazy\+Expr) -\/$>$ std\+::ostream \&
+auto \mbox{\hyperlink{class_catch_1_1_lazy_expression_aa01086581cab2fcd2d4580b8fa787dfc}{operator$<$$<$}} (std\+::ostream \&\mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}, \mbox{\hyperlink{class_catch_1_1_lazy_expression}{Lazy\+Expression}} const \&lazy\+Expr) -\/$>$ std\+::ostream \&
 \end{DoxyCompactItemize}
 
 
@@ -164,16 +164,16 @@ Definition at line \mbox{\hyperlink{catch__assertionhandler_8cpp_source_l00038}{
 \begin{DoxyCode}{0}
 \DoxyCodeLine{00038\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
 \DoxyCodeLine{00039\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ lazyExpr.m\_isNegated\ )}
-\DoxyCodeLine{00040\ \ \ \ \ \ \ \ \ \ \ \ \ os\ <<\ \textcolor{stringliteral}{"{}!"{}};}
+\DoxyCodeLine{00040\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}\ <<\ \textcolor{stringliteral}{"{}!"{}};}
 \DoxyCodeLine{00041\ }
 \DoxyCodeLine{00042\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ lazyExpr\ )\ \{}
 \DoxyCodeLine{00043\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ lazyExpr.m\_isNegated\ \&\&\ lazyExpr.m\_transientExpression-\/>isBinaryExpression()\ )}
-\DoxyCodeLine{00044\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ os\ <<\ \textcolor{stringliteral}{"{}("{}}\ <<\ *lazyExpr.m\_transientExpression\ <<\ \textcolor{stringliteral}{"{})"{}};}
+\DoxyCodeLine{00044\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}\ <<\ \textcolor{stringliteral}{"{}("{}}\ <<\ *lazyExpr.m\_transientExpression\ <<\ \textcolor{stringliteral}{"{})"{}};}
 \DoxyCodeLine{00045\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}}
-\DoxyCodeLine{00046\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ os\ <<\ *lazyExpr.m\_transientExpression;}
+\DoxyCodeLine{00046\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}\ <<\ *lazyExpr.m\_transientExpression;}
 \DoxyCodeLine{00047\ \ \ \ \ \ \ \ \ \}}
 \DoxyCodeLine{00048\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}\ \{}
-\DoxyCodeLine{00049\ \ \ \ \ \ \ \ \ \ \ \ \ os\ <<\ \textcolor{stringliteral}{"{}\{**\ error\ -\/\ unchecked\ empty\ expression\ requested\ **\}"{}};}
+\DoxyCodeLine{00049\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}\ <<\ \textcolor{stringliteral}{"{}\{**\ error\ -\/\ unchecked\ empty\ expression\ requested\ **\}"{}};}
 \DoxyCodeLine{00050\ \ \ \ \ \ \ \ \ \}}
 \DoxyCodeLine{00051\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}};}
 \DoxyCodeLine{00052\ \ \ \ \ \}}
@@ -193,16 +193,16 @@ Definition at line \mbox{\hyperlink{catch__assertionhandler_8cpp_source_l00038}{
 \begin{DoxyCode}{0}
 \DoxyCodeLine{00038\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
 \DoxyCodeLine{00039\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ lazyExpr.m\_isNegated\ )}
-\DoxyCodeLine{00040\ \ \ \ \ \ \ \ \ \ \ \ \ os\ <<\ \textcolor{stringliteral}{"{}!"{}};}
+\DoxyCodeLine{00040\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}\ <<\ \textcolor{stringliteral}{"{}!"{}};}
 \DoxyCodeLine{00041\ }
 \DoxyCodeLine{00042\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ lazyExpr\ )\ \{}
 \DoxyCodeLine{00043\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ lazyExpr.m\_isNegated\ \&\&\ lazyExpr.m\_transientExpression-\/>isBinaryExpression()\ )}
-\DoxyCodeLine{00044\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ os\ <<\ \textcolor{stringliteral}{"{}("{}}\ <<\ *lazyExpr.m\_transientExpression\ <<\ \textcolor{stringliteral}{"{})"{}};}
+\DoxyCodeLine{00044\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}\ <<\ \textcolor{stringliteral}{"{}("{}}\ <<\ *lazyExpr.m\_transientExpression\ <<\ \textcolor{stringliteral}{"{})"{}};}
 \DoxyCodeLine{00045\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}}
-\DoxyCodeLine{00046\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ os\ <<\ *lazyExpr.m\_transientExpression;}
+\DoxyCodeLine{00046\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}\ <<\ *lazyExpr.m\_transientExpression;}
 \DoxyCodeLine{00047\ \ \ \ \ \ \ \ \ \}}
 \DoxyCodeLine{00048\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}\ \{}
-\DoxyCodeLine{00049\ \ \ \ \ \ \ \ \ \ \ \ \ os\ <<\ \textcolor{stringliteral}{"{}\{**\ error\ -\/\ unchecked\ empty\ expression\ requested\ **\}"{}};}
+\DoxyCodeLine{00049\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}\ <<\ \textcolor{stringliteral}{"{}\{**\ error\ -\/\ unchecked\ empty\ expression\ requested\ **\}"{}};}
 \DoxyCodeLine{00050\ \ \ \ \ \ \ \ \ \}}
 \DoxyCodeLine{00051\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}};}
 \DoxyCodeLine{00052\ \ \ \ \ \}}

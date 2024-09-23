@@ -19,8 +19,8 @@ This is the standard way of providing string conversions in C++ -\/ and the chan
 
 
 \begin{DoxyCode}{0}
-\DoxyCodeLine{std::ostream\&\ \mbox{\hyperlink{database__utils_8hpp_a9c651062fd345156256e69573165086c}{operator\ <<\ }}(\ std::ostream\&\ os,\ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}\ \textcolor{keyword}{const}\&\ \mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}}\ )\ \{}
-\DoxyCodeLine{\ \ \ \ os\ <<\ convertMyTypeToString(\ \mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}}\ );}
+\DoxyCodeLine{std::ostream\&\ \mbox{\hyperlink{database__utils_8hpp_a9c651062fd345156256e69573165086c}{operator\ <<\ }}(\ std::ostream\&\ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}},\ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}\ \textcolor{keyword}{const}\&\ \mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}}\ )\ \{}
+\DoxyCodeLine{\ \ \ \ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}\ <<\ convertMyTypeToString(\ \mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}}\ );}
 \DoxyCodeLine{\ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}};}
 \DoxyCodeLine{\}}
 

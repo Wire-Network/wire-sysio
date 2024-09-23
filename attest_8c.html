@@ -331,9 +331,9 @@ Variables</h2></td></tr>
 <div class="line"><span class="lineno">  224</span>  assert(sk_X509_EXTENSION_num(extensions_list) &gt;= 6);</div>
 <div class="line"><span class="lineno">  225</span> </div>
 <div class="line"><span class="lineno">  226</span>  <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i = 0; i &lt; sk_X509_EXTENSION_num(extensions_list); i++) {</div>
-<div class="line"><span class="lineno">  227</span>    X509_EXTENSION *<a class="code hl_variable" href="namespacevalidate__reflection.html#a34a4c51cfedb3b3cad290fcb3a1945cc">extension</a>;</div>
+<div class="line"><span class="lineno">  227</span>    X509_EXTENSION *extension;</div>
 <div class="line"><span class="lineno">  228</span> </div>
-<div class="line"><span class="lineno">  229</span>    <a class="code hl_variable" href="namespacevalidate__reflection.html#a34a4c51cfedb3b3cad290fcb3a1945cc">extension</a> = sk_X509_EXTENSION_value(extensions_list, i);</div>
+<div class="line"><span class="lineno">  229</span>    extension = sk_X509_EXTENSION_value(extensions_list, i);</div>
 <div class="line"><span class="lineno">  230</span> </div>
 <div class="line"><span class="lineno">  231</span>    print_extension(extension);</div>
 <div class="line"><span class="lineno">  232</span>  }</div>
@@ -359,7 +359,6 @@ Variables</h2></td></tr>
 <div class="ttc" id="aattest_8c_html_aaad093b8e1f85e934557c9f70d2562d4"><div class="ttname"><a href="#aaad093b8e1f85e934557c9f70d2562d4">attestation_template_file</a></div><div class="ttdeci">const char attestation_template_file[]</div><div class="ttdef"><b>Definition</b> <a href="attest_8c_source.html#l00037">attest.c:37</a></div></div>
 <div class="ttc" id="aecdh__derive__test_8c_html_a0a2c7706d971796d7dc84fee36d6c84f"><div class="ttname"><a href="ecdh__derive__test_8c.html#a0a2c7706d971796d7dc84fee36d6c84f">session</a></div><div class="ttdeci">CK_SESSION_HANDLE session</div><div class="ttdef"><b>Definition</b> <a href="ecdh__derive__test_8c_source.html#l00045">ecdh_derive_test.c:45</a></div></div>
 <div class="ttc" id="anamespace_log_html_a83926634a3916d0927abca4aca58a60a"><div class="ttname"><a href="namespace_log.html#a83926634a3916d0927abca4aca58a60a">Log::printf</a></div><div class="ttdeci">LOGGING_API void printf(Category category, const char *format,...)</div><div class="ttdef"><b>Definition</b> <a href="_logging_8cpp_source.html#l00030">Logging.cpp:30</a></div></div>
-<div class="ttc" id="anamespacevalidate__reflection_html_a34a4c51cfedb3b3cad290fcb3a1945cc"><div class="ttname"><a href="namespacevalidate__reflection.html#a34a4c51cfedb3b3cad290fcb3a1945cc">validate_reflection.extension</a></div><div class="ttdeci">str extension</div><div class="ttdef"><b>Definition</b> <a href="validate__reflection_8py_source.html#l00063">validate_reflection.py:63</a></div></div>
 <div class="ttc" id="aopenssl-compat_8c_html_a93acf209ee3e7156a5533958e7e50bb0"><div class="ttname"><a href="openssl-compat_8c.html#a93acf209ee3e7156a5533958e7e50bb0">STACK_OF</a></div><div class="ttdeci">const STACK_OF(X509_EXTENSION)</div><div class="ttdef"><b>Definition</b> <a href="openssl-compat_8c_source.html#l00090">openssl-compat.c:90</a></div></div>
 <div class="ttc" id="astdint_8h_html_a273cf69d639a59973b6019625df33e30"><div class="ttname"><a href="stdint_8h.html#a273cf69d639a59973b6019625df33e30">uint16_t</a></div><div class="ttdeci">unsigned short uint16_t</div><div class="ttdef"><b>Definition</b> <a href="stdint_8h_source.html#l00125">stdint.h:125</a></div></div>
 <div class="ttc" id="astdint_8h_html_aba7bc1797add20fe3efdf37ced1182c5"><div class="ttname"><a href="stdint_8h.html#aba7bc1797add20fe3efdf37ced1182c5">uint8_t</a></div><div class="ttdeci">unsigned char uint8_t</div><div class="ttdef"><b>Definition</b> <a href="stdint_8h_source.html#l00124">stdint.h:124</a></div></div>

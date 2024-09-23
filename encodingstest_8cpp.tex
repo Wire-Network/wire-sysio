@@ -5,7 +5,8 @@
 {\ttfamily \#include "{}rapidjson/filewritestream.\+h"{}}\newline
 {\ttfamily \#include "{}rapidjson/encodedstream.\+h"{}}\newline
 {\ttfamily \#include "{}rapidjson/stringbuffer.\+h"{}}\newline
-Include dependency graph for encodingstest.\+cpp\+:\nopagebreak
+Include dependency graph for encodingstest.\+cpp\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -59,9 +60,9 @@ Definition at line \mbox{\hyperlink{encodingstest_8cpp_source_l00428}{428}} of f
 \DoxyCodeLine{00428\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
 \DoxyCodeLine{00429\ \ \ \ \ \mbox{\hyperlink{class_generic_string_buffer}{StringBuffer}}\ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}},\ os2;}
 \DoxyCodeLine{00430\ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{unsigned}\ codepoint\ =\ 0;\ codepoint\ <\ 128;\ codepoint++)\ \{}
-\DoxyCodeLine{00431\ \ \ \ \ \ \ \ \ os.Clear();}
-\DoxyCodeLine{00432\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_a_s_c_i_i_af56b1605fe233c54693facc7de457f72}{ASCII<>::Encode}}(os,\ codepoint);}
-\DoxyCodeLine{00433\ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{struct_a_s_c_i_i_a55aad132d2a556a25f6c02e4f9b372de}{ASCII<>::Ch}}*\ encodedStr\ =\ os.GetString();}
+\DoxyCodeLine{00431\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}.Clear();}
+\DoxyCodeLine{00432\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_a_s_c_i_i_af56b1605fe233c54693facc7de457f72}{ASCII<>::Encode}}(\mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}},\ codepoint);}
+\DoxyCodeLine{00433\ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{struct_a_s_c_i_i_a55aad132d2a556a25f6c02e4f9b372de}{ASCII<>::Ch}}*\ encodedStr\ =\ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}.GetString();}
 \DoxyCodeLine{00434\ \ \ \ \ \ \ \ \ \{}
 \DoxyCodeLine{00435\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_generic_string_stream}{StringStream}}\ is(encodedStr);}
 \DoxyCodeLine{00436\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{unsigned}\ decodedCodepoint;}
@@ -82,7 +83,8 @@ Definition at line \mbox{\hyperlink{encodingstest_8cpp_source_l00428}{428}} of f
 \DoxyCodeLine{00451\ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -106,9 +108,9 @@ Definition at line \mbox{\hyperlink{encodingstest_8cpp_source_l00337}{337}} of f
 \DoxyCodeLine{00339\ \ \ \ \ \mbox{\hyperlink{class_generic_string_buffer}{GenericStringBuffer<UTF8<>}}\ >\ utf8os;}
 \DoxyCodeLine{00340\ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keyword}{const}\ \textcolor{keywordtype}{unsigned}*\ range\ =\ kCodepointRanges;\ *range\ !=\ 0xFFFFFFFF;\ range\ +=\ 2)\ \{}
 \DoxyCodeLine{00341\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{unsigned}\ codepoint\ =\ range[0];\ codepoint\ <=\ range[1];\ ++codepoint)\ \{}
-\DoxyCodeLine{00342\ \ \ \ \ \ \ \ \ \ \ \ \ os.Clear();}
-\DoxyCodeLine{00343\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_u_t_f16_a9d8ded01244e30d037c4afa10ee2b30e}{UTF16<>::Encode}}(os,\ codepoint);}
-\DoxyCodeLine{00344\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{struct_u_t_f16_a2bb000b19017f8c6d607f3db33fa138d}{UTF16<>::Ch}}*\ encodedStr\ =\ os.GetString();}
+\DoxyCodeLine{00342\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}.Clear();}
+\DoxyCodeLine{00343\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_u_t_f16_a9d8ded01244e30d037c4afa10ee2b30e}{UTF16<>::Encode}}(\mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}},\ codepoint);}
+\DoxyCodeLine{00344\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{struct_u_t_f16_a2bb000b19017f8c6d607f3db33fa138d}{UTF16<>::Ch}}*\ encodedStr\ =\ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}.GetString();}
 \DoxyCodeLine{00345\ }
 \DoxyCodeLine{00346\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Encode\ with\ Hoehrmann's\ code}}
 \DoxyCodeLine{00347\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (codepoint\ !=\ 0)\ \textcolor{comment}{//\ cannot\ handle\ U+0000}}
@@ -162,7 +164,8 @@ Definition at line \mbox{\hyperlink{encodingstest_8cpp_source_l00337}{337}} of f
 \DoxyCodeLine{00395\ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -185,9 +188,9 @@ Definition at line \mbox{\hyperlink{encodingstest_8cpp_source_l00397}{397}} of f
 \DoxyCodeLine{00398\ \ \ \ \ \mbox{\hyperlink{class_generic_string_buffer}{GenericStringBuffer<UTF32<>}}\ >\ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}},\ os2;}
 \DoxyCodeLine{00399\ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keyword}{const}\ \textcolor{keywordtype}{unsigned}*\ range\ =\ kCodepointRanges;\ *range\ !=\ 0xFFFFFFFF;\ range\ +=\ 2)\ \{}
 \DoxyCodeLine{00400\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{unsigned}\ codepoint\ =\ range[0];\ codepoint\ <=\ range[1];\ ++codepoint)\ \{}
-\DoxyCodeLine{00401\ \ \ \ \ \ \ \ \ \ \ \ \ os.Clear();}
-\DoxyCodeLine{00402\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_u_t_f32_a511d1b09672ce535085895a28d8c2f13}{UTF32<>::Encode}}(os,\ codepoint);}
-\DoxyCodeLine{00403\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{struct_u_t_f32_aa215989d027f01f256174c5f91332997}{UTF32<>::Ch}}*\ encodedStr\ =\ os.GetString();}
+\DoxyCodeLine{00401\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}.Clear();}
+\DoxyCodeLine{00402\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_u_t_f32_a511d1b09672ce535085895a28d8c2f13}{UTF32<>::Encode}}(\mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}},\ codepoint);}
+\DoxyCodeLine{00403\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{struct_u_t_f32_aa215989d027f01f256174c5f91332997}{UTF32<>::Ch}}*\ encodedStr\ =\ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}.GetString();}
 \DoxyCodeLine{00404\ }
 \DoxyCodeLine{00405\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Decode}}
 \DoxyCodeLine{00406\ \ \ \ \ \ \ \ \ \ \ \ \ \{}
@@ -213,7 +216,8 @@ Definition at line \mbox{\hyperlink{encodingstest_8cpp_source_l00397}{397}} of f
 \DoxyCodeLine{00426\ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -236,9 +240,9 @@ Definition at line \mbox{\hyperlink{encodingstest_8cpp_source_l00285}{285}} of f
 \DoxyCodeLine{00286\ \ \ \ \ \mbox{\hyperlink{class_generic_string_buffer}{StringBuffer}}\ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}},\ os2;}
 \DoxyCodeLine{00287\ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keyword}{const}\ \textcolor{keywordtype}{unsigned}*\ range\ =\ kCodepointRanges;\ *range\ !=\ 0xFFFFFFFF;\ range\ +=\ 2)\ \{}
 \DoxyCodeLine{00288\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{unsigned}\ codepoint\ =\ range[0];\ codepoint\ <=\ range[1];\ ++codepoint)\ \{}
-\DoxyCodeLine{00289\ \ \ \ \ \ \ \ \ \ \ \ \ os.Clear();}
-\DoxyCodeLine{00290\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_u_t_f8}{UTF8<>::Encode}}(os,\ codepoint);}
-\DoxyCodeLine{00291\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ encodedStr\ =\ os.GetString();}
+\DoxyCodeLine{00289\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}.Clear();}
+\DoxyCodeLine{00290\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_u_t_f8}{UTF8<>::Encode}}(\mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}},\ codepoint);}
+\DoxyCodeLine{00291\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ encodedStr\ =\ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}.GetString();}
 \DoxyCodeLine{00292\ }
 \DoxyCodeLine{00293\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Decode\ with\ Hoehrmann}}
 \DoxyCodeLine{00294\ \ \ \ \ \ \ \ \ \ \ \ \ \{}
@@ -285,7 +289,8 @@ Definition at line \mbox{\hyperlink{encodingstest_8cpp_source_l00285}{285}} of f
 \DoxyCodeLine{00335\ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode

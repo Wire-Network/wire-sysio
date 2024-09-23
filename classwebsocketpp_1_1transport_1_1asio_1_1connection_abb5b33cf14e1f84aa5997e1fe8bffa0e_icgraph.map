@@ -1,36 +1,15 @@
 <map id="websocketpp::transport::asio::connection::handle_proxy_read" name="websocketpp::transport::asio::connection::handle_proxy_read">
-<area shape="rect" id="Node000001" title="Proxy read callback." alt="" coords="1765,90,1935,146"/>
-<area shape="rect" id="Node000002" href="$classwebsocketpp_1_1transport_1_1asio_1_1connection.html#a37efcf4f20e4291bb62174cdd4093730" title=" " alt="" coords="1521,98,1717,138"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="1749,121,1717,121,1717,116,1749,116"/>
-<area shape="rect" id="Node000003" href="$classwebsocketpp_1_1transport_1_1asio_1_1connection.html#a5684daf9e8ee3e0447694d4376832917" title=" " alt="" coords="1302,90,1473,146"/>
-<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="1505,121,1473,121,1473,116,1505,116"/>
-<area shape="rect" id="Node000004" href="$classwebsocketpp_1_1transport_1_1asio_1_1connection.html#a55e3fac0ec05389d6765a6496922f099" title=" " alt="" coords="1055,98,1254,138"/>
-<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="1287,121,1255,121,1255,116,1287,116"/>
-<area shape="rect" id="Node000005" href="$classwebsocketpp_1_1transport_1_1asio_1_1connection.html#a27730f6446dd626f40b17ad1b26e5b77" title=" " alt="" coords="837,90,1007,146"/>
-<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="1039,121,1008,121,1008,116,1039,116"/>
-<area shape="rect" id="Node000006" href="$classwebsocketpp_1_1transport_1_1asio_1_1connection.html#ae09d85b808498f06bcc8d938c9107e8e" title="Initialize transport for reading." alt="" coords="631,98,789,138"/>
-<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="821,121,789,121,789,116,821,116"/>
-<area shape="rect" id="Node000007" href="$structmock__con.html#a76adb10b2073f73cf11f310f113adf55" title=" " alt="" coords="468,105,583,131"/>
-<area shape="poly" id="edge6_Node000006_Node000007" title=" " alt="" coords="616,121,584,121,584,116,616,116"/>
-<area shape="rect" id="Node000008" href="$classcpp_1_1tokenize_1_1_token.html#ad93a4059e9932fa2dea149510f0ef002" title=" " alt="" coords="260,15,398,56"/>
-<area shape="poly" id="edge7_Node000007_Node000008" title=" " alt="" coords="485,101,419,70,391,59,393,54,421,65,487,96"/>
-<area shape="rect" id="Node000009" href="$classpump_1_1_token.html#a1a3dc1ee7b0d66e90f4ab7228b37fc0d" title=" " alt="" coords="259,80,398,106"/>
-<area shape="poly" id="edge8_Node000007_Node000009" title=" " alt="" coords="452,111,399,104,399,99,453,106"/>
-<area shape="rect" id="Node000010" href="$classcpp_1_1ast_1_1_node.html#aade2369ed75b8cd0b9e76752bf6ae7fb" title=" " alt="" coords="238,129,420,155"/>
-<area shape="poly" id="edge9_Node000007_Node000010" title=" " alt="" coords="453,130,421,134,420,128,452,124"/>
-<area shape="rect" id="Node000017" href="$classpump_1_1_token.html#a808876dd5a7b1bf6c43a3855dc4a8868" title=" " alt="" coords="264,203,394,228"/>
-<area shape="poly" id="edge16_Node000007_Node000017" title=" " alt="" coords="485,141,358,204,356,200,483,136"/>
-<area shape="rect" id="Node000011" href="$classcpp_1_1ast_1_1_define.html#a8e51e0611e1a76c5874f6b39e27a6d6a" title=" " alt="" coords="21,5,174,31"/>
-<area shape="poly" id="edge10_Node000010_Node000011" title=" " alt="" coords="242,124,236,120,219,101,211,81,204,62,188,44,169,34,172,29,191,40,209,59,216,79,223,98,239,116,245,120"/>
-<area shape="rect" id="Node000012" href="$classcpp_1_1ast_1_1_expr.html#a47968bf1be367a77836f211ced014ec0" title=" " alt="" coords="27,55,168,80"/>
-<area shape="poly" id="edge11_Node000010_Node000012" title=" " alt="" coords="254,127,237,121,212,107,189,94,157,83,159,78,191,89,215,102,239,116,255,122"/>
-<area shape="rect" id="Node000013" href="$classcpp_1_1ast_1_1_goto.html#ad3bb8a557e3075d7b68c5b0449fb494c" title=" " alt="" coords="26,104,169,130"/>
-<area shape="poly" id="edge12_Node000010_Node000013" title=" " alt="" coords="222,133,169,127,170,122,223,128"/>
-<area shape="rect" id="Node000014" href="$classcpp_1_1ast_1_1_using.html#aa489ba90656b2c28290af718f644d2f4" title=" " alt="" coords="23,153,172,179"/>
-<area shape="poly" id="edge13_Node000010_Node000014" title=" " alt="" coords="222,156,173,161,172,156,222,151"/>
-<area shape="rect" id="Node000015" href="$classcpp_1_1ast_1_1_variable_declaration.html#aeafe1b55bcf3005d00951f0accb18def" title=" " alt="" coords="5,203,190,244"/>
-<area shape="poly" id="edge14_Node000010_Node000015" title=" " alt="" coords="256,163,239,169,215,181,191,194,163,205,161,200,189,189,212,176,237,164,254,158"/>
-<area shape="rect" id="Node000016" href="$classcpp_1_1ast_1_1_node.html#acceba1aa15a332dd139ba9587d439a51" title=" " alt="" coords="11,268,184,294"/>
-<area shape="poly" id="edge15_Node000010_Node000016" title=" " alt="" coords="244,165,240,168,223,189,216,212,209,235,191,258,171,270,168,265,188,253,205,232,211,210,218,187,236,164,241,161"/>
-<area shape="poly" id="edge17_Node000017_Node000017" title=" " alt="" coords="363,190,351,184,329,181,308,183,297,188,295,193,300,201,296,204,289,194,293,184,307,178,329,176,353,179,365,186"/>
+<area shape="rect" id="Node000001" title="Proxy read callback." alt="" coords="1302,5,1473,61"/>
+<area shape="rect" id="Node000002" href="$classwebsocketpp_1_1transport_1_1asio_1_1connection.html#a37efcf4f20e4291bb62174cdd4093730" title=" " alt="" coords="1058,13,1254,54"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="1286,36,1255,36,1255,30,1286,30"/>
+<area shape="rect" id="Node000003" href="$classwebsocketpp_1_1transport_1_1asio_1_1connection.html#a5684daf9e8ee3e0447694d4376832917" title=" " alt="" coords="840,5,1010,61"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="1043,36,1011,36,1011,30,1043,30"/>
+<area shape="rect" id="Node000004" href="$classwebsocketpp_1_1transport_1_1asio_1_1connection.html#a55e3fac0ec05389d6765a6496922f099" title=" " alt="" coords="592,13,792,54"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="824,36,792,36,792,30,824,30"/>
+<area shape="rect" id="Node000005" href="$classwebsocketpp_1_1transport_1_1asio_1_1connection.html#a27730f6446dd626f40b17ad1b26e5b77" title=" " alt="" coords="374,5,544,61"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="577,36,545,36,545,30,577,30"/>
+<area shape="rect" id="Node000006" href="$classwebsocketpp_1_1transport_1_1asio_1_1connection.html#ae09d85b808498f06bcc8d938c9107e8e" title="Initialize transport for reading." alt="" coords="169,13,326,54"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="358,36,326,36,326,30,358,30"/>
+<area shape="rect" id="Node000007" href="$structmock__con.html#a76adb10b2073f73cf11f310f113adf55" title=" " alt="" coords="5,20,121,46"/>
+<area shape="poly" id="edge6_Node000006_Node000007" title=" " alt="" coords="153,36,121,36,121,30,153,30"/>
 </map>

@@ -2232,7 +2232,7 @@ Here is the call graph for this function:</div>
 <div class="line"><span class="lineno">  438</span>        <a class="code hl_struct" href="struct_generic_string_stream.html">StringStream</a> is(json_);</div>
 <div class="line"><span class="lineno">  439</span>        <span class="keywordtype">bool</span> result = <span class="keyword">true</span>;</div>
 <div class="line"><span class="lineno">  440</span>        <span class="keywordflow">while</span> (is.Peek() != <span class="charliteral">&#39;\0&#39;</span>)</div>
-<div class="line"><span class="lineno">  441</span>            result &amp;= <a class="code hl_struct" href="struct_u_t_f8.html">UTF8&lt;&gt;::Validate</a>(is, os);</div>
+<div class="line"><span class="lineno">  441</span>            result &amp;= <a class="code hl_struct" href="struct_u_t_f8.html">UTF8&lt;&gt;::Validate</a>(is, <a class="code hl_variable" href="environment_8hpp.html#a3951483d0b31c29ca95336206cd35238">os</a>);</div>
 <div class="line"><span class="lineno">  442</span>        <a class="code hl_define" href="gtest_8h.html#ac33e7cdfb5d44a7a0f0ab552eb5c3c6a">EXPECT_TRUE</a>(result);</div>
 <div class="line"><span class="lineno">  443</span>    }</div>
 <div class="line"><span class="lineno">  444</span>}</div>

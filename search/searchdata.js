@@ -1,9 +1,9 @@
 var indexSectionsWithContent =
 {
-  0: ".0123567:_abcdefghijklmnopqrstuvwxyz~内在常性教正流特编解远",
+  0: "0123567:_abcdefghijklmnopqrstuvwxyz~内在常性教正流特编解远",
   1: "_abcdefghijklmnopqrstuvwxyz",
-  2: "abcdefghijlmnoprstuvwx",
-  3: ".0123_abcdefghijklmnopqrstuvwxyz",
+  2: "abcdefijlmnoprstuwx",
+  3: "0123_abcdefghijklmnopqrstuvwxyz",
   4: "_abcdefghijklmnopqrstuvwxyz~",
   5: "_abcdefghijklmnopqrstuvwxyz",
   6: "_abcdefghijklmnoprstuvwxyz",

@@ -6,7 +6,8 @@
 
 
 
-Inheritance diagram for testing\+::internal\+::Any\+Matcher\+Impl\texorpdfstring{$<$}{<} T \texorpdfstring{$>$}{>}\+:\nopagebreak
+Inheritance diagram for testing\+::internal\+::Any\+Matcher\+Impl\texorpdfstring{$<$}{<} T \texorpdfstring{$>$}{>}\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -15,7 +16,8 @@ Inheritance diagram for testing\+::internal\+::Any\+Matcher\+Impl\texorpdfstring
 \end{figure}
 
 
-Collaboration diagram for testing\+::internal\+::Any\+Matcher\+Impl\texorpdfstring{$<$}{<} T \texorpdfstring{$>$}{>}\+:\nopagebreak
+Collaboration diagram for testing\+::internal\+::Any\+Matcher\+Impl\texorpdfstring{$<$}{<} T \texorpdfstring{$>$}{>}\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -27,9 +29,9 @@ Collaboration diagram for testing\+::internal\+::Any\+Matcher\+Impl\texorpdfstri
 \item 
 virtual bool \mbox{\hyperlink{classtesting_1_1internal_1_1_any_matcher_impl_a9ba9596ab8f6e05fa802ab1643f8c897}{Match\+And\+Explain}} (\mbox{\hyperlink{gtest-port_8h_a9f91fcd24cae0b48fdaeb19102dac525}{GTEST\+\_\+\+REFERENCE\+\_\+\+TO\+\_\+\+CONST\+\_\+}}(\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}), \mbox{\hyperlink{classtesting_1_1_match_result_listener}{Match\+Result\+Listener}} \texorpdfstring{$\ast$}{*}) const
 \item 
-virtual void \mbox{\hyperlink{classtesting_1_1internal_1_1_any_matcher_impl_a743f037083cc9992a4cc0d4e9842bc86}{Describe\+To}} (\+::std\+::ostream \texorpdfstring{$\ast$}{*}os) const
+virtual void \mbox{\hyperlink{classtesting_1_1internal_1_1_any_matcher_impl_a743f037083cc9992a4cc0d4e9842bc86}{Describe\+To}} (\+::std\+::ostream \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}) const
 \item 
-virtual void \mbox{\hyperlink{classtesting_1_1internal_1_1_any_matcher_impl_ac6570e881174ba774b8d56abaa4f7d25}{Describe\+Negation\+To}} (\+::std\+::ostream \texorpdfstring{$\ast$}{*}os) const
+virtual void \mbox{\hyperlink{classtesting_1_1internal_1_1_any_matcher_impl_ac6570e881174ba774b8d56abaa4f7d25}{Describe\+Negation\+To}} (\+::std\+::ostream \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}) const
 \end{DoxyCompactItemize}
 \doxysubsection*{Public Member Functions inherited from \mbox{\hyperlink{classtesting_1_1_matcher_interface}{testing\+::\+Matcher\+Interface$<$ GTEST\+\_\+\+REFERENCE\+\_\+\+TO\+\_\+\+CONST\+\_\+(\+T)$>$}}}
 \begin{DoxyCompactItemize}
@@ -74,7 +76,7 @@ Definition at line \mbox{\hyperlink{gmock-matchers_8h_source_l01033}{1033}} of f
 \DoxyCodeLine{01034\ \ \ \ \ \textcolor{comment}{//\ This\ is\ mostly\ for\ completeness'\ safe,\ as\ it's\ not\ very\ useful}}
 \DoxyCodeLine{01035\ \ \ \ \ \textcolor{comment}{//\ to\ write\ Not(A<bool>()).\ \ However\ we\ cannot\ completely\ rule\ out}}
 \DoxyCodeLine{01036\ \ \ \ \ \textcolor{comment}{//\ such\ a\ possibility,\ and\ it\ doesn't\ hurt\ to\ be\ prepared.}}
-\DoxyCodeLine{01037\ \ \ \ \ *os\ <<\ \textcolor{stringliteral}{"{}never\ matches"{}};}
+\DoxyCodeLine{01037\ \ \ \ \ *\mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}\ <<\ \textcolor{stringliteral}{"{}never\ matches"{}};}
 \DoxyCodeLine{01038\ \ \ \}}
 
 \end{DoxyCode}
@@ -95,7 +97,7 @@ Definition at line \mbox{\hyperlink{gmock-matchers_8h_source_l01032}{1032}} of f
 
 
 \begin{DoxyCode}{0}
-\DoxyCodeLine{01032\ \{\ *os\ <<\ \textcolor{stringliteral}{"{}is\ anything"{}};\ \}}
+\DoxyCodeLine{01032\ \{\ *\mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}\ <<\ \textcolor{stringliteral}{"{}is\ anything"{}};\ \}}
 
 \end{DoxyCode}
 \Hypertarget{classtesting_1_1internal_1_1_any_matcher_impl_a9ba9596ab8f6e05fa802ab1643f8c897}\index{testing::internal::AnyMatcherImpl$<$ T $>$@{testing::internal::AnyMatcherImpl$<$ T $>$}!MatchAndExplain@{MatchAndExplain}}

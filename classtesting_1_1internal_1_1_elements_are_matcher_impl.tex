@@ -6,7 +6,8 @@
 
 
 
-Inheritance diagram for testing\+::internal\+::Elements\+Are\+Matcher\+Impl\texorpdfstring{$<$}{<} Container \texorpdfstring{$>$}{>}\+:\nopagebreak
+Inheritance diagram for testing\+::internal\+::Elements\+Are\+Matcher\+Impl\texorpdfstring{$<$}{<} Container \texorpdfstring{$>$}{>}\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -15,7 +16,8 @@ Inheritance diagram for testing\+::internal\+::Elements\+Are\+Matcher\+Impl\texo
 \end{figure}
 
 
-Collaboration diagram for testing\+::internal\+::Elements\+Are\+Matcher\+Impl\texorpdfstring{$<$}{<} Container \texorpdfstring{$>$}{>}\+:\nopagebreak
+Collaboration diagram for testing\+::internal\+::Elements\+Are\+Matcher\+Impl\texorpdfstring{$<$}{<} Container \texorpdfstring{$>$}{>}\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -40,9 +42,9 @@ typedef \mbox{\hyperlink{classtesting_1_1internal_1_1_elements_are_matcher_impl_
 \item 
 {\footnotesize template$<$typename Input\+Iter $>$ }\\\mbox{\hyperlink{classtesting_1_1internal_1_1_elements_are_matcher_impl_abfe21bd90e0c085d4a171e22f1e2cc09}{Elements\+Are\+Matcher\+Impl}} (Input\+Iter first, Input\+Iter last)
 \item 
-virtual void \mbox{\hyperlink{classtesting_1_1internal_1_1_elements_are_matcher_impl_a685f19f64b22a37317332d512c1bce52}{Describe\+To}} (\+::std\+::ostream \texorpdfstring{$\ast$}{*}os) const
+virtual void \mbox{\hyperlink{classtesting_1_1internal_1_1_elements_are_matcher_impl_a685f19f64b22a37317332d512c1bce52}{Describe\+To}} (\+::std\+::ostream \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}) const
 \item 
-virtual void \mbox{\hyperlink{classtesting_1_1internal_1_1_elements_are_matcher_impl_ab8485a836eb7ffabc43b05187e58616d}{Describe\+Negation\+To}} (\+::std\+::ostream \texorpdfstring{$\ast$}{*}os) const
+virtual void \mbox{\hyperlink{classtesting_1_1internal_1_1_elements_are_matcher_impl_ab8485a836eb7ffabc43b05187e58616d}{Describe\+Negation\+To}} (\+::std\+::ostream \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}) const
 \item 
 virtual bool \mbox{\hyperlink{classtesting_1_1internal_1_1_elements_are_matcher_impl_a6562159fa83e09417c3552fd881f878e}{Match\+And\+Explain}} (Container container, \mbox{\hyperlink{classtesting_1_1_match_result_listener}{Match\+Result\+Listener}} \texorpdfstring{$\ast$}{*}listener) const
 \end{DoxyCompactItemize}
@@ -154,16 +156,16 @@ Definition at line \mbox{\hyperlink{gmock-matchers_8h_source_l03497}{3497}} of f
 \begin{DoxyCode}{0}
 \DoxyCodeLine{03497\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
 \DoxyCodeLine{03498\ \ \ \ \ \textcolor{keywordflow}{if}\ (count()\ ==\ 0)\ \{}
-\DoxyCodeLine{03499\ \ \ \ \ \ \ *os\ <<\ \textcolor{stringliteral}{"{}isn't\ empty"{}};}
+\DoxyCodeLine{03499\ \ \ \ \ \ \ *\mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}\ <<\ \textcolor{stringliteral}{"{}isn't\ empty"{}};}
 \DoxyCodeLine{03500\ \ \ \ \ \ \ \textcolor{keywordflow}{return};}
 \DoxyCodeLine{03501\ \ \ \ \ \}}
 \DoxyCodeLine{03502\ }
-\DoxyCodeLine{03503\ \ \ \ \ *os\ <<\ \textcolor{stringliteral}{"{}doesn't\ have\ "{}}\ <<\ Elements(count())\ <<\ \textcolor{stringliteral}{"{},\ or\(\backslash\)n"{}};}
+\DoxyCodeLine{03503\ \ \ \ \ *\mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}\ <<\ \textcolor{stringliteral}{"{}doesn't\ have\ "{}}\ <<\ Elements(count())\ <<\ \textcolor{stringliteral}{"{},\ or\(\backslash\)n"{}};}
 \DoxyCodeLine{03504\ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{size\_t}\ i\ =\ 0;\ i\ !=\ count();\ ++i)\ \{}
-\DoxyCodeLine{03505\ \ \ \ \ \ \ *os\ <<\ \textcolor{stringliteral}{"{}element\ \#"{}}\ <<\ i\ <<\ \textcolor{stringliteral}{"{}\ "{}};}
-\DoxyCodeLine{03506\ \ \ \ \ \ \ matchers\_[i].DescribeNegationTo(os);}
+\DoxyCodeLine{03505\ \ \ \ \ \ \ *\mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}\ <<\ \textcolor{stringliteral}{"{}element\ \#"{}}\ <<\ i\ <<\ \textcolor{stringliteral}{"{}\ "{}};}
+\DoxyCodeLine{03506\ \ \ \ \ \ \ matchers\_[i].DescribeNegationTo(\mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}});}
 \DoxyCodeLine{03507\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (i\ +\ 1\ <\ count())\ \{}
-\DoxyCodeLine{03508\ \ \ \ \ \ \ \ \ *os\ <<\ \textcolor{stringliteral}{"{},\ or\(\backslash\)n"{}};}
+\DoxyCodeLine{03508\ \ \ \ \ \ \ \ \ *\mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}\ <<\ \textcolor{stringliteral}{"{},\ or\(\backslash\)n"{}};}
 \DoxyCodeLine{03509\ \ \ \ \ \ \ \}}
 \DoxyCodeLine{03510\ \ \ \ \ \}}
 \DoxyCodeLine{03511\ \ \ \}}
@@ -188,17 +190,17 @@ Definition at line \mbox{\hyperlink{gmock-matchers_8h_source_l03478}{3478}} of f
 \begin{DoxyCode}{0}
 \DoxyCodeLine{03478\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
 \DoxyCodeLine{03479\ \ \ \ \ \textcolor{keywordflow}{if}\ (count()\ ==\ 0)\ \{}
-\DoxyCodeLine{03480\ \ \ \ \ \ \ *os\ <<\ \textcolor{stringliteral}{"{}is\ empty"{}};}
+\DoxyCodeLine{03480\ \ \ \ \ \ \ *\mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}\ <<\ \textcolor{stringliteral}{"{}is\ empty"{}};}
 \DoxyCodeLine{03481\ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}\ (count()\ ==\ 1)\ \{}
-\DoxyCodeLine{03482\ \ \ \ \ \ \ *os\ <<\ \textcolor{stringliteral}{"{}has\ 1\ element\ that\ "{}};}
-\DoxyCodeLine{03483\ \ \ \ \ \ \ matchers\_[0].DescribeTo(os);}
+\DoxyCodeLine{03482\ \ \ \ \ \ \ *\mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}\ <<\ \textcolor{stringliteral}{"{}has\ 1\ element\ that\ "{}};}
+\DoxyCodeLine{03483\ \ \ \ \ \ \ matchers\_[0].DescribeTo(\mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}});}
 \DoxyCodeLine{03484\ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
-\DoxyCodeLine{03485\ \ \ \ \ \ \ *os\ <<\ \textcolor{stringliteral}{"{}has\ "{}}\ <<\ Elements(count())\ <<\ \textcolor{stringliteral}{"{}\ where\(\backslash\)n"{}};}
+\DoxyCodeLine{03485\ \ \ \ \ \ \ *\mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}\ <<\ \textcolor{stringliteral}{"{}has\ "{}}\ <<\ Elements(count())\ <<\ \textcolor{stringliteral}{"{}\ where\(\backslash\)n"{}};}
 \DoxyCodeLine{03486\ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{size\_t}\ i\ =\ 0;\ i\ !=\ count();\ ++i)\ \{}
-\DoxyCodeLine{03487\ \ \ \ \ \ \ \ \ *os\ <<\ \textcolor{stringliteral}{"{}element\ \#"{}}\ <<\ i\ <<\ \textcolor{stringliteral}{"{}\ "{}};}
-\DoxyCodeLine{03488\ \ \ \ \ \ \ \ \ matchers\_[i].DescribeTo(os);}
+\DoxyCodeLine{03487\ \ \ \ \ \ \ \ \ *\mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}\ <<\ \textcolor{stringliteral}{"{}element\ \#"{}}\ <<\ i\ <<\ \textcolor{stringliteral}{"{}\ "{}};}
+\DoxyCodeLine{03488\ \ \ \ \ \ \ \ \ matchers\_[i].DescribeTo(\mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}});}
 \DoxyCodeLine{03489\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (i\ +\ 1\ <\ count())\ \{}
-\DoxyCodeLine{03490\ \ \ \ \ \ \ \ \ \ \ *os\ <<\ \textcolor{stringliteral}{"{},\(\backslash\)n"{}};}
+\DoxyCodeLine{03490\ \ \ \ \ \ \ \ \ \ \ *\mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}\ <<\ \textcolor{stringliteral}{"{},\(\backslash\)n"{}};}
 \DoxyCodeLine{03491\ \ \ \ \ \ \ \ \ \}}
 \DoxyCodeLine{03492\ \ \ \ \ \ \ \}}
 \DoxyCodeLine{03493\ \ \ \ \ \}}
@@ -309,7 +311,8 @@ Definition at line \mbox{\hyperlink{gmock-matchers_8h_source_l03513}{3513}} of f
 \DoxyCodeLine{03591\ \ \ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode

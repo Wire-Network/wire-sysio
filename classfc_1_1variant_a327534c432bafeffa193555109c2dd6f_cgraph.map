@@ -1,5 +1,7 @@
 <map id="fc::variant::visit" name="fc::variant::visit">
-<area shape="rect" id="Node000001" title=" " alt="" coords="5,5,117,31"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,35,117,60"/>
 <area shape="rect" id="Node000002" href="$classfc_1_1variant.html#afaae1df286ff97c83301eda21dbd51ea" title=" " alt="" coords="165,5,302,31"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="117,16,149,16,149,21,117,21"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="116,35,149,30,150,35,117,41"/>
+<area shape="rect" id="Node000003" href="$classfc_1_1variant_1_1visitor.html#a7916c02372821c928e8ba73e00c34a8b" title="handles null_type variants" alt="" coords="172,55,294,96"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="117,54,157,60,156,66,117,59"/>
 </map>

@@ -70,12 +70,11 @@ var searchData=
   ['http_5fplugin_67',['http_plugin',['../classsysio_1_1http__plugin.html',1,'sysio']]],
   ['http_5fplugin_5fdefaults_68',['http_plugin_defaults',['../structsysio_1_1http__plugin__defaults.html',1,'sysio']]],
   ['http_5fplugin_5fimpl_69',['http_plugin_impl',['../classsysio_1_1http__plugin__impl.html',1,'sysio']]],
-  ['httprpcserver_70',['HttpRpcServer',['../classupload_1_1_http_rpc_server.html',1,'upload']]],
-  ['hybi00_71',['hybi00',['../classwebsocketpp_1_1processor_1_1hybi00.html',1,'websocketpp::processor']]],
-  ['hybi00_3c_20stub_5fconfig_20_3e_72',['hybi00&lt; stub_config &gt;',['../classwebsocketpp_1_1processor_1_1hybi00.html',1,'websocketpp::processor']]],
-  ['hybi07_73',['hybi07',['../classwebsocketpp_1_1processor_1_1hybi07.html',1,'websocketpp::processor']]],
-  ['hybi08_74',['hybi08',['../classwebsocketpp_1_1processor_1_1hybi08.html',1,'websocketpp::processor']]],
-  ['hybi13_75',['hybi13',['../classwebsocketpp_1_1processor_1_1hybi13.html',1,'websocketpp::processor']]],
-  ['hybi13_3c_20stub_5fconfig_20_3e_76',['hybi13&lt; stub_config &gt;',['../classwebsocketpp_1_1processor_1_1hybi13.html',1,'websocketpp::processor']]],
-  ['hybi13_3c_20stub_5fconfig_5fext_20_3e_77',['hybi13&lt; stub_config_ext &gt;',['../classwebsocketpp_1_1processor_1_1hybi13.html',1,'websocketpp::processor']]]
+  ['hybi00_70',['hybi00',['../classwebsocketpp_1_1processor_1_1hybi00.html',1,'websocketpp::processor']]],
+  ['hybi00_3c_20stub_5fconfig_20_3e_71',['hybi00&lt; stub_config &gt;',['../classwebsocketpp_1_1processor_1_1hybi00.html',1,'websocketpp::processor']]],
+  ['hybi07_72',['hybi07',['../classwebsocketpp_1_1processor_1_1hybi07.html',1,'websocketpp::processor']]],
+  ['hybi08_73',['hybi08',['../classwebsocketpp_1_1processor_1_1hybi08.html',1,'websocketpp::processor']]],
+  ['hybi13_74',['hybi13',['../classwebsocketpp_1_1processor_1_1hybi13.html',1,'websocketpp::processor']]],
+  ['hybi13_3c_20stub_5fconfig_20_3e_75',['hybi13&lt; stub_config &gt;',['../classwebsocketpp_1_1processor_1_1hybi13.html',1,'websocketpp::processor']]],
+  ['hybi13_3c_20stub_5fconfig_5fext_20_3e_76',['hybi13&lt; stub_config_ext &gt;',['../classwebsocketpp_1_1processor_1_1hybi13.html',1,'websocketpp::processor']]]
 ];

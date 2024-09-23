@@ -504,7 +504,7 @@ Here is the call graph for this function:</div>
 <div class="line"><span class="lineno">  228</span>      <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
 <div class="line"><span class="lineno">  229</span>   }</div>
 <div class="line"><span class="lineno">  230</span> </div>
-<div class="line"><span class="lineno">  231</span>   <span class="keyword">constexpr</span> <span class="keywordtype">size_t</span> <a class="code hl_variable" href="namespaceversiongenerate.html#a5656c48d43f7e869041b6a30c124702e">buffer_size</a> = 64*1024;</div>
+<div class="line"><span class="lineno">  231</span>   <span class="keyword">constexpr</span> <span class="keywordtype">size_t</span> buffer_size = 64*1024;</div>
 <div class="line"><span class="lineno">  232</span>   <span class="keyword">auto</span> input_buffer = std::vector&lt;uint8_t&gt;(buffer_size);</div>
 <div class="line"><span class="lineno">  233</span>   <span class="keyword">auto</span> output_buffer = std::vector&lt;uint8_t&gt;(buffer_size);</div>
 <div class="line"><span class="lineno">  234</span> </div>
@@ -538,7 +538,7 @@ Here is the call graph for this function:</div>
 <div class="line"><span class="lineno">  262</span>   <span class="keywordtype">size_t</span> read_offset = 0;</div>
 <div class="line"><span class="lineno">  263</span>   <span class="keywordflow">while</span> (read_offset &lt; input_size) {</div>
 <div class="line"><span class="lineno">  264</span>      <span class="keyword">const</span> <span class="keyword">auto</span> bytes_remaining = input_size - read_offset;</div>
-<div class="line"><span class="lineno">  265</span>      <span class="keyword">const</span> <span class="keyword">auto</span> read_size = std::min({ <a class="code hl_variable" href="namespaceversiongenerate.html#a5656c48d43f7e869041b6a30c124702e">buffer_size</a>, bytes_remaining, bytes_remaining_before_sync });</div>
+<div class="line"><span class="lineno">  265</span>      <span class="keyword">const</span> <span class="keyword">auto</span> read_size = std::min({ buffer_size, bytes_remaining, bytes_remaining_before_sync });</div>
 <div class="line"><span class="lineno">  266</span>      input_file.<a class="code hl_function" href="classfc_1_1cfile.html#a247250a28d17544a57dfafe07012d27b">read</a>(<span class="keyword">reinterpret_cast&lt;</span><span class="keywordtype">char</span>*<span class="keyword">&gt;</span>(input_buffer.data()), read_size);</div>
 <div class="line"><span class="lineno">  267</span> </div>
 <div class="line"><span class="lineno">  268</span>      <span class="keyword">auto</span> <a class="code hl_variable" href="yubihsm__pkcs11_8c.html#a3d854b6efad16a16e4d7b4539d4fc71f">ret</a> = process_chunk(read_size, Z_NO_FLUSH);</div>
@@ -597,7 +597,6 @@ Here is the call graph for this function:</div>
 <div class="ttc" id="aclassfc_1_1path_html_ab1eae2062df4ea01435348ec52fb3784"><div class="ttname"><a href="classfc_1_1path.html#ab1eae2062df4ea01435348ec52fb3784">fc::path::generic_string</a></div><div class="ttdeci">std::string generic_string() const</div><div class="ttdef"><b>Definition</b> <a href="filesystem_8cpp_source.html#l00101">filesystem.cpp:101</a></div></div>
 <div class="ttc" id="anamespacefc_html_a3fcf0d920aea28014aacae50a51d8485"><div class="ttname"><a href="namespacefc.html#a3fcf0d920aea28014aacae50a51d8485">fc::exists</a></div><div class="ttdeci">bool exists(const path &amp;p)</div><div class="ttdef"><b>Definition</b> <a href="filesystem_8cpp_source.html#l00217">filesystem.cpp:217</a></div></div>
 <div class="ttc" id="anamespacesysio_1_1chain_1_1webassembly_html_a72ffd6653260a2dedcc4b55e39e10973a4e09c20e9a85794807a130e8283e8769"><div class="ttname"><a href="namespacesysio_1_1chain_1_1webassembly.html#a72ffd6653260a2dedcc4b55e39e10973a4e09c20e9a85794807a130e8283e8769">sysio::chain::webassembly::success</a></div><div class="ttdeci">@ success</div><div class="ttdef"><b>Definition</b> <a href="return__codes_8hpp_source.html#l00008">return_codes.hpp:8</a></div></div>
-<div class="ttc" id="anamespaceversiongenerate_html_a5656c48d43f7e869041b6a30c124702e"><div class="ttname"><a href="namespaceversiongenerate.html#a5656c48d43f7e869041b6a30c124702e">versiongenerate.buffer_size</a></div><div class="ttdeci">int buffer_size</div><div class="ttdef"><b>Definition</b> <a href="versiongenerate_8py_source.html#l00065">versiongenerate.py:65</a></div></div>
 <div class="ttc" id="ayubihsm__pkcs11_8c_html_a3d854b6efad16a16e4d7b4539d4fc71f"><div class="ttname"><a href="yubihsm__pkcs11_8c.html#a3d854b6efad16a16e4d7b4539d4fc71f">ret</a></div><div class="ttdeci">CK_RV ret</div><div class="ttdef"><b>Definition</b> <a href="yubihsm__pkcs11_8c_source.html#l00973">yubihsm_pkcs11.c:973</a></div></div>
 </div><!-- fragment --><div class="dynheader">
 Here is the call graph for this function:</div>

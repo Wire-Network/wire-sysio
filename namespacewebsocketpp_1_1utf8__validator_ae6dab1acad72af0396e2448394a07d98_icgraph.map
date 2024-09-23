@@ -1,11 +1,23 @@
 <map id="websocketpp::utf8_validator::decode" name="websocketpp::utf8_validator::decode">
-<area shape="rect" id="Node000001" title="Decode the next byte of a UTF8 sequence." alt="" coords="709,39,894,79"/>
-<area shape="rect" id="Node000002" href="$classwebsocketpp_1_1utf8__validator_1_1validator.html#ada7f6cdd4261d848d51d7ba0bd9d28b4" title="Advance the state of the validator with the next input byte." alt="" coords="477,5,661,46"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="693,46,662,42,662,36,694,41"/>
-<area shape="rect" id="Node000003" href="$classwebsocketpp_1_1utf8__validator_1_1validator.html#a2cde6cad6f1a0f66674010848ec80fba" title="Advance validator state with input from an iterator pair." alt="" coords="477,71,661,111"/>
-<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="694,76,662,81,662,76,693,71"/>
-<area shape="rect" id="Node000004" href="$classwebsocketpp_1_1processor_1_1hybi13.html#aa7eece3f48840535f41b625061fa7867" title="Reads bytes from buf into message payload." alt="" coords="217,71,429,111"/>
-<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="461,94,430,94,430,88,461,88"/>
-<area shape="rect" id="Node000005" href="$classwebsocketpp_1_1processor_1_1hybi13.html#a5c5e3234a0067c7f14fe0ceb4e647659" title="Process new websocket connection bytes." alt="" coords="5,71,169,111"/>
-<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="201,94,169,94,169,88,201,88"/>
+<area shape="rect" id="Node000001" title="Decode the next byte of a UTF8 sequence." alt="" coords="981,40,1165,81"/>
+<area shape="rect" id="Node000002" href="$classwebsocketpp_1_1utf8__validator_1_1validator.html#ada7f6cdd4261d848d51d7ba0bd9d28b4" title="Advance the state of the validator with the next input byte." alt="" coords="748,7,933,47"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="965,48,933,43,934,38,966,42"/>
+<area shape="rect" id="Node000003" href="$classwebsocketpp_1_1utf8__validator_1_1validator.html#a2cde6cad6f1a0f66674010848ec80fba" title="Advance validator state with input from an iterator pair." alt="" coords="748,72,933,113"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="966,78,934,82,933,77,965,73"/>
+<area shape="rect" id="Node000004" href="$classwebsocketpp_1_1processor_1_1hybi13.html#aa7eece3f48840535f41b625061fa7867" title="Reads bytes from buf into message payload." alt="" coords="488,23,700,63"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="732,73,698,67,699,61,734,68"/>
+<area shape="rect" id="Node000006" href="$namespacewebsocketpp_1_1utf8__validator.html#ad088137c6f18e6844e20496d8782c835" title="Validate a UTF8 string." alt="" coords="502,104,686,145"/>
+<area shape="poly" id="edge5_Node000003_Node000006" title=" " alt="" coords="733,109,687,115,686,110,732,104"/>
+<area shape="rect" id="Node000005" href="$classwebsocketpp_1_1processor_1_1hybi13.html#a5c5e3234a0067c7f14fe0ceb4e647659" title="Process new websocket connection bytes." alt="" coords="263,5,426,46"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="472,37,427,34,427,29,472,32"/>
+<area shape="rect" id="Node000007" href="$namespacewebsocketpp_1_1close.html#a537f66833c7b6e745b3cf5dc0252c0ca" title="Extract the reason string from a close payload." alt="" coords="276,71,414,111"/>
+<area shape="poly" id="edge6_Node000006_Node000007" title=" " alt="" coords="486,113,414,103,414,98,487,107"/>
+<area shape="rect" id="Node000008" href="$classwebsocketpp_1_1processor_1_1hybi00.html#a919aaed345cab679875be1d95c7302ec" title="Prepare a message for writing." alt="" coords="250,136,440,177"/>
+<area shape="poly" id="edge7_Node000006_Node000008" title=" " alt="" coords="487,141,441,147,440,141,486,136"/>
+<area shape="rect" id="Node000011" href="$classwebsocketpp_1_1processor_1_1hybi13.html#a72f4833d66eb51e37a956f434895b3ab" title="Prepare a user data message for writing." alt="" coords="250,201,440,242"/>
+<area shape="poly" id="edge10_Node000006_Node000011" title=" " alt="" coords="532,154,441,191,407,203,405,198,439,186,530,149"/>
+<area shape="rect" id="Node000009" href="$hybi00_8cpp.html#ae8fa75d088192976938f98253c21555f" title=" " alt="" coords="5,120,202,145"/>
+<area shape="poly" id="edge8_Node000008_Node000009" title=" " alt="" coords="234,148,202,145,202,139,234,143"/>
+<area shape="rect" id="Node000010" href="$hybi00_8cpp.html#abb0b7aa704fbeecbfd602779c7a8c6b8" title=" " alt="" coords="5,169,202,194"/>
+<area shape="poly" id="edge9_Node000008_Node000010" title=" " alt="" coords="234,171,202,174,202,169,234,165"/>
 </map>

@@ -365,10 +365,10 @@
 \DoxyCodeLine{\Hypertarget{documenttest_8cpp_source_l00361}00361\ \ \ \ \ doc.\mbox{\hyperlink{class_generic_document_a901db1678f99a1b550003eed75bc380a}{Parse}}(\textcolor{stringliteral}{"{}\ \{\ \(\backslash\)"{}hello\(\backslash\)"{}\ :\ \(\backslash\)"{}world\(\backslash\)"{},\ \(\backslash\)"{}t\(\backslash\)"{}\ :\ true\ ,\ \(\backslash\)"{}f\(\backslash\)"{}\ :\ false,\ \(\backslash\)"{}n\(\backslash\)"{}:\ null,\ \(\backslash\)"{}i\(\backslash\)"{}:123,\ \(\backslash\)"{}pi\(\backslash\)"{}:\ 3.1416,\ \(\backslash\)"{}a\(\backslash\)"{}:[1,\ 2,\ 3,\ 4]\ \}\ "{}});}
 \DoxyCodeLine{\Hypertarget{documenttest_8cpp_source_l00362}00362\ }
 \DoxyCodeLine{\Hypertarget{documenttest_8cpp_source_l00363}00363\ \ \ \ \ \mbox{\hyperlink{struct_output_string_stream}{OutputStringStream}}\ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}};}
-\DoxyCodeLine{\Hypertarget{documenttest_8cpp_source_l00364}00364\ \ \ \ \ \mbox{\hyperlink{class_writer}{Writer<OutputStringStream>}}\ writer(os);}
+\DoxyCodeLine{\Hypertarget{documenttest_8cpp_source_l00364}00364\ \ \ \ \ \mbox{\hyperlink{class_writer}{Writer<OutputStringStream>}}\ writer(\mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}});}
 \DoxyCodeLine{\Hypertarget{documenttest_8cpp_source_l00365}00365\ \ \ \ \ doc.Accept(writer);}
 \DoxyCodeLine{\Hypertarget{documenttest_8cpp_source_l00366}00366\ }
-\DoxyCodeLine{\Hypertarget{documenttest_8cpp_source_l00367}00367\ \ \ \ \ \mbox{\hyperlink{gtest_8h_a4159019abda84f5366acdb7604ff220a}{EXPECT\_EQ}}(\textcolor{stringliteral}{"{}\{\(\backslash\)"{}hello\(\backslash\)"{}:\(\backslash\)"{}world\(\backslash\)"{},\(\backslash\)"{}t\(\backslash\)"{}:true,\(\backslash\)"{}f\(\backslash\)"{}:false,\(\backslash\)"{}n\(\backslash\)"{}:null,\(\backslash\)"{}i\(\backslash\)"{}:123,\(\backslash\)"{}pi\(\backslash\)"{}:3.1416,\(\backslash\)"{}a\(\backslash\)"{}:[1,2,3,4]\}"{}},\ os.str());}
+\DoxyCodeLine{\Hypertarget{documenttest_8cpp_source_l00367}00367\ \ \ \ \ \mbox{\hyperlink{gtest_8h_a4159019abda84f5366acdb7604ff220a}{EXPECT\_EQ}}(\textcolor{stringliteral}{"{}\{\(\backslash\)"{}hello\(\backslash\)"{}:\(\backslash\)"{}world\(\backslash\)"{},\(\backslash\)"{}t\(\backslash\)"{}:true,\(\backslash\)"{}f\(\backslash\)"{}:false,\(\backslash\)"{}n\(\backslash\)"{}:null,\(\backslash\)"{}i\(\backslash\)"{}:123,\(\backslash\)"{}pi\(\backslash\)"{}:3.1416,\(\backslash\)"{}a\(\backslash\)"{}:[1,2,3,4]\}"{}},\ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}.str());}
 \DoxyCodeLine{\Hypertarget{documenttest_8cpp_source_l00368}00368\ \}}
 \DoxyCodeLine{\Hypertarget{documenttest_8cpp_source_l00369}00369\ }
 \DoxyCodeLine{\Hypertarget{documenttest_8cpp_source_l00370}\mbox{\hyperlink{documenttest_8cpp_ad1980d8266a2b99f75584060ab129fa4}{00370}}\ \mbox{\hyperlink{gtest_8h_ad8b332753515c0ab8baada563c2547eb}{TEST}}(\mbox{\hyperlink{class_generic_document}{Document}},\ UserBuffer)\ \{}
@@ -396,7 +396,7 @@
 \DoxyCodeLine{\Hypertarget{documenttest_8cpp_source_l00392}00392\ \ \ \ \ doc.FindMember(\textcolor{stringliteral}{"{}a"{}})-\/>name.SetNull();\ \textcolor{comment}{//\ Change\ name\ to\ non-\/string\ type.}}
 \DoxyCodeLine{\Hypertarget{documenttest_8cpp_source_l00393}00393\ }
 \DoxyCodeLine{\Hypertarget{documenttest_8cpp_source_l00394}00394\ \ \ \ \ \mbox{\hyperlink{struct_output_string_stream}{OutputStringStream}}\ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}};}
-\DoxyCodeLine{\Hypertarget{documenttest_8cpp_source_l00395}00395\ \ \ \ \ \mbox{\hyperlink{class_writer}{Writer<OutputStringStream>}}\ writer(os);}
+\DoxyCodeLine{\Hypertarget{documenttest_8cpp_source_l00395}00395\ \ \ \ \ \mbox{\hyperlink{class_writer}{Writer<OutputStringStream>}}\ writer(\mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}});}
 \DoxyCodeLine{\Hypertarget{documenttest_8cpp_source_l00396}00396\ \ \ \ \ \mbox{\hyperlink{gtest_8h_aedb1eddae6c2a2430b0e7b7e03b4f052}{ASSERT\_THROW}}(doc.Accept(writer),\ \mbox{\hyperlink{class_assert_exception}{AssertException}});}
 \DoxyCodeLine{\Hypertarget{documenttest_8cpp_source_l00397}00397\ \}}
 \DoxyCodeLine{\Hypertarget{documenttest_8cpp_source_l00398}00398\ }

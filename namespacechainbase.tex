@@ -130,7 +130,7 @@ enum \mbox{\hyperlink{namespacechainbase_abb4bd31323d8b6ab74b536e87de8aca3}{db\+
 \item 
 struct \mbox{\hyperlink{structchainbase_1_1environment}{chainbase\+::environment}} \mbox{\hyperlink{namespacechainbase_ae035193195fb0b2f1d8c652f21df45ff}{\+\_\+\+\_\+attribute\+\_\+\+\_\+}} ((packed))
 \item 
-std\+::ostream \& \mbox{\hyperlink{namespacechainbase_a95429aafa8b5bf2fda83a052e67d71c7}{operator$<$$<$}} (std\+::ostream \&os, const \mbox{\hyperlink{structchainbase_1_1environment}{chainbase\+::environment}} \&dt)
+std\+::ostream \& \mbox{\hyperlink{namespacechainbase_a95429aafa8b5bf2fda83a052e67d71c7}{operator$<$$<$}} (std\+::ostream \&\mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}, const \mbox{\hyperlink{structchainbase_1_1environment}{chainbase\+::environment}} \&dt)
 \item 
 const std\+::error\+\_\+category \& \mbox{\hyperlink{namespacechainbase_ae09d7fc4436a627f73b16fde609ddb91}{chainbase\+\_\+error\+\_\+category}} ()
 \item 
@@ -436,7 +436,8 @@ Definition at line \mbox{\hyperlink{pinnable__mapped__file_8cpp_source_l00048}{4
 \DoxyCodeLine{00051\ \}}
 
 \end{DoxyCode}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -460,14 +461,16 @@ Definition at line \mbox{\hyperlink{pinnable__mapped__file_8hpp_source_l00030}{3
 \DoxyCodeLine{00032\ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
 \includegraphics[width=350pt]{namespacechainbase_a0e543f894d75318b5f34a661e9b6b7c8_cgraph}
 \end{center}
 \end{figure}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -493,7 +496,8 @@ Definition at line \mbox{\hyperlink{database__utils_8hpp_source_l00216}{216}} of
 \DoxyCodeLine{00219\ \ \ \ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -514,18 +518,19 @@ Definition at line \mbox{\hyperlink{chain_2include_2sysio_2chain_2types_8hpp_sou
 
 \begin{DoxyCode}{0}
 \DoxyCodeLine{00392\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
-\DoxyCodeLine{00393\ \ \ \ \ \ \ \mbox{\hyperlink{exception_8hpp_abed525eeff3ae581be7e4e2fcd3b7bf4}{FC\_ASSERT}}(\ v.size()\ <=\ \mbox{\hyperlink{utility_8hpp_a5e3c645782d12166c98f3654471efd61}{MAX\_SIZE\_OF\_BYTE\_ARRAYS}}\ );}
-\DoxyCodeLine{00394\ \ \ \ \ \ \ \mbox{\hyperlink{namespacefc_1_1raw_a3a18d8161aa5b4f4f02b6fcfdff5e5d1}{fc::raw::pack}}(\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}},\ \mbox{\hyperlink{structfc_1_1unsigned__int}{fc::unsigned\_int}}((\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}})v.size()));}
-\DoxyCodeLine{00395\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ v.size()\ )\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}.write(\ v.data(),\ v.size()\ );}
+\DoxyCodeLine{00393\ \ \ \ \ \ \ \mbox{\hyperlink{exception_8hpp_abed525eeff3ae581be7e4e2fcd3b7bf4}{FC\_ASSERT}}(\ v.\mbox{\hyperlink{classchainbase_1_1shared__cow__string_a3b3c57c0d2ee027bb70beb283be2a0f2}{size}}()\ <=\ \mbox{\hyperlink{utility_8hpp_a5e3c645782d12166c98f3654471efd61}{MAX\_SIZE\_OF\_BYTE\_ARRAYS}}\ );}
+\DoxyCodeLine{00394\ \ \ \ \ \ \ \mbox{\hyperlink{namespacefc_1_1raw_a3a18d8161aa5b4f4f02b6fcfdff5e5d1}{fc::raw::pack}}(\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}},\ \mbox{\hyperlink{structfc_1_1unsigned__int}{fc::unsigned\_int}}((\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}})v.\mbox{\hyperlink{classchainbase_1_1shared__cow__string_a3b3c57c0d2ee027bb70beb283be2a0f2}{size}}()));}
+\DoxyCodeLine{00395\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ v.\mbox{\hyperlink{classchainbase_1_1shared__cow__string_a3b3c57c0d2ee027bb70beb283be2a0f2}{size}}()\ )\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}.write(\ v.\mbox{\hyperlink{classchainbase_1_1shared__cow__string_aa7b1bac206e0abc7e9ea9d642eb0b5b3}{data}}(),\ v.\mbox{\hyperlink{classchainbase_1_1shared__cow__string_a3b3c57c0d2ee027bb70beb283be2a0f2}{size}}()\ );}
 \DoxyCodeLine{00396\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}};}
 \DoxyCodeLine{00397\ \ \ \ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
-\includegraphics[width=303pt]{namespacechainbase_abb0c97ebd98434014db91bef3afafadd_cgraph}
+\includegraphics[width=348pt]{namespacechainbase_abb0c97ebd98434014db91bef3afafadd_cgraph}
 \end{center}
 \end{figure}
 \Hypertarget{namespacechainbase_a95429aafa8b5bf2fda83a052e67d71c7}\index{chainbase@{chainbase}!operator$<$$<$@{operator$<$$<$}}
@@ -541,11 +546,11 @@ Definition at line \mbox{\hyperlink{pinnable__mapped__file_8cpp_source_l00377}{3
 
 \begin{DoxyCode}{0}
 \DoxyCodeLine{00377\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
-\DoxyCodeLine{00378\ \ \ \ os\ <<\ std::right\ <<\ std::setw(17)\ <<\ \textcolor{stringliteral}{"{}Compiler:\ "{}}\ <<\ dt.\mbox{\hyperlink{structchainbase_1_1environment_a5877d3a8ae187320facd1c7935ae40fc}{compiler}}\ <<\ std::endl;}
-\DoxyCodeLine{00379\ \ \ \ os\ <<\ std::right\ <<\ std::setw(17)\ <<\ \textcolor{stringliteral}{"{}Debug:\ "{}}\ <<\ (dt.\mbox{\hyperlink{structchainbase_1_1environment_a328120bb740176a5215fb32d641800b8}{debug}}\ ?\ \textcolor{stringliteral}{"{}Yes"{}}\ :\ \textcolor{stringliteral}{"{}No"{}})\ <<\ std::endl;}
-\DoxyCodeLine{00380\ \ \ \ os\ <<\ std::right\ <<\ std::setw(17)\ <<\ \textcolor{stringliteral}{"{}OS:\ "{}}\ <<\ print\_os(dt.\mbox{\hyperlink{structchainbase_1_1environment_a29626f3d5a8c2e741807d4818800455d}{os}})\ <<\ std::endl;}
-\DoxyCodeLine{00381\ \ \ \ os\ <<\ std::right\ <<\ std::setw(17)\ <<\ \textcolor{stringliteral}{"{}Arch:\ "{}}\ <<\ print\_arch(dt.\mbox{\hyperlink{structchainbase_1_1environment_ab83a258982dca21a9bbe652773295e30}{arch}})\ <<\ std::endl;}
-\DoxyCodeLine{00382\ \ \ \ os\ <<\ std::right\ <<\ std::setw(17)\ <<\ \textcolor{stringliteral}{"{}Boost:\ "{}}\ <<\ dt.\mbox{\hyperlink{structchainbase_1_1environment_a4244eac72c418fa7d07f97cc1e3bdfd4}{boost\_version}}/100000\ <<\ \textcolor{stringliteral}{"{}."{}}}
+\DoxyCodeLine{00378\ \ \ \ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}\ <<\ std::right\ <<\ std::setw(17)\ <<\ \textcolor{stringliteral}{"{}Compiler:\ "{}}\ <<\ dt.\mbox{\hyperlink{structchainbase_1_1environment_a5877d3a8ae187320facd1c7935ae40fc}{compiler}}\ <<\ std::endl;}
+\DoxyCodeLine{00379\ \ \ \ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}\ <<\ std::right\ <<\ std::setw(17)\ <<\ \textcolor{stringliteral}{"{}Debug:\ "{}}\ <<\ (dt.\mbox{\hyperlink{structchainbase_1_1environment_a328120bb740176a5215fb32d641800b8}{debug}}\ ?\ \textcolor{stringliteral}{"{}Yes"{}}\ :\ \textcolor{stringliteral}{"{}No"{}})\ <<\ std::endl;}
+\DoxyCodeLine{00380\ \ \ \ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}\ <<\ std::right\ <<\ std::setw(17)\ <<\ \textcolor{stringliteral}{"{}OS:\ "{}}\ <<\ print\_os(dt.\mbox{\hyperlink{structchainbase_1_1environment_a29626f3d5a8c2e741807d4818800455d}{os}})\ <<\ std::endl;}
+\DoxyCodeLine{00381\ \ \ \ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}\ <<\ std::right\ <<\ std::setw(17)\ <<\ \textcolor{stringliteral}{"{}Arch:\ "{}}\ <<\ print\_arch(dt.\mbox{\hyperlink{structchainbase_1_1environment_ab83a258982dca21a9bbe652773295e30}{arch}})\ <<\ std::endl;}
+\DoxyCodeLine{00382\ \ \ \ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}\ <<\ std::right\ <<\ std::setw(17)\ <<\ \textcolor{stringliteral}{"{}Boost:\ "{}}\ <<\ dt.\mbox{\hyperlink{structchainbase_1_1environment_a4244eac72c418fa7d07f97cc1e3bdfd4}{boost\_version}}/100000\ <<\ \textcolor{stringliteral}{"{}."{}}}
 \DoxyCodeLine{00383\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ <<\ dt.\mbox{\hyperlink{structchainbase_1_1environment_a4244eac72c418fa7d07f97cc1e3bdfd4}{boost\_version}}/100\%1000\ <<\ \textcolor{stringliteral}{"{}."{}}}
 \DoxyCodeLine{00384\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ <<\ dt.\mbox{\hyperlink{structchainbase_1_1environment_a4244eac72c418fa7d07f97cc1e3bdfd4}{boost\_version}}\%100\ <<\ std::endl;}
 \DoxyCodeLine{00385\ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}};}
@@ -595,7 +600,8 @@ Definition at line \mbox{\hyperlink{database__utils_8hpp_source_l00222}{222}} of
 \DoxyCodeLine{00225\ \ \ \ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -618,17 +624,18 @@ Definition at line \mbox{\hyperlink{chain_2include_2sysio_2chain_2types_8hpp_sou
 \DoxyCodeLine{00399\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
 \DoxyCodeLine{00400\ \ \ \ \ \ \ \mbox{\hyperlink{structfc_1_1unsigned__int}{fc::unsigned\_int}}\ size;\ \mbox{\hyperlink{namespacefc_1_1raw_a0b442d98ceb22dd5a6ae84745e43ffab}{fc::raw::unpack}}(\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}},\ size\ );}
 \DoxyCodeLine{00401\ \ \ \ \ \ \ \mbox{\hyperlink{exception_8hpp_abed525eeff3ae581be7e4e2fcd3b7bf4}{FC\_ASSERT}}(\ size.\mbox{\hyperlink{structfc_1_1unsigned__int_ac54ac972d3e38a5852616aaee955ff3f}{value}}\ <=\ \mbox{\hyperlink{utility_8hpp_a5e3c645782d12166c98f3654471efd61}{MAX\_SIZE\_OF\_BYTE\_ARRAYS}}\ );}
-\DoxyCodeLine{00402\ \ \ \ \ \ \ \mbox{\hyperlink{exception_8hpp_abed525eeff3ae581be7e4e2fcd3b7bf4}{FC\_ASSERT}}(\ v.size()\ ==\ 0\ );}
-\DoxyCodeLine{00403\ \ \ \ \ \ \ v.resize\_and\_fill(size.\mbox{\hyperlink{structfc_1_1unsigned__int_ac54ac972d3e38a5852616aaee955ff3f}{value}},\ [\&\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}](\textcolor{keywordtype}{char}*\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a855e99b645b13e7905d074d02fe0bff5}{buf}},\ std::size\_t\ sz)\ \{\ s.read(buf,\ sz);\ \});}
+\DoxyCodeLine{00402\ \ \ \ \ \ \ \mbox{\hyperlink{exception_8hpp_abed525eeff3ae581be7e4e2fcd3b7bf4}{FC\_ASSERT}}(\ v.\mbox{\hyperlink{classchainbase_1_1shared__cow__string_a3b3c57c0d2ee027bb70beb283be2a0f2}{size}}()\ ==\ 0\ );}
+\DoxyCodeLine{00403\ \ \ \ \ \ \ v.\mbox{\hyperlink{classchainbase_1_1shared__cow__string_a6158f8f10a5b21ac57a3fb3bc9d213f2}{resize\_and\_fill}}(size.\mbox{\hyperlink{structfc_1_1unsigned__int_ac54ac972d3e38a5852616aaee955ff3f}{value}},\ [\&\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}](\textcolor{keywordtype}{char}*\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a855e99b645b13e7905d074d02fe0bff5}{buf}},\ std::size\_t\ sz)\ \{\ s.read(buf,\ sz);\ \});}
 \DoxyCodeLine{00404\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}};}
 \DoxyCodeLine{00405\ \ \ \ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
-\includegraphics[width=313pt]{namespacechainbase_a42fa77a4b7fd878c28a83b4ebbb63789_cgraph}
+\includegraphics[width=350pt]{namespacechainbase_a42fa77a4b7fd878c28a83b4ebbb63789_cgraph}
 \end{center}
 \end{figure}
 \Hypertarget{namespacechainbase_a5abe58c7240700d6a137700b6b1aa22b}\index{chainbase@{chainbase}!operator$>$$>$@{operator$>$$>$}}
@@ -674,7 +681,8 @@ Definition at line \mbox{\hyperlink{undo__index_8hpp_source_l00222}{222}} of fil
 \DoxyCodeLine{00222\ \{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}};\ \}}
 
 \end{DoxyCode}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode

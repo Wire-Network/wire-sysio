@@ -1,17 +1,3 @@
 <map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
-<area shape="rect" id="Node000000" href="$structsysio_1_1vm_1_1running__context.html" title=" " alt="" coords="5,5,217,61"/>
-<area shape="rect" id="Node000001" href="$structsysio_1_1vm_1_1type__converter.html" title=" " alt="" coords="272,21,455,62"/>
-<area shape="poly" id="edge708_Node000000_Node000001" title=" " alt="" coords="233,34,271,36,271,41,232,40"/>
-<area shape="rect" id="Node000002" href="$structcnv.html" title=" " alt="" coords="535,100,577,126"/>
-<area shape="poly" id="edge709_Node000001_Node000002" title=" " alt="" coords="435,65,536,103,534,108,433,70"/>
-<area shape="rect" id="Node000004" href="$structsysio_1_1vm_1_1running__context.html" title=" " alt="" coords="23,85,199,141"/>
-<area shape="rect" id="Node000003" href="$structsysio_1_1vm_1_1type__converter.html" title=" " alt="" coords="265,93,462,134"/>
-<area shape="poly" id="edge710_Node000004_Node000003" title=" " alt="" coords="214,110,264,110,264,116,214,116"/>
-<area shape="poly" id="edge711_Node000003_Node000002" title=" " alt="" coords="478,110,535,110,535,116,478,116"/>
-<area shape="rect" id="Node000007" href="$structsysio_1_1vm_1_1running__context.html" title=" " alt="" coords="36,164,186,235"/>
-<area shape="rect" id="Node000005" href="$structsysio_1_1vm_1_1type__converter.html" title=" " alt="" coords="277,169,450,210"/>
-<area shape="poly" id="edge712_Node000007_Node000005" title=" " alt="" coords="201,193,277,190,277,195,201,199"/>
-<area shape="poly" id="edge713_Node000005_Node000002" title=" " alt="" coords="430,160,534,119,536,124,432,165"/>
-<area shape="rect" id="Node000006" href="$structstateful__cnv.html" title=" " alt="" coords="510,176,602,202"/>
-<area shape="poly" id="edge714_Node000005_Node000006" title=" " alt="" coords="465,186,509,186,509,192,465,192"/>
+<area shape="rect" id="Node000000" href="$classsysio_1_1vm_1_1watchdog.html" title="Triggers a callback after a given time elapses." alt="" coords="5,5,148,31"/>
 </map>

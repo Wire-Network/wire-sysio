@@ -316,7 +316,7 @@ Functions</h2></td></tr>
 <tr class="separator:abb7e41c7063536ff6eeee4bb5f66de6c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a943d5d09c43872f2477c9340d4eb9645" id="r_a943d5d09c43872f2477c9340d4eb9645"><td class="memItemLeft" align="right" valign="top">std::istream &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a943d5d09c43872f2477c9340d4eb9645">operator&gt;&gt;</a> (std::istream &amp;is, <a class="el" href="classpicojson_1_1value.html">picojson::value</a> &amp;x)</td></tr>
 <tr class="separator:a943d5d09c43872f2477c9340d4eb9645"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aff57d8c4a4e6df0306c7014e51e9a36f" id="r_aff57d8c4a4e6df0306c7014e51e9a36f"><td class="memItemLeft" align="right" valign="top">std::ostream &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aff57d8c4a4e6df0306c7014e51e9a36f">operator&lt;&lt;</a> (std::ostream &amp;os, const <a class="el" href="classpicojson_1_1value.html">picojson::value</a> &amp;x)</td></tr>
+<tr class="memitem:aff57d8c4a4e6df0306c7014e51e9a36f" id="r_aff57d8c4a4e6df0306c7014e51e9a36f"><td class="memItemLeft" align="right" valign="top">std::ostream &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aff57d8c4a4e6df0306c7014e51e9a36f">operator&lt;&lt;</a> (std::ostream &amp;<a class="el" href="environment_8hpp.html#a3951483d0b31c29ca95336206cd35238">os</a>, const <a class="el" href="classpicojson_1_1value.html">picojson::value</a> &amp;x)</td></tr>
 <tr class="separator:aff57d8c4a4e6df0306c7014e51e9a36f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a4c563586940721ed1087d699128c6d2a" id="r_a4c563586940721ed1087d699128c6d2a"><td class="memItemLeft" align="right" valign="top">std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a4c563586940721ed1087d699128c6d2a">cpp_string</a> (const <a class="el" href="classpicojson_1_1value.html">picojson::value</a> &amp;x)</td></tr>
 <tr class="separator:a4c563586940721ed1087d699128c6d2a"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -1279,12 +1279,12 @@ Here is the caller graph for this function:</div>
 <div class="line"><span class="lineno"> 1362</span>   <span class="keywordflow">while</span> (getline(ifs, <a class="code hl_variable" href="yubihsm__pkcs11_8c.html#a506da415c9307c897ca9be93acfe1d0f">s</a>)) <a class="code hl_function" href="namespace_xbyak_1_1util.html#a67cd5471fb751b186b53fdab6da7d3f7">ss</a> &lt;&lt; <a class="code hl_variable" href="yubihsm__pkcs11_8c.html#a506da415c9307c897ca9be93acfe1d0f">s</a>;</div>
 <div class="line"><span class="lineno"> 1363</span>   ifs.close();</div>
 <div class="line"><span class="lineno"> 1364</span> </div>
-<div class="line"><span class="lineno"> 1365</span>   <a class="code hl_class" href="classpicojson_1_1value.html">picojson::value</a> <a class="code hl_variable" href="namespacedevelop_build.html#ade64cd34608f9442ef3049116a2da428">v</a>;</div>
+<div class="line"><span class="lineno"> 1365</span>   <a class="code hl_class" href="classpicojson_1_1value.html">picojson::value</a> v;</div>
 <div class="line"><span class="lineno"> 1366</span>   <a class="code hl_function" href="namespacepicojson.html#a3aca598f5855bc130a92a3e08a0c6ebf">picojson::parse</a>(v, <a class="code hl_function" href="namespace_xbyak_1_1util.html#a67cd5471fb751b186b53fdab6da7d3f7">ss</a>.str());</div>
 <div class="line"><span class="lineno"> 1367</span>   <span class="keywordtype">string</span> test_suite_name;</div>
 <div class="line"><span class="lineno"> 1368</span> </div>
 <div class="line"><span class="lineno"> 1369</span>   map&lt;string, vector&lt;picojson::object&gt;&gt; test_mappings;</div>
-<div class="line"><span class="lineno"> 1370</span>   <span class="keyword">const</span> <a class="code hl_typedef" href="classpicojson_1_1value.html#afaff3eacfcaa3816a1c3c05191c6a378">picojson::value::object</a>&amp;        obj = <a class="code hl_variable" href="namespacedevelop_build.html#ade64cd34608f9442ef3049116a2da428">v</a>.get&lt;<a class="code hl_typedef" href="namespacepicojson.html#a3e769a5e2dbffd9a9309e1dc2d67975b">picojson::object</a>&gt;();</div>
+<div class="line"><span class="lineno"> 1370</span>   <span class="keyword">const</span> <a class="code hl_typedef" href="classpicojson_1_1value.html#afaff3eacfcaa3816a1c3c05191c6a378">picojson::value::object</a>&amp;        obj = v.<a class="code hl_function" href="classpicojson_1_1value.html#a13bd312245da5d28a8ae13b3df3d7301">get</a>&lt;<a class="code hl_typedef" href="namespacepicojson.html#a3e769a5e2dbffd9a9309e1dc2d67975b">picojson::object</a>&gt;();</div>
 <div class="line"><span class="lineno"> 1371</span>   <span class="keywordflow">for</span> (picojson::value::object::const_iterator i = obj.begin(); i != obj.end(); i++)</div>
 <div class="line"><span class="lineno"> 1372</span>      <span class="keywordflow">if</span> (i-&gt;first == <span class="stringliteral">&quot;commands&quot;</span>) {</div>
 <div class="line"><span class="lineno"> 1373</span>         <span class="keywordflow">for</span> (<span class="keyword">const</span> <span class="keyword">auto</span>&amp; o : i-&gt;second.get&lt;<a class="code hl_typedef" href="namespacepicojson.html#ac1e72166adfe3d96dc58cddc7ebd536a">picojson::array</a>&gt;()) {</div>
@@ -1299,8 +1299,8 @@ Here is the caller graph for this function:</div>
 <div class="line"><span class="lineno"> 1382</span> </div>
 <div class="line"><span class="lineno"> 1383</span>   <a class="code hl_function" href="#a38dbcefacf2213267f0b88c3cbe75efc">generate_tests</a>(test_mappings);</div>
 <div class="line"><span class="lineno"> 1384</span>}</div>
+<div class="ttc" id="aclasspicojson_1_1value_html_a13bd312245da5d28a8ae13b3df3d7301"><div class="ttname"><a href="classpicojson_1_1value.html#a13bd312245da5d28a8ae13b3df3d7301">picojson::value::get</a></div><div class="ttdeci">const T &amp; get() const</div></div>
 <div class="ttc" id="aclasspicojson_1_1value_html_afaff3eacfcaa3816a1c3c05191c6a378"><div class="ttname"><a href="classpicojson_1_1value.html#afaff3eacfcaa3816a1c3c05191c6a378">picojson::value::object</a></div><div class="ttdeci">std::map&lt; std::string, value &gt; object</div><div class="ttdef"><b>Definition</b> <a href="spec__test__generator_8cpp_source.html#l00143">spec_test_generator.cpp:143</a></div></div>
-<div class="ttc" id="anamespacedevelop_build_html_ade64cd34608f9442ef3049116a2da428"><div class="ttname"><a href="namespacedevelop_build.html#ade64cd34608f9442ef3049116a2da428">developBuild.v</a></div><div class="ttdeci">v</div><div class="ttdef"><b>Definition</b> <a href="develop_build_8py_source.html#l00006">developBuild.py:6</a></div></div>
 <div class="ttc" id="anamespacepicojson_html_a3aca598f5855bc130a92a3e08a0c6ebf"><div class="ttname"><a href="namespacepicojson.html#a3aca598f5855bc130a92a3e08a0c6ebf">picojson::parse</a></div><div class="ttdeci">std::string parse(value &amp;out, Iter &amp;pos, const Iter &amp;last)</div><div class="ttdef"><b>Definition</b> <a href="spec__test__generator_8cpp_source.html#l01015">spec_test_generator.cpp:1015</a></div></div>
 <div class="ttc" id="anamespacepicojson_html_ac1e72166adfe3d96dc58cddc7ebd536a"><div class="ttname"><a href="namespacepicojson.html#ac1e72166adfe3d96dc58cddc7ebd536a">picojson::array</a></div><div class="ttdeci">value::array array</div><div class="ttdef"><b>Definition</b> <a href="spec__test__generator_8cpp_source.html#l00221">spec_test_generator.cpp:221</a></div></div>
 <div class="ttc" id="aspec__test__generator_8cpp_html_a38dbcefacf2213267f0b88c3cbe75efc"><div class="ttname"><a href="#a38dbcefacf2213267f0b88c3cbe75efc">generate_tests</a></div><div class="ttdeci">void generate_tests(const map&lt; string, vector&lt; picojson::object &gt; &gt; &amp;mappings)</div><div class="ttdef"><b>Definition</b> <a href="spec__test__generator_8cpp_source.html#l01285">spec_test_generator.cpp:1285</a></div></div>
@@ -1311,31 +1311,33 @@ Here is the call graph for this function:</div>
 <div class="dyncontent">
 <div class="center"><img src="spec__test__generator_8cpp_a3c04138a5bfe5d72780bb7e82a18e627_cgraph.png" border="0" usemap="#aspec__test__generator_8cpp_a3c04138a5bfe5d72780bb7e82a18e627_cgraph" alt=""/></div>
 <map name="aspec__test__generator_8cpp_a3c04138a5bfe5d72780bb7e82a18e627_cgraph" id="aspec__test__generator_8cpp_a3c04138a5bfe5d72780bb7e82a18e627_cgraph">
-<area shape="rect" title=" " alt="" coords="5,152,55,178"/>
-<area shape="rect" href="spec__test__generator_8cpp.html#a38dbcefacf2213267f0b88c3cbe75efc" title=" " alt="" coords="104,79,211,104"/>
-<area shape="poly" title=" " alt="" coords="47,150,101,113,109,109,112,114,104,118,50,154"/>
-<area shape="rect" href="namespacepicojson.html#a3aca598f5855bc130a92a3e08a0c6ebf" title=" " alt="" coords="103,152,212,178"/>
-<area shape="poly" title=" " alt="" coords="55,162,87,162,87,168,55,168"/>
-<area shape="rect" href="spec__test__generator_8cpp.html#a7cac13da282785878351e0a820104851" title=" " alt="" coords="129,201,186,227"/>
-<area shape="poly" title=" " alt="" coords="56,172,116,195,114,200,54,177"/>
-<area shape="rect" href="spec__test__generator_8cpp.html#a4f960e6f7420b1eb5f83a1b4c989dda1" title=" " alt="" coords="288,5,387,31"/>
-<area shape="poly" title=" " alt="" coords="182,76,259,40,275,34,277,39,261,45,185,80"/>
-<area shape="rect" href="spec__test__generator_8cpp.html#a7b5371af396d265eedbfded79eae7fd4" title=" " alt="" coords="274,55,401,80"/>
-<area shape="poly" title=" " alt="" coords="211,82,258,75,259,81,212,87"/>
-<area shape="rect" href="spec__test__generator_8cpp.html#a5d8023afa2b7d6564addbf974b0d9c36" title=" " alt="" coords="260,104,415,130"/>
-<area shape="poly" title=" " alt="" coords="212,96,245,101,244,106,211,102"/>
-<area shape="rect" href="spec__test__generator_8cpp.html#aa09b4f9b6325a55b404c2fb94a1667d3" title=" " alt="" coords="274,153,401,179"/>
-<area shape="poly" title=" " alt="" coords="190,102,213,113,261,140,275,145,273,150,259,145,211,118,188,107"/>
-<area shape="rect" href="spec__test__generator_8cpp.html#a4c563586940721ed1087d699128c6d2a" title=" " alt="" coords="463,80,545,106"/>
-<area shape="poly" title=" " alt="" coords="388,29,416,40,471,69,468,74,414,45,386,34"/>
-<area shape="rect" href="classpicojson_1_1value.html#a005099b2865752cf31b7ced33bd85f59" title=" " alt="" coords="593,80,742,106"/>
-<area shape="poly" title=" " alt="" coords="545,90,577,90,577,96,545,96"/>
-<area shape="rect" href="xbyak__mnemonic_8h.html#a3357ad22233ec022b85f32d969935f51" title=" " alt="" coords="790,80,836,106"/>
-<area shape="poly" title=" " alt="" coords="742,90,775,90,775,96,742,96"/>
-<area shape="poly" title=" " alt="" coords="402,75,448,82,448,87,401,80"/>
-<area shape="poly" title=" " alt="" coords="415,103,447,98,448,104,416,108"/>
-<area shape="poly" title=" " alt="" coords="386,150,414,140,468,112,470,116,416,145,388,155"/>
-<area shape="poly" title=" " alt="" coords="135,153,131,143,133,134,143,128,157,125,173,128,182,135,178,139,171,133,157,131,144,133,138,137,136,143,140,151"/>
+<area shape="rect" title=" " alt="" coords="5,165,55,191"/>
+<area shape="rect" href="spec__test__generator_8cpp.html#a38dbcefacf2213267f0b88c3cbe75efc" title=" " alt="" coords="116,79,224,104"/>
+<area shape="poly" title=" " alt="" coords="41,163,68,138,101,113,109,109,112,114,104,118,71,142,45,167"/>
+<area shape="rect" href="classpicojson_1_1value.html#a13bd312245da5d28a8ae13b3df3d7301" title=" " alt="" coords="103,128,237,154"/>
+<area shape="poly" title=" " alt="" coords="55,169,104,156,105,161,56,174"/>
+<area shape="rect" href="namespacepicojson.html#a3aca598f5855bc130a92a3e08a0c6ebf" title=" " alt="" coords="115,201,224,227"/>
+<area shape="poly" title=" " alt="" coords="56,182,103,194,102,200,55,187"/>
+<area shape="rect" href="spec__test__generator_8cpp.html#a7cac13da282785878351e0a820104851" title=" " alt="" coords="142,251,198,276"/>
+<area shape="poly" title=" " alt="" coords="46,190,71,214,104,237,128,248,126,253,101,242,68,218,42,193"/>
+<area shape="rect" href="spec__test__generator_8cpp.html#a4f960e6f7420b1eb5f83a1b4c989dda1" title=" " alt="" coords="314,5,412,31"/>
+<area shape="poly" title=" " alt="" coords="199,76,284,40,300,34,302,39,286,45,201,81"/>
+<area shape="rect" href="spec__test__generator_8cpp.html#a7b5371af396d265eedbfded79eae7fd4" title=" " alt="" coords="299,55,426,80"/>
+<area shape="poly" title=" " alt="" coords="224,82,283,75,284,80,224,87"/>
+<area shape="rect" href="spec__test__generator_8cpp.html#a5d8023afa2b7d6564addbf974b0d9c36" title=" " alt="" coords="285,104,440,130"/>
+<area shape="poly" title=" " alt="" coords="224,96,270,102,269,107,224,101"/>
+<area shape="rect" href="spec__test__generator_8cpp.html#aa09b4f9b6325a55b404c2fb94a1667d3" title=" " alt="" coords="299,153,426,179"/>
+<area shape="poly" title=" " alt="" coords="212,103,238,113,286,140,300,145,298,150,284,145,236,118,210,107"/>
+<area shape="rect" href="spec__test__generator_8cpp.html#a4c563586940721ed1087d699128c6d2a" title=" " alt="" coords="488,80,570,106"/>
+<area shape="poly" title=" " alt="" coords="413,29,441,40,496,69,493,74,439,45,411,34"/>
+<area shape="rect" href="classpicojson_1_1value.html#a005099b2865752cf31b7ced33bd85f59" title=" " alt="" coords="618,80,767,106"/>
+<area shape="poly" title=" " alt="" coords="570,90,602,90,602,96,570,96"/>
+<area shape="rect" href="xbyak__mnemonic_8h.html#a3357ad22233ec022b85f32d969935f51" title=" " alt="" coords="815,80,861,106"/>
+<area shape="poly" title=" " alt="" coords="767,90,800,90,800,96,767,96"/>
+<area shape="poly" title=" " alt="" coords="427,75,473,82,473,87,426,80"/>
+<area shape="poly" title=" " alt="" coords="440,103,472,98,473,104,441,108"/>
+<area shape="poly" title=" " alt="" coords="411,150,439,140,493,112,495,116,441,145,413,155"/>
+<area shape="poly" title=" " alt="" coords="146,202,141,193,144,183,154,177,170,175,187,177,196,184,193,188,185,182,170,180,156,182,148,186,146,192,150,200"/>
 </map>
 </div>
 
@@ -1370,7 +1372,7 @@ Here is the call graph for this function:</div>
 
 <p class="definition">Definition at line <a class="el" href="spec__test__generator_8cpp_source.html#l01110">1110</a> of file <a class="el" href="spec__test__generator_8cpp_source.html">spec_test_generator.cpp</a>.</p>
 <div class="fragment"><div class="line"><span class="lineno"> 1110</span>                                                                      {</div>
-<div class="line"><span class="lineno"> 1111</span>   x.<a class="code hl_function" href="classpicojson_1_1value.html#a23664084ed4a8ecbfda901484de34bbc">serialize</a>(std::ostream_iterator&lt;char&gt;(os));</div>
+<div class="line"><span class="lineno"> 1111</span>   x.<a class="code hl_function" href="classpicojson_1_1value.html#a23664084ed4a8ecbfda901484de34bbc">serialize</a>(std::ostream_iterator&lt;char&gt;(<a class="code hl_variable" href="environment_8hpp.html#a3951483d0b31c29ca95336206cd35238">os</a>));</div>
 <div class="line"><span class="lineno"> 1112</span>   <span class="keywordflow">return</span> <a class="code hl_variable" href="environment_8hpp.html#a3951483d0b31c29ca95336206cd35238">os</a>;</div>
 <div class="line"><span class="lineno"> 1113</span>}</div>
 <div class="ttc" id="aclasspicojson_1_1value_html_a23664084ed4a8ecbfda901484de34bbc"><div class="ttname"><a href="classpicojson_1_1value.html#a23664084ed4a8ecbfda901484de34bbc">picojson::value::serialize</a></div><div class="ttdeci">void serialize(Iter os, bool prettify=false) const</div><div class="ttdef"><b>Definition</b> <a href="spec__test__generator_8cpp_source.html#l00540">spec_test_generator.cpp:540</a></div></div>

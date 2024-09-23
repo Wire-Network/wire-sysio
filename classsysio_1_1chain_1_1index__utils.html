@@ -261,9 +261,9 @@ template&lt;typename Secondary , typename Key &gt; </div>
 
 <p class="definition">Definition at line <a class="el" href="database__utils_8hpp_source.html#l00038">38</a> of file <a class="el" href="database__utils_8hpp_source.html">database_utils.hpp</a>.</p>
 <div class="fragment"><div class="line"><span class="lineno">   38</span>                                                                                                           {</div>
-<div class="line"><span class="lineno">   39</span>            <span class="keyword">const</span> <span class="keyword">auto</span>&amp; <a class="code hl_variable" href="namespacehost__functions__tests__1.html#a8496a24b5236a2dc07bb4f2930d88342">idx</a> = db.<a class="code hl_function" href="classchainbase_1_1database.html#a4d5297635dcf70be481d9b600da9bc13">get_index</a>&lt;Index, Secondary&gt;();</div>
-<div class="line"><span class="lineno">   40</span>            <span class="keyword">auto</span> begin_itr = <a class="code hl_variable" href="namespacehost__functions__tests__1.html#a8496a24b5236a2dc07bb4f2930d88342">idx</a>.lower_bound(begin_key);</div>
-<div class="line"><span class="lineno">   41</span>            <span class="keyword">auto</span> end_itr = <a class="code hl_variable" href="namespacehost__functions__tests__1.html#a8496a24b5236a2dc07bb4f2930d88342">idx</a>.lower_bound(end_key);</div>
+<div class="line"><span class="lineno">   39</span>            <span class="keyword">const</span> <span class="keyword">auto</span>&amp; idx = db.<a class="code hl_function" href="classchainbase_1_1database.html#a4d5297635dcf70be481d9b600da9bc13">get_index</a>&lt;Index, Secondary&gt;();</div>
+<div class="line"><span class="lineno">   40</span>            <span class="keyword">auto</span> begin_itr = idx.lower_bound(begin_key);</div>
+<div class="line"><span class="lineno">   41</span>            <span class="keyword">auto</span> end_itr = idx.lower_bound(end_key);</div>
 <div class="line"><span class="lineno">   42</span>            <span class="keywordtype">size_t</span> res = 0;</div>
 <div class="line"><span class="lineno">   43</span>            <span class="keywordflow">while</span> (begin_itr != end_itr) {</div>
 <div class="line"><span class="lineno">   44</span>               res++; ++begin_itr;</div>
@@ -271,7 +271,6 @@ template&lt;typename Secondary , typename Key &gt; </div>
 <div class="line"><span class="lineno">   46</span>            <span class="keywordflow">return</span> res;</div>
 <div class="line"><span class="lineno">   47</span>         }</div>
 <div class="ttc" id="aclasschainbase_1_1database_html_a4d5297635dcf70be481d9b600da9bc13"><div class="ttname"><a href="classchainbase_1_1database.html#a4d5297635dcf70be481d9b600da9bc13">chainbase::database::get_index</a></div><div class="ttdeci">const generic_index&lt; MultiIndexType &gt; &amp; get_index() const</div><div class="ttdef"><b>Definition</b> <a href="chainbase_8hpp_source.html#l00425">chainbase.hpp:425</a></div></div>
-<div class="ttc" id="anamespacehost__functions__tests__1_html_a8496a24b5236a2dc07bb4f2930d88342"><div class="ttname"><a href="namespacehost__functions__tests__1.html#a8496a24b5236a2dc07bb4f2930d88342">host_functions_tests_1.idx</a></div><div class="ttdeci">int idx</div><div class="ttdef"><b>Definition</b> <a href="host__functions__tests__1_8py_source.html#l00021">host_functions_tests_1.py:21</a></div></div>
 </div><!-- fragment --><div class="dynheader">
 Here is the call graph for this function:</div>
 <div class="dyncontent">
@@ -409,9 +408,9 @@ template&lt;typename Secondary , typename Key , typename F &gt; </div>
 
 <p class="definition">Definition at line <a class="el" href="database__utils_8hpp_source.html#l00028">28</a> of file <a class="el" href="database__utils_8hpp_source.html">database_utils.hpp</a>.</p>
 <div class="fragment"><div class="line"><span class="lineno">   28</span>                                                                                                                     {</div>
-<div class="line"><span class="lineno">   29</span>            <span class="keyword">const</span> <span class="keyword">auto</span>&amp; <a class="code hl_variable" href="namespacehost__functions__tests__1.html#a8496a24b5236a2dc07bb4f2930d88342">idx</a> = db.<a class="code hl_function" href="classchainbase_1_1database.html#a4d5297635dcf70be481d9b600da9bc13">get_index</a>&lt;Index, Secondary&gt;();</div>
-<div class="line"><span class="lineno">   30</span>            <span class="keyword">auto</span> begin_itr = <a class="code hl_variable" href="namespacehost__functions__tests__1.html#a8496a24b5236a2dc07bb4f2930d88342">idx</a>.lower_bound(begin_key);</div>
-<div class="line"><span class="lineno">   31</span>            <span class="keyword">auto</span> end_itr = <a class="code hl_variable" href="namespacehost__functions__tests__1.html#a8496a24b5236a2dc07bb4f2930d88342">idx</a>.lower_bound(end_key);</div>
+<div class="line"><span class="lineno">   29</span>            <span class="keyword">const</span> <span class="keyword">auto</span>&amp; idx = db.<a class="code hl_function" href="classchainbase_1_1database.html#a4d5297635dcf70be481d9b600da9bc13">get_index</a>&lt;Index, Secondary&gt;();</div>
+<div class="line"><span class="lineno">   30</span>            <span class="keyword">auto</span> begin_itr = idx.lower_bound(begin_key);</div>
+<div class="line"><span class="lineno">   31</span>            <span class="keyword">auto</span> end_itr = idx.lower_bound(end_key);</div>
 <div class="line"><span class="lineno">   32</span>            <span class="keywordflow">for</span> (<span class="keyword">auto</span> itr = begin_itr; itr != end_itr; ++itr) {</div>
 <div class="line"><span class="lineno">   33</span>               function(*itr);</div>
 <div class="line"><span class="lineno">   34</span>            }</div>

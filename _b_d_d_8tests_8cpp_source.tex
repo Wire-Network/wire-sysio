@@ -57,30 +57,30 @@
 \DoxyCodeLine{\Hypertarget{_b_d_d_8tests_8cpp_source_l00053}00053\ }
 \DoxyCodeLine{\Hypertarget{_b_d_d_8tests_8cpp_source_l00054}00054\ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_acf8f441c7b9d70251ccbb7ccd8b83183}{SCENARIO}}("{}Vector\ resizing\ affects\ size\ and\ capacity"{},\ "{}[vector][bdd][size][capacity]"{})\ \{}
 \DoxyCodeLine{\Hypertarget{_b_d_d_8tests_8cpp_source_l00055}00055\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_a2b70c603786d759242856d883dbe93bd}{GIVEN}}(\textcolor{stringliteral}{"{}an\ empty\ vector"{}})\ \{}
-\DoxyCodeLine{\Hypertarget{_b_d_d_8tests_8cpp_source_l00056}00056\ \ \ \ \ \ \ \ \ \ \ \ \ std::vector<int>\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}};}
-\DoxyCodeLine{\Hypertarget{_b_d_d_8tests_8cpp_source_l00057}00057\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_ad57835ba8f1bb419a865ada6bd011a85}{REQUIRE}}(\mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.size()\ ==\ 0);}
+\DoxyCodeLine{\Hypertarget{_b_d_d_8tests_8cpp_source_l00056}00056\ \ \ \ \ \ \ \ \ \ \ \ \ std::vector<int>\ v;}
+\DoxyCodeLine{\Hypertarget{_b_d_d_8tests_8cpp_source_l00057}00057\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_ad57835ba8f1bb419a865ada6bd011a85}{REQUIRE}}(v.size()\ ==\ 0);}
 \DoxyCodeLine{\Hypertarget{_b_d_d_8tests_8cpp_source_l00058}00058\ }
 \DoxyCodeLine{\Hypertarget{_b_d_d_8tests_8cpp_source_l00059}00059\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_ab09e9b8186233f676ce6a23aebe89d6e}{WHEN}}(\textcolor{stringliteral}{"{}it\ is\ made\ larger"{}})\ \{}
-\DoxyCodeLine{\Hypertarget{_b_d_d_8tests_8cpp_source_l00060}00060\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.resize(10);}
+\DoxyCodeLine{\Hypertarget{_b_d_d_8tests_8cpp_source_l00060}00060\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ v.resize(10);}
 \DoxyCodeLine{\Hypertarget{_b_d_d_8tests_8cpp_source_l00061}00061\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_a27987092139727fd7a471b5f74dc62de}{THEN}}(\textcolor{stringliteral}{"{}the\ size\ and\ capacity\ go\ up"{}})\ \{}
-\DoxyCodeLine{\Hypertarget{_b_d_d_8tests_8cpp_source_l00062}00062\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_ad57835ba8f1bb419a865ada6bd011a85}{REQUIRE}}(\mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.size()\ ==\ 10);}
-\DoxyCodeLine{\Hypertarget{_b_d_d_8tests_8cpp_source_l00063}00063\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_ad57835ba8f1bb419a865ada6bd011a85}{REQUIRE}}(\mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.capacity()\ >=\ 10);}
+\DoxyCodeLine{\Hypertarget{_b_d_d_8tests_8cpp_source_l00062}00062\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_ad57835ba8f1bb419a865ada6bd011a85}{REQUIRE}}(v.size()\ ==\ 10);}
+\DoxyCodeLine{\Hypertarget{_b_d_d_8tests_8cpp_source_l00063}00063\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_ad57835ba8f1bb419a865ada6bd011a85}{REQUIRE}}(v.capacity()\ >=\ 10);}
 \DoxyCodeLine{\Hypertarget{_b_d_d_8tests_8cpp_source_l00064}00064\ }
 \DoxyCodeLine{\Hypertarget{_b_d_d_8tests_8cpp_source_l00065}00065\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_a054a37584492a5dfbdb5ee0f2fc10b7a}{AND\_WHEN}}(\textcolor{stringliteral}{"{}it\ is\ made\ smaller\ again"{}})\ \{}
-\DoxyCodeLine{\Hypertarget{_b_d_d_8tests_8cpp_source_l00066}00066\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.resize(5);}
+\DoxyCodeLine{\Hypertarget{_b_d_d_8tests_8cpp_source_l00066}00066\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ v.resize(5);}
 \DoxyCodeLine{\Hypertarget{_b_d_d_8tests_8cpp_source_l00067}00067\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_a27987092139727fd7a471b5f74dc62de}{THEN}}(\textcolor{stringliteral}{"{}the\ size\ goes\ down\ but\ the\ capacity\ stays\ the\ same"{}})\ \{}
-\DoxyCodeLine{\Hypertarget{_b_d_d_8tests_8cpp_source_l00068}00068\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_ad57835ba8f1bb419a865ada6bd011a85}{REQUIRE}}(\mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.size()\ ==\ 5);}
-\DoxyCodeLine{\Hypertarget{_b_d_d_8tests_8cpp_source_l00069}00069\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_ad57835ba8f1bb419a865ada6bd011a85}{REQUIRE}}(\mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.capacity()\ >=\ 10);}
+\DoxyCodeLine{\Hypertarget{_b_d_d_8tests_8cpp_source_l00068}00068\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_ad57835ba8f1bb419a865ada6bd011a85}{REQUIRE}}(v.size()\ ==\ 5);}
+\DoxyCodeLine{\Hypertarget{_b_d_d_8tests_8cpp_source_l00069}00069\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_ad57835ba8f1bb419a865ada6bd011a85}{REQUIRE}}(v.capacity()\ >=\ 10);}
 \DoxyCodeLine{\Hypertarget{_b_d_d_8tests_8cpp_source_l00070}00070\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
 \DoxyCodeLine{\Hypertarget{_b_d_d_8tests_8cpp_source_l00071}00071\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
 \DoxyCodeLine{\Hypertarget{_b_d_d_8tests_8cpp_source_l00072}00072\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
 \DoxyCodeLine{\Hypertarget{_b_d_d_8tests_8cpp_source_l00073}00073\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
 \DoxyCodeLine{\Hypertarget{_b_d_d_8tests_8cpp_source_l00074}00074\ }
 \DoxyCodeLine{\Hypertarget{_b_d_d_8tests_8cpp_source_l00075}00075\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_ab09e9b8186233f676ce6a23aebe89d6e}{WHEN}}(\textcolor{stringliteral}{"{}we\ reserve\ more\ space"{}})\ \{}
-\DoxyCodeLine{\Hypertarget{_b_d_d_8tests_8cpp_source_l00076}00076\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.reserve(10);}
+\DoxyCodeLine{\Hypertarget{_b_d_d_8tests_8cpp_source_l00076}00076\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ v.reserve(10);}
 \DoxyCodeLine{\Hypertarget{_b_d_d_8tests_8cpp_source_l00077}00077\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_a27987092139727fd7a471b5f74dc62de}{THEN}}(\textcolor{stringliteral}{"{}The\ capacity\ is\ increased\ but\ the\ size\ remains\ the\ same"{}})\ \{}
-\DoxyCodeLine{\Hypertarget{_b_d_d_8tests_8cpp_source_l00078}00078\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_ad57835ba8f1bb419a865ada6bd011a85}{REQUIRE}}(\mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.capacity()\ >=\ 10);}
-\DoxyCodeLine{\Hypertarget{_b_d_d_8tests_8cpp_source_l00079}00079\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_ad57835ba8f1bb419a865ada6bd011a85}{REQUIRE}}(\mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.size()\ ==\ 0);}
+\DoxyCodeLine{\Hypertarget{_b_d_d_8tests_8cpp_source_l00078}00078\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_ad57835ba8f1bb419a865ada6bd011a85}{REQUIRE}}(v.capacity()\ >=\ 10);}
+\DoxyCodeLine{\Hypertarget{_b_d_d_8tests_8cpp_source_l00079}00079\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_ad57835ba8f1bb419a865ada6bd011a85}{REQUIRE}}(v.size()\ ==\ 0);}
 \DoxyCodeLine{\Hypertarget{_b_d_d_8tests_8cpp_source_l00080}00080\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
 \DoxyCodeLine{\Hypertarget{_b_d_d_8tests_8cpp_source_l00081}00081\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
 \DoxyCodeLine{\Hypertarget{_b_d_d_8tests_8cpp_source_l00082}00082\ \ \ \ \ \ \ \ \ \}}

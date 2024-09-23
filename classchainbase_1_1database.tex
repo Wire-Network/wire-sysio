@@ -260,14 +260,16 @@ Definition at line \mbox{\hyperlink{chainbase_8hpp_source_l00344}{344}} of file 
 \DoxyCodeLine{00409\ \ \ \ \ \ \ \ \ \ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
 \includegraphics[width=350pt]{classchainbase_1_1database_a43a85f8b7d728b69dbf7a9d69c9ebc1c_cgraph}
 \end{center}
 \end{figure}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -294,14 +296,16 @@ Definition at line \mbox{\hyperlink{chainbase_8cpp_source_l00057}{57}} of file \
 \DoxyCodeLine{00063\ \ \ \ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
 \includegraphics[width=328pt]{classchainbase_1_1database_aca6d7bcd700644f077b89203b2e8b7ef_cgraph}
 \end{center}
 \end{figure}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -328,14 +332,16 @@ Definition at line \mbox{\hyperlink{chainbase_8hpp_source_l00519}{519}} of file 
 \DoxyCodeLine{00524\ \ \ \ \ \ \ \ \ \ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
 \includegraphics[width=350pt]{classchainbase_1_1database_adc8f336b33d7013d1b0400399b16c5a7_cgraph}
 \end{center}
 \end{figure}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -358,21 +364,23 @@ Definition at line \mbox{\hyperlink{chainbase_8hpp_source_l00458}{458}} of file 
 \DoxyCodeLine{00459\ \ \ \ \ \ \ \ \ \ \{}
 \DoxyCodeLine{00460\ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{chainbase_8hpp_a92cd7cf8dd03d26bd5ef6a1a15d6d755}{CHAINBASE\_REQUIRE\_READ\_LOCK}}(\textcolor{stringliteral}{"{}find"{}},\ ObjectType);}
 \DoxyCodeLine{00461\ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{typedef}\ \textcolor{keyword}{typename}\ get\_index\_type<\ ObjectType\ >::type\ index\_type;}
-\DoxyCodeLine{00462\ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ \mbox{\hyperlink{namespacehost__functions__tests__1_a8496a24b5236a2dc07bb4f2930d88342}{idx}}\ =\ \mbox{\hyperlink{classchainbase_1_1database_a4d5297635dcf70be481d9b600da9bc13}{get\_index<\ index\_type\ >}}().indices().template\ \mbox{\hyperlink{classchainbase_1_1database_afcfe00f81a526c1376d4f51197dd3a9a}{get<\ IndexedByType\ >}}();}
-\DoxyCodeLine{00463\ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ itr\ =\ \mbox{\hyperlink{namespacehost__functions__tests__1_a8496a24b5236a2dc07bb4f2930d88342}{idx}}.find(\ std::forward<\ CompatibleKey\ >(\ key\ )\ );}
-\DoxyCodeLine{00464\ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ itr\ ==\ \mbox{\hyperlink{namespacehost__functions__tests__1_a8496a24b5236a2dc07bb4f2930d88342}{idx}}.end()\ )\ \textcolor{keywordflow}{return}\ \textcolor{keyword}{nullptr};}
+\DoxyCodeLine{00462\ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ idx\ =\ \mbox{\hyperlink{classchainbase_1_1database_a4d5297635dcf70be481d9b600da9bc13}{get\_index<\ index\_type\ >}}().indices().template\ \mbox{\hyperlink{classchainbase_1_1database_afcfe00f81a526c1376d4f51197dd3a9a}{get<\ IndexedByType\ >}}();}
+\DoxyCodeLine{00463\ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ itr\ =\ idx.find(\ std::forward<\ CompatibleKey\ >(\ key\ )\ );}
+\DoxyCodeLine{00464\ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ itr\ ==\ idx.end()\ )\ \textcolor{keywordflow}{return}\ \textcolor{keyword}{nullptr};}
 \DoxyCodeLine{00465\ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \&*itr;}
 \DoxyCodeLine{00466\ \ \ \ \ \ \ \ \ \ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
 \includegraphics[width=350pt]{classchainbase_1_1database_aa5a2ca0da0092693ac49b36b7ec6817a_cgraph}
 \end{center}
 \end{figure}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -399,7 +407,8 @@ Definition at line \mbox{\hyperlink{chainbase_8hpp_source_l00469}{469}} of file 
 \DoxyCodeLine{00474\ \ \ \ \ \ \ \ \ \ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -437,7 +446,8 @@ Definition at line \mbox{\hyperlink{chainbase_8hpp_source_l00477}{477}} of file 
 \DoxyCodeLine{00487\ \ \ \ \ \ \ \ \ \ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -469,7 +479,8 @@ Definition at line \mbox{\hyperlink{chainbase_8hpp_source_l00490}{490}} of file 
 \DoxyCodeLine{00500\ \ \ \ \ \ \ \ \ \ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -493,14 +504,16 @@ Definition at line \mbox{\hyperlink{chainbase_8hpp_source_l00419}{419}} of file 
 \DoxyCodeLine{00422\ \ \ \ \ \ \ \ \ \ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
 \includegraphics[width=350pt]{classchainbase_1_1database_a63a87fe56634ee1e93511a894b98e40d_cgraph}
 \end{center}
 \end{figure}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -530,14 +543,16 @@ Definition at line \mbox{\hyperlink{chainbase_8hpp_source_l00425}{425}} of file 
 \DoxyCodeLine{00433\ \ \ \ \ \ \ \ \ \ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
 \includegraphics[width=350pt]{classchainbase_1_1database_a4d5297635dcf70be481d9b600da9bc13_cgraph}
 \end{center}
 \end{figure}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -567,7 +582,8 @@ Definition at line \mbox{\hyperlink{chainbase_8hpp_source_l00436}{436}} of file 
 \DoxyCodeLine{00444\ \ \ \ \ \ \ \ \ \ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -597,14 +613,16 @@ Definition at line \mbox{\hyperlink{chainbase_8hpp_source_l00447}{447}} of file 
 \DoxyCodeLine{00455\ \ \ \ \ \ \ \ \ \ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
 \includegraphics[width=350pt]{classchainbase_1_1database_afaea057692a8bbbf3f506b64c60308b6_cgraph}
 \end{center}
 \end{figure}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -628,14 +646,16 @@ Definition at line \mbox{\hyperlink{chainbase_8hpp_source_l00411}{411}} of file 
 \DoxyCodeLine{00413\ \ \ \ \ \ \ \ \ \ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
 \includegraphics[width=350pt]{classchainbase_1_1database_a64133afb9e0ae374eeab86bd1d4db08b_cgraph}
 \end{center}
 \end{figure}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -659,7 +679,8 @@ Definition at line \mbox{\hyperlink{chainbase_8hpp_source_l00415}{415}} of file 
 \DoxyCodeLine{00417\ \ \ \ \ \ \ \ \ \ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -701,14 +722,16 @@ Definition at line \mbox{\hyperlink{chainbase_8hpp_source_l00503}{503}} of file 
 \DoxyCodeLine{00508\ \ \ \ \ \ \ \ \ \ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
 \includegraphics[width=350pt]{classchainbase_1_1database_a9ebc006075e8fc2e84357a0e068b58d4_cgraph}
 \end{center}
 \end{figure}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -741,14 +764,16 @@ Definition at line \mbox{\hyperlink{chainbase_8hpp_source_l00511}{511}} of file 
 \DoxyCodeLine{00516\ \ \ \ \ \ \ \ \ \ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
 \includegraphics[width=350pt]{classchainbase_1_1database_ac6bb29708e4fdfb6899028e3c351fe0b_cgraph}
 \end{center}
 \end{figure}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -773,7 +798,8 @@ Definition at line \mbox{\hyperlink{chainbase_8hpp_source_l00325}{325}} of file 
 \DoxyCodeLine{00328\ \ \ \ \ \ \ \ \ \ \}}
 
 \end{DoxyCode}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -803,7 +829,8 @@ Definition at line \mbox{\hyperlink{chainbase_8hpp_source_l00526}{526}} of file 
 \DoxyCodeLine{00534\ \ \ \ \ \ \ \ \ \ \}}
 
 \end{DoxyCode}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -847,14 +874,16 @@ Definition at line \mbox{\hyperlink{chainbase_8hpp_source_l00336}{336}} of file 
 \DoxyCodeLine{00340\ \ \ \ \ \ \ \ \ \ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
 \includegraphics[width=328pt]{classchainbase_1_1database_a24e7f6336cad0bd2fc280dab381665ed_cgraph}
 \end{center}
 \end{figure}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -907,7 +936,8 @@ Definition at line \mbox{\hyperlink{chainbase_8cpp_source_l00073}{73}} of file \
 \DoxyCodeLine{00085\ \ \ \ \}}
 
 \end{DoxyCode}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -934,7 +964,8 @@ Definition at line \mbox{\hyperlink{chainbase_8cpp_source_l00041}{41}} of file \
 \DoxyCodeLine{00047\ \ \ \ \}}
 
 \end{DoxyCode}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -961,7 +992,8 @@ Definition at line \mbox{\hyperlink{chainbase_8cpp_source_l00065}{65}} of file \
 \DoxyCodeLine{00071\ \ \ \ \}}
 
 \end{DoxyCode}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode

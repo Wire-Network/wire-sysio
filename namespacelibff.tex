@@ -1723,15 +1723,15 @@ Definition at line \mbox{\hyperlink{alt__bn128__pairing_8cpp_source_l00422}{422}
 \DoxyCodeLine{00471\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}}\ =\ \mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}}.inverse();}
 \DoxyCodeLine{00472\ \ \ \ \ \}}
 \DoxyCodeLine{00473\ }
-\DoxyCodeLine{00474\ \ \ \ \ alt\_bn128\_ate\_ell\_coeffs\ c1\ =\ prec\_Q1.\mbox{\hyperlink{structlibff_1_1alt__bn128__ate___g2__precomp_a093576e21dbfbab74253b847b1c0dce7}{coeffs}}[\mbox{\hyperlink{namespacehost__functions__tests__1_a8496a24b5236a2dc07bb4f2930d88342}{idx}}];}
-\DoxyCodeLine{00475\ \ \ \ \ alt\_bn128\_ate\_ell\_coeffs\ c2\ =\ prec\_Q2.\mbox{\hyperlink{structlibff_1_1alt__bn128__ate___g2__precomp_a093576e21dbfbab74253b847b1c0dce7}{coeffs}}[\mbox{\hyperlink{namespacehost__functions__tests__1_a8496a24b5236a2dc07bb4f2930d88342}{idx}}];}
-\DoxyCodeLine{00476\ \ \ \ \ ++\mbox{\hyperlink{namespacehost__functions__tests__1_a8496a24b5236a2dc07bb4f2930d88342}{idx}};}
+\DoxyCodeLine{00474\ \ \ \ \ alt\_bn128\_ate\_ell\_coeffs\ c1\ =\ prec\_Q1.\mbox{\hyperlink{structlibff_1_1alt__bn128__ate___g2__precomp_a093576e21dbfbab74253b847b1c0dce7}{coeffs}}[idx];}
+\DoxyCodeLine{00475\ \ \ \ \ alt\_bn128\_ate\_ell\_coeffs\ c2\ =\ prec\_Q2.\mbox{\hyperlink{structlibff_1_1alt__bn128__ate___g2__precomp_a093576e21dbfbab74253b847b1c0dce7}{coeffs}}[idx];}
+\DoxyCodeLine{00476\ \ \ \ \ ++idx;}
 \DoxyCodeLine{00477\ \ \ \ \ \mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}}\ =\ \mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}}.mul\_by\_024(c1.ell\_0,\ prec\_P1.\mbox{\hyperlink{structlibff_1_1alt__bn128__ate___g1__precomp_a5db2c840300e686e5d126b9f594b2ee5}{PY}}\ *\ c1.ell\_VW,\ prec\_P1.\mbox{\hyperlink{structlibff_1_1alt__bn128__ate___g1__precomp_a81552b61b56535280e67730014522177}{PX}}\ *\ c1.ell\_VV);}
 \DoxyCodeLine{00478\ \ \ \ \ \mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}}\ =\ \mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}}.mul\_by\_024(c2.ell\_0,\ prec\_P2.\mbox{\hyperlink{structlibff_1_1alt__bn128__ate___g1__precomp_a5db2c840300e686e5d126b9f594b2ee5}{PY}}\ *\ c2.ell\_VW,\ prec\_P2.\mbox{\hyperlink{structlibff_1_1alt__bn128__ate___g1__precomp_a81552b61b56535280e67730014522177}{PX}}\ *\ c2.ell\_VV);}
 \DoxyCodeLine{00479\ }
-\DoxyCodeLine{00480\ \ \ \ \ c1\ =\ prec\_Q1.\mbox{\hyperlink{structlibff_1_1alt__bn128__ate___g2__precomp_a093576e21dbfbab74253b847b1c0dce7}{coeffs}}[\mbox{\hyperlink{namespacehost__functions__tests__1_a8496a24b5236a2dc07bb4f2930d88342}{idx}}];}
-\DoxyCodeLine{00481\ \ \ \ \ c2\ =\ prec\_Q2.\mbox{\hyperlink{structlibff_1_1alt__bn128__ate___g2__precomp_a093576e21dbfbab74253b847b1c0dce7}{coeffs}}[\mbox{\hyperlink{namespacehost__functions__tests__1_a8496a24b5236a2dc07bb4f2930d88342}{idx}}];}
-\DoxyCodeLine{00482\ \ \ \ \ ++\mbox{\hyperlink{namespacehost__functions__tests__1_a8496a24b5236a2dc07bb4f2930d88342}{idx}};}
+\DoxyCodeLine{00480\ \ \ \ \ c1\ =\ prec\_Q1.\mbox{\hyperlink{structlibff_1_1alt__bn128__ate___g2__precomp_a093576e21dbfbab74253b847b1c0dce7}{coeffs}}[idx];}
+\DoxyCodeLine{00481\ \ \ \ \ c2\ =\ prec\_Q2.\mbox{\hyperlink{structlibff_1_1alt__bn128__ate___g2__precomp_a093576e21dbfbab74253b847b1c0dce7}{coeffs}}[idx];}
+\DoxyCodeLine{00482\ \ \ \ \ ++idx;}
 \DoxyCodeLine{00483\ \ \ \ \ \mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}}\ =\ \mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}}.mul\_by\_024(c1.ell\_0,\ prec\_P1.\mbox{\hyperlink{structlibff_1_1alt__bn128__ate___g1__precomp_a5db2c840300e686e5d126b9f594b2ee5}{PY}}\ *\ c1.ell\_VW,\ prec\_P1.\mbox{\hyperlink{structlibff_1_1alt__bn128__ate___g1__precomp_a81552b61b56535280e67730014522177}{PX}}\ *\ c1.ell\_VV);}
 \DoxyCodeLine{00484\ \ \ \ \ \mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}}\ =\ \mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}}.mul\_by\_024(c2.ell\_0,\ prec\_P2.\mbox{\hyperlink{structlibff_1_1alt__bn128__ate___g1__precomp_a5db2c840300e686e5d126b9f594b2ee5}{PY}}\ *\ c2.ell\_VW,\ prec\_P2.\mbox{\hyperlink{structlibff_1_1alt__bn128__ate___g1__precomp_a81552b61b56535280e67730014522177}{PX}}\ *\ c2.ell\_VV);}
 \DoxyCodeLine{00485\ }
@@ -1741,14 +1741,16 @@ Definition at line \mbox{\hyperlink{alt__bn128__pairing_8cpp_source_l00422}{422}
 \DoxyCodeLine{00489\ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
 \includegraphics[width=350pt]{namespacelibff_afd32cda5e8c3cda9a970bd9acb97b802_cgraph}
 \end{center}
 \end{figure}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -1809,10 +1811,10 @@ Definition at line \mbox{\hyperlink{alt__bn128__pairing_8cpp_source_l00368}{368}
 \DoxyCodeLine{00409\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}}\ =\ \mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}}.inverse();}
 \DoxyCodeLine{00410\ \ \ \ \ \}}
 \DoxyCodeLine{00411\ }
-\DoxyCodeLine{00412\ \ \ \ \ c\ =\ prec\_Q.\mbox{\hyperlink{structlibff_1_1alt__bn128__ate___g2__precomp_a093576e21dbfbab74253b847b1c0dce7}{coeffs}}[\mbox{\hyperlink{namespacehost__functions__tests__1_a8496a24b5236a2dc07bb4f2930d88342}{idx}}++];}
+\DoxyCodeLine{00412\ \ \ \ \ c\ =\ prec\_Q.\mbox{\hyperlink{structlibff_1_1alt__bn128__ate___g2__precomp_a093576e21dbfbab74253b847b1c0dce7}{coeffs}}[idx++];}
 \DoxyCodeLine{00413\ \ \ \ \ \mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}}\ =\ \mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}}.mul\_by\_024(c.\mbox{\hyperlink{structlibff_1_1alt__bn128__ate__ell__coeffs_a68ba454273dff19747e9cba44cd2950f}{ell\_0}},prec\_P.\mbox{\hyperlink{structlibff_1_1alt__bn128__ate___g1__precomp_a5db2c840300e686e5d126b9f594b2ee5}{PY}}\ *\ c.\mbox{\hyperlink{structlibff_1_1alt__bn128__ate__ell__coeffs_a78664903b1bc91fc0f899bff0ab23ad9}{ell\_VW}},prec\_P.\mbox{\hyperlink{structlibff_1_1alt__bn128__ate___g1__precomp_a81552b61b56535280e67730014522177}{PX}}\ *\ c.\mbox{\hyperlink{structlibff_1_1alt__bn128__ate__ell__coeffs_a009aeadb6e8f89405692e0a78c47b571}{ell\_VV}});}
 \DoxyCodeLine{00414\ }
-\DoxyCodeLine{00415\ \ \ \ \ c\ =\ prec\_Q.\mbox{\hyperlink{structlibff_1_1alt__bn128__ate___g2__precomp_a093576e21dbfbab74253b847b1c0dce7}{coeffs}}[\mbox{\hyperlink{namespacehost__functions__tests__1_a8496a24b5236a2dc07bb4f2930d88342}{idx}}++];}
+\DoxyCodeLine{00415\ \ \ \ \ c\ =\ prec\_Q.\mbox{\hyperlink{structlibff_1_1alt__bn128__ate___g2__precomp_a093576e21dbfbab74253b847b1c0dce7}{coeffs}}[idx++];}
 \DoxyCodeLine{00416\ \ \ \ \ \mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}}\ =\ \mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}}.mul\_by\_024(c.\mbox{\hyperlink{structlibff_1_1alt__bn128__ate__ell__coeffs_a68ba454273dff19747e9cba44cd2950f}{ell\_0}},prec\_P.\mbox{\hyperlink{structlibff_1_1alt__bn128__ate___g1__precomp_a5db2c840300e686e5d126b9f594b2ee5}{PY}}\ *\ c.\mbox{\hyperlink{structlibff_1_1alt__bn128__ate__ell__coeffs_a78664903b1bc91fc0f899bff0ab23ad9}{ell\_VW}},prec\_P.\mbox{\hyperlink{structlibff_1_1alt__bn128__ate___g1__precomp_a81552b61b56535280e67730014522177}{PX}}\ *\ c.\mbox{\hyperlink{structlibff_1_1alt__bn128__ate__ell__coeffs_a009aeadb6e8f89405692e0a78c47b571}{ell\_VV}});}
 \DoxyCodeLine{00417\ }
 \DoxyCodeLine{00418\ \ \ \ \ \mbox{\hyperlink{namespacelibff_ac68d4feb3f7413e9e7de86e06fe6ef1f}{leave\_block}}(\textcolor{stringliteral}{"{}Call\ to\ alt\_bn128\_ate\_miller\_loop"{}});}
@@ -1820,14 +1822,16 @@ Definition at line \mbox{\hyperlink{alt__bn128__pairing_8cpp_source_l00368}{368}
 \DoxyCodeLine{00420\ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
 \includegraphics[width=350pt]{namespacelibff_abb8757555631894637c117f6cd62fdd4_cgraph}
 \end{center}
 \end{figure}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -1856,14 +1860,16 @@ Definition at line \mbox{\hyperlink{alt__bn128__pairing_8cpp_source_l00491}{491}
 \DoxyCodeLine{00499\ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
 \includegraphics[width=350pt]{namespacelibff_ae1600c88d69ff1c22e5b607955bbee95_cgraph}
 \end{center}
 \end{figure}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -1897,14 +1903,16 @@ Definition at line \mbox{\hyperlink{alt__bn128__pairing_8cpp_source_l00290}{290}
 \DoxyCodeLine{00303\ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
 \includegraphics[width=350pt]{namespacelibff_ab3e5dcf5471f27a30dae932e1b269f9e_cgraph}
 \end{center}
 \end{figure}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -1986,14 +1994,16 @@ Definition at line \mbox{\hyperlink{alt__bn128__pairing_8cpp_source_l00305}{305}
 \DoxyCodeLine{00366\ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
 \includegraphics[width=350pt]{namespacelibff_a58f4ade33befb87fbf475e48adfac9c0_cgraph}
 \end{center}
 \end{figure}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -2021,14 +2031,16 @@ Definition at line \mbox{\hyperlink{alt__bn128__pairing_8cpp_source_l00501}{501}
 \DoxyCodeLine{00508\ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
 \includegraphics[width=350pt]{namespacelibff_a52e70e9ff5407db6df5ee855dd889a02_cgraph}
 \end{center}
 \end{figure}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -2052,14 +2064,16 @@ Definition at line \mbox{\hyperlink{alt__bn128__pairing_8cpp_source_l00528}{528}
 \DoxyCodeLine{00534\ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
 \includegraphics[width=350pt]{namespacelibff_aa74dc01d97f7911c58165e962c932ed5_cgraph}
 \end{center}
 \end{figure}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -2093,14 +2107,16 @@ Definition at line \mbox{\hyperlink{alt__bn128__pairing_8cpp_source_l00137}{137}
 \DoxyCodeLine{00150\ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
 \includegraphics[width=350pt]{namespacelibff_a90f309dff0e97a726bc4c637b9ad2947_cgraph}
 \end{center}
 \end{figure}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -2132,14 +2148,16 @@ Definition at line \mbox{\hyperlink{alt__bn128__pairing_8cpp_source_l00226}{226}
 \DoxyCodeLine{00237\ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
 \includegraphics[width=350pt]{namespacelibff_add51b65ee720635bce0b03b339703425_cgraph}
 \end{center}
 \end{figure}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -2185,14 +2203,16 @@ Definition at line \mbox{\hyperlink{alt__bn128__pairing_8cpp_source_l00110}{110}
 \DoxyCodeLine{00135\ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
 \includegraphics[width=350pt]{namespacelibff_aa358d87f7982afbc39001a979daaee29_cgraph}
 \end{center}
 \end{figure}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -2285,14 +2305,16 @@ Definition at line \mbox{\hyperlink{alt__bn128__pairing_8cpp_source_l00152}{152}
 \DoxyCodeLine{00224\ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
 \includegraphics[width=350pt]{namespacelibff_a27b23f04483187d1f2a38d35b710ce86_cgraph}
 \end{center}
 \end{figure}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -2316,14 +2338,16 @@ Definition at line \mbox{\hyperlink{alt__bn128__pairing_8cpp_source_l00522}{522}
 \DoxyCodeLine{00526\ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
 \includegraphics[width=350pt]{namespacelibff_a57e7bc7a0733b011baf0e0690cd8e179_cgraph}
 \end{center}
 \end{figure}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -2347,14 +2371,16 @@ Definition at line \mbox{\hyperlink{alt__bn128__pairing_8cpp_source_l00536}{536}
 \DoxyCodeLine{00540\ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
 \includegraphics[width=350pt]{namespacelibff_a03eb0822828ec4a2889e9ddc469a49c1_cgraph}
 \end{center}
 \end{figure}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -2378,14 +2404,16 @@ Definition at line \mbox{\hyperlink{alt__bn128__pairing_8cpp_source_l00512}{512}
 \DoxyCodeLine{00515\ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
 \includegraphics[width=350pt]{namespacelibff_a91e96b81cf41394720aa8f8b29de53ba_cgraph}
 \end{center}
 \end{figure}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -2409,14 +2437,16 @@ Definition at line \mbox{\hyperlink{alt__bn128__pairing_8cpp_source_l00517}{517}
 \DoxyCodeLine{00520\ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
 \includegraphics[width=350pt]{namespacelibff_a732504a1d544ec92340318077e535288_cgraph}
 \end{center}
 \end{figure}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -2440,14 +2470,16 @@ Definition at line \mbox{\hyperlink{alt__bn128__pairing_8cpp_source_l00542}{542}
 \DoxyCodeLine{00546\ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
 \includegraphics[width=350pt]{namespacelibff_a39a2b42cbf3d7d40f35250b0af14aba8_cgraph}
 \end{center}
 \end{figure}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -2475,7 +2507,8 @@ std\+::vector$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e
 template$<$typename FieldT $>$ \\
 void libff\+::batch\+\_\+invert (\begin{DoxyParamCaption}\item[{std\+::vector$<$ FieldT $>$ \&}]{vec}{}\end{DoxyParamCaption})}
 
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -2531,14 +2564,16 @@ Definition at line \mbox{\hyperlink{bn128__pairing_8cpp_source_l00190}{190}} of 
 \DoxyCodeLine{00196\ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
 \includegraphics[width=350pt]{namespacelibff_a4af9894412498937172d90343a9bbb90_cgraph}
 \end{center}
 \end{figure}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -2570,14 +2605,16 @@ Definition at line \mbox{\hyperlink{bn128__pairing_8cpp_source_l00164}{164}} of 
 \DoxyCodeLine{00175\ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
 \includegraphics[width=350pt]{namespacelibff_afab71143fae177429731dac6f7642a74_cgraph}
 \end{center}
 \end{figure}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -2609,14 +2646,16 @@ Definition at line \mbox{\hyperlink{bn128__pairing_8cpp_source_l00177}{177}} of 
 \DoxyCodeLine{00188\ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
 \includegraphics[width=350pt]{namespacelibff_a4822f3dd76b083bdba87ee80865b25ed_cgraph}
 \end{center}
 \end{figure}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -2642,14 +2681,16 @@ Definition at line \mbox{\hyperlink{bn128__pairing_8cpp_source_l00198}{198}} of 
 \DoxyCodeLine{00206\ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
 \includegraphics[width=350pt]{namespacelibff_a4098fab909d49417e9051db55932f6cd_cgraph}
 \end{center}
 \end{figure}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -2677,14 +2718,16 @@ Definition at line \mbox{\hyperlink{bn128__pairing_8cpp_source_l00208}{208}} of 
 \DoxyCodeLine{00215\ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
 \includegraphics[width=350pt]{namespacelibff_a94cda500a6c4fadd7c821134984f01ee_cgraph}
 \end{center}
 \end{figure}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -2698,7 +2741,8 @@ Here is the caller graph for this function\+:\nopagebreak
 template$<$typename FieldT $>$ \\
 void libff\+::bn\+\_\+batch\+\_\+invert (\begin{DoxyParamCaption}\item[{std\+::vector$<$ FieldT $>$ \&}]{vec}{}\end{DoxyParamCaption})}
 
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -2731,7 +2775,8 @@ Definition at line \mbox{\hyperlink{profiling_8cpp_source_l00098}{98}} of file \
 {\footnotesize\ttfamily \label{namespacelibff_adf450a87fdc5eb1a37422fabcba95023} 
 void libff\+::consume\+\_\+newline (\begin{DoxyParamCaption}\item[{std\+::istream \&}]{in}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
 
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -2744,7 +2789,8 @@ Here is the caller graph for this function\+:\nopagebreak
 {\footnotesize\ttfamily \label{namespacelibff_a1cde4f28fdf0349673d1361daf4298d4} 
 void libff\+::consume\+\_\+\+OUTPUT\+\_\+\+NEWLINE (\begin{DoxyParamCaption}\item[{std\+::istream \&}]{in}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
 
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -2870,14 +2916,16 @@ Definition at line \mbox{\hyperlink{alt__bn128__pairing_8cpp_source_l00241}{241}
 \DoxyCodeLine{00265\ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
 \includegraphics[width=350pt]{namespacelibff_a7970ee7294f3d4cbf302e269fdc0c215_cgraph}
 \end{center}
 \end{figure}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -2932,7 +2980,8 @@ Definition at line \mbox{\hyperlink{edwards__pairing_8cpp_source_l00471}{471}} o
 \DoxyCodeLine{00506\ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -2978,7 +3027,8 @@ Definition at line \mbox{\hyperlink{mnt4__pairing_8cpp_source_l00410}{410}} of f
 \DoxyCodeLine{00436\ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -3024,7 +3074,8 @@ Definition at line \mbox{\hyperlink{mnt6__pairing_8cpp_source_l00416}{416}} of f
 \DoxyCodeLine{00442\ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -3075,14 +3126,16 @@ Definition at line \mbox{\hyperlink{edwards__pairing_8cpp_source_l00253}{253}} o
 \DoxyCodeLine{00284\ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
 \includegraphics[width=335pt]{namespacelibff_a43c553ff3e92e640871280b2aeff30ae_cgraph}
 \end{center}
 \end{figure}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -3151,14 +3204,16 @@ Definition at line \mbox{\hyperlink{edwards__pairing_8cpp_source_l00669}{669}} o
 \DoxyCodeLine{00720\ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
 \includegraphics[width=350pt]{namespacelibff_a2705662b679ab8c8121e4d4279275e89_cgraph}
 \end{center}
 \end{figure}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -3217,14 +3272,16 @@ Definition at line \mbox{\hyperlink{edwards__pairing_8cpp_source_l00628}{628}} o
 \DoxyCodeLine{00667\ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
 \includegraphics[width=350pt]{namespacelibff_a043ba92a9726654aaffde2f3b766561e_cgraph}
 \end{center}
 \end{figure}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -3253,14 +3310,16 @@ Definition at line \mbox{\hyperlink{edwards__pairing_8cpp_source_l00722}{722}} o
 \DoxyCodeLine{00730\ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
 \includegraphics[width=350pt]{namespacelibff_a987c91300773a3209d9ad66bf9a20b99_cgraph}
 \end{center}
 \end{figure}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -3292,14 +3351,16 @@ Definition at line \mbox{\hyperlink{edwards__pairing_8cpp_source_l00573}{573}} o
 \DoxyCodeLine{00584\ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
 \includegraphics[width=350pt]{namespacelibff_a1e8681b4f66413f6ecbb52b28010f4d0_cgraph}
 \end{center}
 \end{figure}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -3360,14 +3421,16 @@ Definition at line \mbox{\hyperlink{edwards__pairing_8cpp_source_l00586}{586}} o
 \DoxyCodeLine{00626\ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
 \includegraphics[width=350pt]{namespacelibff_a14f89201ecdd4f18a812c3cab388023b_cgraph}
 \end{center}
 \end{figure}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -3395,14 +3458,16 @@ Definition at line \mbox{\hyperlink{edwards__pairing_8cpp_source_l00732}{732}} o
 \DoxyCodeLine{00739\ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
 \includegraphics[width=350pt]{namespacelibff_a457b556111bdae0f9e425b6339b126ec_cgraph}
 \end{center}
 \end{figure}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -3426,14 +3491,16 @@ Definition at line \mbox{\hyperlink{edwards__pairing_8cpp_source_l00757}{757}} o
 \DoxyCodeLine{00763\ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
 \includegraphics[width=350pt]{namespacelibff_a871736f4388a0c5d0b84e6b6d2c57e2b_cgraph}
 \end{center}
 \end{figure}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -3464,14 +3531,16 @@ Definition at line \mbox{\hyperlink{edwards__pairing_8cpp_source_l00207}{207}} o
 \DoxyCodeLine{00217\ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
 \includegraphics[width=350pt]{namespacelibff_a85284345b22dbc9f312fa9ff3422879c_cgraph}
 \end{center}
 \end{figure}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -3508,14 +3577,16 @@ Definition at line \mbox{\hyperlink{edwards__pairing_8cpp_source_l00189}{189}} o
 \DoxyCodeLine{00205\ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
 \includegraphics[width=350pt]{namespacelibff_a1776aa3a82b421746336f8c6488997f8_cgraph}
 \end{center}
 \end{figure}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -3552,14 +3623,16 @@ Definition at line \mbox{\hyperlink{edwards__pairing_8cpp_source_l00171}{171}} o
 \DoxyCodeLine{00187\ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
 \includegraphics[width=350pt]{namespacelibff_ada61ece18b57a61e3bb3943e0a5183af_cgraph}
 \end{center}
 \end{figure}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -3583,14 +3656,16 @@ Definition at line \mbox{\hyperlink{edwards__pairing_8cpp_source_l00751}{751}} o
 \DoxyCodeLine{00755\ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
 \includegraphics[width=350pt]{namespacelibff_a4b1f136e47bf3d30af588778c84dd064_cgraph}
 \end{center}
 \end{figure}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -3614,14 +3689,16 @@ Definition at line \mbox{\hyperlink{edwards__pairing_8cpp_source_l00765}{765}} o
 \DoxyCodeLine{00769\ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
 \includegraphics[width=350pt]{namespacelibff_a8c17e4985eaee6405f4ec75c9e49580f_cgraph}
 \end{center}
 \end{figure}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -3645,14 +3722,16 @@ Definition at line \mbox{\hyperlink{edwards__pairing_8cpp_source_l00741}{741}} o
 \DoxyCodeLine{00744\ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
 \includegraphics[width=350pt]{namespacelibff_a565f7d8220d055a87eec02c2e994d2f4_cgraph}
 \end{center}
 \end{figure}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -3676,14 +3755,16 @@ Definition at line \mbox{\hyperlink{edwards__pairing_8cpp_source_l00746}{746}} o
 \DoxyCodeLine{00749\ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
 \includegraphics[width=350pt]{namespacelibff_ae01f87b36128cd2a51ed19f9a6201e74_cgraph}
 \end{center}
 \end{figure}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -3707,14 +3788,16 @@ Definition at line \mbox{\hyperlink{edwards__pairing_8cpp_source_l00771}{771}} o
 \DoxyCodeLine{00775\ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
 \includegraphics[width=350pt]{namespacelibff_abc470ab32b6db3ec5b31fdccb691dcdd_cgraph}
 \end{center}
 \end{figure}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -3772,14 +3855,16 @@ Definition at line \mbox{\hyperlink{edwards__pairing_8cpp_source_l00391}{391}} o
 \DoxyCodeLine{00429\ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
 \includegraphics[width=350pt]{namespacelibff_aa5e05803eced44cc5d2bcb4eb44140aa_cgraph}
 \end{center}
 \end{figure}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -3808,14 +3893,16 @@ Definition at line \mbox{\hyperlink{edwards__pairing_8cpp_source_l00431}{431}} o
 \DoxyCodeLine{00439\ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
 \includegraphics[width=350pt]{namespacelibff_a8896fe6a389e4c2d592346a6db8b02d8_cgraph}
 \end{center}
 \end{figure}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -3879,14 +3966,16 @@ Definition at line \mbox{\hyperlink{edwards__pairing_8cpp_source_l00346}{346}} o
 \DoxyCodeLine{00389\ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
 \includegraphics[width=350pt]{namespacelibff_a3f622531109816611bae155c7d634c9e_cgraph}
 \end{center}
 \end{figure}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -3918,14 +4007,16 @@ Definition at line \mbox{\hyperlink{edwards__pairing_8cpp_source_l00219}{219}} o
 \DoxyCodeLine{00230\ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
 \includegraphics[width=350pt]{namespacelibff_a1e6b6773e228ad4e687304b8725bec6a_cgraph}
 \end{center}
 \end{figure}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -3953,7 +4044,8 @@ Definition at line \mbox{\hyperlink{edwards__pairing_8cpp_source_l00441}{441}} o
 \DoxyCodeLine{00448\ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -4009,7 +4101,8 @@ Definition at line \mbox{\hyperlink{profiling_8cpp_source_l00245}{245}} of file 
 \DoxyCodeLine{00280\ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -4038,7 +4131,8 @@ Definition at line \mbox{\hyperlink{fc_2libraries_2ff_2libff_2common_2utils_8hpp
 template$<$mp\+\_\+size\+\_\+t n$>$ \\
 std\+::vector$<$ long $>$ libff\+::find\+\_\+wnaf (\begin{DoxyParamCaption}\item[{const size\+\_\+t}]{window\+\_\+size}{, }\item[{const \mbox{\hyperlink{classlibff_1_1bigint}{bigint}}$<$ n $>$ \&}]{scalar}{}\end{DoxyParamCaption})}
 
-Find the w\+NAF representation of the given scalar relative to the given window size. Here is the caller graph for this function\+:\nopagebreak
+Find the w\+NAF representation of the given scalar relative to the given window size. Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -4137,7 +4231,8 @@ Definition at line \mbox{\hyperlink{edwards__pairing_8cpp_source_l00508}{508}} o
 \DoxyCodeLine{00539\ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -4217,7 +4312,8 @@ Definition at line \mbox{\hyperlink{profiling_8cpp_source_l00039}{39}} of file \
 \DoxyCodeLine{00051\ \}}
 
 \end{DoxyCode}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -4242,7 +4338,8 @@ Definition at line \mbox{\hyperlink{profiling_8cpp_source_l00032}{32}} of file \
 \DoxyCodeLine{00036\ \}}
 
 \end{DoxyCode}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -4556,14 +4653,16 @@ Definition at line \mbox{\hyperlink{alt__bn128__init_8cpp_source_l00031}{31}} of
 \DoxyCodeLine{00278\ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
 \includegraphics[width=348pt]{namespacelibff_a9bd1b963def6b03da3f6371bcd41117b_cgraph}
 \end{center}
 \end{figure}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -4785,14 +4884,16 @@ Definition at line \mbox{\hyperlink{bn128__init_8cpp_source_l00028}{28}} of file
 \DoxyCodeLine{00229\ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
 \includegraphics[width=350pt]{namespacelibff_ac6fb1d4d50b5298ed361253e9a777c10_cgraph}
 \end{center}
 \end{figure}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -5046,14 +5147,16 @@ Definition at line \mbox{\hyperlink{edwards__init_8cpp_source_l00037}{37}} of fi
 \DoxyCodeLine{00270\ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
 \includegraphics[width=348pt]{namespacelibff_a0e91814e1b60e75813ae9dc499316893_cgraph}
 \end{center}
 \end{figure}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -5299,14 +5402,16 @@ Definition at line \mbox{\hyperlink{mnt4__init_8cpp_source_l00040}{40}} of file 
 \DoxyCodeLine{00265\ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
 \includegraphics[width=350pt]{namespacelibff_a418fc2dba8fb78bcd6522010f31cb5fd_cgraph}
 \end{center}
 \end{figure}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -5562,14 +5667,16 @@ Definition at line \mbox{\hyperlink{mnt6__init_8cpp_source_l00042}{42}} of file 
 \DoxyCodeLine{00277\ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
 \includegraphics[width=350pt]{namespacelibff_a43aa84da89b1fe08dc54a140165e6f8f_cgraph}
 \end{center}
 \end{figure}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -5702,7 +5809,8 @@ Definition at line \mbox{\hyperlink{profiling_8cpp_source_l00282}{282}} of file 
 \DoxyCodeLine{00331\ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -5767,14 +5875,16 @@ Definition at line \mbox{\hyperlink{alt__bn128__pairing_8cpp_source_l00267}{267}
 \DoxyCodeLine{00288\ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
 \includegraphics[width=350pt]{namespacelibff_af90b6a00b53d890afc332a92a49f552a_cgraph}
 \end{center}
 \end{figure}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -5823,7 +5933,8 @@ Definition at line \mbox{\hyperlink{edwards__pairing_8cpp_source_l00541}{541}} o
 \DoxyCodeLine{00571\ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -5868,7 +5979,8 @@ Definition at line \mbox{\hyperlink{mnt4__pairing_8cpp_source_l00438}{438}} of f
 \DoxyCodeLine{00464\ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -5913,7 +6025,8 @@ Definition at line \mbox{\hyperlink{mnt6__pairing_8cpp_source_l00444}{444}} of f
 \DoxyCodeLine{00470\ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -5960,7 +6073,8 @@ Definition at line \mbox{\hyperlink{edwards__pairing_8cpp_source_l00316}{316}} o
 \DoxyCodeLine{00344\ \}}
 
 \end{DoxyCode}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -6042,14 +6156,16 @@ Definition at line \mbox{\hyperlink{mnt4__pairing_8cpp_source_l00323}{323}} of f
 \DoxyCodeLine{00385\ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
 \includegraphics[width=350pt]{namespacelibff_aa8d1da4048443acdaae31e3316eb6342_cgraph}
 \end{center}
 \end{figure}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -6084,14 +6200,16 @@ Definition at line \mbox{\hyperlink{mnt4__pairing_8cpp_source_l00227}{227}} of f
 \DoxyCodeLine{00241\ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
 \includegraphics[width=350pt]{namespacelibff_a28f0eb8de9e69c9fab0322e456478695_cgraph}
 \end{center}
 \end{figure}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -6190,14 +6308,16 @@ Definition at line \mbox{\hyperlink{mnt4__pairing_8cpp_source_l00243}{243}} of f
 \DoxyCodeLine{00321\ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
 \includegraphics[width=350pt]{namespacelibff_acfa3e66502b98f02154547bf524c4d4c_cgraph}
 \end{center}
 \end{figure}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -6225,14 +6345,16 @@ Definition at line \mbox{\hyperlink{mnt4__pairing_8cpp_source_l00731}{731}} of f
 \DoxyCodeLine{00739\ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
 \includegraphics[width=350pt]{namespacelibff_aa9f90b6d235a759486cebec9732f145a_cgraph}
 \end{center}
 \end{figure}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -6324,14 +6446,16 @@ Definition at line \mbox{\hyperlink{mnt4__pairing_8cpp_source_l00600}{600}} of f
 \DoxyCodeLine{00674\ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
 \includegraphics[width=350pt]{namespacelibff_a710be29d78a796fff893e1781b1a00f6_cgraph}
 \end{center}
 \end{figure}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -6405,14 +6529,16 @@ Definition at line \mbox{\hyperlink{mnt4__pairing_8cpp_source_l00544}{544}} of f
 \DoxyCodeLine{00598\ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
 \includegraphics[width=350pt]{namespacelibff_a5a705afa3b8be033e24144fe532028db_cgraph}
 \end{center}
 \end{figure}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -6441,14 +6567,16 @@ Definition at line \mbox{\hyperlink{mnt4__pairing_8cpp_source_l00676}{676}} of f
 \DoxyCodeLine{00684\ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
 \includegraphics[width=350pt]{namespacelibff_a2a59920d54beacaf07e1907faa77a725_cgraph}
 \end{center}
 \end{figure}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -6484,14 +6612,16 @@ Definition at line \mbox{\hyperlink{mnt4__pairing_8cpp_source_l00466}{466}} of f
 \DoxyCodeLine{00481\ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
 \includegraphics[width=350pt]{namespacelibff_adb54ce7e24eef2b31b0369f777d42628_cgraph}
 \end{center}
 \end{figure}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -6571,14 +6701,16 @@ Definition at line \mbox{\hyperlink{mnt4__pairing_8cpp_source_l00483}{483}} of f
 \DoxyCodeLine{00542\ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
 \includegraphics[width=350pt]{namespacelibff_a74e6b56e78576e39d76fbff0e9909faf_cgraph}
 \end{center}
 \end{figure}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -6606,14 +6738,16 @@ Definition at line \mbox{\hyperlink{mnt4__pairing_8cpp_source_l00686}{686}} of f
 \DoxyCodeLine{00693\ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
 \includegraphics[width=350pt]{namespacelibff_afa28850f9babcd1e68c753c8f0d7fcdf_cgraph}
 \end{center}
 \end{figure}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -6637,14 +6771,16 @@ Definition at line \mbox{\hyperlink{mnt4__pairing_8cpp_source_l00711}{711}} of f
 \DoxyCodeLine{00717\ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
 \includegraphics[width=350pt]{namespacelibff_a27f5470f08b1a95069202b550ffa6589_cgraph}
 \end{center}
 \end{figure}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -6675,14 +6811,16 @@ Definition at line \mbox{\hyperlink{mnt4__pairing_8cpp_source_l00213}{213}} of f
 \DoxyCodeLine{00223\ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
 \includegraphics[width=350pt]{namespacelibff_aaee21786d51b9167f7a7c9e1bc6f8c4e_cgraph}
 \end{center}
 \end{figure}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -6716,14 +6854,16 @@ Definition at line \mbox{\hyperlink{mnt4__pairing_8cpp_source_l00198}{198}} of f
 \DoxyCodeLine{00211\ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
 \includegraphics[width=350pt]{namespacelibff_acc766ad0e0339c92100cfc1ce8cc2e5b_cgraph}
 \end{center}
 \end{figure}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -6760,14 +6900,16 @@ Definition at line \mbox{\hyperlink{mnt4__pairing_8cpp_source_l00180}{180}} of f
 \DoxyCodeLine{00196\ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
 \includegraphics[width=350pt]{namespacelibff_a52a75e74a50cdcea5c8a81899e0aebe0_cgraph}
 \end{center}
 \end{figure}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -6791,14 +6933,16 @@ Definition at line \mbox{\hyperlink{mnt4__pairing_8cpp_source_l00705}{705}} of f
 \DoxyCodeLine{00709\ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
 \includegraphics[width=350pt]{namespacelibff_a680f0d8d1d676eaf27ec2cc52b511488_cgraph}
 \end{center}
 \end{figure}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -6822,14 +6966,16 @@ Definition at line \mbox{\hyperlink{mnt4__pairing_8cpp_source_l00719}{719}} of f
 \DoxyCodeLine{00723\ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
 \includegraphics[width=350pt]{namespacelibff_a066e82ea1aa1d7d693fa95656eee1bdf_cgraph}
 \end{center}
 \end{figure}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -6853,14 +6999,16 @@ Definition at line \mbox{\hyperlink{mnt4__pairing_8cpp_source_l00695}{695}} of f
 \DoxyCodeLine{00698\ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
 \includegraphics[width=350pt]{namespacelibff_a1dcbf6d82ae1ca7143823e3a7c2140f3_cgraph}
 \end{center}
 \end{figure}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -6884,14 +7032,16 @@ Definition at line \mbox{\hyperlink{mnt4__pairing_8cpp_source_l00700}{700}} of f
 \DoxyCodeLine{00703\ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
 \includegraphics[width=350pt]{namespacelibff_a53789b714f2bf892353706af547166dd_cgraph}
 \end{center}
 \end{figure}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -6915,14 +7065,16 @@ Definition at line \mbox{\hyperlink{mnt4__pairing_8cpp_source_l00725}{725}} of f
 \DoxyCodeLine{00729\ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
 \includegraphics[width=350pt]{namespacelibff_a1b1d19434ce7cdf48069d7201cc2ce37_cgraph}
 \end{center}
 \end{figure}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -7005,14 +7157,16 @@ Definition at line \mbox{\hyperlink{mnt6__pairing_8cpp_source_l00328}{328}} of f
 \DoxyCodeLine{00391\ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
 \includegraphics[width=350pt]{namespacelibff_ae16d9451848e585e644eb7a7d0670384_cgraph}
 \end{center}
 \end{figure}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -7047,14 +7201,16 @@ Definition at line \mbox{\hyperlink{mnt6__pairing_8cpp_source_l00232}{232}} of f
 \DoxyCodeLine{00246\ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
 \includegraphics[width=350pt]{namespacelibff_abe383e7b0590959ea0e418104cbbced7_cgraph}
 \end{center}
 \end{figure}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -7153,14 +7309,16 @@ Definition at line \mbox{\hyperlink{mnt6__pairing_8cpp_source_l00248}{248}} of f
 \DoxyCodeLine{00326\ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
 \includegraphics[width=350pt]{namespacelibff_aee3090d964cd83e8fb1e505cf7180963_cgraph}
 \end{center}
 \end{figure}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -7188,14 +7346,16 @@ Definition at line \mbox{\hyperlink{mnt6__pairing_8cpp_source_l00743}{743}} of f
 \DoxyCodeLine{00751\ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
 \includegraphics[width=350pt]{namespacelibff_ad83ad1f2d8128601ca173c358f80990e_cgraph}
 \end{center}
 \end{figure}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -7288,14 +7448,16 @@ Definition at line \mbox{\hyperlink{mnt6__pairing_8cpp_source_l00611}{611}} of f
 \DoxyCodeLine{00686\ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
 \includegraphics[width=350pt]{namespacelibff_aaf20a3c32edcf3fae170f1419f1522b1_cgraph}
 \end{center}
 \end{figure}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -7371,14 +7533,16 @@ Definition at line \mbox{\hyperlink{mnt6__pairing_8cpp_source_l00553}{553}} of f
 \DoxyCodeLine{00609\ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
 \includegraphics[width=350pt]{namespacelibff_a0fad643f9f7eaed1708e9bf9eca123fa_cgraph}
 \end{center}
 \end{figure}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -7407,14 +7571,16 @@ Definition at line \mbox{\hyperlink{mnt6__pairing_8cpp_source_l00688}{688}} of f
 \DoxyCodeLine{00696\ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
 \includegraphics[width=350pt]{namespacelibff_a79b23d4ed2fa9e1471f068b498acbd14_cgraph}
 \end{center}
 \end{figure}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -7450,14 +7616,16 @@ Definition at line \mbox{\hyperlink{mnt6__pairing_8cpp_source_l00472}{472}} of f
 \DoxyCodeLine{00487\ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
 \includegraphics[width=350pt]{namespacelibff_a282b69dac7844d68833acbd6a8b9c1b8_cgraph}
 \end{center}
 \end{figure}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -7540,14 +7708,16 @@ Definition at line \mbox{\hyperlink{mnt6__pairing_8cpp_source_l00489}{489}} of f
 \DoxyCodeLine{00551\ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
 \includegraphics[width=350pt]{namespacelibff_a2e98514f1a39e8d6088850c72bc795de_cgraph}
 \end{center}
 \end{figure}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -7575,14 +7745,16 @@ Definition at line \mbox{\hyperlink{mnt6__pairing_8cpp_source_l00698}{698}} of f
 \DoxyCodeLine{00705\ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
 \includegraphics[width=350pt]{namespacelibff_a297dfe9a15af7a001cda37669624c5bc_cgraph}
 \end{center}
 \end{figure}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -7606,14 +7778,16 @@ Definition at line \mbox{\hyperlink{mnt6__pairing_8cpp_source_l00723}{723}} of f
 \DoxyCodeLine{00729\ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
 \includegraphics[width=350pt]{namespacelibff_a651d5c86d39de0e9cf6f1cf184880079_cgraph}
 \end{center}
 \end{figure}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -7644,14 +7818,16 @@ Definition at line \mbox{\hyperlink{mnt6__pairing_8cpp_source_l00218}{218}} of f
 \DoxyCodeLine{00228\ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
 \includegraphics[width=350pt]{namespacelibff_a090c6829d62b7f9516b91406926cd87f_cgraph}
 \end{center}
 \end{figure}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -7688,14 +7864,16 @@ Definition at line \mbox{\hyperlink{mnt6__pairing_8cpp_source_l00200}{200}} of f
 \DoxyCodeLine{00216\ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
 \includegraphics[width=350pt]{namespacelibff_a98cecad0beae70c255ac9ca178973bf3_cgraph}
 \end{center}
 \end{figure}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -7732,14 +7910,16 @@ Definition at line \mbox{\hyperlink{mnt6__pairing_8cpp_source_l00182}{182}} of f
 \DoxyCodeLine{00198\ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
 \includegraphics[width=350pt]{namespacelibff_a25a40bf5a3dae3f0aa1e1058ac5b5ad7_cgraph}
 \end{center}
 \end{figure}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -7763,14 +7943,16 @@ Definition at line \mbox{\hyperlink{mnt6__pairing_8cpp_source_l00717}{717}} of f
 \DoxyCodeLine{00721\ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
 \includegraphics[width=350pt]{namespacelibff_a3ad50cd35382dbaa4fe4d1a77c2055f6_cgraph}
 \end{center}
 \end{figure}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -7794,14 +7976,16 @@ Definition at line \mbox{\hyperlink{mnt6__pairing_8cpp_source_l00731}{731}} of f
 \DoxyCodeLine{00735\ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
 \includegraphics[width=350pt]{namespacelibff_a8aaa35918ab963e8ee8accd0ed67451c_cgraph}
 \end{center}
 \end{figure}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -7825,14 +8009,16 @@ Definition at line \mbox{\hyperlink{mnt6__pairing_8cpp_source_l00707}{707}} of f
 \DoxyCodeLine{00710\ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
 \includegraphics[width=350pt]{namespacelibff_ad975e1a663cdff44dc94342055ef5036_cgraph}
 \end{center}
 \end{figure}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -7856,14 +8042,16 @@ Definition at line \mbox{\hyperlink{mnt6__pairing_8cpp_source_l00712}{712}} of f
 \DoxyCodeLine{00715\ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
 \includegraphics[width=350pt]{namespacelibff_af3ddbcf0a87afa46f9351c300de2696e_cgraph}
 \end{center}
 \end{figure}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -7887,14 +8075,16 @@ Definition at line \mbox{\hyperlink{mnt6__pairing_8cpp_source_l00737}{737}} of f
 \DoxyCodeLine{00741\ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
 \includegraphics[width=350pt]{namespacelibff_a31123de4f5948bcbed068d9e4cae7195_cgraph}
 \end{center}
 \end{figure}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -7908,7 +8098,8 @@ Here is the caller graph for this function\+:\nopagebreak
 template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} , typename FieldT , \mbox{\hyperlink{namespacelibff_a8b13cbb28debbfc9b15e779d932e6709}{multi\+\_\+exp\+\_\+method}} Method$>$ \\
 \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} libff\+::multi\+\_\+exp (\begin{DoxyParamCaption}\item[{typename std\+::vector$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$\+::const\+\_\+iterator}]{vec\+\_\+start}{, }\item[{typename std\+::vector$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$\+::const\+\_\+iterator}]{vec\+\_\+end}{, }\item[{typename std\+::vector$<$ FieldT $>$\+::const\+\_\+iterator}]{scalar\+\_\+start}{, }\item[{typename std\+::vector$<$ FieldT $>$\+::const\+\_\+iterator}]{scalar\+\_\+end}{, }\item[{const size\+\_\+t}]{chunks}{}\end{DoxyParamCaption})}
 
-Computes the sum \textbackslash{}sum\+\_\+i scalar\+\_\+start\mbox{[}i\mbox{]} \texorpdfstring{$\ast$}{*} vec\+\_\+start\mbox{[}i\mbox{]} using the selected method. Input is split into the given number of chunks, and, when compiled with MULTICORE, the chunks are processed in parallel. Here is the caller graph for this function\+:\nopagebreak
+Computes the sum \textbackslash{}sum\+\_\+i scalar\+\_\+start\mbox{[}i\mbox{]} \texorpdfstring{$\ast$}{*} vec\+\_\+start\mbox{[}i\mbox{]} using the selected method. Input is split into the given number of chunks, and, when compiled with MULTICORE, the chunks are processed in parallel. Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -7942,7 +8133,8 @@ Definition at line \mbox{\hyperlink{profiling_8cpp_source_l00237}{237}} of file 
 \DoxyCodeLine{00243\ \}}
 
 \end{DoxyCode}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -7967,7 +8159,8 @@ Definition at line \mbox{\hyperlink{alt__bn128__g1_8hpp_source_l00079}{79}} of f
 \DoxyCodeLine{00082\ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -7992,7 +8185,8 @@ Definition at line \mbox{\hyperlink{alt__bn128__g2_8hpp_source_l00083}{83}} of f
 \DoxyCodeLine{00086\ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -8017,7 +8211,8 @@ Definition at line \mbox{\hyperlink{bn128__g1_8hpp_source_l00083}{83}} of file \
 \DoxyCodeLine{00086\ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -8042,7 +8237,8 @@ Definition at line \mbox{\hyperlink{bn128__g2_8hpp_source_l00084}{84}} of file \
 \DoxyCodeLine{00087\ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -8067,7 +8263,8 @@ Definition at line \mbox{\hyperlink{edwards__g1_8hpp_source_l00081}{81}} of file
 \DoxyCodeLine{00084\ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -8092,7 +8289,8 @@ Definition at line \mbox{\hyperlink{edwards__g2_8hpp_source_l00087}{87}} of file
 \DoxyCodeLine{00090\ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -8117,7 +8315,8 @@ Definition at line \mbox{\hyperlink{mnt4__g1_8hpp_source_l00087}{87}} of file \m
 \DoxyCodeLine{00090\ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -8142,7 +8341,8 @@ Definition at line \mbox{\hyperlink{mnt4__g2_8hpp_source_l00092}{92}} of file \m
 \DoxyCodeLine{00095\ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -8167,7 +8367,8 @@ Definition at line \mbox{\hyperlink{mnt6__g1_8hpp_source_l00087}{87}} of file \m
 \DoxyCodeLine{00090\ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -8192,7 +8393,8 @@ Definition at line \mbox{\hyperlink{mnt6__g2_8hpp_source_l00092}{92}} of file \m
 \DoxyCodeLine{00095\ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -8245,7 +8447,8 @@ Definition at line \mbox{\hyperlink{alt__bn128__g1_8hpp_source_l00085}{85}} of f
 \DoxyCodeLine{00088\ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -8270,7 +8473,8 @@ Definition at line \mbox{\hyperlink{alt__bn128__g2_8hpp_source_l00089}{89}} of f
 \DoxyCodeLine{00092\ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -8295,7 +8499,8 @@ Definition at line \mbox{\hyperlink{bn128__g1_8hpp_source_l00089}{89}} of file \
 \DoxyCodeLine{00092\ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -8320,7 +8525,8 @@ Definition at line \mbox{\hyperlink{bn128__g2_8hpp_source_l00090}{90}} of file \
 \DoxyCodeLine{00093\ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -8345,7 +8551,8 @@ Definition at line \mbox{\hyperlink{edwards__g1_8hpp_source_l00087}{87}} of file
 \DoxyCodeLine{00090\ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -8370,7 +8577,8 @@ Definition at line \mbox{\hyperlink{edwards__g2_8hpp_source_l00093}{93}} of file
 \DoxyCodeLine{00096\ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -8395,7 +8603,8 @@ Definition at line \mbox{\hyperlink{mnt4__g1_8hpp_source_l00093}{93}} of file \m
 \DoxyCodeLine{00096\ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -8420,7 +8629,8 @@ Definition at line \mbox{\hyperlink{mnt4__g2_8hpp_source_l00098}{98}} of file \m
 \DoxyCodeLine{00101\ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -8445,7 +8655,8 @@ Definition at line \mbox{\hyperlink{mnt6__g1_8hpp_source_l00093}{93}} of file \m
 \DoxyCodeLine{00096\ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -8470,7 +8681,8 @@ Definition at line \mbox{\hyperlink{mnt6__g2_8hpp_source_l00098}{98}} of file \m
 \DoxyCodeLine{00101\ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -10025,7 +10237,8 @@ Definition at line \mbox{\hyperlink{edwards__pairing_8cpp_source_l00127}{127}} o
 \DoxyCodeLine{00147\ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -10220,7 +10433,8 @@ Definition at line \mbox{\hyperlink{edwards__pairing_8cpp_source_l00052}{52}} of
 \DoxyCodeLine{00071\ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -10836,7 +11050,8 @@ Definition at line \mbox{\hyperlink{alt__bn128__g1_8cpp_source_l00482}{482}} of 
 \DoxyCodeLine{00501\ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -10874,7 +11089,8 @@ Definition at line \mbox{\hyperlink{bn128__g1_8cpp_source_l00486}{486}} of file 
 \DoxyCodeLine{00503\ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -10913,7 +11129,8 @@ Definition at line \mbox{\hyperlink{edwards__g1_8cpp_source_l00375}{375}} of fil
 \DoxyCodeLine{00393\ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -10989,7 +11206,8 @@ Definition at line \mbox{\hyperlink{mnt4__g1_8cpp_source_l00467}{467}} of file \
 \DoxyCodeLine{00487\ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -11029,7 +11247,8 @@ Definition at line \mbox{\hyperlink{mnt6__g1_8cpp_source_l00467}{467}} of file \
 \DoxyCodeLine{00486\ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -11061,7 +11280,8 @@ Definition at line \mbox{\hyperlink{bn128__gt_8hpp_source_l00044}{44}} of file \
 \DoxyCodeLine{00047\ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -11086,7 +11306,8 @@ Definition at line \mbox{\hyperlink{bn128__gt_8hpp_source_l00051}{51}} of file \
 \DoxyCodeLine{00054\ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -11182,7 +11403,8 @@ std\+::vector$<$ FieldT $>$ libff\+::pack\+\_\+int\+\_\+vector\+\_\+into\+\_\+fi
 template$<$typename FieldT , mp\+\_\+size\+\_\+t m$>$ \\
 FieldT libff\+::power (\begin{DoxyParamCaption}\item[{const FieldT \&}]{base}{, }\item[{const \mbox{\hyperlink{classlibff_1_1bigint}{bigint}}$<$ m $>$ \&}]{exponent}{}\end{DoxyParamCaption})}
 
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -11241,7 +11463,8 @@ Definition at line \mbox{\hyperlink{profiling_8cpp_source_l00351}{351}} of file 
 \DoxyCodeLine{00382\ \}}
 
 \end{DoxyCode}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -11312,7 +11535,8 @@ Definition at line \mbox{\hyperlink{profiling_8cpp_source_l00106}{106}} of file 
 \DoxyCodeLine{00112\ \}}
 
 \end{DoxyCode}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -11340,7 +11564,8 @@ Definition at line \mbox{\hyperlink{profiling_8cpp_source_l00114}{114}} of file 
 \DoxyCodeLine{00121\ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -11386,7 +11611,8 @@ Definition at line \mbox{\hyperlink{profiling_8cpp_source_l00229}{229}} of file 
 \DoxyCodeLine{00235\ \}}
 
 \end{DoxyCode}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -11459,14 +11685,16 @@ Definition at line \mbox{\hyperlink{profiling_8cpp_source_l00155}{155}} of file 
 \DoxyCodeLine{00177\ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
 \includegraphics[width=315pt]{namespacelibff_a7e7bb713ec5b021db2031e0adffa8cce_cgraph}
 \end{center}
 \end{figure}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -11507,7 +11735,8 @@ Definition at line \mbox{\hyperlink{profiling_8cpp_source_l00200}{200}} of file 
 \DoxyCodeLine{00220\ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -11521,7 +11750,8 @@ Here is the call graph for this function\+:\nopagebreak
 template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \\
 \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} libff\+::reserialize (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \&}]{obj}{}\end{DoxyParamCaption})}
 
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -11535,7 +11765,8 @@ Here is the caller graph for this function\+:\nopagebreak
 template$<$typename GroupT , mp\+\_\+size\+\_\+t m$>$ \\
 GroupT libff\+::scalar\+\_\+mul (\begin{DoxyParamCaption}\item[{const GroupT \&}]{base}{, }\item[{const \mbox{\hyperlink{classlibff_1_1bigint}{bigint}}$<$ m $>$ \&}]{scalar}{}\end{DoxyParamCaption})}
 
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -11570,7 +11801,8 @@ Definition at line \mbox{\hyperlink{utils_8cpp_source_l00108}{108}} of file \mbo
 template$<$typename FieldT $>$ \\
 FieldT libff\+::\+SHA512\+\_\+rng (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}}}]{idx}{}\end{DoxyParamCaption})}
 
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -11604,14 +11836,16 @@ Definition at line \mbox{\hyperlink{profiling_8cpp_source_l00056}{56}} of file \
 \DoxyCodeLine{00062\ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
 \includegraphics[width=335pt]{namespacelibff_a4bcbacbbf8d028be4c4b2a863d21f4c6_cgraph}
 \end{center}
 \end{figure}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode

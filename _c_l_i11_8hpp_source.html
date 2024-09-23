@@ -4547,7 +4547,7 @@ $(function(){initNavTree('_c_l_i11_8hpp_source.html',''); initResizable(true); }
 <div class="line"><a id="l04524" name="l04524"></a><span class="lineno"> 4524</span>            <span class="keywordflow">return</span> err_msg;</div>
 <div class="line"><a id="l04525" name="l04525"></a><span class="lineno"> 4525</span>        }</div>
 <div class="line"><a id="l04526" name="l04526"></a><span class="lineno"> 4526</span>        <span class="keywordflow">for</span>(<span class="keyword">const</span> <span class="keyword">auto</span> &amp;vali : <a class="code hl_variable" href="class_c_l_i_1_1_option.html#ad406b8299fb243f0caa52a35863c82b7">validators_</a>) {</div>
-<div class="line"><a id="l04527" name="l04527"></a><span class="lineno"> 4527</span>            <span class="keyword">auto</span> <a class="code hl_variable" href="namespacedevelop_build.html#ade64cd34608f9442ef3049116a2da428">v</a> = vali.get_application_index();</div>
+<div class="line"><a id="l04527" name="l04527"></a><span class="lineno"> 4527</span>            <span class="keyword">auto</span> v = vali.get_application_index();</div>
 <div class="line"><a id="l04528" name="l04528"></a><span class="lineno"> 4528</span>            <span class="keywordflow">if</span>(v == -1 || v == index) {</div>
 <div class="line"><a id="l04529" name="l04529"></a><span class="lineno"> 4529</span>                <span class="keywordflow">try</span> {</div>
 <div class="line"><a id="l04530" name="l04530"></a><span class="lineno"> 4530</span>                    err_msg = vali(result);</div>
@@ -6050,7 +6050,7 @@ $(function(){initNavTree('_c_l_i11_8hpp_source.html',''); initResizable(true); }
 <div class="line"><a id="l06096" name="l06096"></a><span class="lineno"> 6096</span>                          std::end(options));</div>
 <div class="line"><a id="l06097" name="l06097"></a><span class="lineno"> 6097</span>        }</div>
 <div class="line"><a id="l06098" name="l06098"></a><span class="lineno"> 6098</span> </div>
-<div class="line"><a id="l06099" name="l06099"></a><span class="lineno"> 6099</span>        <span class="keywordflow">return</span> <a class="code hl_variable" href="namespacebenchmark_compile.html#acf738bbf3b8391aa78929ceeceb8a03b">options</a>;</div>
+<div class="line"><a id="l06099" name="l06099"></a><span class="lineno"> 6099</span>        <span class="keywordflow">return</span> options;</div>
 <div class="line"><a id="l06100" name="l06100"></a><span class="lineno"> 6100</span>    }</div>
 </div>
 <div class="line"><a id="l06101" name="l06101"></a><span class="lineno"> 6101</span> </div>
@@ -6067,7 +6067,7 @@ $(function(){initNavTree('_c_l_i11_8hpp_source.html',''); initResizable(true); }
 <div class="line"><a id="l06112" name="l06112"></a><span class="lineno"> 6112</span>                std::end(options));</div>
 <div class="line"><a id="l06113" name="l06113"></a><span class="lineno"> 6113</span>        }</div>
 <div class="line"><a id="l06114" name="l06114"></a><span class="lineno"> 6114</span> </div>
-<div class="line"><a id="l06115" name="l06115"></a><span class="lineno"> 6115</span>        <span class="keywordflow">return</span> <a class="code hl_variable" href="namespacebenchmark_compile.html#acf738bbf3b8391aa78929ceeceb8a03b">options</a>;</div>
+<div class="line"><a id="l06115" name="l06115"></a><span class="lineno"> 6115</span>        <span class="keywordflow">return</span> options;</div>
 <div class="line"><a id="l06116" name="l06116"></a><span class="lineno"> 6116</span>    }</div>
 </div>
 <div class="line"><a id="l06117" name="l06117"></a><span class="lineno"> 6117</span> </div>
@@ -7691,23 +7691,23 @@ $(function(){initNavTree('_c_l_i11_8hpp_source.html',''); initResizable(true); }
 <div class="line"><a id="l07732" name="l07732"></a><span class="lineno"> 7732</span>        }</div>
 <div class="line"><a id="l07733" name="l07733"></a><span class="lineno"> 7733</span> </div>
 <div class="line"><a id="l07734" name="l07734"></a><span class="lineno"> 7734</span>        <span class="keywordflow">if</span>(parents.size() &gt; 1) {</div>
-<div class="line"><a id="l07735" name="l07735"></a><span class="lineno"> 7735</span>            std::size_t <a class="code hl_namespace" href="namespacecommon.html">common</a> = 0;</div>
+<div class="line"><a id="l07735" name="l07735"></a><span class="lineno"> 7735</span>            std::size_t common = 0;</div>
 <div class="line"><a id="l07736" name="l07736"></a><span class="lineno"> 7736</span>            std::size_t mpair = (std::min)(output.back().parents.size(), parents.size() - 1);</div>
 <div class="line"><a id="l07737" name="l07737"></a><span class="lineno"> 7737</span>            <span class="keywordflow">for</span>(std::size_t ii = 0; ii &lt; mpair; ++ii) {</div>
 <div class="line"><a id="l07738" name="l07738"></a><span class="lineno"> 7738</span>                <span class="keywordflow">if</span>(output.back().parents[ii] != parents[ii]) {</div>
 <div class="line"><a id="l07739" name="l07739"></a><span class="lineno"> 7739</span>                    <span class="keywordflow">break</span>;</div>
 <div class="line"><a id="l07740" name="l07740"></a><span class="lineno"> 7740</span>                }</div>
-<div class="line"><a id="l07741" name="l07741"></a><span class="lineno"> 7741</span>                ++<a class="code hl_namespace" href="namespacecommon.html">common</a>;</div>
+<div class="line"><a id="l07741" name="l07741"></a><span class="lineno"> 7741</span>                ++common;</div>
 <div class="line"><a id="l07742" name="l07742"></a><span class="lineno"> 7742</span>            }</div>
-<div class="line"><a id="l07743" name="l07743"></a><span class="lineno"> 7743</span>            <span class="keywordflow">if</span>(<a class="code hl_namespace" href="namespacecommon.html">common</a> == mpair) {</div>
+<div class="line"><a id="l07743" name="l07743"></a><span class="lineno"> 7743</span>            <span class="keywordflow">if</span>(common == mpair) {</div>
 <div class="line"><a id="l07744" name="l07744"></a><span class="lineno"> 7744</span>                output.pop_back();</div>
 <div class="line"><a id="l07745" name="l07745"></a><span class="lineno"> 7745</span>            } <span class="keywordflow">else</span> {</div>
-<div class="line"><a id="l07746" name="l07746"></a><span class="lineno"> 7746</span>                <span class="keywordflow">while</span>(output.back().parents.size() &gt; <a class="code hl_namespace" href="namespacecommon.html">common</a> + 1) {</div>
+<div class="line"><a id="l07746" name="l07746"></a><span class="lineno"> 7746</span>                <span class="keywordflow">while</span>(output.back().parents.size() &gt; common + 1) {</div>
 <div class="line"><a id="l07747" name="l07747"></a><span class="lineno"> 7747</span>                    output.push_back(output.back());</div>
 <div class="line"><a id="l07748" name="l07748"></a><span class="lineno"> 7748</span>                    output.back().parents.pop_back();</div>
 <div class="line"><a id="l07749" name="l07749"></a><span class="lineno"> 7749</span>                }</div>
 <div class="line"><a id="l07750" name="l07750"></a><span class="lineno"> 7750</span>            }</div>
-<div class="line"><a id="l07751" name="l07751"></a><span class="lineno"> 7751</span>            <span class="keywordflow">for</span>(std::size_t ii = <a class="code hl_namespace" href="namespacecommon.html">common</a>; ii &lt; parents.size() - 1; ++ii) {</div>
+<div class="line"><a id="l07751" name="l07751"></a><span class="lineno"> 7751</span>            <span class="keywordflow">for</span>(std::size_t ii = common; ii &lt; parents.size() - 1; ++ii) {</div>
 <div class="line"><a id="l07752" name="l07752"></a><span class="lineno"> 7752</span>                output.emplace_back();</div>
 <div class="line"><a id="l07753" name="l07753"></a><span class="lineno"> 7753</span>                output.back().parents.assign(parents.begin(), parents.begin() + <span class="keyword">static_cast&lt;</span>std::ptrdiff_t<span class="keyword">&gt;</span>(ii) + 1);</div>
 <div class="line"><a id="l07754" name="l07754"></a><span class="lineno"> 7754</span>                output.back().name = <span class="stringliteral">&quot;++&quot;</span>;</div>
@@ -8929,10 +8929,7 @@ $(function(){initNavTree('_c_l_i11_8hpp_source.html',''); initResizable(true); }
 <div class="ttc" id="anamespace_c_l_i_html_afac11216d7de35041e5d82a35be30481"><div class="ttname"><a href="namespace_c_l_i.html#afac11216d7de35041e5d82a35be30481">CLI::TransformPairs</a></div><div class="ttdeci">std::vector&lt; std::pair&lt; std::string, T &gt; &gt; TransformPairs</div><div class="ttdoc">definition of the default transformation object</div><div class="ttdef"><b>Definition</b> <a href="#l02780">CLI11.hpp:2780</a></div></div>
 <div class="ttc" id="anamespace_c_l_i_html_afca10810a722704f401fe6c5bf57d52a"><div class="ttname"><a href="namespace_c_l_i.html#afca10810a722704f401fe6c5bf57d52a">CLI::Option_p</a></div><div class="ttdeci">std::unique_ptr&lt; Option &gt; Option_p</div><div class="ttdef"><b>Definition</b> <a href="#l03334">CLI11.hpp:3334</a></div></div>
 <div class="ttc" id="anamespace_catch_1_1clara_1_1detail_html_a437f089d309df2e967ebed3b873f0bf9a054b4f3ea543c990f6b125f41af6ebf7"><div class="ttname"><a href="namespace_catch_1_1clara_1_1detail.html#a437f089d309df2e967ebed3b873f0bf9a054b4f3ea543c990f6b125f41af6ebf7">Catch::clara::detail::TokenType::Option</a></div><div class="ttdeci">@ Option</div></div>
-<div class="ttc" id="anamespacebenchmark_compile_html_acf738bbf3b8391aa78929ceeceb8a03b"><div class="ttname"><a href="namespacebenchmark_compile.html#acf738bbf3b8391aa78929ceeceb8a03b">benchmarkCompile.options</a></div><div class="ttdeci">list options</div><div class="ttdef"><b>Definition</b> <a href="benchmark_compile_8py_source.html#l00107">benchmarkCompile.py:107</a></div></div>
-<div class="ttc" id="anamespacecommon_html"><div class="ttname"><a href="namespacecommon.html">common</a></div><div class="ttdef"><b>Definition</b> <a href="common_8py_source.html#l00001">common.py:1</a></div></div>
 <div class="ttc" id="anamespacedetail_html"><div class="ttname"><a href="namespacedetail.html">detail</a></div><div class="ttdef"><b>Definition</b> <a href="programs_2nodeop_2main_8cpp_source.html#l00023">main.cpp:23</a></div></div>
-<div class="ttc" id="anamespacedevelop_build_html_ade64cd34608f9442ef3049116a2da428"><div class="ttname"><a href="namespacedevelop_build.html#ade64cd34608f9442ef3049116a2da428">developBuild.v</a></div><div class="ttdeci">v</div><div class="ttdef"><b>Definition</b> <a href="develop_build_8py_source.html#l00006">developBuild.py:6</a></div></div>
 <div class="ttc" id="anamespacestd_html"><div class="ttname"><a href="namespacestd.html">std</a></div><div class="ttdef"><b>Definition</b> <a href="name_8hpp_source.html#l00106">name.hpp:106</a></div></div>
 <div class="ttc" id="anamespacestd_html_abb7e41c7063536ff6eeee4bb5f66de6c"><div class="ttname"><a href="namespacestd.html#abb7e41c7063536ff6eeee4bb5f66de6c">std::swap</a></div><div class="ttdeci">void swap(picojson::value &amp;x, picojson::value &amp;y)</div><div class="ttdef"><b>Definition</b> <a href="spec__test__generator_8cpp_source.html#l01094">spec_test_generator.cpp:1094</a></div></div>
 <div class="ttc" id="apkcs11_8h_html_a32aff7c6c4cd253fdf6563677afab5ce"><div class="ttname"><a href="pkcs11_8h.html#a32aff7c6c4cd253fdf6563677afab5ce">value</a></div><div class="ttdeci">#define value</div><div class="ttdef"><b>Definition</b> <a href="pkcs11_8h_source.html#l00157">pkcs11.h:157</a></div></div>

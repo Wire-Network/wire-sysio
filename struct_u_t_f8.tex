@@ -20,13 +20,13 @@ typedef Char\+Type \mbox{\hyperlink{struct_u_t_f8_a8351676b3eda285d7fe902fc472e0
 \doxysubsubsection*{Static Public Member Functions}
 \begin{DoxyCompactItemize}
 \item 
-{\footnotesize template$<$typename Output\+Stream $>$ }\\static void \mbox{\hyperlink{struct_u_t_f8_af286ed19ca60d261a9b11b65bee1298b}{Encode}} (Output\+Stream \&os, unsigned codepoint)
+{\footnotesize template$<$typename Output\+Stream $>$ }\\static void \mbox{\hyperlink{struct_u_t_f8_af286ed19ca60d261a9b11b65bee1298b}{Encode}} (Output\+Stream \&\mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}, unsigned codepoint)
 \item 
-{\footnotesize template$<$typename Output\+Stream $>$ }\\static void \mbox{\hyperlink{struct_u_t_f8_aac6bdaf03c114265384b2ae3e425e7a8}{Encode\+Unsafe}} (Output\+Stream \&os, unsigned codepoint)
+{\footnotesize template$<$typename Output\+Stream $>$ }\\static void \mbox{\hyperlink{struct_u_t_f8_aac6bdaf03c114265384b2ae3e425e7a8}{Encode\+Unsafe}} (Output\+Stream \&\mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}, unsigned codepoint)
 \item 
 {\footnotesize template$<$typename Input\+Stream $>$ }\\static bool \mbox{\hyperlink{struct_u_t_f8_a17c6badb31acf4f784111c886737fb17}{Decode}} (Input\+Stream \&is, unsigned \texorpdfstring{$\ast$}{*}codepoint)
 \item 
-{\footnotesize template$<$typename Input\+Stream , typename Output\+Stream $>$ }\\static bool \mbox{\hyperlink{struct_u_t_f8_a9e2e7e37d819baeb5e643654c6e61e33}{Validate}} (Input\+Stream \&is, Output\+Stream \&os)
+{\footnotesize template$<$typename Input\+Stream , typename Output\+Stream $>$ }\\static bool \mbox{\hyperlink{struct_u_t_f8_a9e2e7e37d819baeb5e643654c6e61e33}{Validate}} (Input\+Stream \&is, Output\+Stream \&\mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}})
 \item 
 static unsigned char \mbox{\hyperlink{struct_u_t_f8_ac06bbf38df41adb0c7b9eaa93f85cc38}{Get\+Range}} (unsigned char c)
 \item 
@@ -34,9 +34,9 @@ static unsigned char \mbox{\hyperlink{struct_u_t_f8_ac06bbf38df41adb0c7b9eaa93f8
 \item 
 {\footnotesize template$<$typename Input\+Byte\+Stream $>$ }\\static \mbox{\hyperlink{struct_u_t_f8_a8351676b3eda285d7fe902fc472e066e}{Ch}} \mbox{\hyperlink{struct_u_t_f8_a5b2561a5031c8a699e593cd51b2c6864}{Take}} (Input\+Byte\+Stream \&is)
 \item 
-{\footnotesize template$<$typename Output\+Byte\+Stream $>$ }\\static void \mbox{\hyperlink{struct_u_t_f8_a6b171e5f0662ad81d498875bbdbc536a}{Put\+BOM}} (Output\+Byte\+Stream \&os)
+{\footnotesize template$<$typename Output\+Byte\+Stream $>$ }\\static void \mbox{\hyperlink{struct_u_t_f8_a6b171e5f0662ad81d498875bbdbc536a}{Put\+BOM}} (Output\+Byte\+Stream \&\mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}})
 \item 
-{\footnotesize template$<$typename Output\+Byte\+Stream $>$ }\\static void \mbox{\hyperlink{struct_u_t_f8_ab24c23227413798e9be28a21eb26fe51}{Put}} (Output\+Byte\+Stream \&os, \mbox{\hyperlink{struct_u_t_f8_a8351676b3eda285d7fe902fc472e066e}{Ch}} c)
+{\footnotesize template$<$typename Output\+Byte\+Stream $>$ }\\static void \mbox{\hyperlink{struct_u_t_f8_ab24c23227413798e9be28a21eb26fe51}{Put}} (Output\+Byte\+Stream \&\mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}, \mbox{\hyperlink{struct_u_t_f8_a8351676b3eda285d7fe902fc472e066e}{Ch}} c)
 \end{DoxyCompactItemize}
 
 
@@ -142,7 +142,8 @@ Definition at line \mbox{\hyperlink{encodings_8h_source_l00146}{146}} of file \m
 \DoxyCodeLine{00176\ \ \ \ \ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -165,22 +166,22 @@ Definition at line \mbox{\hyperlink{encodings_8h_source_l00102}{102}} of file \m
 \begin{DoxyCode}{0}
 \DoxyCodeLine{00102\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
 \DoxyCodeLine{00103\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (codepoint\ <=\ 0x7F)\ }
-\DoxyCodeLine{00104\ \ \ \ \ \ \ \ \ \ \ \ \ os.Put(\textcolor{keyword}{static\_cast<}\mbox{\hyperlink{struct_u_t_f8_a8351676b3eda285d7fe902fc472e066e}{Ch}}\textcolor{keyword}{>}(codepoint\ \&\ 0xFF));}
+\DoxyCodeLine{00104\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}.Put(\textcolor{keyword}{static\_cast<}\mbox{\hyperlink{struct_u_t_f8_a8351676b3eda285d7fe902fc472e066e}{Ch}}\textcolor{keyword}{>}(codepoint\ \&\ 0xFF));}
 \DoxyCodeLine{00105\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}\ (codepoint\ <=\ 0x7FF)\ \{}
-\DoxyCodeLine{00106\ \ \ \ \ \ \ \ \ \ \ \ \ os.Put(\textcolor{keyword}{static\_cast<}\mbox{\hyperlink{struct_u_t_f8_a8351676b3eda285d7fe902fc472e066e}{Ch}}\textcolor{keyword}{>}(0xC0\ |\ ((codepoint\ >>\ 6)\ \&\ 0xFF)));}
-\DoxyCodeLine{00107\ \ \ \ \ \ \ \ \ \ \ \ \ os.Put(\textcolor{keyword}{static\_cast<}\mbox{\hyperlink{struct_u_t_f8_a8351676b3eda285d7fe902fc472e066e}{Ch}}\textcolor{keyword}{>}(0x80\ |\ ((codepoint\ \&\ 0x3F))));}
+\DoxyCodeLine{00106\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}.Put(\textcolor{keyword}{static\_cast<}\mbox{\hyperlink{struct_u_t_f8_a8351676b3eda285d7fe902fc472e066e}{Ch}}\textcolor{keyword}{>}(0xC0\ |\ ((codepoint\ >>\ 6)\ \&\ 0xFF)));}
+\DoxyCodeLine{00107\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}.Put(\textcolor{keyword}{static\_cast<}\mbox{\hyperlink{struct_u_t_f8_a8351676b3eda285d7fe902fc472e066e}{Ch}}\textcolor{keyword}{>}(0x80\ |\ ((codepoint\ \&\ 0x3F))));}
 \DoxyCodeLine{00108\ \ \ \ \ \ \ \ \ \}}
 \DoxyCodeLine{00109\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}\ (codepoint\ <=\ 0xFFFF)\ \{}
-\DoxyCodeLine{00110\ \ \ \ \ \ \ \ \ \ \ \ \ os.Put(\textcolor{keyword}{static\_cast<}\mbox{\hyperlink{hash__impl_8h_ab0a0d1ad13c7e4d3cb38c89f7127c85a}{Ch}}\textcolor{keyword}{>}(0xE0\ |\ ((codepoint\ >>\ 12)\ \&\ 0xFF)));}
-\DoxyCodeLine{00111\ \ \ \ \ \ \ \ \ \ \ \ \ os.Put(\textcolor{keyword}{static\_cast<}\mbox{\hyperlink{hash__impl_8h_ab0a0d1ad13c7e4d3cb38c89f7127c85a}{Ch}}\textcolor{keyword}{>}(0x80\ |\ ((codepoint\ >>\ 6)\ \&\ 0x3F)));}
-\DoxyCodeLine{00112\ \ \ \ \ \ \ \ \ \ \ \ \ os.Put(\textcolor{keyword}{static\_cast<}\mbox{\hyperlink{hash__impl_8h_ab0a0d1ad13c7e4d3cb38c89f7127c85a}{Ch}}\textcolor{keyword}{>}(0x80\ |\ (codepoint\ \&\ 0x3F)));}
+\DoxyCodeLine{00110\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}.Put(\textcolor{keyword}{static\_cast<}\mbox{\hyperlink{hash__impl_8h_ab0a0d1ad13c7e4d3cb38c89f7127c85a}{Ch}}\textcolor{keyword}{>}(0xE0\ |\ ((codepoint\ >>\ 12)\ \&\ 0xFF)));}
+\DoxyCodeLine{00111\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}.Put(\textcolor{keyword}{static\_cast<}\mbox{\hyperlink{hash__impl_8h_ab0a0d1ad13c7e4d3cb38c89f7127c85a}{Ch}}\textcolor{keyword}{>}(0x80\ |\ ((codepoint\ >>\ 6)\ \&\ 0x3F)));}
+\DoxyCodeLine{00112\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}.Put(\textcolor{keyword}{static\_cast<}\mbox{\hyperlink{hash__impl_8h_ab0a0d1ad13c7e4d3cb38c89f7127c85a}{Ch}}\textcolor{keyword}{>}(0x80\ |\ (codepoint\ \&\ 0x3F)));}
 \DoxyCodeLine{00113\ \ \ \ \ \ \ \ \ \}}
 \DoxyCodeLine{00114\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}\ \{}
 \DoxyCodeLine{00115\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g_gabeba18d612187bad2ac62aed9276d47c}{RAPIDJSON\_ASSERT}}(codepoint\ <=\ 0x10FFFF);}
-\DoxyCodeLine{00116\ \ \ \ \ \ \ \ \ \ \ \ \ os.Put(\textcolor{keyword}{static\_cast<}\mbox{\hyperlink{hash__impl_8h_ab0a0d1ad13c7e4d3cb38c89f7127c85a}{Ch}}\textcolor{keyword}{>}(0xF0\ |\ ((codepoint\ >>\ 18)\ \&\ 0xFF)));}
-\DoxyCodeLine{00117\ \ \ \ \ \ \ \ \ \ \ \ \ os.Put(\textcolor{keyword}{static\_cast<}\mbox{\hyperlink{hash__impl_8h_ab0a0d1ad13c7e4d3cb38c89f7127c85a}{Ch}}\textcolor{keyword}{>}(0x80\ |\ ((codepoint\ >>\ 12)\ \&\ 0x3F)));}
-\DoxyCodeLine{00118\ \ \ \ \ \ \ \ \ \ \ \ \ os.Put(\textcolor{keyword}{static\_cast<}\mbox{\hyperlink{hash__impl_8h_ab0a0d1ad13c7e4d3cb38c89f7127c85a}{Ch}}\textcolor{keyword}{>}(0x80\ |\ ((codepoint\ >>\ 6)\ \&\ 0x3F)));}
-\DoxyCodeLine{00119\ \ \ \ \ \ \ \ \ \ \ \ \ os.Put(\textcolor{keyword}{static\_cast<}\mbox{\hyperlink{hash__impl_8h_ab0a0d1ad13c7e4d3cb38c89f7127c85a}{Ch}}\textcolor{keyword}{>}(0x80\ |\ (codepoint\ \&\ 0x3F)));}
+\DoxyCodeLine{00116\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}.Put(\textcolor{keyword}{static\_cast<}\mbox{\hyperlink{hash__impl_8h_ab0a0d1ad13c7e4d3cb38c89f7127c85a}{Ch}}\textcolor{keyword}{>}(0xF0\ |\ ((codepoint\ >>\ 18)\ \&\ 0xFF)));}
+\DoxyCodeLine{00117\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}.Put(\textcolor{keyword}{static\_cast<}\mbox{\hyperlink{hash__impl_8h_ab0a0d1ad13c7e4d3cb38c89f7127c85a}{Ch}}\textcolor{keyword}{>}(0x80\ |\ ((codepoint\ >>\ 12)\ \&\ 0x3F)));}
+\DoxyCodeLine{00118\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}.Put(\textcolor{keyword}{static\_cast<}\mbox{\hyperlink{hash__impl_8h_ab0a0d1ad13c7e4d3cb38c89f7127c85a}{Ch}}\textcolor{keyword}{>}(0x80\ |\ ((codepoint\ >>\ 6)\ \&\ 0x3F)));}
+\DoxyCodeLine{00119\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}.Put(\textcolor{keyword}{static\_cast<}\mbox{\hyperlink{hash__impl_8h_ab0a0d1ad13c7e4d3cb38c89f7127c85a}{Ch}}\textcolor{keyword}{>}(0x80\ |\ (codepoint\ \&\ 0x3F)));}
 \DoxyCodeLine{00120\ \ \ \ \ \ \ \ \ \}}
 \DoxyCodeLine{00121\ \ \ \ \ \}}
 
@@ -201,27 +202,28 @@ Definition at line \mbox{\hyperlink{encodings_8h_source_l00124}{124}} of file \m
 \begin{DoxyCode}{0}
 \DoxyCodeLine{00124\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
 \DoxyCodeLine{00125\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (codepoint\ <=\ 0x7F)\ }
-\DoxyCodeLine{00126\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{encodings_8h_ad57ba7f2912c5509924b69dec7db4396}{PutUnsafe}}(os,\ \textcolor{keyword}{static\_cast<}\mbox{\hyperlink{struct_u_t_f8_a8351676b3eda285d7fe902fc472e066e}{Ch}}\textcolor{keyword}{>}(codepoint\ \&\ 0xFF));}
+\DoxyCodeLine{00126\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{encodings_8h_ad57ba7f2912c5509924b69dec7db4396}{PutUnsafe}}(\mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}},\ \textcolor{keyword}{static\_cast<}\mbox{\hyperlink{struct_u_t_f8_a8351676b3eda285d7fe902fc472e066e}{Ch}}\textcolor{keyword}{>}(codepoint\ \&\ 0xFF));}
 \DoxyCodeLine{00127\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}\ (codepoint\ <=\ 0x7FF)\ \{}
-\DoxyCodeLine{00128\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{encodings_8h_ad57ba7f2912c5509924b69dec7db4396}{PutUnsafe}}(os,\ \textcolor{keyword}{static\_cast<}\mbox{\hyperlink{struct_u_t_f8_a8351676b3eda285d7fe902fc472e066e}{Ch}}\textcolor{keyword}{>}(0xC0\ |\ ((codepoint\ >>\ 6)\ \&\ 0xFF)));}
-\DoxyCodeLine{00129\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{encodings_8h_ad57ba7f2912c5509924b69dec7db4396}{PutUnsafe}}(os,\ \textcolor{keyword}{static\_cast<}\mbox{\hyperlink{struct_u_t_f8_a8351676b3eda285d7fe902fc472e066e}{Ch}}\textcolor{keyword}{>}(0x80\ |\ ((codepoint\ \&\ 0x3F))));}
+\DoxyCodeLine{00128\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{encodings_8h_ad57ba7f2912c5509924b69dec7db4396}{PutUnsafe}}(\mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}},\ \textcolor{keyword}{static\_cast<}\mbox{\hyperlink{struct_u_t_f8_a8351676b3eda285d7fe902fc472e066e}{Ch}}\textcolor{keyword}{>}(0xC0\ |\ ((codepoint\ >>\ 6)\ \&\ 0xFF)));}
+\DoxyCodeLine{00129\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{encodings_8h_ad57ba7f2912c5509924b69dec7db4396}{PutUnsafe}}(\mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}},\ \textcolor{keyword}{static\_cast<}\mbox{\hyperlink{struct_u_t_f8_a8351676b3eda285d7fe902fc472e066e}{Ch}}\textcolor{keyword}{>}(0x80\ |\ ((codepoint\ \&\ 0x3F))));}
 \DoxyCodeLine{00130\ \ \ \ \ \ \ \ \ \}}
 \DoxyCodeLine{00131\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}\ (codepoint\ <=\ 0xFFFF)\ \{}
-\DoxyCodeLine{00132\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{encodings_8h_ad57ba7f2912c5509924b69dec7db4396}{PutUnsafe}}(os,\ \textcolor{keyword}{static\_cast<}\mbox{\hyperlink{hash__impl_8h_ab0a0d1ad13c7e4d3cb38c89f7127c85a}{Ch}}\textcolor{keyword}{>}(0xE0\ |\ ((codepoint\ >>\ 12)\ \&\ 0xFF)));}
-\DoxyCodeLine{00133\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{encodings_8h_ad57ba7f2912c5509924b69dec7db4396}{PutUnsafe}}(os,\ \textcolor{keyword}{static\_cast<}\mbox{\hyperlink{hash__impl_8h_ab0a0d1ad13c7e4d3cb38c89f7127c85a}{Ch}}\textcolor{keyword}{>}(0x80\ |\ ((codepoint\ >>\ 6)\ \&\ 0x3F)));}
-\DoxyCodeLine{00134\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{encodings_8h_ad57ba7f2912c5509924b69dec7db4396}{PutUnsafe}}(os,\ \textcolor{keyword}{static\_cast<}\mbox{\hyperlink{hash__impl_8h_ab0a0d1ad13c7e4d3cb38c89f7127c85a}{Ch}}\textcolor{keyword}{>}(0x80\ |\ (codepoint\ \&\ 0x3F)));}
+\DoxyCodeLine{00132\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{encodings_8h_ad57ba7f2912c5509924b69dec7db4396}{PutUnsafe}}(\mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}},\ \textcolor{keyword}{static\_cast<}\mbox{\hyperlink{hash__impl_8h_ab0a0d1ad13c7e4d3cb38c89f7127c85a}{Ch}}\textcolor{keyword}{>}(0xE0\ |\ ((codepoint\ >>\ 12)\ \&\ 0xFF)));}
+\DoxyCodeLine{00133\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{encodings_8h_ad57ba7f2912c5509924b69dec7db4396}{PutUnsafe}}(\mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}},\ \textcolor{keyword}{static\_cast<}\mbox{\hyperlink{hash__impl_8h_ab0a0d1ad13c7e4d3cb38c89f7127c85a}{Ch}}\textcolor{keyword}{>}(0x80\ |\ ((codepoint\ >>\ 6)\ \&\ 0x3F)));}
+\DoxyCodeLine{00134\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{encodings_8h_ad57ba7f2912c5509924b69dec7db4396}{PutUnsafe}}(\mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}},\ \textcolor{keyword}{static\_cast<}\mbox{\hyperlink{hash__impl_8h_ab0a0d1ad13c7e4d3cb38c89f7127c85a}{Ch}}\textcolor{keyword}{>}(0x80\ |\ (codepoint\ \&\ 0x3F)));}
 \DoxyCodeLine{00135\ \ \ \ \ \ \ \ \ \}}
 \DoxyCodeLine{00136\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}\ \{}
 \DoxyCodeLine{00137\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g_gabeba18d612187bad2ac62aed9276d47c}{RAPIDJSON\_ASSERT}}(codepoint\ <=\ 0x10FFFF);}
-\DoxyCodeLine{00138\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{encodings_8h_ad57ba7f2912c5509924b69dec7db4396}{PutUnsafe}}(os,\ \textcolor{keyword}{static\_cast<}\mbox{\hyperlink{hash__impl_8h_ab0a0d1ad13c7e4d3cb38c89f7127c85a}{Ch}}\textcolor{keyword}{>}(0xF0\ |\ ((codepoint\ >>\ 18)\ \&\ 0xFF)));}
-\DoxyCodeLine{00139\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{encodings_8h_ad57ba7f2912c5509924b69dec7db4396}{PutUnsafe}}(os,\ \textcolor{keyword}{static\_cast<}\mbox{\hyperlink{hash__impl_8h_ab0a0d1ad13c7e4d3cb38c89f7127c85a}{Ch}}\textcolor{keyword}{>}(0x80\ |\ ((codepoint\ >>\ 12)\ \&\ 0x3F)));}
-\DoxyCodeLine{00140\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{encodings_8h_ad57ba7f2912c5509924b69dec7db4396}{PutUnsafe}}(os,\ \textcolor{keyword}{static\_cast<}\mbox{\hyperlink{hash__impl_8h_ab0a0d1ad13c7e4d3cb38c89f7127c85a}{Ch}}\textcolor{keyword}{>}(0x80\ |\ ((codepoint\ >>\ 6)\ \&\ 0x3F)));}
-\DoxyCodeLine{00141\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{encodings_8h_ad57ba7f2912c5509924b69dec7db4396}{PutUnsafe}}(os,\ \textcolor{keyword}{static\_cast<}\mbox{\hyperlink{hash__impl_8h_ab0a0d1ad13c7e4d3cb38c89f7127c85a}{Ch}}\textcolor{keyword}{>}(0x80\ |\ (codepoint\ \&\ 0x3F)));}
+\DoxyCodeLine{00138\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{encodings_8h_ad57ba7f2912c5509924b69dec7db4396}{PutUnsafe}}(\mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}},\ \textcolor{keyword}{static\_cast<}\mbox{\hyperlink{hash__impl_8h_ab0a0d1ad13c7e4d3cb38c89f7127c85a}{Ch}}\textcolor{keyword}{>}(0xF0\ |\ ((codepoint\ >>\ 18)\ \&\ 0xFF)));}
+\DoxyCodeLine{00139\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{encodings_8h_ad57ba7f2912c5509924b69dec7db4396}{PutUnsafe}}(\mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}},\ \textcolor{keyword}{static\_cast<}\mbox{\hyperlink{hash__impl_8h_ab0a0d1ad13c7e4d3cb38c89f7127c85a}{Ch}}\textcolor{keyword}{>}(0x80\ |\ ((codepoint\ >>\ 12)\ \&\ 0x3F)));}
+\DoxyCodeLine{00140\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{encodings_8h_ad57ba7f2912c5509924b69dec7db4396}{PutUnsafe}}(\mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}},\ \textcolor{keyword}{static\_cast<}\mbox{\hyperlink{hash__impl_8h_ab0a0d1ad13c7e4d3cb38c89f7127c85a}{Ch}}\textcolor{keyword}{>}(0x80\ |\ ((codepoint\ >>\ 6)\ \&\ 0x3F)));}
+\DoxyCodeLine{00141\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{encodings_8h_ad57ba7f2912c5509924b69dec7db4396}{PutUnsafe}}(\mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}},\ \textcolor{keyword}{static\_cast<}\mbox{\hyperlink{hash__impl_8h_ab0a0d1ad13c7e4d3cb38c89f7127c85a}{Ch}}\textcolor{keyword}{>}(0x80\ |\ (codepoint\ \&\ 0x3F)));}
 \DoxyCodeLine{00142\ \ \ \ \ \ \ \ \ \}}
 \DoxyCodeLine{00143\ \ \ \ \ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -260,7 +262,8 @@ Definition at line \mbox{\hyperlink{encodings_8h_source_l00204}{204}} of file \m
 \DoxyCodeLine{00220\ \ \ \ \ \}}
 
 \end{DoxyCode}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -283,7 +286,7 @@ Definition at line \mbox{\hyperlink{encodings_8h_source_l00250}{250}} of file \m
 \begin{DoxyCode}{0}
 \DoxyCodeLine{00250\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
 \DoxyCodeLine{00251\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{rapidjson_8h_af95188da1d8eb6d4b148fe9ce71cd7c4}{RAPIDJSON\_STATIC\_ASSERT}}(\textcolor{keyword}{sizeof}(\textcolor{keyword}{typename}\ OutputByteStream::Ch)\ ==\ 1);}
-\DoxyCodeLine{00252\ \ \ \ \ \ \ \ \ os.Put(\textcolor{keyword}{static\_cast<}typename\ OutputByteStream::Ch\textcolor{keyword}{>}(c));}
+\DoxyCodeLine{00252\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}.Put(\textcolor{keyword}{static\_cast<}typename\ OutputByteStream::Ch\textcolor{keyword}{>}(c));}
 \DoxyCodeLine{00253\ \ \ \ \ \}}
 
 \end{DoxyCode}
@@ -303,9 +306,9 @@ Definition at line \mbox{\hyperlink{encodings_8h_source_l00242}{242}} of file \m
 \begin{DoxyCode}{0}
 \DoxyCodeLine{00242\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
 \DoxyCodeLine{00243\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{rapidjson_8h_af95188da1d8eb6d4b148fe9ce71cd7c4}{RAPIDJSON\_STATIC\_ASSERT}}(\textcolor{keyword}{sizeof}(\textcolor{keyword}{typename}\ OutputByteStream::Ch)\ ==\ 1);}
-\DoxyCodeLine{00244\ \ \ \ \ \ \ \ \ os.Put(\textcolor{keyword}{static\_cast<}typename\ OutputByteStream::Ch\textcolor{keyword}{>}(0xEFu));}
-\DoxyCodeLine{00245\ \ \ \ \ \ \ \ \ os.Put(\textcolor{keyword}{static\_cast<}typename\ OutputByteStream::Ch\textcolor{keyword}{>}(0xBBu));}
-\DoxyCodeLine{00246\ \ \ \ \ \ \ \ \ os.Put(\textcolor{keyword}{static\_cast<}typename\ OutputByteStream::Ch\textcolor{keyword}{>}(0xBFu));}
+\DoxyCodeLine{00244\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}.Put(\textcolor{keyword}{static\_cast<}typename\ OutputByteStream::Ch\textcolor{keyword}{>}(0xEFu));}
+\DoxyCodeLine{00245\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}.Put(\textcolor{keyword}{static\_cast<}typename\ OutputByteStream::Ch\textcolor{keyword}{>}(0xBBu));}
+\DoxyCodeLine{00246\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}.Put(\textcolor{keyword}{static\_cast<}typename\ OutputByteStream::Ch\textcolor{keyword}{>}(0xBFu));}
 \DoxyCodeLine{00247\ \ \ \ \ \}}
 
 \end{DoxyCode}
@@ -329,7 +332,8 @@ Definition at line \mbox{\hyperlink{encodings_8h_source_l00236}{236}} of file \m
 \DoxyCodeLine{00239\ \ \ \ \ \}}
 
 \end{DoxyCode}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -363,7 +367,8 @@ Definition at line \mbox{\hyperlink{encodings_8h_source_l00223}{223}} of file \m
 \DoxyCodeLine{00233\ \ \ \ \ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -410,7 +415,8 @@ Definition at line \mbox{\hyperlink{encodings_8h_source_l00179}{179}} of file \m
 \DoxyCodeLine{00202\ \ \ \ \ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode

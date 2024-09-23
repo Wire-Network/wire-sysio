@@ -1,3 +1,11 @@
 <map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
-<area shape="rect" id="Node000000" href="$structtype__converter32.html" title=" " alt="" coords="5,5,127,31"/>
+<area shape="rect" id="Node000000" href="$struct_u_t_f32.html" title=" " alt="" coords="5,80,143,106"/>
+<area shape="rect" id="Node000001" href="$struct_u_t_f32_b_e.html" title=" " alt="" coords="193,5,348,31"/>
+<area shape="poly" id="edge945_Node000000_Node000001" title=" " alt="" coords="116,71,190,40,221,29,223,34,192,45,118,76"/>
+<area shape="rect" id="Node000002" href="$struct_u_t_f32_l_e.html" title=" " alt="" coords="194,55,347,80"/>
+<area shape="poly" id="edge946_Node000000_Node000002" title=" " alt="" coords="158,79,193,75,193,80,158,85"/>
+<area shape="rect" id="Node000003" href="$struct_u_t_f32_b_e.html" title="UTF&#45;32 big endian encoding." alt="" coords="191,104,350,130"/>
+<area shape="poly" id="edge947_Node000000_Node000003" title=" " alt="" coords="159,100,190,104,190,110,158,106"/>
+<area shape="rect" id="Node000004" href="$struct_u_t_f32_l_e.html" title="UTF&#45;32 little endian enocoding." alt="" coords="192,153,349,179"/>
+<area shape="poly" id="edge948_Node000000_Node000004" title=" " alt="" coords="119,110,192,140,223,150,221,155,190,145,117,115"/>
 </map>

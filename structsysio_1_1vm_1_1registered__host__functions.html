@@ -237,13 +237,12 @@ template&lt;auto Func, typename... Preconditions&gt; </div>
 
 <p class="definition">Definition at line <a class="el" href="sysio_2vm_2host__function_8hpp_source.html#l00448">448</a> of file <a class="el" href="sysio_2vm_2host__function_8hpp_source.html">host_function.hpp</a>.</p>
 <div class="fragment"><div class="line"><span class="lineno">  448</span>                                                                   {</div>
-<div class="line"><span class="lineno">  449</span>         <span class="keyword">using </span><a class="code hl_variable" href="namespacebenchmark_compile.html#ad0ed96ae1454e4347ca61ac3887c379e">args</a>          = <a class="code hl_typedef" href="namespacesysio_1_1vm.html#a871cdea8ae24f8fa579391a905359519">flatten_parameters_t</a>&lt;<a class="code hl_define" href="sysio_2vm_2function__traits_8hpp.html#ae0e7ec10d6ffcb99b68833b2156699f4">AUTO_PARAM_WORKAROUND</a>(Func)&gt;;</div>
+<div class="line"><span class="lineno">  449</span>         <span class="keyword">using </span>args          = <a class="code hl_typedef" href="namespacesysio_1_1vm.html#a871cdea8ae24f8fa579391a905359519">flatten_parameters_t</a>&lt;<a class="code hl_define" href="sysio_2vm_2function__traits_8hpp.html#ae0e7ec10d6ffcb99b68833b2156699f4">AUTO_PARAM_WORKAROUND</a>(Func)&gt;;</div>
 <div class="line"><span class="lineno">  450</span>         <span class="keyword">using </span>res           = <a class="code hl_typedef" href="namespacesysio_1_1vm.html#a00e04408ac84e1dcbe0add9494c351ff">return_type_t</a>&lt;<a class="code hl_define" href="sysio_2vm_2function__traits_8hpp.html#ae0e7ec10d6ffcb99b68833b2156699f4">AUTO_PARAM_WORKAROUND</a>(Func)&gt;;</div>
 <div class="line"><span class="lineno">  451</span>         <span class="keyword">using </span>preconditions = std::tuple&lt;Preconditions...&gt;;</div>
 <div class="line"><span class="lineno">  452</span>         <a class="code hl_function" href="structsysio_1_1vm_1_1registered__host__functions_1_1mappings.html#a99a30645a5be92083d777a00c79e4dad">mappings::get</a>().template add_mapping&lt;Func, res, args, preconditions&gt;(mod, <a class="code hl_variable" href="catch__reporter__console_8cpp.html#a9b45b3e13bd9167aab02e17e08916231">name</a>);</div>
 <div class="line"><span class="lineno">  453</span>      }</div>
 <div class="ttc" id="acatch__reporter__console_8cpp_html_a9b45b3e13bd9167aab02e17e08916231"><div class="ttname"><a href="catch__reporter__console_8cpp.html#a9b45b3e13bd9167aab02e17e08916231">name</a></div><div class="ttdeci">std::string name</div><div class="ttdef"><b>Definition</b> <a href="catch__reporter__console_8cpp_source.html#l00186">catch_reporter_console.cpp:186</a></div></div>
-<div class="ttc" id="anamespacebenchmark_compile_html_ad0ed96ae1454e4347ca61ac3887c379e"><div class="ttname"><a href="namespacebenchmark_compile.html#ad0ed96ae1454e4347ca61ac3887c379e">benchmarkCompile.args</a></div><div class="ttdeci">args</div><div class="ttdef"><b>Definition</b> <a href="benchmark_compile_8py_source.html#l00122">benchmarkCompile.py:122</a></div></div>
 <div class="ttc" id="anamespacesysio_1_1vm_html_a00e04408ac84e1dcbe0add9494c351ff"><div class="ttname"><a href="namespacesysio_1_1vm.html#a00e04408ac84e1dcbe0add9494c351ff">sysio::vm::return_type_t</a></div><div class="ttdeci">decltype(return_type(AUTO_PARAM_WORKAROUND(FN))) return_type_t</div><div class="ttdef"><b>Definition</b> <a href="sysio_2vm_2function__traits_8hpp_source.html#l00197">function_traits.hpp:197</a></div></div>
 <div class="ttc" id="anamespacesysio_1_1vm_html_a871cdea8ae24f8fa579391a905359519"><div class="ttname"><a href="namespacesysio_1_1vm.html#a871cdea8ae24f8fa579391a905359519">sysio::vm::flatten_parameters_t</a></div><div class="ttdeci">decltype(flatten_parameters(AUTO_PARAM_WORKAROUND(FN))) flatten_parameters_t</div><div class="ttdef"><b>Definition</b> <a href="sysio_2vm_2function__traits_8hpp_source.html#l00209">function_traits.hpp:209</a></div></div>
 <div class="ttc" id="astructsysio_1_1vm_1_1registered__host__functions_1_1mappings_html_a99a30645a5be92083d777a00c79e4dad"><div class="ttname"><a href="structsysio_1_1vm_1_1registered__host__functions_1_1mappings.html#a99a30645a5be92083d777a00c79e4dad">sysio::vm::registered_host_functions::mappings::get</a></div><div class="ttdeci">static mappings &amp; get()</div><div class="ttdef"><b>Definition</b> <a href="sysio_2vm_2host__function_8hpp_source.html#l00441">host_function.hpp:441</a></div></div>
@@ -263,9 +262,23 @@ Here is the caller graph for this function:</div>
 <div class="dyncontent">
 <div class="center"><img src="structsysio_1_1vm_1_1registered__host__functions_a11ed5e893c0eb9af80290f9024485be2_icgraph.png" border="0" usemap="#astructsysio_1_1vm_1_1registered__host__functions_a11ed5e893c0eb9af80290f9024485be2_icgraph" alt=""/></div>
 <map name="astructsysio_1_1vm_1_1registered__host__functions_a11ed5e893c0eb9af80290f9024485be2_icgraph" id="astructsysio_1_1vm_1_1registered__host__functions_a11ed5e893c0eb9af80290f9024485be2_icgraph">
-<area shape="rect" title=" " alt="" coords="222,5,365,46"/>
-<area shape="rect" href="classvalidate__reflection_1_1_empty_scope.html#a1fb4f76506790294268dc078986d7430" title=" " alt="" coords="5,5,174,46"/>
-<area shape="poly" title=" " alt="" coords="206,28,174,28,174,23,206,23"/>
+<area shape="rect" title=" " alt="" coords="233,171,376,212"/>
+<area shape="rect" href="host__functions__tests_8cpp.html#ad5bda7d36608d7278a3921f06daf1ecc" title=" " alt="" coords="9,5,181,31"/>
+<area shape="poly" title=" " alt="" coords="283,159,242,100,215,70,183,44,163,34,165,29,186,40,218,66,246,96,287,156"/>
+<area shape="rect" href="implementation__limits__tests_8cpp.html#a62a8ae4b1a8ab3f4a7d74bc1d458965d" title=" " alt="" coords="9,55,181,80"/>
+<area shape="poly" title=" " alt="" coords="272,162,232,126,183,94,158,83,160,79,186,89,235,122,275,158"/>
+<area shape="rect" href="implementation__limits__tests_8cpp.html#a75852f164664918221f13dc5b1cd4ee7" title=" " alt="" coords="9,104,181,130"/>
+<area shape="poly" title=" " alt="" coords="243,167,184,143,150,133,151,128,186,138,245,162"/>
+<area shape="rect" href="host__functions__tests_8cpp.html#a2259b64580f4291f036c5abba85870fa" title=" " alt="" coords="9,153,181,179"/>
+<area shape="poly" title=" " alt="" coords="217,184,181,179,182,174,218,178"/>
+<area shape="rect" href="preconditions__tests_8cpp.html#ab6ebb1eb28c94cdff83d66d9ea24f935" title=" " alt="" coords="9,203,181,228"/>
+<area shape="poly" title=" " alt="" coords="218,204,182,208,181,203,217,199"/>
+<area shape="rect" href="host__functions__tests_8cpp.html#a6b44e563c0402069274db771df1cc4dc" title=" " alt="" coords="9,252,181,278"/>
+<area shape="poly" title=" " alt="" coords="244,221,186,243,151,254,150,249,184,238,242,216"/>
+<area shape="rect" href="host__functions__tests_8cpp.html#aaa1f6066f869535b132215a0b0e9ea4b" title=" " alt="" coords="9,301,181,327"/>
+<area shape="poly" title=" " alt="" coords="275,225,234,260,186,293,160,303,158,298,183,288,231,256,271,221"/>
+<area shape="rect" href="structsysio_1_1chain_1_1webassembly_1_1host__function__registrator.html#a8373c77aa3ef9e367a25f8f52c55ea7d" title=" " alt="" coords="5,352,185,407"/>
+<area shape="poly" title=" " alt="" coords="285,227,243,284,216,315,186,342,169,353,166,349,183,337,213,311,239,281,281,224"/>
 </map>
 </div>
 
@@ -304,7 +317,7 @@ template&lt;auto Func, typename... Preconditions&gt; </div>
 
 <p class="definition">Definition at line <a class="el" href="vm_2host__function_8hpp_source.html#l00448">448</a> of file <a class="el" href="vm_2host__function_8hpp_source.html">host_function.hpp</a>.</p>
 <div class="fragment"><div class="line"><span class="lineno">  448</span>                                                                   {</div>
-<div class="line"><span class="lineno">  449</span>         <span class="keyword">using </span><a class="code hl_variable" href="namespacebenchmark_compile.html#ad0ed96ae1454e4347ca61ac3887c379e">args</a>          = <a class="code hl_typedef" href="namespacesysio_1_1vm.html#a871cdea8ae24f8fa579391a905359519">flatten_parameters_t</a>&lt;<a class="code hl_define" href="sysio_2vm_2function__traits_8hpp.html#ae0e7ec10d6ffcb99b68833b2156699f4">AUTO_PARAM_WORKAROUND</a>(Func)&gt;;</div>
+<div class="line"><span class="lineno">  449</span>         <span class="keyword">using </span>args          = <a class="code hl_typedef" href="namespacesysio_1_1vm.html#a871cdea8ae24f8fa579391a905359519">flatten_parameters_t</a>&lt;<a class="code hl_define" href="sysio_2vm_2function__traits_8hpp.html#ae0e7ec10d6ffcb99b68833b2156699f4">AUTO_PARAM_WORKAROUND</a>(Func)&gt;;</div>
 <div class="line"><span class="lineno">  450</span>         <span class="keyword">using </span>res           = <a class="code hl_typedef" href="namespacesysio_1_1vm.html#a00e04408ac84e1dcbe0add9494c351ff">return_type_t</a>&lt;<a class="code hl_define" href="sysio_2vm_2function__traits_8hpp.html#ae0e7ec10d6ffcb99b68833b2156699f4">AUTO_PARAM_WORKAROUND</a>(Func)&gt;;</div>
 <div class="line"><span class="lineno">  451</span>         <span class="keyword">using </span>preconditions = std::tuple&lt;Preconditions...&gt;;</div>
 <div class="line"><span class="lineno">  452</span>         <a class="code hl_function" href="structsysio_1_1vm_1_1registered__host__functions_1_1mappings.html#a99a30645a5be92083d777a00c79e4dad">mappings::get</a>().template add_mapping&lt;Func, res, args, preconditions&gt;(mod, <a class="code hl_variable" href="catch__reporter__console_8cpp.html#a9b45b3e13bd9167aab02e17e08916231">name</a>);</div>
@@ -317,16 +330,6 @@ Here is the call graph for this function:</div>
 <area shape="rect" title=" " alt="" coords="5,5,149,46"/>
 <area shape="rect" href="structsysio_1_1vm_1_1registered__host__functions_1_1mappings.html#a99a30645a5be92083d777a00c79e4dad" title=" " alt="" coords="197,5,400,46"/>
 <area shape="poly" title=" " alt="" coords="149,23,181,23,181,28,149,28"/>
-</map>
-</div>
-<div class="dynheader">
-Here is the caller graph for this function:</div>
-<div class="dyncontent">
-<div class="center"><img src="structsysio_1_1vm_1_1registered__host__functions_a11ed5e893c0eb9af80290f9024485be2_icgraph.png" border="0" usemap="#astructsysio_1_1vm_1_1registered__host__functions_a11ed5e893c0eb9af80290f9024485be2_icgraph" alt=""/></div>
-<map name="astructsysio_1_1vm_1_1registered__host__functions_a11ed5e893c0eb9af80290f9024485be2_icgraph" id="astructsysio_1_1vm_1_1registered__host__functions_a11ed5e893c0eb9af80290f9024485be2_icgraph">
-<area shape="rect" title=" " alt="" coords="222,5,365,46"/>
-<area shape="rect" href="classvalidate__reflection_1_1_empty_scope.html#a1fb4f76506790294268dc078986d7430" title=" " alt="" coords="5,5,174,46"/>
-<area shape="poly" title=" " alt="" coords="206,28,174,28,174,23,206,23"/>
 </map>
 </div>
 

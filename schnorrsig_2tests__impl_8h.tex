@@ -1,7 +1,8 @@
 \doxysection{libraries/fc/secp256k1/secp256k1/src/modules/schnorrsig/tests\+\_\+impl.h File Reference}
 \hypertarget{schnorrsig_2tests__impl_8h}{}\label{schnorrsig_2tests__impl_8h}\index{libraries/fc/secp256k1/secp256k1/src/modules/schnorrsig/tests\_impl.h@{libraries/fc/secp256k1/secp256k1/src/modules/schnorrsig/tests\_impl.h}}
 {\ttfamily \#include "{}../../../include/secp256k1\+\_\+schnorrsig.\+h"{}}\newline
-Include dependency graph for tests\+\_\+impl.\+h\+:\nopagebreak
+Include dependency graph for tests\+\_\+impl.\+h\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -77,7 +78,8 @@ Definition at line \mbox{\hyperlink{schnorrsig_2tests__impl_8h_source_l00015}{15
 \DoxyCodeLine{00021\ \}}
 
 \end{DoxyCode}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -109,7 +111,7 @@ Definition at line \mbox{\hyperlink{schnorrsig_2tests__impl_8h_source_l00034}{34
 \DoxyCodeLine{00044\ \ \ \ \ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}\ key[32];}
 \DoxyCodeLine{00045\ \ \ \ \ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}\ pk[32];}
 \DoxyCodeLine{00046\ \ \ \ \ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}\ aux\_rand[32];}
-\DoxyCodeLine{00047\ \ \ \ \ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}\ *\mbox{\hyperlink{namespacebenchmark_compile_ad0ed96ae1454e4347ca61ac3887c379e}{args}}[5];}
+\DoxyCodeLine{00047\ \ \ \ \ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}\ *args[5];}
 \DoxyCodeLine{00048\ \ \ \ \ \textcolor{keywordtype}{int}\ i;}
 \DoxyCodeLine{00049\ }
 \DoxyCodeLine{00050\ \ \ \ \ \textcolor{comment}{/*\ Check\ that\ hash\ initialized\ by}}
@@ -132,11 +134,11 @@ Definition at line \mbox{\hyperlink{schnorrsig_2tests__impl_8h_source_l00034}{34
 \DoxyCodeLine{00067\ \ \ \ \ secp256k1\_testrand256(aux\_rand);}
 \DoxyCodeLine{00068\ }
 \DoxyCodeLine{00069\ \ \ \ \ \textcolor{comment}{/*\ Check\ that\ a\ bitflip\ in\ an\ argument\ results\ in\ different\ nonces.\ */}}
-\DoxyCodeLine{00070\ \ \ \ \ \mbox{\hyperlink{namespacebenchmark_compile_ad0ed96ae1454e4347ca61ac3887c379e}{args}}[0]\ =\ msg;}
-\DoxyCodeLine{00071\ \ \ \ \ \mbox{\hyperlink{namespacebenchmark_compile_ad0ed96ae1454e4347ca61ac3887c379e}{args}}[1]\ =\ \mbox{\hyperlink{yubico__otp_8c_a9246c20bb98ad2b4c60313c053c70f08}{key}};}
-\DoxyCodeLine{00072\ \ \ \ \ \mbox{\hyperlink{namespacebenchmark_compile_ad0ed96ae1454e4347ca61ac3887c379e}{args}}[2]\ =\ pk;}
-\DoxyCodeLine{00073\ \ \ \ \ \mbox{\hyperlink{namespacebenchmark_compile_ad0ed96ae1454e4347ca61ac3887c379e}{args}}[3]\ =\ algo;}
-\DoxyCodeLine{00074\ \ \ \ \ \mbox{\hyperlink{namespacebenchmark_compile_ad0ed96ae1454e4347ca61ac3887c379e}{args}}[4]\ =\ aux\_rand;}
+\DoxyCodeLine{00070\ \ \ \ \ args[0]\ =\ msg;}
+\DoxyCodeLine{00071\ \ \ \ \ args[1]\ =\ \mbox{\hyperlink{yubico__otp_8c_a9246c20bb98ad2b4c60313c053c70f08}{key}};}
+\DoxyCodeLine{00072\ \ \ \ \ args[2]\ =\ pk;}
+\DoxyCodeLine{00073\ \ \ \ \ args[3]\ =\ algo;}
+\DoxyCodeLine{00074\ \ \ \ \ args[4]\ =\ aux\_rand;}
 \DoxyCodeLine{00075\ \ \ \ \ \textcolor{keywordflow}{for}\ (i\ =\ 0;\ i\ <\ \mbox{\hyperlink{gmock__stress__test_8cc_afd9db40e3361ae09188795e8cbe19752}{count}};\ i++)\ \{}
 \DoxyCodeLine{00076\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{schnorrsig_2tests__impl_8h_ac5feade0e2d42bfe7b2d1aa2cc55abe9}{nonce\_function\_bip340\_bitflip}}(args,\ 0,\ 32,\ msglen,\ algolen);}
 \DoxyCodeLine{00077\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{schnorrsig_2tests__impl_8h_ac5feade0e2d42bfe7b2d1aa2cc55abe9}{nonce\_function\_bip340\_bitflip}}(args,\ 1,\ 32,\ msglen,\ algolen);}
@@ -180,14 +182,16 @@ Definition at line \mbox{\hyperlink{schnorrsig_2tests__impl_8h_source_l00034}{34
 \DoxyCodeLine{00115\ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
 \includegraphics[width=333pt]{schnorrsig_2tests__impl_8h_a2ecc08a50eb957a118ff4988f65cf87f_cgraph}
 \end{center}
 \end{figure}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -221,14 +225,16 @@ Definition at line \mbox{\hyperlink{schnorrsig_2tests__impl_8h_source_l00891}{89
 \DoxyCodeLine{00903\ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
 \includegraphics[width=350pt]{schnorrsig_2tests__impl_8h_ac157ab3450c7cca7e46cdc65e8019392_cgraph}
 \end{center}
 \end{figure}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -361,14 +367,16 @@ Definition at line \mbox{\hyperlink{schnorrsig_2tests__impl_8h_source_l00117}{11
 \DoxyCodeLine{00228\ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
 \includegraphics[width=350pt]{schnorrsig_2tests__impl_8h_afbcc12169b7558d9bd9cbbad8174ac06_cgraph}
 \end{center}
 \end{figure}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -805,14 +813,16 @@ Definition at line \mbox{\hyperlink{schnorrsig_2tests__impl_8h_source_l00270}{27
 \DoxyCodeLine{00685\ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
 \includegraphics[width=350pt]{schnorrsig_2tests__impl_8h_a0866fca54a0356a508e7ecfaf7ba68ea_cgraph}
 \end{center}
 \end{figure}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -847,14 +857,16 @@ Definition at line \mbox{\hyperlink{schnorrsig_2tests__impl_8h_source_l00244}{24
 \DoxyCodeLine{00257\ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
 \includegraphics[width=350pt]{schnorrsig_2tests__impl_8h_a3da78c8240bed7f834cde952569d440a_cgraph}
 \end{center}
 \end{figure}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -881,14 +893,16 @@ Definition at line \mbox{\hyperlink{schnorrsig_2tests__impl_8h_source_l00261}{26
 \DoxyCodeLine{00266\ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
 \includegraphics[width=350pt]{schnorrsig_2tests__impl_8h_a40bf8f20fa4a04a544e177feef693980_cgraph}
 \end{center}
 \end{figure}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -918,14 +932,16 @@ Definition at line \mbox{\hyperlink{schnorrsig_2tests__impl_8h_source_l00232}{23
 \DoxyCodeLine{00240\ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
 \includegraphics[width=321pt]{schnorrsig_2tests__impl_8h_ad2f75756c66b500a9681e085076a0e81_cgraph}
 \end{center}
 \end{figure}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -991,14 +1007,16 @@ Definition at line \mbox{\hyperlink{schnorrsig_2tests__impl_8h_source_l00728}{72
 \DoxyCodeLine{00772\ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
 \includegraphics[width=350pt]{schnorrsig_2tests__impl_8h_a12bd744ae085199a91c835561c1638f5_cgraph}
 \end{center}
 \end{figure}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -1094,14 +1112,16 @@ Definition at line \mbox{\hyperlink{schnorrsig_2tests__impl_8h_source_l00778}{77
 \DoxyCodeLine{00852\ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
 \includegraphics[width=350pt]{schnorrsig_2tests__impl_8h_abb22271ab74be54de7b405f2729467e8_cgraph}
 \end{center}
 \end{figure}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -1157,14 +1177,16 @@ Definition at line \mbox{\hyperlink{schnorrsig_2tests__impl_8h_source_l00855}{85
 \DoxyCodeLine{00889\ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
 \includegraphics[width=350pt]{schnorrsig_2tests__impl_8h_a6c1382ba9264d73d3daa0b3a059b7c6d_cgraph}
 \end{center}
 \end{figure}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -1192,7 +1214,8 @@ Definition at line \mbox{\hyperlink{schnorrsig_2tests__impl_8h_source_l00026}{26
 \DoxyCodeLine{00032\ \}}
 
 \end{DoxyCode}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode

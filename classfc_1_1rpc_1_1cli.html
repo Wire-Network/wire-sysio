@@ -304,7 +304,7 @@ Here is the call graph for this function:</div>
 <div class="line"><span class="lineno">  216</span>         rl_bind_key( <span class="charliteral">&#39;\t&#39;</span>, rl_complete );</div>
 <div class="line"><span class="lineno">  217</span>         <span class="keywordflow">if</span>( *line_read )</div>
 <div class="line"><span class="lineno">  218</span>            add_history(line_read);</div>
-<div class="line"><span class="lineno">  219</span>         <a class="code hl_variable" href="namespacevalidate__reflection.html#a54d4e98ade8417b88a7e3859a693630a">line</a> = line_read;</div>
+<div class="line"><span class="lineno">  219</span>         line = line_read;</div>
 <div class="line"><span class="lineno">  220</span>         free(line_read);</div>
 <div class="line"><span class="lineno">  221</span>      }).<a class="code hl_function" href="#ae273a9d552292105027c5a508403f934">wait</a>();</div>
 <div class="line"><span class="lineno">  222</span>   }</div>
@@ -319,7 +319,6 @@ Here is the call graph for this function:</div>
 <div class="line"><span class="lineno">  231</span>}</div>
 <div class="ttc" id="aclassfc_1_1rpc_1_1cli_html_ae273a9d552292105027c5a508403f934"><div class="ttname"><a href="#ae273a9d552292105027c5a508403f934">fc::rpc::cli::wait</a></div><div class="ttdeci">void wait()</div><div class="ttdef"><b>Definition</b> <a href="cli_8cpp_source.html#l00074">cli.cpp:74</a></div></div>
 <div class="ttc" id="aexception_8hpp_html_a7590ddac4f181b661c3eeaf5feccc6ac"><div class="ttname"><a href="exception_8hpp.html#a7590ddac4f181b661c3eeaf5feccc6ac">FC_THROW_EXCEPTION</a></div><div class="ttdeci">#define FC_THROW_EXCEPTION(EXCEPTION, FORMAT,...)</div><div class="ttdef"><b>Definition</b> <a href="exception_8hpp_source.html#l00395">exception.hpp:395</a></div></div>
-<div class="ttc" id="anamespacevalidate__reflection_html_a54d4e98ade8417b88a7e3859a693630a"><div class="ttname"><a href="namespacevalidate__reflection.html#a54d4e98ade8417b88a7e3859a693630a">validate_reflection.line</a></div><div class="ttdeci">line</div><div class="ttdef"><b>Definition</b> <a href="validate__reflection_8py_source.html#l00735">validate_reflection.py:735</a></div></div>
 </div><!-- fragment --><div class="dynheader">
 Here is the call graph for this function:</div>
 <div class="dyncontent">
@@ -499,35 +498,6 @@ Here is the call graph for this function:</div>
 <area shape="rect" title=" " alt="" coords="5,13,119,38"/>
 <area shape="rect" href="classfc_1_1api__connection.html#a31c921df625930a9a7d0ad114bb2ba1e" title=" " alt="" coords="167,5,310,46"/>
 <area shape="poly" title=" " alt="" coords="119,23,151,23,151,28,119,28"/>
-</map>
-</div>
-<div class="dynheader">
-Here is the caller graph for this function:</div>
-<div class="dyncontent">
-<div class="center"><img src="classfc_1_1rpc_1_1cli_a5ca2f4c807517379e93cbe65371f599d_icgraph.png" border="0" usemap="#aclassfc_1_1rpc_1_1cli_a5ca2f4c807517379e93cbe65371f599d_icgraph" alt=""/></div>
-<map name="aclassfc_1_1rpc_1_1cli_a5ca2f4c807517379e93cbe65371f599d_icgraph" id="aclassfc_1_1rpc_1_1cli_a5ca2f4c807517379e93cbe65371f599d_icgraph">
-<area shape="rect" title=" " alt="" coords="468,105,581,131"/>
-<area shape="rect" href="classcpp_1_1tokenize_1_1_token.html#ad93a4059e9932fa2dea149510f0ef002" title=" " alt="" coords="260,15,398,56"/>
-<area shape="poly" title=" " alt="" coords="484,101,419,70,391,59,393,54,421,65,486,96"/>
-<area shape="rect" href="classpump_1_1_token.html#a1a3dc1ee7b0d66e90f4ab7228b37fc0d" title=" " alt="" coords="259,80,398,106"/>
-<area shape="poly" title=" " alt="" coords="452,112,399,104,399,99,453,106"/>
-<area shape="rect" href="classcpp_1_1ast_1_1_node.html#aade2369ed75b8cd0b9e76752bf6ae7fb" title=" " alt="" coords="238,129,420,155"/>
-<area shape="poly" title=" " alt="" coords="453,130,421,134,420,128,452,124"/>
-<area shape="rect" href="classpump_1_1_token.html#a808876dd5a7b1bf6c43a3855dc4a8868" title=" " alt="" coords="264,203,394,228"/>
-<area shape="poly" title=" " alt="" coords="485,141,358,204,356,200,482,136"/>
-<area shape="rect" href="classcpp_1_1ast_1_1_define.html#a8e51e0611e1a76c5874f6b39e27a6d6a" title=" " alt="" coords="21,5,174,31"/>
-<area shape="poly" title=" " alt="" coords="242,124,236,120,219,101,211,81,204,62,188,44,169,34,172,29,191,40,209,59,216,79,223,98,239,116,245,120"/>
-<area shape="rect" href="classcpp_1_1ast_1_1_expr.html#a47968bf1be367a77836f211ced014ec0" title=" " alt="" coords="27,55,168,80"/>
-<area shape="poly" title=" " alt="" coords="254,127,237,121,212,107,189,94,157,83,159,78,191,89,215,102,239,116,255,122"/>
-<area shape="rect" href="classcpp_1_1ast_1_1_goto.html#ad3bb8a557e3075d7b68c5b0449fb494c" title=" " alt="" coords="26,104,169,130"/>
-<area shape="poly" title=" " alt="" coords="222,133,169,127,170,122,223,128"/>
-<area shape="rect" href="classcpp_1_1ast_1_1_using.html#aa489ba90656b2c28290af718f644d2f4" title=" " alt="" coords="23,153,172,179"/>
-<area shape="poly" title=" " alt="" coords="222,156,173,161,172,156,222,151"/>
-<area shape="rect" href="classcpp_1_1ast_1_1_variable_declaration.html#aeafe1b55bcf3005d00951f0accb18def" title=" " alt="" coords="5,203,190,244"/>
-<area shape="poly" title=" " alt="" coords="256,163,239,169,215,181,191,194,163,205,161,200,189,189,212,176,237,164,254,158"/>
-<area shape="rect" href="classcpp_1_1ast_1_1_node.html#acceba1aa15a332dd139ba9587d439a51" title=" " alt="" coords="11,268,184,294"/>
-<area shape="poly" title=" " alt="" coords="244,165,240,168,223,189,216,212,209,235,191,258,171,270,168,265,188,253,205,232,211,210,218,187,236,164,241,161"/>
-<area shape="poly" title=" " alt="" coords="363,190,351,184,329,181,308,183,297,188,295,193,300,201,296,204,290,194,293,184,307,178,329,176,353,179,365,186"/>
 </map>
 </div>
 

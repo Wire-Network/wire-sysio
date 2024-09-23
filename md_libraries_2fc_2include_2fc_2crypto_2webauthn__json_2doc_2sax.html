@@ -345,12 +345,13 @@ Template</h2>
 <div class="line"><span class="keyword">template</span>&lt;<span class="keyword">typename</span> OutputStream, <span class="keyword">typename</span> SourceEncoding = UTF8&lt;&gt;, <span class="keyword">typename</span> TargetEncoding = UTF8&lt;&gt;, <span class="keyword">typename</span> Allocator = CrtAllocator&lt;&gt;, <span class="keywordtype">unsigned</span> writeFlags = kWriteDefaultFlags&gt;</div>
 <div class="line"><span class="keyword">class </span><a class="code hl_class" href="class_writer.html">Writer</a> {</div>
 <div class="line"><span class="keyword">public</span>:</div>
-<div class="line">    <a class="code hl_class" href="class_writer.html">Writer</a>(OutputStream&amp; os, <a class="code hl_class" href="classrapidjson_1_1_allocator.html">Allocator</a>* allocator = 0, <span class="keywordtype">size_t</span> levelDepth = kDefaultLevelDepth)</div>
+<div class="line">    <a class="code hl_class" href="class_writer.html">Writer</a>(OutputStream&amp; <a class="code hl_variable" href="environment_8hpp.html#a3951483d0b31c29ca95336206cd35238">os</a>, <a class="code hl_class" href="classrapidjson_1_1_allocator.html">Allocator</a>* allocator = 0, <span class="keywordtype">size_t</span> levelDepth = kDefaultLevelDepth)</div>
 <div class="line"><span class="comment">// ...</span></div>
 <div class="line">};</div>
 <div class="line"> </div>
 <div class="line">} <span class="comment">// namespace rapidjson</span></div>
 <div class="ttc" id="aclassrapidjson_1_1_allocator_html"><div class="ttname"><a href="classrapidjson_1_1_allocator.html">Allocator</a></div><div class="ttdoc">Concept for allocating, resizing and freeing memory block.</div></div>
+<div class="ttc" id="aenvironment_8hpp_html_a3951483d0b31c29ca95336206cd35238"><div class="ttname"><a href="environment_8hpp.html#a3951483d0b31c29ca95336206cd35238">os</a></div><div class="ttdeci">os_t os</div><div class="ttdef"><b>Definition</b> <a href="environment_8hpp_source.html#l00023">environment.hpp:23</a></div></div>
 </div><!-- fragment --><p>The <code>OutputStream</code> template parameter is the type of output stream. It cannot be deduced and must be specified by user.</p>
 <p>The <code>SourceEncoding</code> template parameter specifies the encoding to be used in <code>String(const Ch*, ...)</code>.</p>
 <p>The <code>TargetEncoding</code> template parameter specifies the encoding in the output stream.</p>
@@ -550,7 +551,7 @@ Filtering of JSON</h2>
 <div class="line">    <span class="comment">// Prepare JSON writer and output stream.</span></div>
 <div class="line">    <span class="keywordtype">char</span> writeBuffer[65536];</div>
 <div class="line">    <a class="code hl_class" href="class_file_write_stream.html">FileWriteStream</a> <a class="code hl_variable" href="environment_8hpp.html#a3951483d0b31c29ca95336206cd35238">os</a>(stdout, writeBuffer, <span class="keyword">sizeof</span>(writeBuffer));</div>
-<div class="line">    <a class="code hl_class" href="class_writer.html">Writer&lt;FileWriteStream&gt;</a> writer(os);</div>
+<div class="line">    <a class="code hl_class" href="class_writer.html">Writer&lt;FileWriteStream&gt;</a> writer(<a class="code hl_variable" href="environment_8hpp.html#a3951483d0b31c29ca95336206cd35238">os</a>);</div>
 <div class="line"> </div>
 <div class="line">    <span class="comment">// JSON reader parse from the input stream and let writer generate the output.</span></div>
 <div class="line">    <a class="code hl_struct" href="struct_capitalize_filter.html">CapitalizeFilter&lt;Writer&lt;FileWriteStream&gt;</a> &gt; filter(writer);</div>
@@ -563,7 +564,6 @@ Filtering of JSON</h2>
 <div class="line">}</div>
 <div class="ttc" id="aclass_file_read_stream_html"><div class="ttname"><a href="class_file_read_stream.html">FileReadStream</a></div><div class="ttdoc">File byte stream for input using fread().</div><div class="ttdef"><b>Definition</b> <a href="filereadstream_8h_source.html#l00034">filereadstream.h:34</a></div></div>
 <div class="ttc" id="aclass_file_write_stream_html"><div class="ttname"><a href="class_file_write_stream.html">FileWriteStream</a></div><div class="ttdoc">Wrapper of C file stream for output using fwrite().</div><div class="ttdef"><b>Definition</b> <a href="filewritestream_8h_source.html#l00032">filewritestream.h:32</a></div></div>
-<div class="ttc" id="aenvironment_8hpp_html_a3951483d0b31c29ca95336206cd35238"><div class="ttname"><a href="environment_8hpp.html#a3951483d0b31c29ca95336206cd35238">os</a></div><div class="ttdeci">os_t os</div><div class="ttdef"><b>Definition</b> <a href="environment_8hpp_source.html#l00023">environment.hpp:23</a></div></div>
 <div class="ttc" id="afilereadstream_8h_html"><div class="ttname"><a href="filereadstream_8h.html">filereadstream.h</a></div></div>
 <div class="ttc" id="afilewritestream_8h_html"><div class="ttname"><a href="filewritestream_8h.html">filewritestream.h</a></div></div>
 <div class="ttc" id="astruct_capitalize_filter_html"><div class="ttname"><a href="struct_capitalize_filter.html">CapitalizeFilter</a></div><div class="ttdef"><b>Definition</b> <a href="capitalize_8cpp_source.html#l00017">capitalize.cpp:17</a></div></div>

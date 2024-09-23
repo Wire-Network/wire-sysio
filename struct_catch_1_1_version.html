@@ -131,7 +131,7 @@ Public Attributes</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="friends" name="friends"></a>
 Friends</h2></td></tr>
-<tr class="memitem:a6730b4be4f5fa640b39de13d8ffe1dce" id="r_a6730b4be4f5fa640b39de13d8ffe1dce"><td class="memItemLeft" align="right" valign="top">std::ostream &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a6730b4be4f5fa640b39de13d8ffe1dce">operator&lt;&lt;</a> (std::ostream &amp;os, <a class="el" href="struct_catch_1_1_version.html">Version</a> const &amp;version)</td></tr>
+<tr class="memitem:a6730b4be4f5fa640b39de13d8ffe1dce" id="r_a6730b4be4f5fa640b39de13d8ffe1dce"><td class="memItemLeft" align="right" valign="top">std::ostream &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a6730b4be4f5fa640b39de13d8ffe1dce">operator&lt;&lt;</a> (std::ostream &amp;<a class="el" href="environment_8hpp.html#a3951483d0b31c29ca95336206cd35238">os</a>, <a class="el" href="struct_catch_1_1_version.html">Version</a> const &amp;version)</td></tr>
 <tr class="separator:a6730b4be4f5fa640b39de13d8ffe1dce"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
@@ -268,12 +268,12 @@ Friends</h2></td></tr>
 
 <p class="definition">Definition at line <a class="el" href="catch__version_8cpp_source.html#l00027">27</a> of file <a class="el" href="catch__version_8cpp_source.html">catch_version.cpp</a>.</p>
 <div class="fragment"><div class="line"><span class="lineno">   27</span>                                                                       {</div>
-<div class="line"><span class="lineno">   28</span>        os  &lt;&lt; <a class="code hl_enumvalue" href="namespacewebsocketpp_1_1http_1_1parser_1_1state.html#a12f378e0c6dbf373781e7988ee4a0853a08c88a938bc459c7997b48f74248752f">version</a>.majorVersion &lt;&lt; <span class="charliteral">&#39;.&#39;</span></div>
+<div class="line"><span class="lineno">   28</span>        <a class="code hl_variable" href="environment_8hpp.html#a3951483d0b31c29ca95336206cd35238">os</a>  &lt;&lt; <a class="code hl_enumvalue" href="namespacewebsocketpp_1_1http_1_1parser_1_1state.html#a12f378e0c6dbf373781e7988ee4a0853a08c88a938bc459c7997b48f74248752f">version</a>.majorVersion &lt;&lt; <span class="charliteral">&#39;.&#39;</span></div>
 <div class="line"><span class="lineno">   29</span>            &lt;&lt; <a class="code hl_enumvalue" href="namespacewebsocketpp_1_1http_1_1parser_1_1state.html#a12f378e0c6dbf373781e7988ee4a0853a08c88a938bc459c7997b48f74248752f">version</a>.minorVersion &lt;&lt; <span class="charliteral">&#39;.&#39;</span></div>
 <div class="line"><span class="lineno">   30</span>            &lt;&lt; <a class="code hl_enumvalue" href="namespacewebsocketpp_1_1http_1_1parser_1_1state.html#a12f378e0c6dbf373781e7988ee4a0853a08c88a938bc459c7997b48f74248752f">version</a>.patchNumber;</div>
 <div class="line"><span class="lineno">   31</span>        <span class="comment">// branchName is never null -&gt; 0th char is \0 if it is empty</span></div>
 <div class="line"><span class="lineno">   32</span>        <span class="keywordflow">if</span> (<a class="code hl_enumvalue" href="namespacewebsocketpp_1_1http_1_1parser_1_1state.html#a12f378e0c6dbf373781e7988ee4a0853a08c88a938bc459c7997b48f74248752f">version</a>.branchName[0]) {</div>
-<div class="line"><span class="lineno">   33</span>            os &lt;&lt; <span class="charliteral">&#39;-&#39;</span> &lt;&lt; <a class="code hl_enumvalue" href="namespacewebsocketpp_1_1http_1_1parser_1_1state.html#a12f378e0c6dbf373781e7988ee4a0853a08c88a938bc459c7997b48f74248752f">version</a>.branchName</div>
+<div class="line"><span class="lineno">   33</span>            <a class="code hl_variable" href="environment_8hpp.html#a3951483d0b31c29ca95336206cd35238">os</a> &lt;&lt; <span class="charliteral">&#39;-&#39;</span> &lt;&lt; <a class="code hl_enumvalue" href="namespacewebsocketpp_1_1http_1_1parser_1_1state.html#a12f378e0c6dbf373781e7988ee4a0853a08c88a938bc459c7997b48f74248752f">version</a>.branchName</div>
 <div class="line"><span class="lineno">   34</span>               &lt;&lt; <span class="charliteral">&#39;.&#39;</span> &lt;&lt; <a class="code hl_enumvalue" href="namespacewebsocketpp_1_1http_1_1parser_1_1state.html#a12f378e0c6dbf373781e7988ee4a0853a08c88a938bc459c7997b48f74248752f">version</a>.buildNumber;</div>
 <div class="line"><span class="lineno">   35</span>        }</div>
 <div class="line"><span class="lineno">   36</span>        <span class="keywordflow">return</span> <a class="code hl_variable" href="environment_8hpp.html#a3951483d0b31c29ca95336206cd35238">os</a>;</div>

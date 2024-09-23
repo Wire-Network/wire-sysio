@@ -19,7 +19,8 @@
 {\ttfamily \#include "{}yubihsm-\/shell.\+h"{}}\newline
 {\ttfamily \#include $<$editline/readline.\+h$>$}\newline
 {\ttfamily \#include $<$histedit.\+h$>$}\newline
-Include dependency graph for main.\+c\+:\nopagebreak
+Include dependency graph for main.\+c\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -456,14 +457,16 @@ Definition at line \mbox{\hyperlink{src_2main_8c_source_l00925}{925}} of file \m
 \DoxyCodeLine{01101\ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
 \includegraphics[width=243pt]{src_2main_8c_a7f5a0a815226228ed913b8c8afe19a51_cgraph}
 \end{center}
 \end{figure}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -542,14 +545,16 @@ Definition at line \mbox{\hyperlink{src_2main_8c_source_l01103}{1103}} of file \
 \DoxyCodeLine{01161\ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
 \includegraphics[width=270pt]{src_2main_8c_a2cc07cef63c0cb85fa153a5ee8f3688d_cgraph}
 \end{center}
 \end{figure}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -935,7 +940,8 @@ Definition at line \mbox{\hyperlink{src_2main_8c_source_l00221}{221}} of file \m
 \DoxyCodeLine{00585\ \}}
 
 \end{DoxyCode}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -986,7 +992,8 @@ Definition at line \mbox{\hyperlink{src_2main_8c_source_l00820}{820}} of file \m
 \DoxyCodeLine{00850\ \}}
 
 \end{DoxyCode}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -2124,7 +2131,8 @@ Definition at line \mbox{\hyperlink{src_2main_8c_source_l00137}{137}} of file \m
 \DoxyCodeLine{00219\ \}}
 
 \end{DoxyCode}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -2156,14 +2164,16 @@ Definition at line \mbox{\hyperlink{src_2main_8c_source_l00112}{112}} of file \m
 \DoxyCodeLine{00122\ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
 \includegraphics[width=266pt]{src_2main_8c_adf60c5d85f9b442e0c7a42235207a241_cgraph}
 \end{center}
 \end{figure}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -2196,14 +2206,16 @@ Definition at line \mbox{\hyperlink{src_2main_8c_source_l00124}{124}} of file \m
 \DoxyCodeLine{00135\ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
 \includegraphics[width=282pt]{src_2main_8c_aee871967a1e47d3fca17a36cf48e6da6_cgraph}
 \end{center}
 \end{figure}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -2228,10 +2240,10 @@ Definition at line \mbox{\hyperlink{src_2main_8c_source_l00852}{852}} of file \m
 \DoxyCodeLine{00856\ \ \ \textcolor{keywordtype}{int}\ length\ =\ strlen(line);}
 \DoxyCodeLine{00857\ \ \ \textcolor{keywordtype}{int}\ start\_of\_word\ =\ 0;}
 \DoxyCodeLine{00858\ \ \ \textcolor{keyword}{enum}\ states\ \{\ SPACE,\ WORD,\ QUOTE\ \}\ \mbox{\hyperlink{structstate}{state}}\ =\ SPACE;}
-\DoxyCodeLine{00859\ \ \ toks[0]\ =\ \mbox{\hyperlink{namespacevalidate__reflection_a54d4e98ade8417b88a7e3859a693630a}{line}};\ \textcolor{comment}{//\ set\ up\ as\ fall-\/through}}
+\DoxyCodeLine{00859\ \ \ toks[0]\ =\ line;\ \textcolor{comment}{//\ set\ up\ as\ fall-\/through}}
 \DoxyCodeLine{00860\ }
 \DoxyCodeLine{00861\ \ \ \textcolor{keywordflow}{for}\ (i\ =\ 0;\ i\ <=\ length;\ i++)\ \{}
-\DoxyCodeLine{00862\ \ \ \ \ \textcolor{keywordtype}{char}\ c\ =\ \mbox{\hyperlink{namespacevalidate__reflection_a54d4e98ade8417b88a7e3859a693630a}{line}}[i];}
+\DoxyCodeLine{00862\ \ \ \ \ \textcolor{keywordtype}{char}\ c\ =\ line[i];}
 \DoxyCodeLine{00863\ \ \ \ \ \textcolor{keywordflow}{if}\ (cursorc\ \&\&\ i\ ==\ *cursorc\ \&\&\ tok\ >\ 0)\ \{}
 \DoxyCodeLine{00864\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{structstate}{state}}\ ==\ SPACE)\ \{}
 \DoxyCodeLine{00865\ \ \ \ \ \ \ \ \ *cursoro\ =\ 0;}
@@ -2268,18 +2280,18 @@ Definition at line \mbox{\hyperlink{src_2main_8c_source_l00852}{852}} of file \m
 \DoxyCodeLine{00896\ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structstate}{state}}\ =\ WORD;}
 \DoxyCodeLine{00897\ \ \ \ \ \ \ \ \ \ \ start\_of\_word\ =\ i;}
 \DoxyCodeLine{00898\ \ \ \ \ \ \ \ \ \}}
-\DoxyCodeLine{00899\ \ \ \ \ \ \ \ \ toks[tok++]\ =\ \mbox{\hyperlink{namespacevalidate__reflection_a54d4e98ade8417b88a7e3859a693630a}{line}}\ +\ start\_of\_word;}
+\DoxyCodeLine{00899\ \ \ \ \ \ \ \ \ toks[tok++]\ =\ line\ +\ start\_of\_word;}
 \DoxyCodeLine{00900\ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{break};}
 \DoxyCodeLine{00901\ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ QUOTE:}
 \DoxyCodeLine{00902\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (c\ ==\ \textcolor{charliteral}{'"{}'})\ \{}
-\DoxyCodeLine{00903\ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacevalidate__reflection_a54d4e98ade8417b88a7e3859a693630a}{line}}[i]\ =\ \textcolor{charliteral}{'\(\backslash\)0'};}
+\DoxyCodeLine{00903\ \ \ \ \ \ \ \ \ \ \ line[i]\ =\ \textcolor{charliteral}{'\(\backslash\)0'};}
 \DoxyCodeLine{00904\ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structstate}{state}}\ =\ SPACE;}
 \DoxyCodeLine{00905\ \ \ \ \ \ \ \ \ \}}
 \DoxyCodeLine{00906\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
 \DoxyCodeLine{00907\ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ WORD:}
 \DoxyCodeLine{00908\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{size\_t}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a538d097420e725c4dad63c3caa9e55bd}{j}}\ =\ 0;\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a538d097420e725c4dad63c3caa9e55bd}{j}}\ <\ strlen(space);\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a538d097420e725c4dad63c3caa9e55bd}{j}}++)\ \{}
 \DoxyCodeLine{00909\ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (c\ ==\ space[\mbox{\hyperlink{yubihsm__pkcs11_8c_a538d097420e725c4dad63c3caa9e55bd}{j}}])\ \{}
-\DoxyCodeLine{00910\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacevalidate__reflection_a54d4e98ade8417b88a7e3859a693630a}{line}}[i]\ =\ \textcolor{charliteral}{'\(\backslash\)0'};}
+\DoxyCodeLine{00910\ \ \ \ \ \ \ \ \ \ \ \ \ line[i]\ =\ \textcolor{charliteral}{'\(\backslash\)0'};}
 \DoxyCodeLine{00911\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structstate}{state}}\ =\ SPACE;}
 \DoxyCodeLine{00912\ \ \ \ \ \ \ \ \ \ \ \}}
 \DoxyCodeLine{00913\ \ \ \ \ \ \ \ \ \}}
@@ -2290,7 +2302,8 @@ Definition at line \mbox{\hyperlink{src_2main_8c_source_l00852}{852}} of file \m
 \DoxyCodeLine{00918\ \}}
 
 \end{DoxyCode}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -2323,7 +2336,7 @@ Definition at line \mbox{\hyperlink{src_2main_8c_source_l01507}{1507}} of file \
 \DoxyCodeLine{01518\ }
 \DoxyCodeLine{01519\ \ \ \textcolor{keywordtype}{bool}\ completing\_args\ =\ \textcolor{keyword}{false};}
 \DoxyCodeLine{01520\ }
-\DoxyCodeLine{01521\ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ *\mbox{\hyperlink{namespacebenchmark_compile_ad0ed96ae1454e4347ca61ac3887c379e}{args}}\ =\ \textcolor{stringliteral}{"{}"{}};}
+\DoxyCodeLine{01521\ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ *args\ =\ \textcolor{stringliteral}{"{}"{}};}
 \DoxyCodeLine{01522\ }
 \DoxyCodeLine{01523\ \ \ \mbox{\hyperlink{struct_argument}{Argument}}\ arguments[\mbox{\hyperlink{src_2main_8c_a0edb60dab8dbc580a40d8d987492631f}{MAX\_ARGUMENTS}}]\ =\ \{\{\{0\},\ 0,\ 0\}\};}
 \DoxyCodeLine{01524\ \ \ \textcolor{keywordtype}{int}\ n\_arguments\ =\ 0;}
@@ -2367,7 +2380,7 @@ Definition at line \mbox{\hyperlink{src_2main_8c_source_l01507}{1507}} of file \
 \DoxyCodeLine{01562\ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (command-\/>\mbox{\hyperlink{struct_command_a07afbf564c2e3b7b8d310e22a301dfba}{args}}\ !=\ NULL)\ \{}
 \DoxyCodeLine{01563\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{char}\ *arg\_toks[64];}
 \DoxyCodeLine{01564\ }
-\DoxyCodeLine{01565\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacebenchmark_compile_ad0ed96ae1454e4347ca61ac3887c379e}{args}}\ =\ command-\/>\mbox{\hyperlink{struct_command_a07afbf564c2e3b7b8d310e22a301dfba}{args}};}
+\DoxyCodeLine{01565\ \ \ \ \ \ \ \ \ \ \ \ \ args\ =\ command-\/>\mbox{\hyperlink{struct_command_a07afbf564c2e3b7b8d310e22a301dfba}{args}};}
 \DoxyCodeLine{01566\ \ \ \ \ \ \ \ \ \ \ \ \ strncpy(arg\_data,\ args,}
 \DoxyCodeLine{01567\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{src_2main_8c_ad9514bbc324b3ddd5f2ad47dcf4aa5e3}{ARGS\_BUFFER\_SIZE}});\ \textcolor{comment}{//\ since\ tokenize()\ modifies\ the\ buffer..}}
 \DoxyCodeLine{01568\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ num\_args\ =\ \mbox{\hyperlink{src_2main_8c_a2324bfd26dadd085f211c969ccfcabf2}{tokenize}}(arg\_data,\ arg\_toks,\ 64,\ NULL,\ NULL,\ \textcolor{stringliteral}{"{},"{}});}
@@ -2410,10 +2423,10 @@ Definition at line \mbox{\hyperlink{src_2main_8c_source_l01507}{1507}} of file \
 \DoxyCodeLine{01605\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
 \DoxyCodeLine{01606\ \ \ \ \ \ \ \}}
 \DoxyCodeLine{01607\ \ \ \ \ \ \ \textcolor{keywordflow}{while}\ (*args\ !=\ \textcolor{charliteral}{'\(\backslash\)0'}\ \&\&\ *args\ !=\ \textcolor{charliteral}{','})\ \{}
-\DoxyCodeLine{01608\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacebenchmark_compile_ad0ed96ae1454e4347ca61ac3887c379e}{args}}++;}
+\DoxyCodeLine{01608\ \ \ \ \ \ \ \ \ args++;}
 \DoxyCodeLine{01609\ \ \ \ \ \ \ \}}
 \DoxyCodeLine{01610\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (*args\ ==\ \textcolor{charliteral}{','})\ \{}
-\DoxyCodeLine{01611\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacebenchmark_compile_ad0ed96ae1454e4347ca61ac3887c379e}{args}}++;}
+\DoxyCodeLine{01611\ \ \ \ \ \ \ \ \ args++;}
 \DoxyCodeLine{01612\ \ \ \ \ \ \ \ \ i++;\ \textcolor{comment}{//\ NOTE(adma):\ next\ word}}
 \DoxyCodeLine{01613\ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
 \DoxyCodeLine{01614\ \ \ \ \ \ \ \ \ found\ =\ \textcolor{keyword}{true};}
@@ -2445,7 +2458,7 @@ Definition at line \mbox{\hyperlink{src_2main_8c_source_l01507}{1507}} of file \
 \DoxyCodeLine{01640\ \ \ \ \ \ \ strncpy(arg,\ args,\ \mbox{\hyperlink{src_2main_8c_ad9514bbc324b3ddd5f2ad47dcf4aa5e3}{ARGS\_BUFFER\_SIZE}});}
 \DoxyCodeLine{01641\ \ \ \ \ \ \ \textcolor{keywordtype}{char}\ *end\ =\ strchr(args,\ \textcolor{charliteral}{','});}
 \DoxyCodeLine{01642\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (end)\ \{}
-\DoxyCodeLine{01643\ \ \ \ \ \ \ \ \ arg[end\ -\/\ \mbox{\hyperlink{namespacebenchmark_compile_ad0ed96ae1454e4347ca61ac3887c379e}{args}}]\ =\ \textcolor{charliteral}{'\(\backslash\)0'};}
+\DoxyCodeLine{01643\ \ \ \ \ \ \ \ \ arg[end\ -\/\ args]\ =\ \textcolor{charliteral}{'\(\backslash\)0'};}
 \DoxyCodeLine{01644\ \ \ \ \ \ \ \}}
 \DoxyCodeLine{01645\ \ \ \ \ \ \ \mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{printf}}(\textcolor{stringliteral}{"{}Invalid\ argument\ \%d:\ \%s\ (\%s)\(\backslash\)n"{}},\ i,\ \mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}}[i],\ arg);}
 \DoxyCodeLine{01646\ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}\ (command\ ==\ NULL)\ \{}
@@ -2464,14 +2477,16 @@ Definition at line \mbox{\hyperlink{src_2main_8c_source_l01507}{1507}} of file \
 \DoxyCodeLine{01659\ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
 \includegraphics[width=350pt]{src_2main_8c_a29146144eaaaf11f5b49e85d4fe2bd4c_cgraph}
 \end{center}
 \end{figure}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -2614,14 +2629,16 @@ Definition at line \mbox{\hyperlink{src_2main_8c_source_l01383}{1383}} of file \
 \DoxyCodeLine{01505\ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
 \includegraphics[width=350pt]{src_2main_8c_a4f0deecffa91ccb37fdf866d83789e8c_cgraph}
 \end{center}
 \end{figure}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -2684,7 +2701,8 @@ Definition at line \mbox{\hyperlink{src_2main_8c_source_l00628}{628}} of file \m
 \DoxyCodeLine{00669\ \}}
 
 \end{DoxyCode}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -2724,7 +2742,8 @@ Definition at line \mbox{\hyperlink{src_2main_8c_source_l00595}{595}} of file \m
 \DoxyCodeLine{00613\ \}}
 
 \end{DoxyCode}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -2753,7 +2772,8 @@ Definition at line \mbox{\hyperlink{src_2main_8c_source_l00774}{774}} of file \m
 \DoxyCodeLine{00781\ \}}
 
 \end{DoxyCode}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -2782,7 +2802,8 @@ Definition at line \mbox{\hyperlink{src_2main_8c_source_l00763}{763}} of file \m
 \DoxyCodeLine{00770\ \}}
 
 \end{DoxyCode}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -2813,7 +2834,8 @@ Definition at line \mbox{\hyperlink{src_2main_8c_source_l00673}{673}} of file \m
 \DoxyCodeLine{00682\ \}}
 
 \end{DoxyCode}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -2850,7 +2872,8 @@ Definition at line \mbox{\hyperlink{src_2main_8c_source_l00783}{783}} of file \m
 \DoxyCodeLine{00798\ \}}
 
 \end{DoxyCode}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -2890,7 +2913,8 @@ Definition at line \mbox{\hyperlink{src_2main_8c_source_l00800}{800}} of file \m
 \DoxyCodeLine{00818\ \}}
 
 \end{DoxyCode}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -2943,7 +2967,7 @@ Definition at line \mbox{\hyperlink{src_2main_8c_source_l01163}{1163}} of file \
 \DoxyCodeLine{01194\ \ \ \ \ \textcolor{keywordtype}{int}\ i\ =\ 0;}
 \DoxyCodeLine{01195\ \ \ \ \ \mbox{\hyperlink{struct_command}{Command}}\ *command\ =\ \mbox{\hyperlink{src_2main_8c_a872d1e0eb3ee3fb13c651a1a0a8fbeb3}{g\_commands}};}
 \DoxyCodeLine{01196\ \ \ \ \ \mbox{\hyperlink{struct_command}{Command}}\ *to\_complete\ =\ NULL;}
-\DoxyCodeLine{01197\ \ \ \ \ \textcolor{keywordtype}{char}\ *\mbox{\hyperlink{namespacebenchmark_compile_ad0ed96ae1454e4347ca61ac3887c379e}{args}}\ =\ \textcolor{stringliteral}{"{}"{}};}
+\DoxyCodeLine{01197\ \ \ \ \ \textcolor{keywordtype}{char}\ *args\ =\ \textcolor{stringliteral}{"{}"{}};}
 \DoxyCodeLine{01198\ }
 \DoxyCodeLine{01199\ \ \ \ \ \textcolor{keywordtype}{bool}\ completing\_args\ =\ \textcolor{keyword}{false};}
 \DoxyCodeLine{01200\ }
@@ -2963,7 +2987,7 @@ Definition at line \mbox{\hyperlink{src_2main_8c_source_l01163}{1163}} of file \
 \DoxyCodeLine{01214\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ NOTE(adma):\ start\ matching\ arguments\ otherwise}}
 \DoxyCodeLine{01215\ \ \ \ \ \ \ \ \ \ \ \ \ completing\_args\ =\ \textcolor{keyword}{true};}
 \DoxyCodeLine{01216\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (command-\/>\mbox{\hyperlink{struct_command_a07afbf564c2e3b7b8d310e22a301dfba}{args}}\ !=\ NULL)\ \{}
-\DoxyCodeLine{01217\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacebenchmark_compile_ad0ed96ae1454e4347ca61ac3887c379e}{args}}\ =\ command-\/>\mbox{\hyperlink{struct_command_a07afbf564c2e3b7b8d310e22a301dfba}{args}};}
+\DoxyCodeLine{01217\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ args\ =\ command-\/>\mbox{\hyperlink{struct_command_a07afbf564c2e3b7b8d310e22a301dfba}{args}};}
 \DoxyCodeLine{01218\ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
 \DoxyCodeLine{01219\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ NOTE(adma):\ there\ are\ no\ args\ for\ this\ command}}
 \DoxyCodeLine{01220\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
@@ -2980,10 +3004,10 @@ Definition at line \mbox{\hyperlink{src_2main_8c_source_l01163}{1163}} of file \
 \DoxyCodeLine{01231\ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
 \DoxyCodeLine{01232\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ NOTE(adma):\ match\ arguments}}
 \DoxyCodeLine{01233\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{while}\ (*args\ !=\ \textcolor{charliteral}{'\(\backslash\)0'}\ \&\&\ *args\ !=\ \textcolor{charliteral}{','})\ \{}
-\DoxyCodeLine{01234\ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacebenchmark_compile_ad0ed96ae1454e4347ca61ac3887c379e}{args}}++;}
+\DoxyCodeLine{01234\ \ \ \ \ \ \ \ \ \ \ args++;}
 \DoxyCodeLine{01235\ \ \ \ \ \ \ \ \ \}}
 \DoxyCodeLine{01236\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (*args\ ==\ \textcolor{charliteral}{','})\ \{}
-\DoxyCodeLine{01237\ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacebenchmark_compile_ad0ed96ae1454e4347ca61ac3887c379e}{args}}++;}
+\DoxyCodeLine{01237\ \ \ \ \ \ \ \ \ \ \ args++;}
 \DoxyCodeLine{01238\ \ \ \ \ \ \ \ \ \ \ i++;\ \textcolor{comment}{//\ NOTE(adma):\ next\ word}}
 \DoxyCodeLine{01239\ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
 \DoxyCodeLine{01240\ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
@@ -3028,14 +3052,16 @@ Definition at line \mbox{\hyperlink{src_2main_8c_source_l01163}{1163}} of file \
 \DoxyCodeLine{01279\ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
 \includegraphics[width=350pt]{src_2main_8c_addae6d2b1863758ac22b845a1fada92b_cgraph}
 \end{center}
 \end{figure}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode

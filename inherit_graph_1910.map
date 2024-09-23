@@ -1,3 +1,7 @@
 <map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
-<area shape="rect" id="Node000000" href="$structsysio_1_1state__history_1_1get__blocks__request__v0.html" title=" " alt="" coords="5,5,169,46"/>
+<area shape="rect" id="Node000000" href="$classsysio_1_1testing_1_1base__tester.html" title=" " alt="" coords="5,27,141,68"/>
+<area shape="rect" id="Node000001" href="$classsysio_1_1testing_1_1tester.html" title="provides utility function to simplify the creation of unit tests" alt="" coords="200,5,340,31"/>
+<area shape="poly" id="edge624_Node000000_Node000001" title=" " alt="" coords="156,33,199,26,200,31,156,38"/>
+<area shape="rect" id="Node000002" href="$classsysio_1_1testing_1_1validating__tester.html" title=" " alt="" coords="189,55,351,96"/>
+<area shape="poly" id="edge625_Node000000_Node000002" title=" " alt="" coords="156,57,189,61,188,67,156,62"/>
 </map>

@@ -562,7 +562,7 @@ template&lt;<a class="el" href="yubihsm__pkcs11_8c.html#a53ef06e29c840024a683512
 
 <p class="definition">Definition at line <a class="el" href="container__detail_8hpp_source.html#l00146">146</a> of file <a class="el" href="container__detail_8hpp_source.html">container_detail.hpp</a>.</p>
 <div class="fragment"><div class="line"><span class="lineno">  146</span>                                                                            {</div>
-<div class="line"><span class="lineno">  147</span>         <span class="keyword">const</span> <a class="code hl_typedef" href="namespacefc.html#a9148361f6aaa3d739990a75ac557fe59">variants</a>&amp; vars = v.get_array();</div>
+<div class="line"><span class="lineno">  147</span>         <span class="keyword">const</span> <a class="code hl_typedef" href="namespacefc.html#a9148361f6aaa3d739990a75ac557fe59">variants</a>&amp; vars = v.<a class="code hl_function" href="classfc_1_1variant.html#aea83c87e4e1b1e185f57717b4bd683a5">get_array</a>();</div>
 <div class="line"><span class="lineno">  148</span>         <a class="code hl_define" href="exception_8hpp.html#abed525eeff3ae581be7e4e2fcd3b7bf4">FC_ASSERT</a>( vars.size() &lt;= <a class="code hl_define" href="utility_8hpp.html#ad647a8ed8233ea2357905dde291af0f6">MAX_NUM_ARRAY_ELEMENTS</a> );</div>
 <div class="line"><span class="lineno">  149</span>         m.clear();</div>
 <div class="line"><span class="lineno">  150</span>         m.reserve( vars.size() );</div>
@@ -572,6 +572,7 @@ template&lt;<a class="el" href="yubihsm__pkcs11_8c.html#a53ef06e29c840024a683512
 <div class="line"><span class="lineno">  154</span>            m.insert( m.end(), std::move(item) );</div>
 <div class="line"><span class="lineno">  155</span>         }</div>
 <div class="line"><span class="lineno">  156</span>      }</div>
+<div class="ttc" id="aclassfc_1_1variant_html_aea83c87e4e1b1e185f57717b4bd683a5"><div class="ttname"><a href="classfc_1_1variant.html#aea83c87e4e1b1e185f57717b4bd683a5">fc::variant::get_array</a></div><div class="ttdeci">variants &amp; get_array()</div><div class="ttdef"><b>Definition</b> <a href="variant_8cpp_source.html#l00496">variant.cpp:496</a></div></div>
 <div class="ttc" id="anamespacefc_html_a9148361f6aaa3d739990a75ac557fe59"><div class="ttname"><a href="namespacefc.html#a9148361f6aaa3d739990a75ac557fe59">fc::variants</a></div><div class="ttdeci">std::vector&lt; fc::variant &gt; variants</div><div class="ttdef"><b>Definition</b> <a href="fc_2include_2fc_2variant_8hpp_source.html#l00173">variant.hpp:173</a></div></div>
 <div class="ttc" id="autility_8hpp_html_ad647a8ed8233ea2357905dde291af0f6"><div class="ttname"><a href="utility_8hpp.html#ad647a8ed8233ea2357905dde291af0f6">MAX_NUM_ARRAY_ELEMENTS</a></div><div class="ttdeci">#define MAX_NUM_ARRAY_ELEMENTS</div><div class="ttdef"><b>Definition</b> <a href="utility_8hpp_source.html#l00018">utility.hpp:18</a></div></div>
 </div><!-- fragment --><div class="dynheader">
@@ -579,11 +580,15 @@ Here is the call graph for this function:</div>
 <div class="dyncontent">
 <div class="center"><img src="namespacefc_1_1detail_ae15014210380e1f1689d08732f35e288_cgraph.png" border="0" usemap="#anamespacefc_1_1detail_ae15014210380e1f1689d08732f35e288_cgraph" alt=""/></div>
 <map name="anamespacefc_1_1detail_ae15014210380e1f1689d08732f35e288_cgraph" id="anamespacefc_1_1detail_ae15014210380e1f1689d08732f35e288_cgraph">
-<area shape="rect" title=" " alt="" coords="5,13,157,54"/>
+<area shape="rect" title=" " alt="" coords="5,46,157,87"/>
 <area shape="rect" href="namespacefc_1_1detail.html#abc084808b8a1de1231a150b9a720e014" title=" " alt="" coords="205,5,361,61"/>
-<area shape="poly" title=" " alt="" coords="157,30,189,30,189,36,157,36"/>
+<area shape="poly" title=" " alt="" coords="157,51,189,46,190,51,158,57"/>
+<area shape="rect" href="classfc_1_1variant.html#aea83c87e4e1b1e185f57717b4bd683a5" title=" " alt="" coords="212,86,354,111"/>
+<area shape="poly" title=" " alt="" coords="157,76,197,82,196,88,157,81"/>
 <area shape="rect" href="namespacefc_1_1detail.html#a96db523ac0dda6593bfb5bf0b2e8bac9" title=" " alt="" coords="409,5,584,61"/>
 <area shape="poly" title=" " alt="" coords="362,30,394,30,394,36,362,36"/>
+<area shape="rect" href="classfc_1_1variant.html#afaae1df286ff97c83301eda21dbd51ea" title=" " alt="" coords="428,86,565,111"/>
+<area shape="poly" title=" " alt="" coords="354,96,412,96,412,101,354,101"/>
 </map>
 </div>
 <div class="dynheader">
@@ -624,7 +629,7 @@ template&lt;<a class="el" href="yubihsm__pkcs11_8c.html#a53ef06e29c840024a683512
 
 <p class="definition">Definition at line <a class="el" href="container__detail_8hpp_source.html#l00110">110</a> of file <a class="el" href="container__detail_8hpp_source.html">container_detail.hpp</a>.</p>
 <div class="fragment"><div class="line"><span class="lineno">  110</span>                                                                             {</div>
-<div class="line"><span class="lineno">  111</span>         <span class="keyword">const</span> <a class="code hl_typedef" href="namespacefc.html#a9148361f6aaa3d739990a75ac557fe59">variants</a>&amp; vars = v.get_array();</div>
+<div class="line"><span class="lineno">  111</span>         <span class="keyword">const</span> <a class="code hl_typedef" href="namespacefc.html#a9148361f6aaa3d739990a75ac557fe59">variants</a>&amp; vars = v.<a class="code hl_function" href="classfc_1_1variant.html#aea83c87e4e1b1e185f57717b4bd683a5">get_array</a>();</div>
 <div class="line"><span class="lineno">  112</span>         <a class="code hl_define" href="exception_8hpp.html#abed525eeff3ae581be7e4e2fcd3b7bf4">FC_ASSERT</a>( vars.size() &lt;= <a class="code hl_define" href="utility_8hpp.html#ad647a8ed8233ea2357905dde291af0f6">MAX_NUM_ARRAY_ELEMENTS</a> );</div>
 <div class="line"><span class="lineno">  113</span>         <a class="code hl_variable" href="yubihsm__pkcs11_8c.html#a506da415c9307c897ca9be93acfe1d0f">s</a>.clear();</div>
 <div class="line"><span class="lineno">  114</span>         <a class="code hl_variable" href="yubihsm__pkcs11_8c.html#a506da415c9307c897ca9be93acfe1d0f">s</a>.reserve( vars.size() );</div>
@@ -640,9 +645,13 @@ Here is the call graph for this function:</div>
 <div class="dyncontent">
 <div class="center"><img src="namespacefc_1_1detail_aa7d8883006fddcbdd2c956635ea15dca_cgraph.png" border="0" usemap="#anamespacefc_1_1detail_aa7d8883006fddcbdd2c956635ea15dca_cgraph" alt=""/></div>
 <map name="anamespacefc_1_1detail_aa7d8883006fddcbdd2c956635ea15dca_cgraph" id="anamespacefc_1_1detail_aa7d8883006fddcbdd2c956635ea15dca_cgraph">
-<area shape="rect" title=" " alt="" coords="5,5,157,46"/>
+<area shape="rect" title=" " alt="" coords="5,35,157,75"/>
 <area shape="rect" href="namespacefc_1_1detail.html#a7a3cca8250a11a9085badcf3264ac9d6" title=" " alt="" coords="205,5,359,46"/>
-<area shape="poly" title=" " alt="" coords="157,23,189,23,189,28,157,28"/>
+<area shape="poly" title=" " alt="" coords="157,41,189,37,190,42,158,47"/>
+<area shape="rect" href="classfc_1_1variant.html#aea83c87e4e1b1e185f57717b4bd683a5" title=" " alt="" coords="211,70,352,96"/>
+<area shape="poly" title=" " alt="" coords="158,63,196,68,195,74,157,68"/>
+<area shape="rect" href="classfc_1_1variant.html#afaae1df286ff97c83301eda21dbd51ea" title=" " alt="" coords="407,70,544,96"/>
+<area shape="poly" title=" " alt="" coords="353,80,391,80,391,86,353,86"/>
 </map>
 </div>
 <div class="dynheader">
@@ -683,7 +692,7 @@ template&lt;<a class="el" href="yubihsm__pkcs11_8c.html#a53ef06e29c840024a683512
 
 <p class="definition">Definition at line <a class="el" href="container__detail_8hpp_source.html#l00134">134</a> of file <a class="el" href="container__detail_8hpp_source.html">container_detail.hpp</a>.</p>
 <div class="fragment"><div class="line"><span class="lineno">  134</span>                                                                       {</div>
-<div class="line"><span class="lineno">  135</span>         <span class="keyword">const</span> <a class="code hl_typedef" href="namespacefc.html#a9148361f6aaa3d739990a75ac557fe59">variants</a>&amp; vars = v.get_array();</div>
+<div class="line"><span class="lineno">  135</span>         <span class="keyword">const</span> <a class="code hl_typedef" href="namespacefc.html#a9148361f6aaa3d739990a75ac557fe59">variants</a>&amp; vars = v.<a class="code hl_function" href="classfc_1_1variant.html#aea83c87e4e1b1e185f57717b4bd683a5">get_array</a>();</div>
 <div class="line"><span class="lineno">  136</span>         <a class="code hl_define" href="exception_8hpp.html#abed525eeff3ae581be7e4e2fcd3b7bf4">FC_ASSERT</a>( vars.size() &lt;= <a class="code hl_define" href="utility_8hpp.html#ad647a8ed8233ea2357905dde291af0f6">MAX_NUM_ARRAY_ELEMENTS</a> );</div>
 <div class="line"><span class="lineno">  137</span>         m.clear();</div>
 <div class="line"><span class="lineno">  138</span>         <span class="keywordflow">for</span>( <span class="keyword">const</span> <span class="keyword">auto</span>&amp; var : vars ) {</div>
@@ -697,11 +706,15 @@ Here is the call graph for this function:</div>
 <div class="dyncontent">
 <div class="center"><img src="namespacefc_1_1detail_adb742953371a65a8ab0f98cdee44dba8_cgraph.png" border="0" usemap="#anamespacefc_1_1detail_adb742953371a65a8ab0f98cdee44dba8_cgraph" alt=""/></div>
 <map name="anamespacefc_1_1detail_adb742953371a65a8ab0f98cdee44dba8_cgraph" id="anamespacefc_1_1detail_adb742953371a65a8ab0f98cdee44dba8_cgraph">
-<area shape="rect" title=" " alt="" coords="5,13,157,54"/>
+<area shape="rect" title=" " alt="" coords="5,46,157,87"/>
 <area shape="rect" href="namespacefc_1_1detail.html#abc084808b8a1de1231a150b9a720e014" title=" " alt="" coords="205,5,361,61"/>
-<area shape="poly" title=" " alt="" coords="157,30,189,30,189,36,157,36"/>
+<area shape="poly" title=" " alt="" coords="157,51,189,46,190,51,158,57"/>
+<area shape="rect" href="classfc_1_1variant.html#aea83c87e4e1b1e185f57717b4bd683a5" title=" " alt="" coords="212,86,354,111"/>
+<area shape="poly" title=" " alt="" coords="157,76,197,82,196,88,157,81"/>
 <area shape="rect" href="namespacefc_1_1detail.html#a96db523ac0dda6593bfb5bf0b2e8bac9" title=" " alt="" coords="409,5,584,61"/>
 <area shape="poly" title=" " alt="" coords="362,30,394,30,394,36,362,36"/>
+<area shape="rect" href="classfc_1_1variant.html#afaae1df286ff97c83301eda21dbd51ea" title=" " alt="" coords="428,86,565,111"/>
+<area shape="poly" title=" " alt="" coords="354,96,412,96,412,101,354,101"/>
 </map>
 </div>
 <div class="dynheader">
@@ -742,7 +755,7 @@ template&lt;<a class="el" href="yubihsm__pkcs11_8c.html#a53ef06e29c840024a683512
 
 <p class="definition">Definition at line <a class="el" href="container__detail_8hpp_source.html#l00098">98</a> of file <a class="el" href="container__detail_8hpp_source.html">container_detail.hpp</a>.</p>
 <div class="fragment"><div class="line"><span class="lineno">   98</span>                                                                        {</div>
-<div class="line"><span class="lineno">   99</span>         <span class="keyword">const</span> <a class="code hl_typedef" href="namespacefc.html#a9148361f6aaa3d739990a75ac557fe59">variants</a>&amp; vars = v.get_array();</div>
+<div class="line"><span class="lineno">   99</span>         <span class="keyword">const</span> <a class="code hl_typedef" href="namespacefc.html#a9148361f6aaa3d739990a75ac557fe59">variants</a>&amp; vars = v.<a class="code hl_function" href="classfc_1_1variant.html#aea83c87e4e1b1e185f57717b4bd683a5">get_array</a>();</div>
 <div class="line"><span class="lineno">  100</span>         <a class="code hl_define" href="exception_8hpp.html#abed525eeff3ae581be7e4e2fcd3b7bf4">FC_ASSERT</a>( vars.size() &lt;= <a class="code hl_define" href="utility_8hpp.html#ad647a8ed8233ea2357905dde291af0f6">MAX_NUM_ARRAY_ELEMENTS</a> );</div>
 <div class="line"><span class="lineno">  101</span>         <a class="code hl_variable" href="yubihsm__pkcs11_8c.html#a506da415c9307c897ca9be93acfe1d0f">s</a>.clear();</div>
 <div class="line"><span class="lineno">  102</span>         <span class="keywordflow">for</span>( <span class="keyword">const</span> <span class="keyword">auto</span>&amp; var : vars ) {</div>
@@ -756,9 +769,13 @@ Here is the call graph for this function:</div>
 <div class="dyncontent">
 <div class="center"><img src="namespacefc_1_1detail_af8f1d1a22af22e027b668cfe748cf5e6_cgraph.png" border="0" usemap="#anamespacefc_1_1detail_af8f1d1a22af22e027b668cfe748cf5e6_cgraph" alt=""/></div>
 <map name="anamespacefc_1_1detail_af8f1d1a22af22e027b668cfe748cf5e6_cgraph" id="anamespacefc_1_1detail_af8f1d1a22af22e027b668cfe748cf5e6_cgraph">
-<area shape="rect" title=" " alt="" coords="5,5,157,46"/>
+<area shape="rect" title=" " alt="" coords="5,35,157,75"/>
 <area shape="rect" href="namespacefc_1_1detail.html#a7a3cca8250a11a9085badcf3264ac9d6" title=" " alt="" coords="205,5,359,46"/>
-<area shape="poly" title=" " alt="" coords="157,23,189,23,189,28,157,28"/>
+<area shape="poly" title=" " alt="" coords="157,41,189,37,190,42,158,47"/>
+<area shape="rect" href="classfc_1_1variant.html#aea83c87e4e1b1e185f57717b4bd683a5" title=" " alt="" coords="211,70,352,96"/>
+<area shape="poly" title=" " alt="" coords="158,63,196,68,195,74,157,68"/>
+<area shape="rect" href="classfc_1_1variant.html#afaae1df286ff97c83301eda21dbd51ea" title=" " alt="" coords="407,70,544,96"/>
+<area shape="poly" title=" " alt="" coords="353,80,391,80,391,86,353,86"/>
 </map>
 </div>
 <div class="dynheader">

@@ -1,9 +1,0 @@
-<map id="cpp.ast.TypeConverter.DeclarationToParts" name="cpp.ast.TypeConverter.DeclarationToParts">
-<area shape="rect" id="Node000001" title=" " alt="" coords="5,5,228,46"/>
-<area shape="rect" id="Node000002" href="$classcpp_1_1ast_1_1_type_converter.html#addae0e30b289a768cc9fa1e7e5740b2a" title=" " alt="" coords="522,5,678,46"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="228,14,276,11,375,8,474,11,507,13,507,18,474,16,375,13,276,16,228,19"/>
-<area shape="rect" id="Node000003" href="$classcpp_1_1ast_1_1_type_converter.html#a7742fbf10acd32ae2931a2c6c2813a6d" title=" " alt="" coords="276,50,474,76"/>
-<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="228,39,266,45,266,50,228,44"/>
-<area shape="poly" id="edge3_Node000003_Node000002" title=" " alt="" coords="456,47,506,39,507,44,457,52"/>
-<area shape="poly" id="edge4_Node000003_Node000003" title=" " alt="" coords="337,51,330,42,334,32,350,26,375,24,402,26,416,33,414,38,401,31,375,29,351,31,338,36,335,41,342,48"/>
-</map>

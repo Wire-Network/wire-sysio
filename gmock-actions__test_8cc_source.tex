@@ -559,15 +559,15 @@
 \DoxyCodeLine{\Hypertarget{gmock-actions__test_8cc_source_l00555}00555\ \textcolor{comment}{//\ Test\ struct\ which\ wraps\ a\ vector\ of\ integers.\ Used\ in}}
 \DoxyCodeLine{\Hypertarget{gmock-actions__test_8cc_source_l00556}00556\ \textcolor{comment}{//\ 'SupportsWrapperReturnType'\ test.}}
 \DoxyCodeLine{\Hypertarget{gmock-actions__test_8cc_source_l00557}00557\ \textcolor{keyword}{struct\ }IntegerVectorWrapper\ \{}
-\DoxyCodeLine{\Hypertarget{gmock-actions__test_8cc_source_l00558}00558\ \ \ std::vector<int>\ *\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}};}
-\DoxyCodeLine{\Hypertarget{gmock-actions__test_8cc_source_l00559}00559\ \ \ IntegerVectorWrapper(std::vector<int>\&\ \_v)\ :\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}(\&\_v)\ \{\}\ \ \textcolor{comment}{//\ NOLINT}}
+\DoxyCodeLine{\Hypertarget{gmock-actions__test_8cc_source_l00558}00558\ \ \ std::vector<int>\ *\ v;}
+\DoxyCodeLine{\Hypertarget{gmock-actions__test_8cc_source_l00559}00559\ \ \ IntegerVectorWrapper(std::vector<int>\&\ \_v)\ :\ v(\&\_v)\ \{\}\ \ \textcolor{comment}{//\ NOLINT}}
 \DoxyCodeLine{\Hypertarget{gmock-actions__test_8cc_source_l00560}00560\ \};}
 \DoxyCodeLine{\Hypertarget{gmock-actions__test_8cc_source_l00561}00561\ }
 \DoxyCodeLine{\Hypertarget{gmock-actions__test_8cc_source_l00562}00562\ \textcolor{comment}{//\ Tests\ that\ Return()\ works\ when\ return\ type\ is\ a\ wrapper\ type.}}
 \DoxyCodeLine{\Hypertarget{gmock-actions__test_8cc_source_l00563}00563\ \mbox{\hyperlink{gtest_8h_ad8b332753515c0ab8baada563c2547eb}{TEST}}(ReturnTest,\ SupportsWrapperReturnType)\ \{}
 \DoxyCodeLine{\Hypertarget{gmock-actions__test_8cc_source_l00564}00564\ \ \ \textcolor{comment}{//\ Initialize\ vector\ of\ integers.}}
-\DoxyCodeLine{\Hypertarget{gmock-actions__test_8cc_source_l00565}00565\ \ \ std::vector<int>\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}};}
-\DoxyCodeLine{\Hypertarget{gmock-actions__test_8cc_source_l00566}00566\ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{int}\ i\ =\ 0;\ i\ <\ 5;\ ++i)\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.push\_back(i);}
+\DoxyCodeLine{\Hypertarget{gmock-actions__test_8cc_source_l00565}00565\ \ \ std::vector<int>\ v;}
+\DoxyCodeLine{\Hypertarget{gmock-actions__test_8cc_source_l00566}00566\ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{int}\ i\ =\ 0;\ i\ <\ 5;\ ++i)\ v.push\_back(i);}
 \DoxyCodeLine{\Hypertarget{gmock-actions__test_8cc_source_l00567}00567\ }
 \DoxyCodeLine{\Hypertarget{gmock-actions__test_8cc_source_l00568}00568\ \ \ \textcolor{comment}{//\ Return()\ called\ with\ 'v'\ as\ argument.\ The\ Action\ will\ return\ the\ same\ data}}
 \DoxyCodeLine{\Hypertarget{gmock-actions__test_8cc_source_l00569}00569\ \ \ \textcolor{comment}{//\ as\ 'v'\ (copy)\ but\ it\ will\ be\ wrapped\ in\ an\ IntegerVectorWrapper.}}
@@ -916,7 +916,7 @@
 \DoxyCodeLine{\Hypertarget{gmock-actions__test_8cc_source_l00912}00912\ \ \ \textcolor{comment}{//\ action.}}
 \DoxyCodeLine{\Hypertarget{gmock-actions__test_8cc_source_l00913}00913\ \ \ \textcolor{keyword}{delete}\ msg;}
 \DoxyCodeLine{\Hypertarget{gmock-actions__test_8cc_source_l00914}00914\ }
-\DoxyCodeLine{\Hypertarget{gmock-actions__test_8cc_source_l00915}00915\ \ \ TestMessage\ \mbox{\hyperlink{namespaceupload_a770d9c7b49b1fede80de6078d5e49af7}{dest}};}
+\DoxyCodeLine{\Hypertarget{gmock-actions__test_8cc_source_l00915}00915\ \ \ TestMessage\ dest;}
 \DoxyCodeLine{\Hypertarget{gmock-actions__test_8cc_source_l00916}00916\ \ \ \mbox{\hyperlink{gtest_8h_aeb6c7ae89f440c90c1a1815951c836da}{EXPECT\_FALSE}}(orig\_msg.Equals(dest));}
 \DoxyCodeLine{\Hypertarget{gmock-actions__test_8cc_source_l00917}00917\ \ \ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}.Perform(make\_tuple(\textcolor{keyword}{true},\ \&dest));}
 \DoxyCodeLine{\Hypertarget{gmock-actions__test_8cc_source_l00918}00918\ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(orig\_msg.Equals(dest));}
@@ -938,8 +938,8 @@
 \DoxyCodeLine{\Hypertarget{gmock-actions__test_8cc_source_l00934}00934\ \ \ \textcolor{comment}{//\ action.}}
 \DoxyCodeLine{\Hypertarget{gmock-actions__test_8cc_source_l00935}00935\ \ \ \textcolor{keyword}{delete}\ msg;}
 \DoxyCodeLine{\Hypertarget{gmock-actions__test_8cc_source_l00936}00936\ }
-\DoxyCodeLine{\Hypertarget{gmock-actions__test_8cc_source_l00937}00937\ \ \ TestMessage\ \mbox{\hyperlink{namespaceupload_a770d9c7b49b1fede80de6078d5e49af7}{dest}};}
-\DoxyCodeLine{\Hypertarget{gmock-actions__test_8cc_source_l00938}00938\ \ \ ::ProtocolMessage*\ \textcolor{keyword}{const}\ dest\_base\ =\ \&\mbox{\hyperlink{namespaceupload_a770d9c7b49b1fede80de6078d5e49af7}{dest}};}
+\DoxyCodeLine{\Hypertarget{gmock-actions__test_8cc_source_l00937}00937\ \ \ TestMessage\ dest;}
+\DoxyCodeLine{\Hypertarget{gmock-actions__test_8cc_source_l00938}00938\ \ \ ::ProtocolMessage*\ \textcolor{keyword}{const}\ dest\_base\ =\ \&dest;}
 \DoxyCodeLine{\Hypertarget{gmock-actions__test_8cc_source_l00939}00939\ \ \ \mbox{\hyperlink{gtest_8h_aeb6c7ae89f440c90c1a1815951c836da}{EXPECT\_FALSE}}(orig\_msg.Equals(dest));}
 \DoxyCodeLine{\Hypertarget{gmock-actions__test_8cc_source_l00940}00940\ \ \ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}.Perform(make\_tuple(\textcolor{keyword}{true},\ dest\_base));}
 \DoxyCodeLine{\Hypertarget{gmock-actions__test_8cc_source_l00941}00941\ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(orig\_msg.Equals(dest));}
@@ -963,11 +963,11 @@
 \DoxyCodeLine{\Hypertarget{gmock-actions__test_8cc_source_l00959}00959\ \ \ \textcolor{comment}{//\ before\ using\ the\ action.}}
 \DoxyCodeLine{\Hypertarget{gmock-actions__test_8cc_source_l00960}00960\ \ \ \textcolor{keyword}{delete}\ msg;}
 \DoxyCodeLine{\Hypertarget{gmock-actions__test_8cc_source_l00961}00961\ }
-\DoxyCodeLine{\Hypertarget{gmock-actions__test_8cc_source_l00962}00962\ \ \ FooMessage\ \mbox{\hyperlink{namespaceupload_a770d9c7b49b1fede80de6078d5e49af7}{dest}};}
-\DoxyCodeLine{\Hypertarget{gmock-actions__test_8cc_source_l00963}00963\ \ \ \mbox{\hyperlink{namespaceupload_a770d9c7b49b1fede80de6078d5e49af7}{dest}}.set\_int\_field(0);}
+\DoxyCodeLine{\Hypertarget{gmock-actions__test_8cc_source_l00962}00962\ \ \ FooMessage\ dest;}
+\DoxyCodeLine{\Hypertarget{gmock-actions__test_8cc_source_l00963}00963\ \ \ dest.set\_int\_field(0);}
 \DoxyCodeLine{\Hypertarget{gmock-actions__test_8cc_source_l00964}00964\ \ \ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}.Perform(make\_tuple(\textcolor{keyword}{true},\ \&dest));}
-\DoxyCodeLine{\Hypertarget{gmock-actions__test_8cc_source_l00965}00965\ \ \ \mbox{\hyperlink{gtest_8h_a4159019abda84f5366acdb7604ff220a}{EXPECT\_EQ}}(2,\ \mbox{\hyperlink{namespaceupload_a770d9c7b49b1fede80de6078d5e49af7}{dest}}.int\_field());}
-\DoxyCodeLine{\Hypertarget{gmock-actions__test_8cc_source_l00966}00966\ \ \ \mbox{\hyperlink{gtest_8h_a4159019abda84f5366acdb7604ff220a}{EXPECT\_EQ}}(\textcolor{stringliteral}{"{}hi"{}},\ \mbox{\hyperlink{namespaceupload_a770d9c7b49b1fede80de6078d5e49af7}{dest}}.string\_field());}
+\DoxyCodeLine{\Hypertarget{gmock-actions__test_8cc_source_l00965}00965\ \ \ \mbox{\hyperlink{gtest_8h_a4159019abda84f5366acdb7604ff220a}{EXPECT\_EQ}}(2,\ dest.int\_field());}
+\DoxyCodeLine{\Hypertarget{gmock-actions__test_8cc_source_l00966}00966\ \ \ \mbox{\hyperlink{gtest_8h_a4159019abda84f5366acdb7604ff220a}{EXPECT\_EQ}}(\textcolor{stringliteral}{"{}hi"{}},\ dest.string\_field());}
 \DoxyCodeLine{\Hypertarget{gmock-actions__test_8cc_source_l00967}00967\ \}}
 \DoxyCodeLine{\Hypertarget{gmock-actions__test_8cc_source_l00968}00968\ }
 \DoxyCodeLine{\Hypertarget{gmock-actions__test_8cc_source_l00969}00969\ \textcolor{comment}{//\ Tests\ that\ SetArgPointee<N>(proto2\_buffer)\ sets\ the}}
@@ -988,12 +988,12 @@
 \DoxyCodeLine{\Hypertarget{gmock-actions__test_8cc_source_l00984}00984\ \ \ \textcolor{comment}{//\ before\ using\ the\ action.}}
 \DoxyCodeLine{\Hypertarget{gmock-actions__test_8cc_source_l00985}00985\ \ \ \textcolor{keyword}{delete}\ msg;}
 \DoxyCodeLine{\Hypertarget{gmock-actions__test_8cc_source_l00986}00986\ }
-\DoxyCodeLine{\Hypertarget{gmock-actions__test_8cc_source_l00987}00987\ \ \ FooMessage\ \mbox{\hyperlink{namespaceupload_a770d9c7b49b1fede80de6078d5e49af7}{dest}};}
-\DoxyCodeLine{\Hypertarget{gmock-actions__test_8cc_source_l00988}00988\ \ \ \mbox{\hyperlink{namespaceupload_a770d9c7b49b1fede80de6078d5e49af7}{dest}}.set\_int\_field(0);}
-\DoxyCodeLine{\Hypertarget{gmock-actions__test_8cc_source_l00989}00989\ \ \ ::proto2::Message*\ \textcolor{keyword}{const}\ dest\_base\ =\ \&\mbox{\hyperlink{namespaceupload_a770d9c7b49b1fede80de6078d5e49af7}{dest}};}
+\DoxyCodeLine{\Hypertarget{gmock-actions__test_8cc_source_l00987}00987\ \ \ FooMessage\ dest;}
+\DoxyCodeLine{\Hypertarget{gmock-actions__test_8cc_source_l00988}00988\ \ \ dest.set\_int\_field(0);}
+\DoxyCodeLine{\Hypertarget{gmock-actions__test_8cc_source_l00989}00989\ \ \ ::proto2::Message*\ \textcolor{keyword}{const}\ dest\_base\ =\ \&dest;}
 \DoxyCodeLine{\Hypertarget{gmock-actions__test_8cc_source_l00990}00990\ \ \ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}.Perform(make\_tuple(\textcolor{keyword}{true},\ dest\_base));}
-\DoxyCodeLine{\Hypertarget{gmock-actions__test_8cc_source_l00991}00991\ \ \ \mbox{\hyperlink{gtest_8h_a4159019abda84f5366acdb7604ff220a}{EXPECT\_EQ}}(2,\ \mbox{\hyperlink{namespaceupload_a770d9c7b49b1fede80de6078d5e49af7}{dest}}.int\_field());}
-\DoxyCodeLine{\Hypertarget{gmock-actions__test_8cc_source_l00992}00992\ \ \ \mbox{\hyperlink{gtest_8h_a4159019abda84f5366acdb7604ff220a}{EXPECT\_EQ}}(\textcolor{stringliteral}{"{}hi"{}},\ \mbox{\hyperlink{namespaceupload_a770d9c7b49b1fede80de6078d5e49af7}{dest}}.string\_field());}
+\DoxyCodeLine{\Hypertarget{gmock-actions__test_8cc_source_l00991}00991\ \ \ \mbox{\hyperlink{gtest_8h_a4159019abda84f5366acdb7604ff220a}{EXPECT\_EQ}}(2,\ dest.int\_field());}
+\DoxyCodeLine{\Hypertarget{gmock-actions__test_8cc_source_l00992}00992\ \ \ \mbox{\hyperlink{gtest_8h_a4159019abda84f5366acdb7604ff220a}{EXPECT\_EQ}}(\textcolor{stringliteral}{"{}hi"{}},\ dest.string\_field());}
 \DoxyCodeLine{\Hypertarget{gmock-actions__test_8cc_source_l00993}00993\ \}}
 \DoxyCodeLine{\Hypertarget{gmock-actions__test_8cc_source_l00994}00994\ }
 \DoxyCodeLine{\Hypertarget{gmock-actions__test_8cc_source_l00995}00995\ \textcolor{preprocessor}{\#endif\ \ }\textcolor{comment}{//\ GTEST\_HAS\_PROTOBUF\_}}
@@ -1035,7 +1035,7 @@
 \DoxyCodeLine{\Hypertarget{gmock-actions__test_8cc_source_l01031}01031\ \ \ \textcolor{comment}{//\ action.}}
 \DoxyCodeLine{\Hypertarget{gmock-actions__test_8cc_source_l01032}01032\ \ \ \textcolor{keyword}{delete}\ msg;}
 \DoxyCodeLine{\Hypertarget{gmock-actions__test_8cc_source_l01033}01033\ }
-\DoxyCodeLine{\Hypertarget{gmock-actions__test_8cc_source_l01034}01034\ \ \ TestMessage\ \mbox{\hyperlink{namespaceupload_a770d9c7b49b1fede80de6078d5e49af7}{dest}};}
+\DoxyCodeLine{\Hypertarget{gmock-actions__test_8cc_source_l01034}01034\ \ \ TestMessage\ dest;}
 \DoxyCodeLine{\Hypertarget{gmock-actions__test_8cc_source_l01035}01035\ \ \ \mbox{\hyperlink{gtest_8h_aeb6c7ae89f440c90c1a1815951c836da}{EXPECT\_FALSE}}(orig\_msg.Equals(dest));}
 \DoxyCodeLine{\Hypertarget{gmock-actions__test_8cc_source_l01036}01036\ \ \ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}.Perform(make\_tuple(\textcolor{keyword}{true},\ \&dest));}
 \DoxyCodeLine{\Hypertarget{gmock-actions__test_8cc_source_l01037}01037\ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(orig\_msg.Equals(dest));}
@@ -1057,8 +1057,8 @@
 \DoxyCodeLine{\Hypertarget{gmock-actions__test_8cc_source_l01053}01053\ \ \ \textcolor{comment}{//\ action.}}
 \DoxyCodeLine{\Hypertarget{gmock-actions__test_8cc_source_l01054}01054\ \ \ \textcolor{keyword}{delete}\ msg;}
 \DoxyCodeLine{\Hypertarget{gmock-actions__test_8cc_source_l01055}01055\ }
-\DoxyCodeLine{\Hypertarget{gmock-actions__test_8cc_source_l01056}01056\ \ \ TestMessage\ \mbox{\hyperlink{namespaceupload_a770d9c7b49b1fede80de6078d5e49af7}{dest}};}
-\DoxyCodeLine{\Hypertarget{gmock-actions__test_8cc_source_l01057}01057\ \ \ ::ProtocolMessage*\ \textcolor{keyword}{const}\ dest\_base\ =\ \&\mbox{\hyperlink{namespaceupload_a770d9c7b49b1fede80de6078d5e49af7}{dest}};}
+\DoxyCodeLine{\Hypertarget{gmock-actions__test_8cc_source_l01056}01056\ \ \ TestMessage\ dest;}
+\DoxyCodeLine{\Hypertarget{gmock-actions__test_8cc_source_l01057}01057\ \ \ ::ProtocolMessage*\ \textcolor{keyword}{const}\ dest\_base\ =\ \&dest;}
 \DoxyCodeLine{\Hypertarget{gmock-actions__test_8cc_source_l01058}01058\ \ \ \mbox{\hyperlink{gtest_8h_aeb6c7ae89f440c90c1a1815951c836da}{EXPECT\_FALSE}}(orig\_msg.Equals(dest));}
 \DoxyCodeLine{\Hypertarget{gmock-actions__test_8cc_source_l01059}01059\ \ \ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}.Perform(make\_tuple(\textcolor{keyword}{true},\ dest\_base));}
 \DoxyCodeLine{\Hypertarget{gmock-actions__test_8cc_source_l01060}01060\ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(orig\_msg.Equals(dest));}
@@ -1082,11 +1082,11 @@
 \DoxyCodeLine{\Hypertarget{gmock-actions__test_8cc_source_l01078}01078\ \ \ \textcolor{comment}{//\ before\ using\ the\ action.}}
 \DoxyCodeLine{\Hypertarget{gmock-actions__test_8cc_source_l01079}01079\ \ \ \textcolor{keyword}{delete}\ msg;}
 \DoxyCodeLine{\Hypertarget{gmock-actions__test_8cc_source_l01080}01080\ }
-\DoxyCodeLine{\Hypertarget{gmock-actions__test_8cc_source_l01081}01081\ \ \ FooMessage\ \mbox{\hyperlink{namespaceupload_a770d9c7b49b1fede80de6078d5e49af7}{dest}};}
-\DoxyCodeLine{\Hypertarget{gmock-actions__test_8cc_source_l01082}01082\ \ \ \mbox{\hyperlink{namespaceupload_a770d9c7b49b1fede80de6078d5e49af7}{dest}}.set\_int\_field(0);}
+\DoxyCodeLine{\Hypertarget{gmock-actions__test_8cc_source_l01081}01081\ \ \ FooMessage\ dest;}
+\DoxyCodeLine{\Hypertarget{gmock-actions__test_8cc_source_l01082}01082\ \ \ dest.set\_int\_field(0);}
 \DoxyCodeLine{\Hypertarget{gmock-actions__test_8cc_source_l01083}01083\ \ \ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}.Perform(make\_tuple(\textcolor{keyword}{true},\ \&dest));}
-\DoxyCodeLine{\Hypertarget{gmock-actions__test_8cc_source_l01084}01084\ \ \ \mbox{\hyperlink{gtest_8h_a4159019abda84f5366acdb7604ff220a}{EXPECT\_EQ}}(2,\ \mbox{\hyperlink{namespaceupload_a770d9c7b49b1fede80de6078d5e49af7}{dest}}.int\_field());}
-\DoxyCodeLine{\Hypertarget{gmock-actions__test_8cc_source_l01085}01085\ \ \ \mbox{\hyperlink{gtest_8h_a4159019abda84f5366acdb7604ff220a}{EXPECT\_EQ}}(\textcolor{stringliteral}{"{}hi"{}},\ \mbox{\hyperlink{namespaceupload_a770d9c7b49b1fede80de6078d5e49af7}{dest}}.string\_field());}
+\DoxyCodeLine{\Hypertarget{gmock-actions__test_8cc_source_l01084}01084\ \ \ \mbox{\hyperlink{gtest_8h_a4159019abda84f5366acdb7604ff220a}{EXPECT\_EQ}}(2,\ dest.int\_field());}
+\DoxyCodeLine{\Hypertarget{gmock-actions__test_8cc_source_l01085}01085\ \ \ \mbox{\hyperlink{gtest_8h_a4159019abda84f5366acdb7604ff220a}{EXPECT\_EQ}}(\textcolor{stringliteral}{"{}hi"{}},\ dest.string\_field());}
 \DoxyCodeLine{\Hypertarget{gmock-actions__test_8cc_source_l01086}01086\ \}}
 \DoxyCodeLine{\Hypertarget{gmock-actions__test_8cc_source_l01087}01087\ }
 \DoxyCodeLine{\Hypertarget{gmock-actions__test_8cc_source_l01088}01088\ \textcolor{comment}{//\ Tests\ that\ SetArgumentPointee<N>(proto2\_buffer)\ sets\ the}}
@@ -1107,12 +1107,12 @@
 \DoxyCodeLine{\Hypertarget{gmock-actions__test_8cc_source_l01103}01103\ \ \ \textcolor{comment}{//\ before\ using\ the\ action.}}
 \DoxyCodeLine{\Hypertarget{gmock-actions__test_8cc_source_l01104}01104\ \ \ \textcolor{keyword}{delete}\ msg;}
 \DoxyCodeLine{\Hypertarget{gmock-actions__test_8cc_source_l01105}01105\ }
-\DoxyCodeLine{\Hypertarget{gmock-actions__test_8cc_source_l01106}01106\ \ \ FooMessage\ \mbox{\hyperlink{namespaceupload_a770d9c7b49b1fede80de6078d5e49af7}{dest}};}
-\DoxyCodeLine{\Hypertarget{gmock-actions__test_8cc_source_l01107}01107\ \ \ \mbox{\hyperlink{namespaceupload_a770d9c7b49b1fede80de6078d5e49af7}{dest}}.set\_int\_field(0);}
-\DoxyCodeLine{\Hypertarget{gmock-actions__test_8cc_source_l01108}01108\ \ \ ::proto2::Message*\ \textcolor{keyword}{const}\ dest\_base\ =\ \&\mbox{\hyperlink{namespaceupload_a770d9c7b49b1fede80de6078d5e49af7}{dest}};}
+\DoxyCodeLine{\Hypertarget{gmock-actions__test_8cc_source_l01106}01106\ \ \ FooMessage\ dest;}
+\DoxyCodeLine{\Hypertarget{gmock-actions__test_8cc_source_l01107}01107\ \ \ dest.set\_int\_field(0);}
+\DoxyCodeLine{\Hypertarget{gmock-actions__test_8cc_source_l01108}01108\ \ \ ::proto2::Message*\ \textcolor{keyword}{const}\ dest\_base\ =\ \&dest;}
 \DoxyCodeLine{\Hypertarget{gmock-actions__test_8cc_source_l01109}01109\ \ \ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}.Perform(make\_tuple(\textcolor{keyword}{true},\ dest\_base));}
-\DoxyCodeLine{\Hypertarget{gmock-actions__test_8cc_source_l01110}01110\ \ \ \mbox{\hyperlink{gtest_8h_a4159019abda84f5366acdb7604ff220a}{EXPECT\_EQ}}(2,\ \mbox{\hyperlink{namespaceupload_a770d9c7b49b1fede80de6078d5e49af7}{dest}}.int\_field());}
-\DoxyCodeLine{\Hypertarget{gmock-actions__test_8cc_source_l01111}01111\ \ \ \mbox{\hyperlink{gtest_8h_a4159019abda84f5366acdb7604ff220a}{EXPECT\_EQ}}(\textcolor{stringliteral}{"{}hi"{}},\ \mbox{\hyperlink{namespaceupload_a770d9c7b49b1fede80de6078d5e49af7}{dest}}.string\_field());}
+\DoxyCodeLine{\Hypertarget{gmock-actions__test_8cc_source_l01110}01110\ \ \ \mbox{\hyperlink{gtest_8h_a4159019abda84f5366acdb7604ff220a}{EXPECT\_EQ}}(2,\ dest.int\_field());}
+\DoxyCodeLine{\Hypertarget{gmock-actions__test_8cc_source_l01111}01111\ \ \ \mbox{\hyperlink{gtest_8h_a4159019abda84f5366acdb7604ff220a}{EXPECT\_EQ}}(\textcolor{stringliteral}{"{}hi"{}},\ dest.string\_field());}
 \DoxyCodeLine{\Hypertarget{gmock-actions__test_8cc_source_l01112}01112\ \}}
 \DoxyCodeLine{\Hypertarget{gmock-actions__test_8cc_source_l01113}01113\ }
 \DoxyCodeLine{\Hypertarget{gmock-actions__test_8cc_source_l01114}01114\ \textcolor{preprocessor}{\#endif\ \ }\textcolor{comment}{//\ GTEST\_HAS\_PROTOBUF\_}}

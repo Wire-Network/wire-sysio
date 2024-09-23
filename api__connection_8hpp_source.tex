@@ -273,7 +273,7 @@
 \DoxyCodeLine{\Hypertarget{api__connection_8hpp_source_l00281}00281\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{template}<\textcolor{keyword}{typename}\ Result>}
 \DoxyCodeLine{\Hypertarget{api__connection_8hpp_source_l00282}00282\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{static}\ Result\ from\_variant(\ \textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1variant}{variant}}\&\ v,\ Result*,\ \textcolor{keyword}{const}\ std::shared\_ptr<fc::api\_connection>\&\ \ )}
 \DoxyCodeLine{\Hypertarget{api__connection_8hpp_source_l00283}00283\ \ \ \ \ \ \ \ \ \ \ \ \ \{}
-\DoxyCodeLine{\Hypertarget{api__connection_8hpp_source_l00284}00284\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ v.as<Result>();}
+\DoxyCodeLine{\Hypertarget{api__connection_8hpp_source_l00284}00284\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ v.\mbox{\hyperlink{classfc_1_1variant_a82edd1f33199355d3a1f19bbb92909cc}{as}}<Result>();}
 \DoxyCodeLine{\Hypertarget{api__connection_8hpp_source_l00285}00285\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
 \DoxyCodeLine{\Hypertarget{api__connection_8hpp_source_l00286}00286\ }
 \DoxyCodeLine{\Hypertarget{api__connection_8hpp_source_l00287}00287\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{template}<\textcolor{keyword}{typename}\ ResultInterface>}
@@ -282,7 +282,7 @@
 \DoxyCodeLine{\Hypertarget{api__connection_8hpp_source_l00290}00290\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ std::shared\_ptr<fc::api\_connection>\&\ \ con\ }
 \DoxyCodeLine{\Hypertarget{api__connection_8hpp_source_l00291}00291\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ )}
 \DoxyCodeLine{\Hypertarget{api__connection_8hpp_source_l00292}00292\ \ \ \ \ \ \ \ \ \ \ \ \ \{}
-\DoxyCodeLine{\Hypertarget{api__connection_8hpp_source_l00293}00293\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ con-\/>get\_remote\_api<ResultInterface>(\ v.as\_uint64()\ );}
+\DoxyCodeLine{\Hypertarget{api__connection_8hpp_source_l00293}00293\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ con-\/>get\_remote\_api<ResultInterface>(\ v.\mbox{\hyperlink{classfc_1_1variant_a483bb1f23d9b71ae03e9ca03136ee453}{as\_uint64}}()\ );}
 \DoxyCodeLine{\Hypertarget{api__connection_8hpp_source_l00294}00294\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
 \DoxyCodeLine{\Hypertarget{api__connection_8hpp_source_l00295}00295\ }
 \DoxyCodeLine{\Hypertarget{api__connection_8hpp_source_l00296}00296\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{static}\ \mbox{\hyperlink{namespacefc_abc7fa69d18531d7645307d15b3102886}{fc::api\_ptr}}\ from\_variant(}
@@ -291,7 +291,7 @@
 \DoxyCodeLine{\Hypertarget{api__connection_8hpp_source_l00299}00299\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ std::shared\_ptr<fc::api\_connection>\&\ \ con}
 \DoxyCodeLine{\Hypertarget{api__connection_8hpp_source_l00300}00300\ \ \ \ \ \ \ \ \ \ \ \ \ )}
 \DoxyCodeLine{\Hypertarget{api__connection_8hpp_source_l00301}00301\ \ \ \ \ \ \ \ \ \ \ \ \ \{}
-\DoxyCodeLine{\Hypertarget{api__connection_8hpp_source_l00302}00302\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespacefc_abc7fa69d18531d7645307d15b3102886}{fc::api\_ptr}}(\ \textcolor{keyword}{new}\ \mbox{\hyperlink{classfc_1_1detail_1_1any__api}{detail::any\_api}}(\ v.as\_uint64(),\ con\ )\ );}
+\DoxyCodeLine{\Hypertarget{api__connection_8hpp_source_l00302}00302\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespacefc_abc7fa69d18531d7645307d15b3102886}{fc::api\_ptr}}(\ \textcolor{keyword}{new}\ \mbox{\hyperlink{classfc_1_1detail_1_1any__api}{detail::any\_api}}(\ v.\mbox{\hyperlink{classfc_1_1variant_a483bb1f23d9b71ae03e9ca03136ee453}{as\_uint64}}(),\ con\ )\ );}
 \DoxyCodeLine{\Hypertarget{api__connection_8hpp_source_l00303}00303\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
 \DoxyCodeLine{\Hypertarget{api__connection_8hpp_source_l00304}00304\ }
 \DoxyCodeLine{\Hypertarget{api__connection_8hpp_source_l00305}00305\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{template}<\textcolor{keyword}{typename}\ T>}
@@ -386,11 +386,11 @@
 \DoxyCodeLine{\Hypertarget{api__connection_8hpp_source_l00395}00395\ \textcolor{keyword}{\ \ \ }\{}
 \DoxyCodeLine{\Hypertarget{api__connection_8hpp_source_l00396}00396\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ api\_con\ =\ \_api\_con;}
 \DoxyCodeLine{\Hypertarget{api__connection_8hpp_source_l00397}00397\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ gapi\ =\ \&\_api;}
-\DoxyCodeLine{\Hypertarget{api__connection_8hpp_source_l00398}00398\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ [=](\ \textcolor{keyword}{const}\ \mbox{\hyperlink{namespacefc_a9148361f6aaa3d739990a75ac557fe59}{variants}}\&\ \mbox{\hyperlink{namespacebenchmark_compile_ad0ed96ae1454e4347ca61ac3887c379e}{args}}\ )-\/>\ \mbox{\hyperlink{classfc_1_1variant}{fc::variant}}\ \{\ }
+\DoxyCodeLine{\Hypertarget{api__connection_8hpp_source_l00398}00398\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ [=](\ \textcolor{keyword}{const}\ \mbox{\hyperlink{namespacefc_a9148361f6aaa3d739990a75ac557fe59}{variants}}\&\ args\ )-\/>\ \mbox{\hyperlink{classfc_1_1variant}{fc::variant}}\ \{\ }
 \DoxyCodeLine{\Hypertarget{api__connection_8hpp_source_l00399}00399\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ con\ =\ api\_con.lock();}
 \DoxyCodeLine{\Hypertarget{api__connection_8hpp_source_l00400}00400\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{exception_8hpp_abed525eeff3ae581be7e4e2fcd3b7bf4}{FC\_ASSERT}}(\ con,\ \textcolor{stringliteral}{"{}not\ connected"{}}\ );}
 \DoxyCodeLine{\Hypertarget{api__connection_8hpp_source_l00401}00401\ }
-\DoxyCodeLine{\Hypertarget{api__connection_8hpp_source_l00402}00402\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ api\_result\ =\ gapi-\/>call\_generic(\ \mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}},\ \mbox{\hyperlink{namespacebenchmark_compile_ad0ed96ae1454e4347ca61ac3887c379e}{args}}.begin(),\ \mbox{\hyperlink{namespacebenchmark_compile_ad0ed96ae1454e4347ca61ac3887c379e}{args}}.end()\ );\ }
+\DoxyCodeLine{\Hypertarget{api__connection_8hpp_source_l00402}00402\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ api\_result\ =\ gapi-\/>call\_generic(\ \mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}},\ args.begin(),\ args.end()\ );\ }
 \DoxyCodeLine{\Hypertarget{api__connection_8hpp_source_l00403}00403\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ api\_result\ )}
 \DoxyCodeLine{\Hypertarget{api__connection_8hpp_source_l00404}00404\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ con-\/>register\_api(\ *api\_result\ );}
 \DoxyCodeLine{\Hypertarget{api__connection_8hpp_source_l00405}00405\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ variant();}
@@ -403,11 +403,11 @@
 \DoxyCodeLine{\Hypertarget{api__connection_8hpp_source_l00412}00412\ \textcolor{keyword}{\ \ \ }\{}
 \DoxyCodeLine{\Hypertarget{api__connection_8hpp_source_l00413}00413\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ api\_con\ =\ \_api\_con;}
 \DoxyCodeLine{\Hypertarget{api__connection_8hpp_source_l00414}00414\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ gapi\ =\ \&\_api;}
-\DoxyCodeLine{\Hypertarget{api__connection_8hpp_source_l00415}00415\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ [=](\ \textcolor{keyword}{const}\ \mbox{\hyperlink{namespacefc_a9148361f6aaa3d739990a75ac557fe59}{variants}}\&\ \mbox{\hyperlink{namespacebenchmark_compile_ad0ed96ae1454e4347ca61ac3887c379e}{args}}\ )\ -\/>\ \mbox{\hyperlink{classfc_1_1variant}{fc::variant}}\ \{}
+\DoxyCodeLine{\Hypertarget{api__connection_8hpp_source_l00415}00415\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ [=](\ \textcolor{keyword}{const}\ \mbox{\hyperlink{namespacefc_a9148361f6aaa3d739990a75ac557fe59}{variants}}\&\ args\ )\ -\/>\ \mbox{\hyperlink{classfc_1_1variant}{fc::variant}}\ \{}
 \DoxyCodeLine{\Hypertarget{api__connection_8hpp_source_l00416}00416\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ con\ =\ api\_con.lock();}
 \DoxyCodeLine{\Hypertarget{api__connection_8hpp_source_l00417}00417\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{exception_8hpp_abed525eeff3ae581be7e4e2fcd3b7bf4}{FC\_ASSERT}}(\ con,\ \textcolor{stringliteral}{"{}not\ connected"{}}\ );}
 \DoxyCodeLine{\Hypertarget{api__connection_8hpp_source_l00418}00418\ }
-\DoxyCodeLine{\Hypertarget{api__connection_8hpp_source_l00419}00419\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ api\_result\ =\ gapi-\/>call\_generic(\ \mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}},\ \mbox{\hyperlink{namespacebenchmark_compile_ad0ed96ae1454e4347ca61ac3887c379e}{args}}.begin(),\ \mbox{\hyperlink{namespacebenchmark_compile_ad0ed96ae1454e4347ca61ac3887c379e}{args}}.end()\ );}
+\DoxyCodeLine{\Hypertarget{api__connection_8hpp_source_l00419}00419\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ api\_result\ =\ gapi-\/>call\_generic(\ \mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}},\ args.begin(),\ args.end()\ );}
 \DoxyCodeLine{\Hypertarget{api__connection_8hpp_source_l00420}00420\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ !api\_result\ )}
 \DoxyCodeLine{\Hypertarget{api__connection_8hpp_source_l00421}00421\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ variant();}
 \DoxyCodeLine{\Hypertarget{api__connection_8hpp_source_l00422}00422\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ api\_result-\/>register\_api(\ *con\ );}
@@ -418,8 +418,8 @@
 \DoxyCodeLine{\Hypertarget{api__connection_8hpp_source_l00427}00427\ \ \ \ std::function<variant(\textcolor{keyword}{const}\ \mbox{\hyperlink{namespacefc_a9148361f6aaa3d739990a75ac557fe59}{fc::variants}}\&)>\ generic\_api::api\_visitor::to\_generic(\ \textcolor{keyword}{const}\ std::function<\mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2parser_8hpp_a5c71a5e59a53413cd6c270266d63b031}{R}}(Args...)>\&\ \mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}}\ )\textcolor{keyword}{const}}
 \DoxyCodeLine{\Hypertarget{api__connection_8hpp_source_l00428}00428\ \textcolor{keyword}{\ \ \ }\{}
 \DoxyCodeLine{\Hypertarget{api__connection_8hpp_source_l00429}00429\ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1generic__api_afd5e38e1a2fbbc91a46570914c82c6bf}{generic\_api}}*\ gapi\ =\ \&\_api;}
-\DoxyCodeLine{\Hypertarget{api__connection_8hpp_source_l00430}00430\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ [\mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}},gapi](\ \textcolor{keyword}{const}\ \mbox{\hyperlink{namespacefc_a9148361f6aaa3d739990a75ac557fe59}{variants}}\&\ \mbox{\hyperlink{namespacebenchmark_compile_ad0ed96ae1454e4347ca61ac3887c379e}{args}}\ )\ \{\ }
-\DoxyCodeLine{\Hypertarget{api__connection_8hpp_source_l00431}00431\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ variant(\ gapi-\/>call\_generic(\ \mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}},\ \mbox{\hyperlink{namespacebenchmark_compile_ad0ed96ae1454e4347ca61ac3887c379e}{args}}.begin(),\ \mbox{\hyperlink{namespacebenchmark_compile_ad0ed96ae1454e4347ca61ac3887c379e}{args}}.end()\ )\ );\ }
+\DoxyCodeLine{\Hypertarget{api__connection_8hpp_source_l00430}00430\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ [\mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}},gapi](\ \textcolor{keyword}{const}\ \mbox{\hyperlink{namespacefc_a9148361f6aaa3d739990a75ac557fe59}{variants}}\&\ args\ )\ \{\ }
+\DoxyCodeLine{\Hypertarget{api__connection_8hpp_source_l00431}00431\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ variant(\ gapi-\/>call\_generic(\ \mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}},\ args.begin(),\ args.end()\ )\ );\ }
 \DoxyCodeLine{\Hypertarget{api__connection_8hpp_source_l00432}00432\ \ \ \ \ \ \ \};}
 \DoxyCodeLine{\Hypertarget{api__connection_8hpp_source_l00433}00433\ \ \ \ \}}
 \DoxyCodeLine{\Hypertarget{api__connection_8hpp_source_l00434}00434\ }
@@ -427,8 +427,8 @@
 \DoxyCodeLine{\Hypertarget{api__connection_8hpp_source_l00436}00436\ \ \ \ std::function<variant(\textcolor{keyword}{const}\ \mbox{\hyperlink{namespacefc_a9148361f6aaa3d739990a75ac557fe59}{fc::variants}}\&)>\ generic\_api::api\_visitor::to\_generic(\ \textcolor{keyword}{const}\ std::function<\textcolor{keywordtype}{void}(Args...)>\&\ \mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}}\ )\textcolor{keyword}{const}}
 \DoxyCodeLine{\Hypertarget{api__connection_8hpp_source_l00437}00437\ \textcolor{keyword}{\ \ \ }\{}
 \DoxyCodeLine{\Hypertarget{api__connection_8hpp_source_l00438}00438\ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1generic__api_afd5e38e1a2fbbc91a46570914c82c6bf}{generic\_api}}*\ gapi\ =\ \&\_api;}
-\DoxyCodeLine{\Hypertarget{api__connection_8hpp_source_l00439}00439\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ [\mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}},gapi](\ \textcolor{keyword}{const}\ \mbox{\hyperlink{namespacefc_a9148361f6aaa3d739990a75ac557fe59}{variants}}\&\ \mbox{\hyperlink{namespacebenchmark_compile_ad0ed96ae1454e4347ca61ac3887c379e}{args}}\ )\ \{\ }
-\DoxyCodeLine{\Hypertarget{api__connection_8hpp_source_l00440}00440\ \ \ \ \ \ \ \ \ \ gapi-\/>call\_generic(\ \mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}},\ \mbox{\hyperlink{namespacebenchmark_compile_ad0ed96ae1454e4347ca61ac3887c379e}{args}}.begin(),\ \mbox{\hyperlink{namespacebenchmark_compile_ad0ed96ae1454e4347ca61ac3887c379e}{args}}.end()\ );\ }
+\DoxyCodeLine{\Hypertarget{api__connection_8hpp_source_l00439}00439\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ [\mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}},gapi](\ \textcolor{keyword}{const}\ \mbox{\hyperlink{namespacefc_a9148361f6aaa3d739990a75ac557fe59}{variants}}\&\ args\ )\ \{\ }
+\DoxyCodeLine{\Hypertarget{api__connection_8hpp_source_l00440}00440\ \ \ \ \ \ \ \ \ \ gapi-\/>call\_generic(\ \mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}},\ args.begin(),\ args.end()\ );\ }
 \DoxyCodeLine{\Hypertarget{api__connection_8hpp_source_l00441}00441\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ variant();}
 \DoxyCodeLine{\Hypertarget{api__connection_8hpp_source_l00442}00442\ \ \ \ \ \ \ \};}
 \DoxyCodeLine{\Hypertarget{api__connection_8hpp_source_l00443}00443\ \ \ \ \}}

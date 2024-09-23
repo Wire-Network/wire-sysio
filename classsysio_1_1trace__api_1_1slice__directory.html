@@ -277,8 +277,8 @@ Here is the call graph for this function:</div>
 
 <p class="definition">Definition at line <a class="el" href="store__provider_8cpp_source.html#l00227">227</a> of file <a class="el" href="store__provider_8cpp_source.html">store_provider.cpp</a>.</p>
 <div class="fragment"><div class="line"><span class="lineno">  227</span>                                                                                                                         {</div>
-<div class="line"><span class="lineno">  228</span>      <span class="keyword">auto</span> <a class="code hl_variable" href="namespaceembed_clara.html#a1e1bd594f85f58f5dca6c41c0ac720fb">filename</a> = make_filename(_trace_prefix, _compressed_trace_ext, <a class="code hl_function" href="#a47a30741cf28932df1556209da63b227">slice_number</a>, _width);</div>
-<div class="line"><span class="lineno">  229</span>      <span class="keyword">const</span> path slice_path = _slice_dir / <a class="code hl_variable" href="namespaceembed_clara.html#a1e1bd594f85f58f5dca6c41c0ac720fb">filename</a>;</div>
+<div class="line"><span class="lineno">  228</span>      <span class="keyword">auto</span> filename = make_filename(_trace_prefix, _compressed_trace_ext, <a class="code hl_function" href="#a47a30741cf28932df1556209da63b227">slice_number</a>, _width);</div>
+<div class="line"><span class="lineno">  229</span>      <span class="keyword">const</span> path slice_path = _slice_dir / filename;</div>
 <div class="line"><span class="lineno">  230</span>      <span class="keyword">const</span> <span class="keywordtype">bool</span> file_exists = <a class="code hl_function" href="namespacefc.html#a3fcf0d920aea28014aacae50a51d8485">exists</a>(slice_path);</div>
 <div class="line"><span class="lineno">  231</span> </div>
 <div class="line"><span class="lineno">  232</span>      <span class="keywordflow">if</span> (file_exists) {</div>
@@ -293,7 +293,6 @@ Here is the call graph for this function:</div>
 <div class="line"><span class="lineno">  241</span>      }</div>
 <div class="line"><span class="lineno">  242</span>   }</div>
 <div class="ttc" id="aclasssysio_1_1trace__api_1_1slice__directory_html_a47a30741cf28932df1556209da63b227"><div class="ttname"><a href="#a47a30741cf28932df1556209da63b227">sysio::trace_api::slice_directory::slice_number</a></div><div class="ttdeci">uint32_t slice_number(uint32_t block_height) const</div><div class="ttdef"><b>Definition</b> <a href="store__provider_8hpp_source.html#l00112">store_provider.hpp:112</a></div></div>
-<div class="ttc" id="anamespaceembed_clara_html_a1e1bd594f85f58f5dca6c41c0ac720fb"><div class="ttname"><a href="namespaceembed_clara.html#a1e1bd594f85f58f5dca6c41c0ac720fb">embedClara.filename</a></div><div class="ttdeci">filename</div><div class="ttdef"><b>Definition</b> <a href="embed_clara_8py_source.html#l00010">embedClara.py:10</a></div></div>
 </div><!-- fragment --><div class="dynheader">
 Here is the call graph for this function:</div>
 <div class="dyncontent">

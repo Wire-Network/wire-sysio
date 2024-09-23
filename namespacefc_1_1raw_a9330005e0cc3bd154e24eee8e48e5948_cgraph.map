@@ -1,6 +1,12 @@
 <map id="fc::raw::pack" name="fc::raw::pack">
-<area shape="rect" id="Node000001" title=" " alt="" coords="5,29,103,55"/>
-<area shape="rect" id="Node000002" href="$namespacefc_1_1raw.html#a3a18d8161aa5b4f4f02b6fcfdff5e5d1" title=" " alt="" coords="151,29,248,55"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="103,40,135,40,135,45,103,45"/>
-<area shape="poly" id="edge2_Node000002_Node000002" title=" " alt="" coords="174,30,170,21,172,11,183,5,199,3,217,5,227,12,224,16,215,10,199,8,184,10,177,14,175,20,179,28"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,108,103,133"/>
+<area shape="rect" id="Node000002" href="$classfc_1_1variant__object.html#ae0b10525c519de4e4ea077505cb09ac8" title=" " alt="" coords="165,5,286,46"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="72,105,149,55,158,51,161,55,152,60,75,109"/>
+<area shape="rect" id="Node000003" href="$classfc_1_1variant__object.html#a804706455398e249f6272b3ff19cef5d" title=" " alt="" coords="151,70,301,96"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="102,107,148,97,149,102,103,112"/>
+<area shape="rect" id="Node000004" href="$namespacefc_1_1raw.html#a3a18d8161aa5b4f4f02b6fcfdff5e5d1" title=" " alt="" coords="177,144,274,169"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="103,128,163,140,162,146,102,133"/>
+<area shape="rect" id="Node000005" href="$classfc_1_1variant__object.html#a0e523ff3ad212b0582ad2ac8a07773ae" title=" " alt="" coords="165,193,286,234"/>
+<area shape="poly" id="edge5_Node000001_Node000005" title=" " alt="" coords="76,131,152,179,161,184,158,189,149,184,73,136"/>
+<area shape="poly" id="edge4_Node000004_Node000004" title=" " alt="" coords="197,145,191,135,194,125,206,119,226,117,247,119,258,126,255,131,245,124,226,122,208,124,198,129,196,134,201,142"/>
 </map>

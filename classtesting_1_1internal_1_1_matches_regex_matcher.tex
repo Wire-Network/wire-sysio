@@ -13,9 +13,9 @@
 \item 
 {\footnotesize template$<$\mbox{\hyperlink{yubihsm__pkcs11_8c_a5c230edcb923568000cb7982cf84dfce}{class}} Matchee\+String\+Type $>$ }\\bool \mbox{\hyperlink{classtesting_1_1internal_1_1_matches_regex_matcher_a57042ed4ce640738728d976f63f0702e}{Match\+And\+Explain}} (const Matchee\+String\+Type \&\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}, \mbox{\hyperlink{classtesting_1_1_match_result_listener}{Match\+Result\+Listener}} \texorpdfstring{$\ast$}{*}) const
 \item 
-void \mbox{\hyperlink{classtesting_1_1internal_1_1_matches_regex_matcher_a8ebd3a0cf33a7bad04a3daf4b0653d8f}{Describe\+To}} (\+::std\+::ostream \texorpdfstring{$\ast$}{*}os) const
+void \mbox{\hyperlink{classtesting_1_1internal_1_1_matches_regex_matcher_a8ebd3a0cf33a7bad04a3daf4b0653d8f}{Describe\+To}} (\+::std\+::ostream \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}) const
 \item 
-void \mbox{\hyperlink{classtesting_1_1internal_1_1_matches_regex_matcher_a63154c9c572c1e44a130d58539fde707}{Describe\+Negation\+To}} (\+::std\+::ostream \texorpdfstring{$\ast$}{*}os) const
+void \mbox{\hyperlink{classtesting_1_1internal_1_1_matches_regex_matcher_a63154c9c572c1e44a130d58539fde707}{Describe\+Negation\+To}} (\+::std\+::ostream \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}) const
 \end{DoxyCompactItemize}
 
 
@@ -58,13 +58,14 @@ Definition at line \mbox{\hyperlink{gmock-matchers_8h_source_l01587}{1587}} of f
 
 \begin{DoxyCode}{0}
 \DoxyCodeLine{01587\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
-\DoxyCodeLine{01588\ \ \ \ \ *os\ <<\ \textcolor{stringliteral}{"{}doesn't\ "{}}\ <<\ (full\_match\_\ ?\ \textcolor{stringliteral}{"{}match"{}}\ :\ \textcolor{stringliteral}{"{}contain"{}})}
+\DoxyCodeLine{01588\ \ \ \ \ *\mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}\ <<\ \textcolor{stringliteral}{"{}doesn't\ "{}}\ <<\ (full\_match\_\ ?\ \textcolor{stringliteral}{"{}match"{}}\ :\ \textcolor{stringliteral}{"{}contain"{}})}
 \DoxyCodeLine{01589\ \ \ \ \ \ \ \ \ <<\ \textcolor{stringliteral}{"{}\ regular\ expression\ "{}};}
-\DoxyCodeLine{01590\ \ \ \ \ \mbox{\hyperlink{classtesting_1_1internal_1_1_universal_printer_aecec021e1abbaa260b701e24e3fe33eb}{UniversalPrinter<std::string>::Print}}(regex\_-\/>pattern(),\ os);}
+\DoxyCodeLine{01590\ \ \ \ \ \mbox{\hyperlink{classtesting_1_1internal_1_1_universal_printer_aecec021e1abbaa260b701e24e3fe33eb}{UniversalPrinter<std::string>::Print}}(regex\_-\/>pattern(),\ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}});}
 \DoxyCodeLine{01591\ \ \ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -84,13 +85,14 @@ Definition at line \mbox{\hyperlink{gmock-matchers_8h_source_l01581}{1581}} of f
 
 \begin{DoxyCode}{0}
 \DoxyCodeLine{01581\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
-\DoxyCodeLine{01582\ \ \ \ \ *os\ <<\ (full\_match\_\ ?\ \textcolor{stringliteral}{"{}matches"{}}\ :\ \textcolor{stringliteral}{"{}contains"{}})}
+\DoxyCodeLine{01582\ \ \ \ \ *\mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}\ <<\ (full\_match\_\ ?\ \textcolor{stringliteral}{"{}matches"{}}\ :\ \textcolor{stringliteral}{"{}contains"{}})}
 \DoxyCodeLine{01583\ \ \ \ \ \ \ \ \ <<\ \textcolor{stringliteral}{"{}\ regular\ expression\ "{}};}
-\DoxyCodeLine{01584\ \ \ \ \ \mbox{\hyperlink{classtesting_1_1internal_1_1_universal_printer_aecec021e1abbaa260b701e24e3fe33eb}{UniversalPrinter<std::string>::Print}}(regex\_-\/>pattern(),\ os);}
+\DoxyCodeLine{01584\ \ \ \ \ \mbox{\hyperlink{classtesting_1_1internal_1_1_universal_printer_aecec021e1abbaa260b701e24e3fe33eb}{UniversalPrinter<std::string>::Print}}(regex\_-\/>pattern(),\ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}});}
 \DoxyCodeLine{01585\ \ \ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -115,14 +117,16 @@ Definition at line \mbox{\hyperlink{gmock-matchers_8h_source_l01565}{1565}} of f
 \DoxyCodeLine{01567\ \ \ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
 \includegraphics[width=197pt]{classtesting_1_1internal_1_1_matches_regex_matcher_a00f5f9b19a5308d8daacc502c88a91ba_cgraph}
 \end{center}
 \end{figure}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -149,7 +153,8 @@ Definition at line \mbox{\hyperlink{gmock-matchers_8h_source_l01574}{1574}} of f
 \DoxyCodeLine{01579\ \ \ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode

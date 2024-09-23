@@ -108,16 +108,16 @@
 \DoxyCodeLine{\Hypertarget{catch__session_8cpp_source_l00104}00104\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keyword}{auto}\&\ testCase\ :\ tests)\ \{}
 \DoxyCodeLine{\Hypertarget{catch__session_8cpp_source_l00105}00105\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ tags\ =\ testCase.tags;}
 \DoxyCodeLine{\Hypertarget{catch__session_8cpp_source_l00106}00106\ }
-\DoxyCodeLine{\Hypertarget{catch__session_8cpp_source_l00107}00107\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ std::string\ \mbox{\hyperlink{namespaceembed_clara_a1e1bd594f85f58f5dca6c41c0ac720fb}{filename}}\ =\ testCase.lineInfo.file;}
-\DoxyCodeLine{\Hypertarget{catch__session_8cpp_source_l00108}00108\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ lastSlash\ =\ \mbox{\hyperlink{namespaceembed_clara_a1e1bd594f85f58f5dca6c41c0ac720fb}{filename}}.find\_last\_of(\textcolor{stringliteral}{"{}\(\backslash\)\(\backslash\)/"{}});}
+\DoxyCodeLine{\Hypertarget{catch__session_8cpp_source_l00107}00107\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ std::string\ filename\ =\ testCase.lineInfo.file;}
+\DoxyCodeLine{\Hypertarget{catch__session_8cpp_source_l00108}00108\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ lastSlash\ =\ filename.find\_last\_of(\textcolor{stringliteral}{"{}\(\backslash\)\(\backslash\)/"{}});}
 \DoxyCodeLine{\Hypertarget{catch__session_8cpp_source_l00109}00109\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (lastSlash\ !=\ std::string::npos)\ \{}
-\DoxyCodeLine{\Hypertarget{catch__session_8cpp_source_l00110}00110\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespaceembed_clara_a1e1bd594f85f58f5dca6c41c0ac720fb}{filename}}.erase(0,\ lastSlash);}
-\DoxyCodeLine{\Hypertarget{catch__session_8cpp_source_l00111}00111\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespaceembed_clara_a1e1bd594f85f58f5dca6c41c0ac720fb}{filename}}[0]\ =\ \textcolor{charliteral}{'\#'};}
+\DoxyCodeLine{\Hypertarget{catch__session_8cpp_source_l00110}00110\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ filename.erase(0,\ lastSlash);}
+\DoxyCodeLine{\Hypertarget{catch__session_8cpp_source_l00111}00111\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ filename[0]\ =\ \textcolor{charliteral}{'\#'};}
 \DoxyCodeLine{\Hypertarget{catch__session_8cpp_source_l00112}00112\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
 \DoxyCodeLine{\Hypertarget{catch__session_8cpp_source_l00113}00113\ }
-\DoxyCodeLine{\Hypertarget{catch__session_8cpp_source_l00114}00114\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ lastDot\ =\ \mbox{\hyperlink{namespaceembed_clara_a1e1bd594f85f58f5dca6c41c0ac720fb}{filename}}.find\_last\_of(\textcolor{charliteral}{'.'});}
+\DoxyCodeLine{\Hypertarget{catch__session_8cpp_source_l00114}00114\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ lastDot\ =\ filename.find\_last\_of(\textcolor{charliteral}{'.'});}
 \DoxyCodeLine{\Hypertarget{catch__session_8cpp_source_l00115}00115\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (lastDot\ !=\ std::string::npos)\ \{}
-\DoxyCodeLine{\Hypertarget{catch__session_8cpp_source_l00116}00116\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespaceembed_clara_a1e1bd594f85f58f5dca6c41c0ac720fb}{filename}}.erase(lastDot);}
+\DoxyCodeLine{\Hypertarget{catch__session_8cpp_source_l00116}00116\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ filename.erase(lastDot);}
 \DoxyCodeLine{\Hypertarget{catch__session_8cpp_source_l00117}00117\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
 \DoxyCodeLine{\Hypertarget{catch__session_8cpp_source_l00118}00118\ }
 \DoxyCodeLine{\Hypertarget{catch__session_8cpp_source_l00119}00119\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ tags.push\_back(std::move(filename));}

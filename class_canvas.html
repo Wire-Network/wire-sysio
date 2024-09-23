@@ -114,7 +114,7 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:a5cf12ec3c89b0e8b63c50317e056ebc3"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a277e4e60f5ec3ea16efd7ce9e1fb654b" id="r_a277e4e60f5ec3ea16efd7ce9e1fb654b"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a277e4e60f5ec3ea16efd7ce9e1fb654b">AddShape</a> (<a class="el" href="class_shape.html">Shape</a> *shape)</td></tr>
 <tr class="separator:a277e4e60f5ec3ea16efd7ce9e1fb654b"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:acf5c8e6bbc490927df36e3c30583800e" id="r_acf5c8e6bbc490927df36e3c30583800e"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#acf5c8e6bbc490927df36e3c30583800e">Print</a> (std::ostream &amp;os)</td></tr>
+<tr class="memitem:acf5c8e6bbc490927df36e3c30583800e" id="r_acf5c8e6bbc490927df36e3c30583800e"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#acf5c8e6bbc490927df36e3c30583800e">Print</a> (std::ostream &amp;<a class="el" href="environment_8hpp.html#a3951483d0b31c29ca95336206cd35238">os</a>)</td></tr>
 <tr class="separator:acf5c8e6bbc490927df36e3c30583800e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="friends" name="friends"></a>
@@ -304,10 +304,11 @@ Here is the caller graph for this function:</div>
 <p class="definition">Definition at line <a class="el" href="archivertest_8cpp_source.html#l00214">214</a> of file <a class="el" href="archivertest_8cpp_source.html">archivertest.cpp</a>.</p>
 <div class="fragment"><div class="line"><span class="lineno">  214</span>                               {</div>
 <div class="line"><span class="lineno">  215</span>        <span class="keywordflow">for</span> (std::vector&lt;Shape*&gt;::iterator itr = shapes_.begin(); itr != shapes_.end(); ++itr) {</div>
-<div class="line"><span class="lineno">  216</span>            (*itr)-&gt;Print(os);</div>
+<div class="line"><span class="lineno">  216</span>            (*itr)-&gt;Print(<a class="code hl_variable" href="environment_8hpp.html#a3951483d0b31c29ca95336206cd35238">os</a>);</div>
 <div class="line"><span class="lineno">  217</span>            std::cout &lt;&lt; std::endl;</div>
 <div class="line"><span class="lineno">  218</span>        }</div>
 <div class="line"><span class="lineno">  219</span>    }</div>
+<div class="ttc" id="aenvironment_8hpp_html_a3951483d0b31c29ca95336206cd35238"><div class="ttname"><a href="environment_8hpp.html#a3951483d0b31c29ca95336206cd35238">os</a></div><div class="ttdeci">os_t os</div><div class="ttdef"><b>Definition</b> <a href="environment_8hpp_source.html#l00023">environment.hpp:23</a></div></div>
 </div><!-- fragment --><div class="dynheader">
 Here is the caller graph for this function:</div>
 <div class="dyncontent">

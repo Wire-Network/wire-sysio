@@ -166,7 +166,7 @@ template&lt;typename <a class="el" href="sys-vm_2include_2sysio_2sysio_2vm_2pars
 <div class="line"><span class="lineno">  192</span>           <span class="keywordflow">if</span> <span class="keyword">constexpr</span>( std::is_move_constructible_v&lt;R&gt; ) {</div>
 <div class="line"><span class="lineno">  193</span>              <span class="keywordflow">return</span> std::function&lt;<a class="code hl_define" href="sys-vm_2include_2sysio_2sysio_2vm_2parser_8hpp.html#a5c71a5e59a53413cd6c270266d63b031">R</a>(Args...)&gt;::operator()(std::move(args)...);</div>
 <div class="line"><span class="lineno">  194</span>           } <span class="keywordflow">else</span> {</div>
-<div class="line"><span class="lineno">  195</span>              <span class="keywordflow">return</span> std::function&lt;<a class="code hl_define" href="sys-vm_2include_2sysio_2sysio_2vm_2parser_8hpp.html#a5c71a5e59a53413cd6c270266d63b031">R</a>(Args...)&gt;::operator()(<a class="code hl_variable" href="namespacebenchmark_compile.html#ad0ed96ae1454e4347ca61ac3887c379e">args</a>...);</div>
+<div class="line"><span class="lineno">  195</span>              <span class="keywordflow">return</span> std::function&lt;<a class="code hl_define" href="sys-vm_2include_2sysio_2sysio_2vm_2parser_8hpp.html#a5c71a5e59a53413cd6c270266d63b031">R</a>(Args...)&gt;::operator()(args...);</div>
 <div class="line"><span class="lineno">  196</span>           }</div>
 <div class="line"><span class="lineno">  197</span>        } <span class="keywordflow">else</span> {</div>
 <div class="line"><span class="lineno">  198</span>           <span class="keywordflow">if</span> <span class="keyword">constexpr</span>( !std::is_void_v&lt;R&gt; ) {</div>
@@ -174,7 +174,6 @@ template&lt;typename <a class="el" href="sys-vm_2include_2sysio_2sysio_2vm_2pars
 <div class="line"><span class="lineno">  200</span>           }</div>
 <div class="line"><span class="lineno">  201</span>        }</div>
 <div class="line"><span class="lineno">  202</span>     }</div>
-<div class="ttc" id="anamespacebenchmark_compile_html_ad0ed96ae1454e4347ca61ac3887c379e"><div class="ttname"><a href="namespacebenchmark_compile.html#ad0ed96ae1454e4347ca61ac3887c379e">benchmarkCompile.args</a></div><div class="ttdeci">args</div><div class="ttdef"><b>Definition</b> <a href="benchmark_compile_8py_source.html#l00122">benchmarkCompile.py:122</a></div></div>
 <div class="ttc" id="asys-vm_2include_2sysio_2sysio_2vm_2parser_8hpp_html_a5c71a5e59a53413cd6c270266d63b031"><div class="ttname"><a href="sys-vm_2include_2sysio_2sysio_2vm_2parser_8hpp.html#a5c71a5e59a53413cd6c270266d63b031">R</a></div><div class="ttdeci">#define R</div></div>
 </div><!-- fragment -->
 </div>

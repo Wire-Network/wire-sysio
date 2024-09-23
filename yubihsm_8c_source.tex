@@ -1184,7 +1184,7 @@
 \DoxyCodeLine{\Hypertarget{yubihsm_8c_source_l01180}01180\ }
 \DoxyCodeLine{\Hypertarget{yubihsm_8c_source_l01181}01181\ \ \ \textcolor{keywordflow}{if}\ (response\_len\ ==\ \textcolor{keyword}{sizeof}(response))\ \{}
 \DoxyCodeLine{\Hypertarget{yubihsm_8c_source_l01182}01182\ \ \ \ \ \textcolor{keywordflow}{if}\ (\textcolor{keywordtype}{object})\ \{}
-\DoxyCodeLine{\Hypertarget{yubihsm_8c_source_l01183}01183\ \ \ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_ae785d5badbf1f08b491af31f32a135a1}{memcpy}}(object-\/>capabilities.capabilities,\ response.capabilities,}
+\DoxyCodeLine{\Hypertarget{yubihsm_8c_source_l01183}01183\ \ \ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_ae785d5badbf1f08b491af31f32a135a1}{memcpy}}(\mbox{\hyperlink{yubihsm__pkcs11_8c_a85d991d90970121ba1480cd98d93aab9}{object}}-\/>\mbox{\hyperlink{structyh__object__descriptor_a94fcb9bbe5ffacadafc207c166f6239f}{capabilities}}.\mbox{\hyperlink{structyh__capabilities_a5398bad7e61385aa127265ba0a053079}{capabilities}},\ response.capabilities,}
 \DoxyCodeLine{\Hypertarget{yubihsm_8c_source_l01184}01184\ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{yubihsm_8h_ad3c904849d17cae0a6f426e8007731d7}{YH\_CAPABILITIES\_LEN}});}
 \DoxyCodeLine{\Hypertarget{yubihsm_8c_source_l01185}01185\ }
 \DoxyCodeLine{\Hypertarget{yubihsm_8c_source_l01186}01186\ \ \ \ \ \ \ \textcolor{keywordtype}{object}-\/>id\ =\ htons(response.id);}
@@ -1201,10 +1201,10 @@
 \DoxyCodeLine{\Hypertarget{yubihsm_8c_source_l01197}01197\ }
 \DoxyCodeLine{\Hypertarget{yubihsm_8c_source_l01198}01198\ \ \ \ \ \ \ \textcolor{keywordtype}{object}-\/>origin\ =\ response.origin;}
 \DoxyCodeLine{\Hypertarget{yubihsm_8c_source_l01199}01199\ }
-\DoxyCodeLine{\Hypertarget{yubihsm_8c_source_l01200}01200\ \ \ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_ae785d5badbf1f08b491af31f32a135a1}{memcpy}}(object-\/>label,\ response.label,\ \mbox{\hyperlink{yubihsm_8h_a431f8b753552a8b2f5f980e871b6d019}{YH\_OBJ\_LABEL\_LEN}});}
+\DoxyCodeLine{\Hypertarget{yubihsm_8c_source_l01200}01200\ \ \ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_ae785d5badbf1f08b491af31f32a135a1}{memcpy}}(\mbox{\hyperlink{yubihsm__pkcs11_8c_a85d991d90970121ba1480cd98d93aab9}{object}}-\/>\mbox{\hyperlink{structyh__object__descriptor_ab63cc80a958a1debc4ac0ee255810fa5}{label}},\ response.label,\ \mbox{\hyperlink{yubihsm_8h_a431f8b753552a8b2f5f980e871b6d019}{YH\_OBJ\_LABEL\_LEN}});}
 \DoxyCodeLine{\Hypertarget{yubihsm_8c_source_l01201}01201\ \ \ \ \ \ \ \textcolor{keywordtype}{object}-\/>label[\mbox{\hyperlink{yubihsm_8h_a431f8b753552a8b2f5f980e871b6d019}{YH\_OBJ\_LABEL\_LEN}}]\ =\ 0;}
 \DoxyCodeLine{\Hypertarget{yubihsm_8c_source_l01202}01202\ }
-\DoxyCodeLine{\Hypertarget{yubihsm_8c_source_l01203}01203\ \ \ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_ae785d5badbf1f08b491af31f32a135a1}{memcpy}}(object-\/>delegated\_capabilities.capabilities,}
+\DoxyCodeLine{\Hypertarget{yubihsm_8c_source_l01203}01203\ \ \ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_ae785d5badbf1f08b491af31f32a135a1}{memcpy}}(\mbox{\hyperlink{yubihsm__pkcs11_8c_a85d991d90970121ba1480cd98d93aab9}{object}}-\/>\mbox{\hyperlink{structyh__object__descriptor_a98e1c698e0d1344c4fe4a215d2d633ec}{delegated\_capabilities}}.\mbox{\hyperlink{structyh__capabilities_a5398bad7e61385aa127265ba0a053079}{capabilities}},}
 \DoxyCodeLine{\Hypertarget{yubihsm_8c_source_l01204}01204\ \ \ \ \ \ \ \ \ \ \ \ \ \ response.delegated\_capabilities,\ \mbox{\hyperlink{yubihsm_8h_ad3c904849d17cae0a6f426e8007731d7}{YH\_CAPABILITIES\_LEN}});}
 \DoxyCodeLine{\Hypertarget{yubihsm_8c_source_l01205}01205\ \ \ \ \ \}}
 \DoxyCodeLine{\Hypertarget{yubihsm_8c_source_l01206}01206\ \ \ \}\ \textcolor{keywordflow}{else}\ \{}

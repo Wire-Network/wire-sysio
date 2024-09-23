@@ -119,9 +119,9 @@ Public Types</h2></td></tr>
 Public Member Functions</h2></td></tr>
 <tr class="memitem:ad9a4c224c92176d57a865191f419802f" id="r_ad9a4c224c92176d57a865191f419802f"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ad9a4c224c92176d57a865191f419802f">ContainerEqMatcher</a> (const Container &amp;expected)</td></tr>
 <tr class="separator:ad9a4c224c92176d57a865191f419802f"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a28ace6da475d05134916eb50e54baf1e" id="r_a28ace6da475d05134916eb50e54baf1e"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a28ace6da475d05134916eb50e54baf1e">DescribeTo</a> (::std::ostream *os) const</td></tr>
+<tr class="memitem:a28ace6da475d05134916eb50e54baf1e" id="r_a28ace6da475d05134916eb50e54baf1e"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a28ace6da475d05134916eb50e54baf1e">DescribeTo</a> (::std::ostream *<a class="el" href="environment_8hpp.html#a3951483d0b31c29ca95336206cd35238">os</a>) const</td></tr>
 <tr class="separator:a28ace6da475d05134916eb50e54baf1e"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a3dc9e61b6aff65039325138dccccb8ec" id="r_a3dc9e61b6aff65039325138dccccb8ec"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a3dc9e61b6aff65039325138dccccb8ec">DescribeNegationTo</a> (::std::ostream *os) const</td></tr>
+<tr class="memitem:a3dc9e61b6aff65039325138dccccb8ec" id="r_a3dc9e61b6aff65039325138dccccb8ec"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a3dc9e61b6aff65039325138dccccb8ec">DescribeNegationTo</a> (::std::ostream *<a class="el" href="environment_8hpp.html#a3951483d0b31c29ca95336206cd35238">os</a>) const</td></tr>
 <tr class="separator:a3dc9e61b6aff65039325138dccccb8ec"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a348c6139776dd7d713d100e406ee38f4" id="r_a348c6139776dd7d713d100e406ee38f4"><td class="memTemplParams" colspan="2">template&lt;typename LhsContainer &gt; </td></tr>
 <tr class="memitem:a348c6139776dd7d713d100e406ee38f4"><td class="memTemplItemLeft" align="right" valign="top">bool&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="#a348c6139776dd7d713d100e406ee38f4">MatchAndExplain</a> (const LhsContainer &amp;lhs, <a class="el" href="classtesting_1_1_match_result_listener.html">MatchResultListener</a> *listener) const</td></tr>
@@ -263,9 +263,10 @@ template&lt;typename Container &gt; </div>
 
 <p class="definition">Definition at line <a class="el" href="gmock-matchers_8h_source.html#l02836">2836</a> of file <a class="el" href="gmock-matchers_8h_source.html">gmock-matchers.h</a>.</p>
 <div class="fragment"><div class="line"><span class="lineno"> 2836</span>                                                {</div>
-<div class="line"><span class="lineno"> 2837</span>    *os &lt;&lt; <span class="stringliteral">&quot;does not equal &quot;</span>;</div>
-<div class="line"><span class="lineno"> 2838</span>    <a class="code hl_function" href="namespacetesting_1_1internal.html#a30708fa2bacf11895b03bdb21eb72309">UniversalPrint</a>(expected_, os);</div>
+<div class="line"><span class="lineno"> 2837</span>    *<a class="code hl_variable" href="environment_8hpp.html#a3951483d0b31c29ca95336206cd35238">os</a> &lt;&lt; <span class="stringliteral">&quot;does not equal &quot;</span>;</div>
+<div class="line"><span class="lineno"> 2838</span>    <a class="code hl_function" href="namespacetesting_1_1internal.html#a30708fa2bacf11895b03bdb21eb72309">UniversalPrint</a>(expected_, <a class="code hl_variable" href="environment_8hpp.html#a3951483d0b31c29ca95336206cd35238">os</a>);</div>
 <div class="line"><span class="lineno"> 2839</span>  }</div>
+<div class="ttc" id="aenvironment_8hpp_html_a3951483d0b31c29ca95336206cd35238"><div class="ttname"><a href="environment_8hpp.html#a3951483d0b31c29ca95336206cd35238">os</a></div><div class="ttdeci">os_t os</div><div class="ttdef"><b>Definition</b> <a href="environment_8hpp_source.html#l00023">environment.hpp:23</a></div></div>
 <div class="ttc" id="anamespacetesting_1_1internal_html_a30708fa2bacf11895b03bdb21eb72309"><div class="ttname"><a href="namespacetesting_1_1internal.html#a30708fa2bacf11895b03bdb21eb72309">testing::internal::UniversalPrint</a></div><div class="ttdeci">void UniversalPrint(const T &amp;value, ::std::ostream *os)</div><div class="ttdef"><b>Definition</b> <a href="gtest-printers_8h_source.html#l00931">gtest-printers.h:931</a></div></div>
 </div><!-- fragment --><div class="dynheader">
 Here is the call graph for this function:</div>
@@ -312,8 +313,8 @@ template&lt;typename Container &gt; </div>
 
 <p class="definition">Definition at line <a class="el" href="gmock-matchers_8h_source.html#l02832">2832</a> of file <a class="el" href="gmock-matchers_8h_source.html">gmock-matchers.h</a>.</p>
 <div class="fragment"><div class="line"><span class="lineno"> 2832</span>                                        {</div>
-<div class="line"><span class="lineno"> 2833</span>    *os &lt;&lt; <span class="stringliteral">&quot;equals &quot;</span>;</div>
-<div class="line"><span class="lineno"> 2834</span>    <a class="code hl_function" href="namespacetesting_1_1internal.html#a30708fa2bacf11895b03bdb21eb72309">UniversalPrint</a>(expected_, os);</div>
+<div class="line"><span class="lineno"> 2833</span>    *<a class="code hl_variable" href="environment_8hpp.html#a3951483d0b31c29ca95336206cd35238">os</a> &lt;&lt; <span class="stringliteral">&quot;equals &quot;</span>;</div>
+<div class="line"><span class="lineno"> 2834</span>    <a class="code hl_function" href="namespacetesting_1_1internal.html#a30708fa2bacf11895b03bdb21eb72309">UniversalPrint</a>(expected_, <a class="code hl_variable" href="environment_8hpp.html#a3951483d0b31c29ca95336206cd35238">os</a>);</div>
 <div class="line"><span class="lineno"> 2835</span>  }</div>
 </div><!-- fragment --><div class="dynheader">
 Here is the call graph for this function:</div>
@@ -375,8 +376,8 @@ template&lt;typename LhsContainer &gt; </div>
 <div class="line"><span class="lineno"> 2850</span>    <span class="keywordflow">if</span> (lhs_stl_container == expected_)</div>
 <div class="line"><span class="lineno"> 2851</span>      <span class="keywordflow">return</span> <span class="keyword">true</span>;</div>
 <div class="line"><span class="lineno"> 2852</span> </div>
-<div class="line"><span class="lineno"> 2853</span>    ::std::ostream* <span class="keyword">const</span> os = listener-&gt;stream();</div>
-<div class="line"><span class="lineno"> 2854</span>    <span class="keywordflow">if</span> (os != NULL) {</div>
+<div class="line"><span class="lineno"> 2853</span>    ::std::ostream* <span class="keyword">const</span> <a class="code hl_variable" href="environment_8hpp.html#a3951483d0b31c29ca95336206cd35238">os</a> = listener-&gt;stream();</div>
+<div class="line"><span class="lineno"> 2854</span>    <span class="keywordflow">if</span> (<a class="code hl_variable" href="environment_8hpp.html#a3951483d0b31c29ca95336206cd35238">os</a> != NULL) {</div>
 <div class="line"><span class="lineno"> 2855</span>      <span class="comment">// Something is different. Check for extra values first.</span></div>
 <div class="line"><span class="lineno"> 2856</span>      <span class="keywordtype">bool</span> printed_header = <span class="keyword">false</span>;</div>
 <div class="line"><span class="lineno"> 2857</span>      <span class="keywordflow">for</span> (<span class="keyword">typename</span> LhsStlContainer::const_iterator it =</div>
@@ -385,12 +386,12 @@ template&lt;typename LhsContainer &gt; </div>
 <div class="line"><span class="lineno"> 2860</span>        <span class="keywordflow">if</span> (<a class="code hl_function" href="namespacetesting_1_1internal.html#a94a857fe6ff32cf4fdc4769a4071f239">internal::ArrayAwareFind</a>(expected_.begin(), expected_.end(), *it) ==</div>
 <div class="line"><span class="lineno"> 2861</span>            expected_.end()) {</div>
 <div class="line"><span class="lineno"> 2862</span>          <span class="keywordflow">if</span> (printed_header) {</div>
-<div class="line"><span class="lineno"> 2863</span>            *os &lt;&lt; <span class="stringliteral">&quot;, &quot;</span>;</div>
+<div class="line"><span class="lineno"> 2863</span>            *<a class="code hl_variable" href="environment_8hpp.html#a3951483d0b31c29ca95336206cd35238">os</a> &lt;&lt; <span class="stringliteral">&quot;, &quot;</span>;</div>
 <div class="line"><span class="lineno"> 2864</span>          } <span class="keywordflow">else</span> {</div>
-<div class="line"><span class="lineno"> 2865</span>            *os &lt;&lt; <span class="stringliteral">&quot;which has these unexpected elements: &quot;</span>;</div>
+<div class="line"><span class="lineno"> 2865</span>            *<a class="code hl_variable" href="environment_8hpp.html#a3951483d0b31c29ca95336206cd35238">os</a> &lt;&lt; <span class="stringliteral">&quot;which has these unexpected elements: &quot;</span>;</div>
 <div class="line"><span class="lineno"> 2866</span>            printed_header = <span class="keyword">true</span>;</div>
 <div class="line"><span class="lineno"> 2867</span>          }</div>
-<div class="line"><span class="lineno"> 2868</span>          <a class="code hl_function" href="namespacetesting_1_1internal.html#a30708fa2bacf11895b03bdb21eb72309">UniversalPrint</a>(*it, os);</div>
+<div class="line"><span class="lineno"> 2868</span>          <a class="code hl_function" href="namespacetesting_1_1internal.html#a30708fa2bacf11895b03bdb21eb72309">UniversalPrint</a>(*it, <a class="code hl_variable" href="environment_8hpp.html#a3951483d0b31c29ca95336206cd35238">os</a>);</div>
 <div class="line"><span class="lineno"> 2869</span>        }</div>
 <div class="line"><span class="lineno"> 2870</span>      }</div>
 <div class="line"><span class="lineno"> 2871</span> </div>
@@ -402,13 +403,13 @@ template&lt;typename LhsContainer &gt; </div>
 <div class="line"><span class="lineno"> 2877</span>                lhs_stl_container.begin(), lhs_stl_container.end(), *it) ==</div>
 <div class="line"><span class="lineno"> 2878</span>            lhs_stl_container.end()) {</div>
 <div class="line"><span class="lineno"> 2879</span>          <span class="keywordflow">if</span> (printed_header2) {</div>
-<div class="line"><span class="lineno"> 2880</span>            *os &lt;&lt; <span class="stringliteral">&quot;, &quot;</span>;</div>
+<div class="line"><span class="lineno"> 2880</span>            *<a class="code hl_variable" href="environment_8hpp.html#a3951483d0b31c29ca95336206cd35238">os</a> &lt;&lt; <span class="stringliteral">&quot;, &quot;</span>;</div>
 <div class="line"><span class="lineno"> 2881</span>          } <span class="keywordflow">else</span> {</div>
-<div class="line"><span class="lineno"> 2882</span>            *os &lt;&lt; (printed_header ? <span class="stringliteral">&quot;,\nand&quot;</span> : <span class="stringliteral">&quot;which&quot;</span>)</div>
+<div class="line"><span class="lineno"> 2882</span>            *<a class="code hl_variable" href="environment_8hpp.html#a3951483d0b31c29ca95336206cd35238">os</a> &lt;&lt; (printed_header ? <span class="stringliteral">&quot;,\nand&quot;</span> : <span class="stringliteral">&quot;which&quot;</span>)</div>
 <div class="line"><span class="lineno"> 2883</span>                &lt;&lt; <span class="stringliteral">&quot; doesn&#39;t have these expected elements: &quot;</span>;</div>
 <div class="line"><span class="lineno"> 2884</span>            printed_header2 = <span class="keyword">true</span>;</div>
 <div class="line"><span class="lineno"> 2885</span>          }</div>
-<div class="line"><span class="lineno"> 2886</span>          <a class="code hl_function" href="namespacetesting_1_1internal.html#a30708fa2bacf11895b03bdb21eb72309">UniversalPrint</a>(*it, os);</div>
+<div class="line"><span class="lineno"> 2886</span>          <a class="code hl_function" href="namespacetesting_1_1internal.html#a30708fa2bacf11895b03bdb21eb72309">UniversalPrint</a>(*it, <a class="code hl_variable" href="environment_8hpp.html#a3951483d0b31c29ca95336206cd35238">os</a>);</div>
 <div class="line"><span class="lineno"> 2887</span>        }</div>
 <div class="line"><span class="lineno"> 2888</span>      }</div>
 <div class="line"><span class="lineno"> 2889</span>    }</div>

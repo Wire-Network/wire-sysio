@@ -205,7 +205,7 @@ Public Attributes</h2></td></tr>
 <p class="definition">Definition at line <a class="el" href="rate__limiting_8cpp_source.html#l00092">92</a> of file <a class="el" href="rate__limiting_8cpp_source.html">rate_limiting.cpp</a>.</p>
 <div class="fragment"><div class="line"><span class="lineno">   96</span>                                                                             :</div>
 <div class="line"><span class="lineno">   97</span>        <a class="code hl_function" href="classfc_1_1detail_1_1rate__limited__operation.html#aa04333ce2124f5041df4d4c29edf6c43">rate_limited_operation</a>(length, <a class="code hl_variable" href="classfc_1_1detail_1_1rate__limited__operation.html#a6ba877d2a0fdcb8b029af48feb07421f">offset</a>, std::move(<a class="code hl_variable" href="classfc_1_1detail_1_1rate__limited__operation.html#ac8b6e31c5908b626e58252fe8048f8b9">completion_promise</a>)),</div>
-<div class="line"><span class="lineno">   98</span>        <a class="code hl_variable" href="#a4c916b88d155e708d9a1962b360b723e">socket</a>(socket),</div>
+<div class="line"><span class="lineno">   98</span>        <a class="code hl_variable" href="#a4c916b88d155e708d9a1962b360b723e">socket</a>(<a class="code hl_variable" href="#a4c916b88d155e708d9a1962b360b723e">socket</a>),</div>
 <div class="line"><span class="lineno">   99</span>        <a class="code hl_variable" href="#a13d0bf1fee25d9e43e8dadc16ed3e0f1">raw_buffer</a>(buffer)</div>
 <div class="line"><span class="lineno">  100</span>      {}</div>
 <div class="ttc" id="aclassfc_1_1detail_1_1rate__limited__operation_html_a6ba877d2a0fdcb8b029af48feb07421f"><div class="ttname"><a href="classfc_1_1detail_1_1rate__limited__operation.html#a6ba877d2a0fdcb8b029af48feb07421f">fc::detail::rate_limited_operation::offset</a></div><div class="ttdeci">size_t offset</div><div class="ttdef"><b>Definition</b> <a href="rate__limiting_8cpp_source.html#l00024">rate_limiting.cpp:24</a></div></div>
@@ -261,7 +261,7 @@ Public Attributes</h2></td></tr>
 <p class="definition">Definition at line <a class="el" href="rate__limiting_8cpp_source.html#l00101">101</a> of file <a class="el" href="rate__limiting_8cpp_source.html">rate_limiting.cpp</a>.</p>
 <div class="fragment"><div class="line"><span class="lineno">  105</span>                                                                             :</div>
 <div class="line"><span class="lineno">  106</span>        <a class="code hl_function" href="classfc_1_1detail_1_1rate__limited__operation.html#aa04333ce2124f5041df4d4c29edf6c43">rate_limited_operation</a>(length, <a class="code hl_variable" href="classfc_1_1detail_1_1rate__limited__operation.html#a6ba877d2a0fdcb8b029af48feb07421f">offset</a>, std::move(<a class="code hl_variable" href="classfc_1_1detail_1_1rate__limited__operation.html#ac8b6e31c5908b626e58252fe8048f8b9">completion_promise</a>)),</div>
-<div class="line"><span class="lineno">  107</span>        <a class="code hl_variable" href="#a4c916b88d155e708d9a1962b360b723e">socket</a>(socket),</div>
+<div class="line"><span class="lineno">  107</span>        <a class="code hl_variable" href="#a4c916b88d155e708d9a1962b360b723e">socket</a>(<a class="code hl_variable" href="#a4c916b88d155e708d9a1962b360b723e">socket</a>),</div>
 <div class="line"><span class="lineno">  108</span>        <a class="code hl_variable" href="#a13d0bf1fee25d9e43e8dadc16ed3e0f1">raw_buffer</a>(<span class="keyword">nullptr</span>),</div>
 <div class="line"><span class="lineno">  109</span>        <a class="code hl_variable" href="#a0828f567076e86c02d32596215fa9fb6">shared_buffer</a>(buffer)</div>
 <div class="line"><span class="lineno">  110</span>      {}</div>
@@ -298,11 +298,11 @@ Public Attributes</h2></td></tr>
 <p class="definition">Definition at line <a class="el" href="rate__limiting_8cpp_source.html#l00111">111</a> of file <a class="el" href="rate__limiting_8cpp_source.html">rate_limiting.cpp</a>.</p>
 <div class="fragment"><div class="line"><span class="lineno">  112</span>      {</div>
 <div class="line"><span class="lineno">  113</span>        <span class="keywordflow">if</span> (<a class="code hl_variable" href="#a13d0bf1fee25d9e43e8dadc16ed3e0f1">raw_buffer</a>)</div>
-<div class="line"><span class="lineno">  114</span>          asio::async_read_some(socket,</div>
+<div class="line"><span class="lineno">  114</span>          asio::async_read_some(<a class="code hl_variable" href="#a4c916b88d155e708d9a1962b360b723e">socket</a>,</div>
 <div class="line"><span class="lineno">  115</span>                                <a class="code hl_variable" href="#a13d0bf1fee25d9e43e8dadc16ed3e0f1">raw_buffer</a>, <a class="code hl_variable" href="classfc_1_1detail_1_1rate__limited__operation.html#ae0ebd3357543b80e348bf68b75b796ad">permitted_length</a>,</div>
 <div class="line"><span class="lineno">  116</span>                                <a class="code hl_variable" href="classfc_1_1detail_1_1rate__limited__operation.html#ac8b6e31c5908b626e58252fe8048f8b9">completion_promise</a>);</div>
 <div class="line"><span class="lineno">  117</span>        <span class="keywordflow">else</span></div>
-<div class="line"><span class="lineno">  118</span>          asio::async_read_some(socket,</div>
+<div class="line"><span class="lineno">  118</span>          asio::async_read_some(<a class="code hl_variable" href="#a4c916b88d155e708d9a1962b360b723e">socket</a>,</div>
 <div class="line"><span class="lineno">  119</span>                                <a class="code hl_variable" href="#a0828f567076e86c02d32596215fa9fb6">shared_buffer</a>, <a class="code hl_variable" href="classfc_1_1detail_1_1rate__limited__operation.html#ae0ebd3357543b80e348bf68b75b796ad">permitted_length</a>, <a class="code hl_variable" href="classfc_1_1detail_1_1rate__limited__operation.html#a6ba877d2a0fdcb8b029af48feb07421f">offset</a>,</div>
 <div class="line"><span class="lineno">  120</span>                                <a class="code hl_variable" href="classfc_1_1detail_1_1rate__limited__operation.html#ac8b6e31c5908b626e58252fe8048f8b9">completion_promise</a>);</div>
 <div class="line"><span class="lineno">  121</span> </div>

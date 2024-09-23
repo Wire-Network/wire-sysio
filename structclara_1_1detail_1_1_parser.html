@@ -153,7 +153,7 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:a61838926e30c4c006fcfa43373574f1f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ac2f7b679060b1541c2d12a5da4f37ee4" id="r_ac2f7b679060b1541c2d12a5da4f37ee4"><td class="memItemLeft" align="right" valign="top">auto&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ac2f7b679060b1541c2d12a5da4f37ee4">getHelpColumns</a> () const -&gt; std::vector&lt; <a class="el" href="structclara_1_1detail_1_1_help_columns.html">HelpColumns</a> &gt;</td></tr>
 <tr class="separator:ac2f7b679060b1541c2d12a5da4f37ee4"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ad5838414ec7c9be46913843d5846b1e4" id="r_ad5838414ec7c9be46913843d5846b1e4"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ad5838414ec7c9be46913843d5846b1e4">writeToStream</a> (std::ostream &amp;os) const</td></tr>
+<tr class="memitem:ad5838414ec7c9be46913843d5846b1e4" id="r_ad5838414ec7c9be46913843d5846b1e4"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ad5838414ec7c9be46913843d5846b1e4">writeToStream</a> (std::ostream &amp;<a class="el" href="environment_8hpp.html#a3951483d0b31c29ca95336206cd35238">os</a>) const</td></tr>
 <tr class="separator:ad5838414ec7c9be46913843d5846b1e4"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ac58012621fe7c1bb045716adf88e8b90" id="r_ac58012621fe7c1bb045716adf88e8b90"><td class="memItemLeft" align="right" valign="top">auto&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ac58012621fe7c1bb045716adf88e8b90">validate</a> () const -&gt; <a class="el" href="namespaceclara_1_1detail.html#a57bf21ea8e75684643e79c81502fb570">Result</a> override</td></tr>
 <tr class="separator:ac58012621fe7c1bb045716adf88e8b90"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -180,7 +180,7 @@ Public Attributes</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="friends" name="friends"></a>
 Friends</h2></td></tr>
-<tr class="memitem:a4356adbe31ad7e63bde83df60d685fab" id="r_a4356adbe31ad7e63bde83df60d685fab"><td class="memItemLeft" align="right" valign="top">auto&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a4356adbe31ad7e63bde83df60d685fab">operator&lt;&lt;</a> (std::ostream &amp;os, <a class="el" href="structclara_1_1detail_1_1_parser.html">Parser</a> const &amp;parser) -&gt; std::ostream &amp;</td></tr>
+<tr class="memitem:a4356adbe31ad7e63bde83df60d685fab" id="r_a4356adbe31ad7e63bde83df60d685fab"><td class="memItemLeft" align="right" valign="top">auto&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a4356adbe31ad7e63bde83df60d685fab">operator&lt;&lt;</a> (std::ostream &amp;<a class="el" href="environment_8hpp.html#a3951483d0b31c29ca95336206cd35238">os</a>, <a class="el" href="structclara_1_1detail_1_1_parser.html">Parser</a> const &amp;parser) -&gt; std::ostream &amp;</td></tr>
 <tr class="separator:a4356adbe31ad7e63bde83df60d685fab"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
@@ -521,9 +521,8 @@ Here is the caller graph for this function:</div>
 
 <p class="definition">Definition at line <a class="el" href="third__party_2clara_8hpp_source.html#l00816">816</a> of file <a class="el" href="third__party_2clara_8hpp_source.html">clara.hpp</a>.</p>
 <div class="fragment"><div class="line"><span class="lineno">  816</span>                                                                    {</div>
-<div class="line"><span class="lineno">  817</span>            <span class="keywordflow">return</span> <a class="code hl_function" href="#aec5426284cef80ba61c3cecc51668240">parse</a>( <a class="code hl_variable" href="namespacebenchmark_compile.html#ad0ed96ae1454e4347ca61ac3887c379e">args</a>.exeName(), TokenStream( args ) );</div>
+<div class="line"><span class="lineno">  817</span>            <span class="keywordflow">return</span> <a class="code hl_function" href="#aec5426284cef80ba61c3cecc51668240">parse</a>( args.exeName(), TokenStream( args ) );</div>
 <div class="line"><span class="lineno">  818</span>        }</div>
-<div class="ttc" id="anamespacebenchmark_compile_html_ad0ed96ae1454e4347ca61ac3887c379e"><div class="ttname"><a href="namespacebenchmark_compile.html#ad0ed96ae1454e4347ca61ac3887c379e">benchmarkCompile.args</a></div><div class="ttdeci">args</div><div class="ttdef"><b>Definition</b> <a href="benchmark_compile_8py_source.html#l00122">benchmarkCompile.py:122</a></div></div>
 <div class="ttc" id="astructclara_1_1detail_1_1_parser_html_aec5426284cef80ba61c3cecc51668240"><div class="ttname"><a href="#aec5426284cef80ba61c3cecc51668240">clara::detail::Parser::parse</a></div><div class="ttdeci">auto parse(std::string const &amp;exeName, TokenStream const &amp;tokens) const -&gt; InternalParseResult override</div><div class="ttdef"><b>Definition</b> <a href="third__party_2clara_8hpp_source.html#l01185">clara.hpp:1185</a></div></div>
 </div><!-- fragment -->
 </div>
@@ -561,7 +560,7 @@ Here is the caller graph for this function:</div>
 <div class="fragment"><div class="line"><span class="lineno"> 1185</span>                                                                                                                {</div>
 <div class="line"><span class="lineno"> 1186</span> </div>
 <div class="line"><span class="lineno"> 1187</span>            <span class="keyword">struct </span>ParserInfo {</div>
-<div class="line"><span class="lineno"> 1188</span>                ParserBase <span class="keyword">const</span>* <a class="code hl_variable" href="namespaceupload.html#af9e508d19dc2dd9cdb7c642dde0bdd21">parser</a> = <span class="keyword">nullptr</span>;</div>
+<div class="line"><span class="lineno"> 1188</span>                ParserBase <span class="keyword">const</span>* parser = <span class="keyword">nullptr</span>;</div>
 <div class="line"><span class="lineno"> 1189</span>                <span class="keywordtype">size_t</span> <a class="code hl_variable" href="gmock__stress__test_8cc.html#afd9db40e3361ae09188795e8cbe19752">count</a> = 0;</div>
 <div class="line"><span class="lineno"> 1190</span>            };</div>
 <div class="line"><span class="lineno"> 1191</span>            <span class="keyword">const</span> <span class="keywordtype">size_t</span> totalParsers = <a class="code hl_variable" href="#accf437513e1ab63abbf7a461667723e0">m_options</a>.size() + <a class="code hl_variable" href="#a73161ea34c68eb563317c1efbaba6d72">m_args</a>.size();</div>
@@ -609,7 +608,6 @@ Here is the caller graph for this function:</div>
 <div class="ttc" id="agmock__stress__test_8cc_html_afd9db40e3361ae09188795e8cbe19752"><div class="ttname"><a href="gmock__stress__test_8cc.html#afd9db40e3361ae09188795e8cbe19752">count</a></div><div class="ttdeci">int * count</div><div class="ttdef"><b>Definition</b> <a href="gmock__stress__test_8cc_source.html#l00177">gmock_stress_test.cc:177</a></div></div>
 <div class="ttc" id="anamespaceclara_1_1detail_html_a8da7ceac0fa5d56539ef81f04348193baaa79962a9cad5bd52c86305ad0bd9442"><div class="ttname"><a href="namespaceclara_1_1detail.html#a8da7ceac0fa5d56539ef81f04348193baaa79962a9cad5bd52c86305ad0bd9442">clara::detail::ParseResultType::ShortCircuitAll</a></div><div class="ttdeci">@ ShortCircuitAll</div></div>
 <div class="ttc" id="anamespaceclara_1_1detail_html_a8da7ceac0fa5d56539ef81f04348193bac8b77721c677e0429241a9250972122d"><div class="ttname"><a href="namespaceclara_1_1detail.html#a8da7ceac0fa5d56539ef81f04348193bac8b77721c677e0429241a9250972122d">clara::detail::ParseResultType::NoMatch</a></div><div class="ttdeci">@ NoMatch</div></div>
-<div class="ttc" id="anamespaceupload_html_af9e508d19dc2dd9cdb7c642dde0bdd21"><div class="ttname"><a href="namespaceupload.html#af9e508d19dc2dd9cdb7c642dde0bdd21">upload.parser</a></div><div class="ttdeci">parser</div><div class="ttdef"><b>Definition</b> <a href="googlemock_2scripts_2upload_8py_source.html#l00392">upload.py:392</a></div></div>
 </div><!-- fragment --><div class="dynheader">
 Here is the call graph for this function:</div>
 <div class="dyncontent">
@@ -706,26 +704,26 @@ Here is the call graph for this function:</div>
 <p class="definition">Definition at line <a class="el" href="third__party_2clara_8hpp_source.html#l01123">1123</a> of file <a class="el" href="third__party_2clara_8hpp_source.html">clara.hpp</a>.</p>
 <div class="fragment"><div class="line"><span class="lineno"> 1123</span>                                                   {</div>
 <div class="line"><span class="lineno"> 1124</span>            <span class="keywordflow">if</span> (!<a class="code hl_variable" href="#aef5e115be8e7009c80ff292415204188">m_exeName</a>.<a class="code hl_function" href="classclara_1_1detail_1_1_exe_name.html#ae02b5e2b63f944964a62412b324c4324">name</a>().empty()) {</div>
-<div class="line"><span class="lineno"> 1125</span>                os &lt;&lt; <span class="stringliteral">&quot;usage:\n&quot;</span> &lt;&lt; <span class="stringliteral">&quot;  &quot;</span> &lt;&lt; <a class="code hl_variable" href="#aef5e115be8e7009c80ff292415204188">m_exeName</a>.<a class="code hl_function" href="classclara_1_1detail_1_1_exe_name.html#ae02b5e2b63f944964a62412b324c4324">name</a>() &lt;&lt; <span class="stringliteral">&quot; &quot;</span>;</div>
+<div class="line"><span class="lineno"> 1125</span>                <a class="code hl_variable" href="environment_8hpp.html#a3951483d0b31c29ca95336206cd35238">os</a> &lt;&lt; <span class="stringliteral">&quot;usage:\n&quot;</span> &lt;&lt; <span class="stringliteral">&quot;  &quot;</span> &lt;&lt; <a class="code hl_variable" href="#aef5e115be8e7009c80ff292415204188">m_exeName</a>.<a class="code hl_function" href="classclara_1_1detail_1_1_exe_name.html#ae02b5e2b63f944964a62412b324c4324">name</a>() &lt;&lt; <span class="stringliteral">&quot; &quot;</span>;</div>
 <div class="line"><span class="lineno"> 1126</span>                <span class="keywordtype">bool</span> required = <span class="keyword">true</span>, first = <span class="keyword">true</span>;</div>
 <div class="line"><span class="lineno"> 1127</span>                <span class="keywordflow">for</span>( <span class="keyword">auto</span> <span class="keyword">const</span> &amp;arg : <a class="code hl_variable" href="#a73161ea34c68eb563317c1efbaba6d72">m_args</a> ) {</div>
 <div class="line"><span class="lineno"> 1128</span>                    <span class="keywordflow">if</span> (first)</div>
 <div class="line"><span class="lineno"> 1129</span>                        first = <span class="keyword">false</span>;</div>
 <div class="line"><span class="lineno"> 1130</span>                    <span class="keywordflow">else</span></div>
-<div class="line"><span class="lineno"> 1131</span>                        os &lt;&lt; <span class="stringliteral">&quot; &quot;</span>;</div>
+<div class="line"><span class="lineno"> 1131</span>                        <a class="code hl_variable" href="environment_8hpp.html#a3951483d0b31c29ca95336206cd35238">os</a> &lt;&lt; <span class="stringliteral">&quot; &quot;</span>;</div>
 <div class="line"><span class="lineno"> 1132</span>                    <span class="keywordflow">if</span>( arg.isOptional() &amp;&amp; required ) {</div>
-<div class="line"><span class="lineno"> 1133</span>                        os &lt;&lt; <span class="stringliteral">&quot;[&quot;</span>;</div>
+<div class="line"><span class="lineno"> 1133</span>                        <a class="code hl_variable" href="environment_8hpp.html#a3951483d0b31c29ca95336206cd35238">os</a> &lt;&lt; <span class="stringliteral">&quot;[&quot;</span>;</div>
 <div class="line"><span class="lineno"> 1134</span>                        required = <span class="keyword">false</span>;</div>
 <div class="line"><span class="lineno"> 1135</span>                    }</div>
-<div class="line"><span class="lineno"> 1136</span>                    os &lt;&lt; <span class="stringliteral">&quot;&lt;&quot;</span> &lt;&lt; arg.hint() &lt;&lt; <span class="stringliteral">&quot;&gt;&quot;</span>;</div>
+<div class="line"><span class="lineno"> 1136</span>                    <a class="code hl_variable" href="environment_8hpp.html#a3951483d0b31c29ca95336206cd35238">os</a> &lt;&lt; <span class="stringliteral">&quot;&lt;&quot;</span> &lt;&lt; arg.hint() &lt;&lt; <span class="stringliteral">&quot;&gt;&quot;</span>;</div>
 <div class="line"><span class="lineno"> 1137</span>                    <span class="keywordflow">if</span>( arg.cardinality() == 0 )</div>
-<div class="line"><span class="lineno"> 1138</span>                        os &lt;&lt; <span class="stringliteral">&quot; ... &quot;</span>;</div>
+<div class="line"><span class="lineno"> 1138</span>                        <a class="code hl_variable" href="environment_8hpp.html#a3951483d0b31c29ca95336206cd35238">os</a> &lt;&lt; <span class="stringliteral">&quot; ... &quot;</span>;</div>
 <div class="line"><span class="lineno"> 1139</span>                }</div>
 <div class="line"><span class="lineno"> 1140</span>                <span class="keywordflow">if</span>( !required )</div>
-<div class="line"><span class="lineno"> 1141</span>                    os &lt;&lt; <span class="stringliteral">&quot;]&quot;</span>;</div>
+<div class="line"><span class="lineno"> 1141</span>                    <a class="code hl_variable" href="environment_8hpp.html#a3951483d0b31c29ca95336206cd35238">os</a> &lt;&lt; <span class="stringliteral">&quot;]&quot;</span>;</div>
 <div class="line"><span class="lineno"> 1142</span>                <span class="keywordflow">if</span>( !<a class="code hl_variable" href="#accf437513e1ab63abbf7a461667723e0">m_options</a>.empty() )</div>
-<div class="line"><span class="lineno"> 1143</span>                    os &lt;&lt; <span class="stringliteral">&quot; options&quot;</span>;</div>
-<div class="line"><span class="lineno"> 1144</span>                os &lt;&lt; <span class="stringliteral">&quot;\n\nwhere options are:&quot;</span> &lt;&lt; std::endl;</div>
+<div class="line"><span class="lineno"> 1143</span>                    <a class="code hl_variable" href="environment_8hpp.html#a3951483d0b31c29ca95336206cd35238">os</a> &lt;&lt; <span class="stringliteral">&quot; options&quot;</span>;</div>
+<div class="line"><span class="lineno"> 1144</span>                <a class="code hl_variable" href="environment_8hpp.html#a3951483d0b31c29ca95336206cd35238">os</a> &lt;&lt; <span class="stringliteral">&quot;\n\nwhere options are:&quot;</span> &lt;&lt; std::endl;</div>
 <div class="line"><span class="lineno"> 1145</span>            }</div>
 <div class="line"><span class="lineno"> 1146</span> </div>
 <div class="line"><span class="lineno"> 1147</span>            <span class="keyword">auto</span> rows = <a class="code hl_function" href="#ac2f7b679060b1541c2d12a5da4f37ee4">getHelpColumns</a>();</div>
@@ -741,10 +739,11 @@ Here is the call graph for this function:</div>
 <div class="line"><span class="lineno"> 1157</span>                        TextFlow::Column( cols.left ).width( optWidth ).indent( 2 ) +</div>
 <div class="line"><span class="lineno"> 1158</span>                        TextFlow::Spacer(4) +</div>
 <div class="line"><span class="lineno"> 1159</span>                        TextFlow::Column( cols.right ).width( consoleWidth - 7 - optWidth );</div>
-<div class="line"><span class="lineno"> 1160</span>                os &lt;&lt; row &lt;&lt; std::endl;</div>
+<div class="line"><span class="lineno"> 1160</span>                <a class="code hl_variable" href="environment_8hpp.html#a3951483d0b31c29ca95336206cd35238">os</a> &lt;&lt; row &lt;&lt; std::endl;</div>
 <div class="line"><span class="lineno"> 1161</span>            }</div>
 <div class="line"><span class="lineno"> 1162</span>        }</div>
 <div class="ttc" id="aclassclara_1_1detail_1_1_exe_name_html_ae02b5e2b63f944964a62412b324c4324"><div class="ttname"><a href="classclara_1_1detail_1_1_exe_name.html#ae02b5e2b63f944964a62412b324c4324">clara::detail::ExeName::name</a></div><div class="ttdeci">auto name() const -&gt; std::string</div><div class="ttdef"><b>Definition</b> <a href="third__party_2clara_8hpp_source.html#l00910">clara.hpp:910</a></div></div>
+<div class="ttc" id="aenvironment_8hpp_html_a3951483d0b31c29ca95336206cd35238"><div class="ttname"><a href="environment_8hpp.html#a3951483d0b31c29ca95336206cd35238">os</a></div><div class="ttdeci">os_t os</div><div class="ttdef"><b>Definition</b> <a href="environment_8hpp_source.html#l00023">environment.hpp:23</a></div></div>
 <div class="ttc" id="astructclara_1_1detail_1_1_parser_html_ac2f7b679060b1541c2d12a5da4f37ee4"><div class="ttname"><a href="#ac2f7b679060b1541c2d12a5da4f37ee4">clara::detail::Parser::getHelpColumns</a></div><div class="ttdeci">auto getHelpColumns() const -&gt; std::vector&lt; HelpColumns &gt;</div><div class="ttdef"><b>Definition</b> <a href="third__party_2clara_8hpp_source.html#l01114">clara.hpp:1114</a></div></div>
 <div class="ttc" id="athird__party_2clara_8hpp_html_a808a0d2df0884a96a504a53f7953608e"><div class="ttname"><a href="third__party_2clara_8hpp.html#a808a0d2df0884a96a504a53f7953608e">CLARA_CONFIG_CONSOLE_WIDTH</a></div><div class="ttdeci">#define CLARA_CONFIG_CONSOLE_WIDTH</div><div class="ttdef"><b>Definition</b> <a href="third__party_2clara_8hpp_source.html#l00014">clara.hpp:14</a></div></div>
 </div><!-- fragment --><div class="dynheader">
@@ -794,10 +793,9 @@ Here is the call graph for this function:</div>
 
 <p class="definition">Definition at line <a class="el" href="third__party_2clara_8hpp_source.html#l01164">1164</a> of file <a class="el" href="third__party_2clara_8hpp_source.html">clara.hpp</a>.</p>
 <div class="fragment"><div class="line"><span class="lineno"> 1164</span>                                                                                      {</div>
-<div class="line"><span class="lineno"> 1165</span>            <a class="code hl_variable" href="namespaceupload.html#af9e508d19dc2dd9cdb7c642dde0bdd21">parser</a>.writeToStream( os );</div>
+<div class="line"><span class="lineno"> 1165</span>            parser.writeToStream( <a class="code hl_variable" href="environment_8hpp.html#a3951483d0b31c29ca95336206cd35238">os</a> );</div>
 <div class="line"><span class="lineno"> 1166</span>            <span class="keywordflow">return</span> <a class="code hl_variable" href="environment_8hpp.html#a3951483d0b31c29ca95336206cd35238">os</a>;</div>
 <div class="line"><span class="lineno"> 1167</span>        }</div>
-<div class="ttc" id="aenvironment_8hpp_html_a3951483d0b31c29ca95336206cd35238"><div class="ttname"><a href="environment_8hpp.html#a3951483d0b31c29ca95336206cd35238">os</a></div><div class="ttdeci">os_t os</div><div class="ttdef"><b>Definition</b> <a href="environment_8hpp_source.html#l00023">environment.hpp:23</a></div></div>
 </div><!-- fragment -->
 </div>
 </div>

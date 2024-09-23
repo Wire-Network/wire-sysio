@@ -168,10 +168,10 @@ $(function(){initNavTree('account__object_8hpp_source.html',''); initResizable(t
 <div class="line"><a id="l00064" name="l00064"></a><span class="lineno">   64</span>      <a class="code hl_typedef" href="stdint_8h.html#aba7bc1797add20fe3efdf37ced1182c5">uint8_t</a>               <a class="code hl_enumeration" href="classsysio_1_1chain_1_1wasm__interface.html#a9053d9e65167e5f241f1f3f27b175f9c">vm_type</a> = 0;</div>
 <div class="line"><a id="l00065" name="l00065"></a><span class="lineno">   65</span>      <a class="code hl_typedef" href="stdint_8h.html#aba7bc1797add20fe3efdf37ced1182c5">uint8_t</a>               vm_version = 0;</div>
 <div class="line"><a id="l00066" name="l00066"></a><span class="lineno">   66</span> </div>
-<div class="line"><a id="l00067" name="l00067"></a><span class="lineno">   67</span>      <span class="keywordtype">bool</span> is_privileged()<span class="keyword">const </span>{ <span class="keywordflow">return</span> has_field( flags, flags_fields::privileged ); }</div>
+<div class="line"><a id="l00067" name="l00067"></a><span class="lineno">   67</span>      <span class="keywordtype">bool</span> is_privileged()<span class="keyword">const </span>{ <span class="keywordflow">return</span> has_field( <a class="code hl_variable" href="yubihsm__pkcs11_8c.html#ae0ed371842ace71a7886a6134ecbcb62">flags</a>, flags_fields::privileged ); }</div>
 <div class="line"><a id="l00068" name="l00068"></a><span class="lineno">   68</span> </div>
 <div class="line"><a id="l00069" name="l00069"></a><span class="lineno">   69</span>      <span class="keywordtype">void</span> set_privileged( <span class="keywordtype">bool</span> privileged )  {</div>
-<div class="line"><a id="l00070" name="l00070"></a><span class="lineno">   70</span>         flags = set_field( flags, flags_fields::privileged, privileged );</div>
+<div class="line"><a id="l00070" name="l00070"></a><span class="lineno">   70</span>         <a class="code hl_variable" href="yubihsm__pkcs11_8c.html#ae0ed371842ace71a7886a6134ecbcb62">flags</a> = set_field( <a class="code hl_variable" href="yubihsm__pkcs11_8c.html#ae0ed371842ace71a7886a6134ecbcb62">flags</a>, flags_fields::privileged, privileged );</div>
 <div class="line"><a id="l00071" name="l00071"></a><span class="lineno">   71</span>      }</div>
 <div class="line"><a id="l00072" name="l00072"></a><span class="lineno">   72</span>   };</div>
 </div>

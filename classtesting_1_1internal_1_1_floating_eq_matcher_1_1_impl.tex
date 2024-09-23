@@ -6,7 +6,8 @@
 
 
 
-Inheritance diagram for testing\+::internal\+::Floating\+Eq\+Matcher\texorpdfstring{$<$}{<} Float\+Type \texorpdfstring{$>$}{>}\+::Impl\texorpdfstring{$<$}{<} T \texorpdfstring{$>$}{>}\+:\nopagebreak
+Inheritance diagram for testing\+::internal\+::Floating\+Eq\+Matcher\texorpdfstring{$<$}{<} Float\+Type \texorpdfstring{$>$}{>}\+::Impl\texorpdfstring{$<$}{<} T \texorpdfstring{$>$}{>}\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -15,7 +16,8 @@ Inheritance diagram for testing\+::internal\+::Floating\+Eq\+Matcher\texorpdfstr
 \end{figure}
 
 
-Collaboration diagram for testing\+::internal\+::Floating\+Eq\+Matcher\texorpdfstring{$<$}{<} Float\+Type \texorpdfstring{$>$}{>}\+::Impl\texorpdfstring{$<$}{<} T \texorpdfstring{$>$}{>}\+:\nopagebreak
+Collaboration diagram for testing\+::internal\+::Floating\+Eq\+Matcher\texorpdfstring{$<$}{<} Float\+Type \texorpdfstring{$>$}{>}\+::Impl\texorpdfstring{$<$}{<} T \texorpdfstring{$>$}{>}\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -29,9 +31,9 @@ Collaboration diagram for testing\+::internal\+::Floating\+Eq\+Matcher\texorpdfs
 \item 
 virtual bool \mbox{\hyperlink{classtesting_1_1internal_1_1_floating_eq_matcher_1_1_impl_a4ce47c481fdc4973ed671a492f455f99}{Match\+And\+Explain}} (\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}}, \mbox{\hyperlink{classtesting_1_1_match_result_listener}{Match\+Result\+Listener}} \texorpdfstring{$\ast$}{*}listener) const
 \item 
-virtual void \mbox{\hyperlink{classtesting_1_1internal_1_1_floating_eq_matcher_1_1_impl_aab6dbbe39ef8337e4686ae0f8c81a2c3}{Describe\+To}} (\+::std\+::ostream \texorpdfstring{$\ast$}{*}os) const
+virtual void \mbox{\hyperlink{classtesting_1_1internal_1_1_floating_eq_matcher_1_1_impl_aab6dbbe39ef8337e4686ae0f8c81a2c3}{Describe\+To}} (\+::std\+::ostream \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}) const
 \item 
-virtual void \mbox{\hyperlink{classtesting_1_1internal_1_1_floating_eq_matcher_1_1_impl_a3eff238a812f4a105df1222a28f6cdbf}{Describe\+Negation\+To}} (\+::std\+::ostream \texorpdfstring{$\ast$}{*}os) const
+virtual void \mbox{\hyperlink{classtesting_1_1internal_1_1_floating_eq_matcher_1_1_impl_a3eff238a812f4a105df1222a28f6cdbf}{Describe\+Negation\+To}} (\+::std\+::ostream \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}) const
 \end{DoxyCompactItemize}
 \doxysubsection*{Public Member Functions inherited from \mbox{\hyperlink{classtesting_1_1_matcher_interface}{testing\+::\+Matcher\+Interface$<$ T $>$}}}
 \doxysubsection*{Public Member Functions inherited from \mbox{\hyperlink{classtesting_1_1_matcher_describer_interface}{testing\+::\+Matcher\+Describer\+Interface}}}
@@ -94,22 +96,22 @@ Definition at line \mbox{\hyperlink{gmock-matchers_8h_source_l02173}{2173}} of f
 \begin{DoxyCode}{0}
 \DoxyCodeLine{02173\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
 \DoxyCodeLine{02174\ \ \ \ \ \ \ \textcolor{comment}{//\ As\ before,\ get\ original\ precision.}}
-\DoxyCodeLine{02175\ \ \ \ \ \ \ const\ ::std::streamsize\ old\_precision\ =\ os-\/>precision(}
+\DoxyCodeLine{02175\ \ \ \ \ \ \ const\ ::std::streamsize\ old\_precision\ =\ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}-\/>precision(}
 \DoxyCodeLine{02176\ \ \ \ \ \ \ \ \ \ \ ::std::numeric\_limits<FloatType>::digits10\ +\ 2);}
 \DoxyCodeLine{02177\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (FloatingPoint<FloatType>(expected\_).is\_nan())\ \{}
 \DoxyCodeLine{02178\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (nan\_eq\_nan\_)\ \{}
-\DoxyCodeLine{02179\ \ \ \ \ \ \ \ \ \ \ *os\ <<\ \textcolor{stringliteral}{"{}isn't\ NaN"{}};}
+\DoxyCodeLine{02179\ \ \ \ \ \ \ \ \ \ \ *\mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}\ <<\ \textcolor{stringliteral}{"{}isn't\ NaN"{}};}
 \DoxyCodeLine{02180\ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
-\DoxyCodeLine{02181\ \ \ \ \ \ \ \ \ \ \ *os\ <<\ \textcolor{stringliteral}{"{}is\ anything"{}};}
+\DoxyCodeLine{02181\ \ \ \ \ \ \ \ \ \ \ *\mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}\ <<\ \textcolor{stringliteral}{"{}is\ anything"{}};}
 \DoxyCodeLine{02182\ \ \ \ \ \ \ \ \ \}}
 \DoxyCodeLine{02183\ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
-\DoxyCodeLine{02184\ \ \ \ \ \ \ \ \ *os\ <<\ \textcolor{stringliteral}{"{}isn't\ approximately\ "{}}\ <<\ expected\_;}
+\DoxyCodeLine{02184\ \ \ \ \ \ \ \ \ *\mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}\ <<\ \textcolor{stringliteral}{"{}isn't\ approximately\ "{}}\ <<\ expected\_;}
 \DoxyCodeLine{02185\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (HasMaxAbsError())\ \{}
-\DoxyCodeLine{02186\ \ \ \ \ \ \ \ \ \ \ *os\ <<\ \textcolor{stringliteral}{"{}\ (absolute\ error\ >\ "{}}\ <<\ max\_abs\_error\_\ <<\ \textcolor{stringliteral}{"{})"{}};}
+\DoxyCodeLine{02186\ \ \ \ \ \ \ \ \ \ \ *\mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}\ <<\ \textcolor{stringliteral}{"{}\ (absolute\ error\ >\ "{}}\ <<\ max\_abs\_error\_\ <<\ \textcolor{stringliteral}{"{})"{}};}
 \DoxyCodeLine{02187\ \ \ \ \ \ \ \ \ \}}
 \DoxyCodeLine{02188\ \ \ \ \ \ \ \}}
 \DoxyCodeLine{02189\ \ \ \ \ \ \ \textcolor{comment}{//\ Restore\ original\ precision.}}
-\DoxyCodeLine{02190\ \ \ \ \ \ \ os-\/>precision(old\_precision);}
+\DoxyCodeLine{02190\ \ \ \ \ \ \ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}-\/>precision(old\_precision);}
 \DoxyCodeLine{02191\ \ \ \ \ \}}
 
 \end{DoxyCode}
@@ -135,21 +137,21 @@ Definition at line \mbox{\hyperlink{gmock-matchers_8h_source_l02152}{2152}} of f
 \DoxyCodeLine{02153\ \ \ \ \ \ \ \textcolor{comment}{//\ os-\/>precision()\ returns\ the\ previously\ set\ precision,\ which\ we}}
 \DoxyCodeLine{02154\ \ \ \ \ \ \ \textcolor{comment}{//\ store\ to\ restore\ the\ ostream\ to\ its\ original\ configuration}}
 \DoxyCodeLine{02155\ \ \ \ \ \ \ \textcolor{comment}{//\ after\ outputting.}}
-\DoxyCodeLine{02156\ \ \ \ \ \ \ const\ ::std::streamsize\ old\_precision\ =\ os-\/>precision(}
+\DoxyCodeLine{02156\ \ \ \ \ \ \ const\ ::std::streamsize\ old\_precision\ =\ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}-\/>precision(}
 \DoxyCodeLine{02157\ \ \ \ \ \ \ \ \ \ \ ::std::numeric\_limits<FloatType>::digits10\ +\ 2);}
 \DoxyCodeLine{02158\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (FloatingPoint<FloatType>(expected\_).is\_nan())\ \{}
 \DoxyCodeLine{02159\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (nan\_eq\_nan\_)\ \{}
-\DoxyCodeLine{02160\ \ \ \ \ \ \ \ \ \ \ *os\ <<\ \textcolor{stringliteral}{"{}is\ NaN"{}};}
+\DoxyCodeLine{02160\ \ \ \ \ \ \ \ \ \ \ *\mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}\ <<\ \textcolor{stringliteral}{"{}is\ NaN"{}};}
 \DoxyCodeLine{02161\ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
-\DoxyCodeLine{02162\ \ \ \ \ \ \ \ \ \ \ *os\ <<\ \textcolor{stringliteral}{"{}never\ matches"{}};}
+\DoxyCodeLine{02162\ \ \ \ \ \ \ \ \ \ \ *\mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}\ <<\ \textcolor{stringliteral}{"{}never\ matches"{}};}
 \DoxyCodeLine{02163\ \ \ \ \ \ \ \ \ \}}
 \DoxyCodeLine{02164\ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
-\DoxyCodeLine{02165\ \ \ \ \ \ \ \ \ *os\ <<\ \textcolor{stringliteral}{"{}is\ approximately\ "{}}\ <<\ expected\_;}
+\DoxyCodeLine{02165\ \ \ \ \ \ \ \ \ *\mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}\ <<\ \textcolor{stringliteral}{"{}is\ approximately\ "{}}\ <<\ expected\_;}
 \DoxyCodeLine{02166\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (HasMaxAbsError())\ \{}
-\DoxyCodeLine{02167\ \ \ \ \ \ \ \ \ \ \ *os\ <<\ \textcolor{stringliteral}{"{}\ (absolute\ error\ <=\ "{}}\ <<\ max\_abs\_error\_\ <<\ \textcolor{stringliteral}{"{})"{}};}
+\DoxyCodeLine{02167\ \ \ \ \ \ \ \ \ \ \ *\mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}\ <<\ \textcolor{stringliteral}{"{}\ (absolute\ error\ <=\ "{}}\ <<\ max\_abs\_error\_\ <<\ \textcolor{stringliteral}{"{})"{}};}
 \DoxyCodeLine{02168\ \ \ \ \ \ \ \ \ \}}
 \DoxyCodeLine{02169\ \ \ \ \ \ \ \}}
-\DoxyCodeLine{02170\ \ \ \ \ \ \ os-\/>precision(old\_precision);}
+\DoxyCodeLine{02170\ \ \ \ \ \ \ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}-\/>precision(old\_precision);}
 \DoxyCodeLine{02171\ \ \ \ \ \}}
 
 \end{DoxyCode}
@@ -206,7 +208,8 @@ Definition at line \mbox{\hyperlink{gmock-matchers_8h_source_l02117}{2117}} of f
 \DoxyCodeLine{02150\ \ \ \ \ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode

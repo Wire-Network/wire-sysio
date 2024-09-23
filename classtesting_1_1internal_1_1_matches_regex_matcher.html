@@ -115,9 +115,9 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a57042ed4ce640738728d976f63f0702e" id="r_a57042ed4ce640738728d976f63f0702e"><td class="memTemplParams" colspan="2">template&lt;<a class="el" href="yubihsm__pkcs11_8c.html#a5c230edcb923568000cb7982cf84dfce">class</a> MatcheeStringType &gt; </td></tr>
 <tr class="memitem:a57042ed4ce640738728d976f63f0702e"><td class="memTemplItemLeft" align="right" valign="top">bool&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="#a57042ed4ce640738728d976f63f0702e">MatchAndExplain</a> (const MatcheeStringType &amp;<a class="el" href="yubihsm__pkcs11_8c.html#a506da415c9307c897ca9be93acfe1d0f">s</a>, <a class="el" href="classtesting_1_1_match_result_listener.html">MatchResultListener</a> *) const</td></tr>
 <tr class="separator:a57042ed4ce640738728d976f63f0702e"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a8ebd3a0cf33a7bad04a3daf4b0653d8f" id="r_a8ebd3a0cf33a7bad04a3daf4b0653d8f"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a8ebd3a0cf33a7bad04a3daf4b0653d8f">DescribeTo</a> (::std::ostream *os) const</td></tr>
+<tr class="memitem:a8ebd3a0cf33a7bad04a3daf4b0653d8f" id="r_a8ebd3a0cf33a7bad04a3daf4b0653d8f"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a8ebd3a0cf33a7bad04a3daf4b0653d8f">DescribeTo</a> (::std::ostream *<a class="el" href="environment_8hpp.html#a3951483d0b31c29ca95336206cd35238">os</a>) const</td></tr>
 <tr class="separator:a8ebd3a0cf33a7bad04a3daf4b0653d8f"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a63154c9c572c1e44a130d58539fde707" id="r_a63154c9c572c1e44a130d58539fde707"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a63154c9c572c1e44a130d58539fde707">DescribeNegationTo</a> (::std::ostream *os) const</td></tr>
+<tr class="memitem:a63154c9c572c1e44a130d58539fde707" id="r_a63154c9c572c1e44a130d58539fde707"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a63154c9c572c1e44a130d58539fde707">DescribeNegationTo</a> (::std::ostream *<a class="el" href="environment_8hpp.html#a3951483d0b31c29ca95336206cd35238">os</a>) const</td></tr>
 <tr class="separator:a63154c9c572c1e44a130d58539fde707"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
@@ -182,11 +182,12 @@ Public Member Functions</h2></td></tr>
 
 <p class="definition">Definition at line <a class="el" href="gmock-matchers_8h_source.html#l01587">1587</a> of file <a class="el" href="gmock-matchers_8h_source.html">gmock-matchers.h</a>.</p>
 <div class="fragment"><div class="line"><span class="lineno"> 1587</span>                                                {</div>
-<div class="line"><span class="lineno"> 1588</span>    *os &lt;&lt; <span class="stringliteral">&quot;doesn&#39;t &quot;</span> &lt;&lt; (full_match_ ? <span class="stringliteral">&quot;match&quot;</span> : <span class="stringliteral">&quot;contain&quot;</span>)</div>
+<div class="line"><span class="lineno"> 1588</span>    *<a class="code hl_variable" href="environment_8hpp.html#a3951483d0b31c29ca95336206cd35238">os</a> &lt;&lt; <span class="stringliteral">&quot;doesn&#39;t &quot;</span> &lt;&lt; (full_match_ ? <span class="stringliteral">&quot;match&quot;</span> : <span class="stringliteral">&quot;contain&quot;</span>)</div>
 <div class="line"><span class="lineno"> 1589</span>        &lt;&lt; <span class="stringliteral">&quot; regular expression &quot;</span>;</div>
-<div class="line"><span class="lineno"> 1590</span>    <a class="code hl_function" href="classtesting_1_1internal_1_1_universal_printer.html#aecec021e1abbaa260b701e24e3fe33eb">UniversalPrinter&lt;std::string&gt;::Print</a>(regex_-&gt;pattern(), os);</div>
+<div class="line"><span class="lineno"> 1590</span>    <a class="code hl_function" href="classtesting_1_1internal_1_1_universal_printer.html#aecec021e1abbaa260b701e24e3fe33eb">UniversalPrinter&lt;std::string&gt;::Print</a>(regex_-&gt;pattern(), <a class="code hl_variable" href="environment_8hpp.html#a3951483d0b31c29ca95336206cd35238">os</a>);</div>
 <div class="line"><span class="lineno"> 1591</span>  }</div>
 <div class="ttc" id="aclasstesting_1_1internal_1_1_universal_printer_html_aecec021e1abbaa260b701e24e3fe33eb"><div class="ttname"><a href="classtesting_1_1internal_1_1_universal_printer.html#aecec021e1abbaa260b701e24e3fe33eb">testing::internal::UniversalPrinter::Print</a></div><div class="ttdeci">static void Print(const T &amp;value, ::std::ostream *os)</div><div class="ttdef"><b>Definition</b> <a href="gtest-printers_8h_source.html#l00757">gtest-printers.h:757</a></div></div>
+<div class="ttc" id="aenvironment_8hpp_html_a3951483d0b31c29ca95336206cd35238"><div class="ttname"><a href="environment_8hpp.html#a3951483d0b31c29ca95336206cd35238">os</a></div><div class="ttdeci">os_t os</div><div class="ttdef"><b>Definition</b> <a href="environment_8hpp_source.html#l00023">environment.hpp:23</a></div></div>
 </div><!-- fragment --><div class="dynheader">
 Here is the call graph for this function:</div>
 <div class="dyncontent">
@@ -228,9 +229,9 @@ Here is the call graph for this function:</div>
 
 <p class="definition">Definition at line <a class="el" href="gmock-matchers_8h_source.html#l01581">1581</a> of file <a class="el" href="gmock-matchers_8h_source.html">gmock-matchers.h</a>.</p>
 <div class="fragment"><div class="line"><span class="lineno"> 1581</span>                                        {</div>
-<div class="line"><span class="lineno"> 1582</span>    *os &lt;&lt; (full_match_ ? <span class="stringliteral">&quot;matches&quot;</span> : <span class="stringliteral">&quot;contains&quot;</span>)</div>
+<div class="line"><span class="lineno"> 1582</span>    *<a class="code hl_variable" href="environment_8hpp.html#a3951483d0b31c29ca95336206cd35238">os</a> &lt;&lt; (full_match_ ? <span class="stringliteral">&quot;matches&quot;</span> : <span class="stringliteral">&quot;contains&quot;</span>)</div>
 <div class="line"><span class="lineno"> 1583</span>        &lt;&lt; <span class="stringliteral">&quot; regular expression &quot;</span>;</div>
-<div class="line"><span class="lineno"> 1584</span>    <a class="code hl_function" href="classtesting_1_1internal_1_1_universal_printer.html#aecec021e1abbaa260b701e24e3fe33eb">UniversalPrinter&lt;std::string&gt;::Print</a>(regex_-&gt;pattern(), os);</div>
+<div class="line"><span class="lineno"> 1584</span>    <a class="code hl_function" href="classtesting_1_1internal_1_1_universal_printer.html#aecec021e1abbaa260b701e24e3fe33eb">UniversalPrinter&lt;std::string&gt;::Print</a>(regex_-&gt;pattern(), <a class="code hl_variable" href="environment_8hpp.html#a3951483d0b31c29ca95336206cd35238">os</a>);</div>
 <div class="line"><span class="lineno"> 1585</span>  }</div>
 </div><!-- fragment --><div class="dynheader">
 Here is the call graph for this function:</div>

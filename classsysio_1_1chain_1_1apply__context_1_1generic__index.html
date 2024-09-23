@@ -518,14 +518,13 @@ template&lt;typename ObjectType , typename SecondaryKeyProxy  = typename std::ad
 <div class="line"><span class="lineno">  404</span> </div>
 <div class="line"><span class="lineno">  405</span>               <span class="keyword">auto</span> table_end_itr = itr_cache.cache_table( *tab );</div>
 <div class="line"><span class="lineno">  406</span> </div>
-<div class="line"><span class="lineno">  407</span>               <span class="keyword">const</span> <span class="keyword">auto</span>&amp; <a class="code hl_variable" href="namespacehost__functions__tests__1.html#a8496a24b5236a2dc07bb4f2930d88342">idx</a> = <a class="code hl_struct" href="structcontext.html">context</a>.db.get_index&lt;<span class="keyword">typename</span> <a class="code hl_struct" href="structchainbase_1_1get__index__type.html">chainbase::get_index_type&lt;ObjectType&gt;::type</a>, by_primary&gt;();</div>
-<div class="line"><span class="lineno">  408</span>               <span class="keyword">auto</span> itr = <a class="code hl_variable" href="namespacehost__functions__tests__1.html#a8496a24b5236a2dc07bb4f2930d88342">idx</a>.lower_bound(boost::make_tuple(tab-&gt;id, primary));</div>
-<div class="line"><span class="lineno">  409</span>               <span class="keywordflow">if</span> (itr == <a class="code hl_variable" href="namespacehost__functions__tests__1.html#a8496a24b5236a2dc07bb4f2930d88342">idx</a>.end()) <span class="keywordflow">return</span> table_end_itr;</div>
+<div class="line"><span class="lineno">  407</span>               <span class="keyword">const</span> <span class="keyword">auto</span>&amp; idx = <a class="code hl_struct" href="structcontext.html">context</a>.db.get_index&lt;<span class="keyword">typename</span> <a class="code hl_struct" href="structchainbase_1_1get__index__type.html">chainbase::get_index_type&lt;ObjectType&gt;::type</a>, by_primary&gt;();</div>
+<div class="line"><span class="lineno">  408</span>               <span class="keyword">auto</span> itr = idx.lower_bound(boost::make_tuple(tab-&gt;id, primary));</div>
+<div class="line"><span class="lineno">  409</span>               <span class="keywordflow">if</span> (itr == idx.end()) <span class="keywordflow">return</span> table_end_itr;</div>
 <div class="line"><span class="lineno">  410</span>               <span class="keywordflow">if</span> (itr-&gt;t_id != tab-&gt;id) <span class="keywordflow">return</span> table_end_itr;</div>
 <div class="line"><span class="lineno">  411</span> </div>
 <div class="line"><span class="lineno">  412</span>               <span class="keywordflow">return</span> itr_cache.add(*itr);</div>
 <div class="line"><span class="lineno">  413</span>            }</div>
-<div class="ttc" id="anamespacehost__functions__tests__1_html_a8496a24b5236a2dc07bb4f2930d88342"><div class="ttname"><a href="namespacehost__functions__tests__1.html#a8496a24b5236a2dc07bb4f2930d88342">host_functions_tests_1.idx</a></div><div class="ttdeci">int idx</div><div class="ttdef"><b>Definition</b> <a href="host__functions__tests__1_8py_source.html#l00021">host_functions_tests_1.py:21</a></div></div>
 <div class="ttc" id="astructchainbase_1_1get__index__type_html"><div class="ttname"><a href="structchainbase_1_1get__index__type.html">chainbase::get_index_type</a></div><div class="ttdef"><b>Definition</b> <a href="chainbase_8hpp_source.html#l00100">chainbase.hpp:100</a></div></div>
 </div><!-- fragment -->
 </div>
@@ -581,9 +580,9 @@ template&lt;typename ObjectType , typename SecondaryKeyProxy  = typename std::ad
 <div class="line"><span class="lineno">  303</span> </div>
 <div class="line"><span class="lineno">  304</span>               <span class="keyword">auto</span> table_end_itr = itr_cache.cache_table( *tab );</div>
 <div class="line"><span class="lineno">  305</span> </div>
-<div class="line"><span class="lineno">  306</span>               <span class="keyword">const</span> <span class="keyword">auto</span>&amp; <a class="code hl_variable" href="namespacehost__functions__tests__1.html#a8496a24b5236a2dc07bb4f2930d88342">idx</a> = <a class="code hl_struct" href="structcontext.html">context</a>.db.get_index&lt; <span class="keyword">typename</span> <a class="code hl_struct" href="structchainbase_1_1get__index__type.html">chainbase::get_index_type&lt;ObjectType&gt;::type</a>, <a class="code hl_struct" href="structby__secondary.html">by_secondary</a> &gt;();</div>
-<div class="line"><span class="lineno">  307</span>               <span class="keyword">auto</span> itr = <a class="code hl_variable" href="namespacehost__functions__tests__1.html#a8496a24b5236a2dc07bb4f2930d88342">idx</a>.lower_bound( secondary_key_helper_t::create_tuple( *tab, secondary ) );</div>
-<div class="line"><span class="lineno">  308</span>               <span class="keywordflow">if</span>( itr == <a class="code hl_variable" href="namespacehost__functions__tests__1.html#a8496a24b5236a2dc07bb4f2930d88342">idx</a>.end() ) <span class="keywordflow">return</span> table_end_itr;</div>
+<div class="line"><span class="lineno">  306</span>               <span class="keyword">const</span> <span class="keyword">auto</span>&amp; idx = <a class="code hl_struct" href="structcontext.html">context</a>.db.get_index&lt; <span class="keyword">typename</span> <a class="code hl_struct" href="structchainbase_1_1get__index__type.html">chainbase::get_index_type&lt;ObjectType&gt;::type</a>, <a class="code hl_struct" href="structby__secondary.html">by_secondary</a> &gt;();</div>
+<div class="line"><span class="lineno">  307</span>               <span class="keyword">auto</span> itr = idx.lower_bound( secondary_key_helper_t::create_tuple( *tab, secondary ) );</div>
+<div class="line"><span class="lineno">  308</span>               <span class="keywordflow">if</span>( itr == idx.end() ) <span class="keywordflow">return</span> table_end_itr;</div>
 <div class="line"><span class="lineno">  309</span>               <span class="keywordflow">if</span>( itr-&gt;t_id != tab-&gt;id ) <span class="keywordflow">return</span> table_end_itr;</div>
 <div class="line"><span class="lineno">  310</span> </div>
 <div class="line"><span class="lineno">  311</span>               primary = itr-&gt;primary_key;</div>
@@ -628,12 +627,12 @@ template&lt;typename ObjectType , typename SecondaryKeyProxy  = typename std::ad
 <div class="line"><span class="lineno">  431</span>               <span class="keywordflow">if</span>( iterator &lt; -1 ) <span class="keywordflow">return</span> -1; <span class="comment">// cannot increment past end iterator of table</span></div>
 <div class="line"><span class="lineno">  432</span> </div>
 <div class="line"><span class="lineno">  433</span>               <span class="keyword">const</span> <span class="keyword">auto</span>&amp; obj = itr_cache.get(iterator); <span class="comment">// Check for iterator != -1 happens in this call</span></div>
-<div class="line"><span class="lineno">  434</span>               <span class="keyword">const</span> <span class="keyword">auto</span>&amp; <a class="code hl_variable" href="namespacehost__functions__tests__1.html#a8496a24b5236a2dc07bb4f2930d88342">idx</a> = <a class="code hl_struct" href="structcontext.html">context</a>.db.get_index&lt;<span class="keyword">typename</span> <a class="code hl_struct" href="structchainbase_1_1get__index__type.html">chainbase::get_index_type&lt;ObjectType&gt;::type</a>, by_primary&gt;();</div>
+<div class="line"><span class="lineno">  434</span>               <span class="keyword">const</span> <span class="keyword">auto</span>&amp; idx = <a class="code hl_struct" href="structcontext.html">context</a>.db.get_index&lt;<span class="keyword">typename</span> <a class="code hl_struct" href="structchainbase_1_1get__index__type.html">chainbase::get_index_type&lt;ObjectType&gt;::type</a>, by_primary&gt;();</div>
 <div class="line"><span class="lineno">  435</span> </div>
-<div class="line"><span class="lineno">  436</span>               <span class="keyword">auto</span> itr = <a class="code hl_variable" href="namespacehost__functions__tests__1.html#a8496a24b5236a2dc07bb4f2930d88342">idx</a>.iterator_to(obj);</div>
+<div class="line"><span class="lineno">  436</span>               <span class="keyword">auto</span> itr = idx.iterator_to(obj);</div>
 <div class="line"><span class="lineno">  437</span>               ++itr;</div>
 <div class="line"><span class="lineno">  438</span> </div>
-<div class="line"><span class="lineno">  439</span>               <span class="keywordflow">if</span>( itr == <a class="code hl_variable" href="namespacehost__functions__tests__1.html#a8496a24b5236a2dc07bb4f2930d88342">idx</a>.end() || itr-&gt;t_id != obj.t_id ) <span class="keywordflow">return</span> itr_cache.get_end_iterator_by_table_id(obj.t_id);</div>
+<div class="line"><span class="lineno">  439</span>               <span class="keywordflow">if</span>( itr == idx.end() || itr-&gt;t_id != obj.t_id ) <span class="keywordflow">return</span> itr_cache.get_end_iterator_by_table_id(obj.t_id);</div>
 <div class="line"><span class="lineno">  440</span> </div>
 <div class="line"><span class="lineno">  441</span>               primary = itr-&gt;primary_key;</div>
 <div class="line"><span class="lineno">  442</span>               <span class="keywordflow">return</span> itr_cache.add(*itr);</div>
@@ -675,12 +674,12 @@ template&lt;typename ObjectType , typename SecondaryKeyProxy  = typename std::ad
 <div class="line"><span class="lineno">  342</span>               <span class="keywordflow">if</span>( iterator &lt; -1 ) <span class="keywordflow">return</span> -1; <span class="comment">// cannot increment past end iterator of index</span></div>
 <div class="line"><span class="lineno">  343</span> </div>
 <div class="line"><span class="lineno">  344</span>               <span class="keyword">const</span> <span class="keyword">auto</span>&amp; obj = itr_cache.get(iterator); <span class="comment">// Check for iterator != -1 happens in this call</span></div>
-<div class="line"><span class="lineno">  345</span>               <span class="keyword">const</span> <span class="keyword">auto</span>&amp; <a class="code hl_variable" href="namespacehost__functions__tests__1.html#a8496a24b5236a2dc07bb4f2930d88342">idx</a> = <a class="code hl_struct" href="structcontext.html">context</a>.db.get_index&lt;<span class="keyword">typename</span> <a class="code hl_struct" href="structchainbase_1_1get__index__type.html">chainbase::get_index_type&lt;ObjectType&gt;::type</a>, <a class="code hl_struct" href="structby__secondary.html">by_secondary</a>&gt;();</div>
+<div class="line"><span class="lineno">  345</span>               <span class="keyword">const</span> <span class="keyword">auto</span>&amp; idx = <a class="code hl_struct" href="structcontext.html">context</a>.db.get_index&lt;<span class="keyword">typename</span> <a class="code hl_struct" href="structchainbase_1_1get__index__type.html">chainbase::get_index_type&lt;ObjectType&gt;::type</a>, <a class="code hl_struct" href="structby__secondary.html">by_secondary</a>&gt;();</div>
 <div class="line"><span class="lineno">  346</span> </div>
-<div class="line"><span class="lineno">  347</span>               <span class="keyword">auto</span> itr = <a class="code hl_variable" href="namespacehost__functions__tests__1.html#a8496a24b5236a2dc07bb4f2930d88342">idx</a>.iterator_to(obj);</div>
+<div class="line"><span class="lineno">  347</span>               <span class="keyword">auto</span> itr = idx.iterator_to(obj);</div>
 <div class="line"><span class="lineno">  348</span>               ++itr;</div>
 <div class="line"><span class="lineno">  349</span> </div>
-<div class="line"><span class="lineno">  350</span>               <span class="keywordflow">if</span>( itr == <a class="code hl_variable" href="namespacehost__functions__tests__1.html#a8496a24b5236a2dc07bb4f2930d88342">idx</a>.end() || itr-&gt;t_id != obj.t_id ) <span class="keywordflow">return</span> itr_cache.get_end_iterator_by_table_id(obj.t_id);</div>
+<div class="line"><span class="lineno">  350</span>               <span class="keywordflow">if</span>( itr == idx.end() || itr-&gt;t_id != obj.t_id ) <span class="keywordflow">return</span> itr_cache.get_end_iterator_by_table_id(obj.t_id);</div>
 <div class="line"><span class="lineno">  351</span> </div>
 <div class="line"><span class="lineno">  352</span>               primary = itr-&gt;primary_key;</div>
 <div class="line"><span class="lineno">  353</span>               <span class="keywordflow">return</span> itr_cache.add(*itr);</div>
@@ -719,15 +718,15 @@ template&lt;typename ObjectType , typename SecondaryKeyProxy  = typename std::ad
 
 <p class="definition">Definition at line <a class="el" href="apply__context_8hpp_source.html#l00445">445</a> of file <a class="el" href="apply__context_8hpp_source.html">apply_context.hpp</a>.</p>
 <div class="fragment"><div class="line"><span class="lineno">  445</span>                                                                    {</div>
-<div class="line"><span class="lineno">  446</span>               <span class="keyword">const</span> <span class="keyword">auto</span>&amp; <a class="code hl_variable" href="namespacehost__functions__tests__1.html#a8496a24b5236a2dc07bb4f2930d88342">idx</a> = <a class="code hl_struct" href="structcontext.html">context</a>.db.get_index&lt;<span class="keyword">typename</span> <a class="code hl_struct" href="structchainbase_1_1get__index__type.html">chainbase::get_index_type&lt;ObjectType&gt;::type</a>, by_primary&gt;();</div>
+<div class="line"><span class="lineno">  446</span>               <span class="keyword">const</span> <span class="keyword">auto</span>&amp; idx = <a class="code hl_struct" href="structcontext.html">context</a>.db.get_index&lt;<span class="keyword">typename</span> <a class="code hl_struct" href="structchainbase_1_1get__index__type.html">chainbase::get_index_type&lt;ObjectType&gt;::type</a>, by_primary&gt;();</div>
 <div class="line"><span class="lineno">  447</span> </div>
 <div class="line"><span class="lineno">  448</span>               <span class="keywordflow">if</span>( iterator &lt; -1 ) <span class="comment">// is end iterator</span></div>
 <div class="line"><span class="lineno">  449</span>               {</div>
 <div class="line"><span class="lineno">  450</span>                  <span class="keyword">auto</span> tab = itr_cache.find_table_by_end_iterator(iterator);</div>
 <div class="line"><span class="lineno">  451</span>                  <a class="code hl_define" href="chain_2include_2sysio_2chain_2exceptions_8hpp.html#a40c2826a6fba35c1ffbf912bdf559792">SYS_ASSERT</a>( tab, invalid_table_iterator, <span class="stringliteral">&quot;not a valid end iterator&quot;</span> );</div>
 <div class="line"><span class="lineno">  452</span> </div>
-<div class="line"><span class="lineno">  453</span>                  <span class="keyword">auto</span> itr = <a class="code hl_variable" href="namespacehost__functions__tests__1.html#a8496a24b5236a2dc07bb4f2930d88342">idx</a>.upper_bound(tab-&gt;id);</div>
-<div class="line"><span class="lineno">  454</span>                  <span class="keywordflow">if</span>( <a class="code hl_variable" href="namespacehost__functions__tests__1.html#a8496a24b5236a2dc07bb4f2930d88342">idx</a>.begin() == <a class="code hl_variable" href="namespacehost__functions__tests__1.html#a8496a24b5236a2dc07bb4f2930d88342">idx</a>.end() || itr == <a class="code hl_variable" href="namespacehost__functions__tests__1.html#a8496a24b5236a2dc07bb4f2930d88342">idx</a>.begin() ) <span class="keywordflow">return</span> -1; <span class="comment">// Empty table</span></div>
+<div class="line"><span class="lineno">  453</span>                  <span class="keyword">auto</span> itr = idx.upper_bound(tab-&gt;id);</div>
+<div class="line"><span class="lineno">  454</span>                  <span class="keywordflow">if</span>( idx.begin() == idx.end() || itr == idx.begin() ) <span class="keywordflow">return</span> -1; <span class="comment">// Empty table</span></div>
 <div class="line"><span class="lineno">  455</span> </div>
 <div class="line"><span class="lineno">  456</span>                  --itr;</div>
 <div class="line"><span class="lineno">  457</span> </div>
@@ -739,8 +738,8 @@ template&lt;typename ObjectType , typename SecondaryKeyProxy  = typename std::ad
 <div class="line"><span class="lineno">  463</span> </div>
 <div class="line"><span class="lineno">  464</span>               <span class="keyword">const</span> <span class="keyword">auto</span>&amp; obj = itr_cache.get(iterator); <span class="comment">// Check for iterator != -1 happens in this call</span></div>
 <div class="line"><span class="lineno">  465</span> </div>
-<div class="line"><span class="lineno">  466</span>               <span class="keyword">auto</span> itr = <a class="code hl_variable" href="namespacehost__functions__tests__1.html#a8496a24b5236a2dc07bb4f2930d88342">idx</a>.iterator_to(obj);</div>
-<div class="line"><span class="lineno">  467</span>               <span class="keywordflow">if</span>( itr == <a class="code hl_variable" href="namespacehost__functions__tests__1.html#a8496a24b5236a2dc07bb4f2930d88342">idx</a>.begin() ) <span class="keywordflow">return</span> -1; <span class="comment">// cannot decrement past beginning iterator of table</span></div>
+<div class="line"><span class="lineno">  466</span>               <span class="keyword">auto</span> itr = idx.iterator_to(obj);</div>
+<div class="line"><span class="lineno">  467</span>               <span class="keywordflow">if</span>( itr == idx.begin() ) <span class="keywordflow">return</span> -1; <span class="comment">// cannot decrement past beginning iterator of table</span></div>
 <div class="line"><span class="lineno">  468</span> </div>
 <div class="line"><span class="lineno">  469</span>               --itr;</div>
 <div class="line"><span class="lineno">  470</span> </div>
@@ -784,15 +783,15 @@ template&lt;typename ObjectType , typename SecondaryKeyProxy  = typename std::ad
 
 <p class="definition">Definition at line <a class="el" href="apply__context_8hpp_source.html#l00356">356</a> of file <a class="el" href="apply__context_8hpp_source.html">apply_context.hpp</a>.</p>
 <div class="fragment"><div class="line"><span class="lineno">  356</span>                                                                      {</div>
-<div class="line"><span class="lineno">  357</span>               <span class="keyword">const</span> <span class="keyword">auto</span>&amp; <a class="code hl_variable" href="namespacehost__functions__tests__1.html#a8496a24b5236a2dc07bb4f2930d88342">idx</a> = <a class="code hl_struct" href="structcontext.html">context</a>.db.get_index&lt;<span class="keyword">typename</span> <a class="code hl_struct" href="structchainbase_1_1get__index__type.html">chainbase::get_index_type&lt;ObjectType&gt;::type</a>, <a class="code hl_struct" href="structby__secondary.html">by_secondary</a>&gt;();</div>
+<div class="line"><span class="lineno">  357</span>               <span class="keyword">const</span> <span class="keyword">auto</span>&amp; idx = <a class="code hl_struct" href="structcontext.html">context</a>.db.get_index&lt;<span class="keyword">typename</span> <a class="code hl_struct" href="structchainbase_1_1get__index__type.html">chainbase::get_index_type&lt;ObjectType&gt;::type</a>, <a class="code hl_struct" href="structby__secondary.html">by_secondary</a>&gt;();</div>
 <div class="line"><span class="lineno">  358</span> </div>
 <div class="line"><span class="lineno">  359</span>               <span class="keywordflow">if</span>( iterator &lt; -1 ) <span class="comment">// is end iterator</span></div>
 <div class="line"><span class="lineno">  360</span>               {</div>
 <div class="line"><span class="lineno">  361</span>                  <span class="keyword">auto</span> tab = itr_cache.find_table_by_end_iterator(iterator);</div>
 <div class="line"><span class="lineno">  362</span>                  <a class="code hl_define" href="chain_2include_2sysio_2chain_2exceptions_8hpp.html#a40c2826a6fba35c1ffbf912bdf559792">SYS_ASSERT</a>( tab, invalid_table_iterator, <span class="stringliteral">&quot;not a valid end iterator&quot;</span> );</div>
 <div class="line"><span class="lineno">  363</span> </div>
-<div class="line"><span class="lineno">  364</span>                  <span class="keyword">auto</span> itr = <a class="code hl_variable" href="namespacehost__functions__tests__1.html#a8496a24b5236a2dc07bb4f2930d88342">idx</a>.upper_bound(tab-&gt;id);</div>
-<div class="line"><span class="lineno">  365</span>                  <span class="keywordflow">if</span>( <a class="code hl_variable" href="namespacehost__functions__tests__1.html#a8496a24b5236a2dc07bb4f2930d88342">idx</a>.begin() == <a class="code hl_variable" href="namespacehost__functions__tests__1.html#a8496a24b5236a2dc07bb4f2930d88342">idx</a>.end() || itr == <a class="code hl_variable" href="namespacehost__functions__tests__1.html#a8496a24b5236a2dc07bb4f2930d88342">idx</a>.begin() ) <span class="keywordflow">return</span> -1; <span class="comment">// Empty index</span></div>
+<div class="line"><span class="lineno">  364</span>                  <span class="keyword">auto</span> itr = idx.upper_bound(tab-&gt;id);</div>
+<div class="line"><span class="lineno">  365</span>                  <span class="keywordflow">if</span>( idx.begin() == idx.end() || itr == idx.begin() ) <span class="keywordflow">return</span> -1; <span class="comment">// Empty index</span></div>
 <div class="line"><span class="lineno">  366</span> </div>
 <div class="line"><span class="lineno">  367</span>                  --itr;</div>
 <div class="line"><span class="lineno">  368</span> </div>
@@ -804,8 +803,8 @@ template&lt;typename ObjectType , typename SecondaryKeyProxy  = typename std::ad
 <div class="line"><span class="lineno">  374</span> </div>
 <div class="line"><span class="lineno">  375</span>               <span class="keyword">const</span> <span class="keyword">auto</span>&amp; obj = itr_cache.get(iterator); <span class="comment">// Check for iterator != -1 happens in this call</span></div>
 <div class="line"><span class="lineno">  376</span> </div>
-<div class="line"><span class="lineno">  377</span>               <span class="keyword">auto</span> itr = <a class="code hl_variable" href="namespacehost__functions__tests__1.html#a8496a24b5236a2dc07bb4f2930d88342">idx</a>.iterator_to(obj);</div>
-<div class="line"><span class="lineno">  378</span>               <span class="keywordflow">if</span>( itr == <a class="code hl_variable" href="namespacehost__functions__tests__1.html#a8496a24b5236a2dc07bb4f2930d88342">idx</a>.begin() ) <span class="keywordflow">return</span> -1; <span class="comment">// cannot decrement past beginning iterator of index</span></div>
+<div class="line"><span class="lineno">  377</span>               <span class="keyword">auto</span> itr = idx.iterator_to(obj);</div>
+<div class="line"><span class="lineno">  378</span>               <span class="keywordflow">if</span>( itr == idx.begin() ) <span class="keywordflow">return</span> -1; <span class="comment">// cannot decrement past beginning iterator of index</span></div>
 <div class="line"><span class="lineno">  379</span> </div>
 <div class="line"><span class="lineno">  380</span>               --itr;</div>
 <div class="line"><span class="lineno">  381</span> </div>
@@ -1088,9 +1087,9 @@ template&lt;typename ObjectType , typename SecondaryKeyProxy  = typename std::ad
 <div class="line"><span class="lineno">  418</span> </div>
 <div class="line"><span class="lineno">  419</span>               <span class="keyword">auto</span> table_end_itr = itr_cache.cache_table( *tab );</div>
 <div class="line"><span class="lineno">  420</span> </div>
-<div class="line"><span class="lineno">  421</span>               <span class="keyword">const</span> <span class="keyword">auto</span>&amp; <a class="code hl_variable" href="namespacehost__functions__tests__1.html#a8496a24b5236a2dc07bb4f2930d88342">idx</a> = <a class="code hl_struct" href="structcontext.html">context</a>.db.get_index&lt;<span class="keyword">typename</span> <a class="code hl_struct" href="structchainbase_1_1get__index__type.html">chainbase::get_index_type&lt;ObjectType&gt;::type</a>, by_primary&gt;();</div>
-<div class="line"><span class="lineno">  422</span>               <span class="keyword">auto</span> itr = <a class="code hl_variable" href="namespacehost__functions__tests__1.html#a8496a24b5236a2dc07bb4f2930d88342">idx</a>.upper_bound(boost::make_tuple(tab-&gt;id, primary));</div>
-<div class="line"><span class="lineno">  423</span>               <span class="keywordflow">if</span> (itr == <a class="code hl_variable" href="namespacehost__functions__tests__1.html#a8496a24b5236a2dc07bb4f2930d88342">idx</a>.end()) <span class="keywordflow">return</span> table_end_itr;</div>
+<div class="line"><span class="lineno">  421</span>               <span class="keyword">const</span> <span class="keyword">auto</span>&amp; idx = <a class="code hl_struct" href="structcontext.html">context</a>.db.get_index&lt;<span class="keyword">typename</span> <a class="code hl_struct" href="structchainbase_1_1get__index__type.html">chainbase::get_index_type&lt;ObjectType&gt;::type</a>, by_primary&gt;();</div>
+<div class="line"><span class="lineno">  422</span>               <span class="keyword">auto</span> itr = idx.upper_bound(boost::make_tuple(tab-&gt;id, primary));</div>
+<div class="line"><span class="lineno">  423</span>               <span class="keywordflow">if</span> (itr == idx.end()) <span class="keywordflow">return</span> table_end_itr;</div>
 <div class="line"><span class="lineno">  424</span>               <span class="keywordflow">if</span> (itr-&gt;t_id != tab-&gt;id) <span class="keywordflow">return</span> table_end_itr;</div>
 <div class="line"><span class="lineno">  425</span> </div>
 <div class="line"><span class="lineno">  426</span>               itr_cache.cache_table(*tab);</div>
@@ -1150,9 +1149,9 @@ template&lt;typename ObjectType , typename SecondaryKeyProxy  = typename std::ad
 <div class="line"><span class="lineno">  320</span> </div>
 <div class="line"><span class="lineno">  321</span>               <span class="keyword">auto</span> table_end_itr = itr_cache.cache_table( *tab );</div>
 <div class="line"><span class="lineno">  322</span> </div>
-<div class="line"><span class="lineno">  323</span>               <span class="keyword">const</span> <span class="keyword">auto</span>&amp; <a class="code hl_variable" href="namespacehost__functions__tests__1.html#a8496a24b5236a2dc07bb4f2930d88342">idx</a> = <a class="code hl_struct" href="structcontext.html">context</a>.db.get_index&lt; <span class="keyword">typename</span> <a class="code hl_struct" href="structchainbase_1_1get__index__type.html">chainbase::get_index_type&lt;ObjectType&gt;::type</a>, <a class="code hl_struct" href="structby__secondary.html">by_secondary</a> &gt;();</div>
-<div class="line"><span class="lineno">  324</span>               <span class="keyword">auto</span> itr = <a class="code hl_variable" href="namespacehost__functions__tests__1.html#a8496a24b5236a2dc07bb4f2930d88342">idx</a>.upper_bound( secondary_key_helper_t::create_tuple( *tab, secondary ) );</div>
-<div class="line"><span class="lineno">  325</span>               <span class="keywordflow">if</span>( itr == <a class="code hl_variable" href="namespacehost__functions__tests__1.html#a8496a24b5236a2dc07bb4f2930d88342">idx</a>.end() ) <span class="keywordflow">return</span> table_end_itr;</div>
+<div class="line"><span class="lineno">  323</span>               <span class="keyword">const</span> <span class="keyword">auto</span>&amp; idx = <a class="code hl_struct" href="structcontext.html">context</a>.db.get_index&lt; <span class="keyword">typename</span> <a class="code hl_struct" href="structchainbase_1_1get__index__type.html">chainbase::get_index_type&lt;ObjectType&gt;::type</a>, <a class="code hl_struct" href="structby__secondary.html">by_secondary</a> &gt;();</div>
+<div class="line"><span class="lineno">  324</span>               <span class="keyword">auto</span> itr = idx.upper_bound( secondary_key_helper_t::create_tuple( *tab, secondary ) );</div>
+<div class="line"><span class="lineno">  325</span>               <span class="keywordflow">if</span>( itr == idx.end() ) <span class="keywordflow">return</span> table_end_itr;</div>
 <div class="line"><span class="lineno">  326</span>               <span class="keywordflow">if</span>( itr-&gt;t_id != tab-&gt;id ) <span class="keywordflow">return</span> table_end_itr;</div>
 <div class="line"><span class="lineno">  327</span> </div>
 <div class="line"><span class="lineno">  328</span>               primary = itr-&gt;primary_key;</div>

@@ -116,7 +116,7 @@ $(function(){initNavTree('_linker_8cpp_source.html',''); initResizable(true); })
 <div class="foldopen" id="foldopen00015" data-start="{" data-end="}">
 <div class="line"><a id="l00015" name="l00015"></a><span class="lineno"><a class="line" href="namespace_runtime.html#a6235ca7597f3333aa3932daeca2e4746">   15</a></span>    <span class="keywordtype">bool</span> <a class="code hl_function" href="namespace_runtime.html#a6235ca7597f3333aa3932daeca2e4746">isA</a>(<a class="code hl_struct" href="struct_runtime_1_1_object_instance.html">ObjectInstance</a>* <span class="keywordtype">object</span>,<span class="keyword">const</span> <a class="code hl_struct" href="struct_i_r_1_1_object_type.html">ObjectType</a>&amp; type)</div>
 <div class="line"><a id="l00016" name="l00016"></a><span class="lineno">   16</span>    {</div>
-<div class="line"><a id="l00017" name="l00017"></a><span class="lineno">   17</span>        <span class="keywordflow">if</span>(type.kind != object-&gt;kind) { <span class="keywordflow">return</span> <span class="keyword">false</span>; }</div>
+<div class="line"><a id="l00017" name="l00017"></a><span class="lineno">   17</span>        <span class="keywordflow">if</span>(type.kind != <a class="code hl_variable" href="yubihsm__pkcs11_8c.html#a85d991d90970121ba1480cd98d93aab9">object</a>-&gt;kind) { <span class="keywordflow">return</span> <span class="keyword">false</span>; }</div>
 <div class="line"><a id="l00018" name="l00018"></a><span class="lineno">   18</span> </div>
 <div class="line"><a id="l00019" name="l00019"></a><span class="lineno">   19</span>        <span class="keywordflow">switch</span>(type.kind)</div>
 <div class="line"><a id="l00020" name="l00020"></a><span class="lineno">   20</span>        {</div>
@@ -238,6 +238,7 @@ $(function(){initNavTree('_linker_8cpp_source.html',''); initResizable(true); })
 <div class="ttc" id="astruct_runtime_1_1_resolver_html_a8387253cf2addc917647cba230a00334"><div class="ttname"><a href="struct_runtime_1_1_resolver.html#a8387253cf2addc917647cba230a00334">Runtime::Resolver::resolve</a></div><div class="ttdeci">virtual bool resolve(const std::string &amp;moduleName, const std::string &amp;exportName, IR::ObjectType type, ObjectInstance *&amp;outObject)=0</div></div>
 <div class="ttc" id="awasm-jit_2_include_2_platform_2platform_8h_html"><div class="ttname"><a href="wasm-jit_2_include_2_platform_2platform_8h.html">Platform.h</a></div></div>
 <div class="ttc" id="ayubihsm_8h_html_a1d127017fb298b889f4ba24752d08b8e"><div class="ttname"><a href="yubihsm_8h.html#a1d127017fb298b889f4ba24752d08b8e">type</a></div><div class="ttdeci">yh_object_type type</div><div class="ttdef"><b>Definition</b> <a href="yubihsm_8h_source.html#l00672">yubihsm.h:672</a></div></div>
+<div class="ttc" id="ayubihsm__pkcs11_8c_html_a85d991d90970121ba1480cd98d93aab9"><div class="ttname"><a href="yubihsm__pkcs11_8c.html#a85d991d90970121ba1480cd98d93aab9">object</a></div><div class="ttdeci">yh_object_descriptor object</div><div class="ttdef"><b>Definition</b> <a href="yubihsm__pkcs11_8c_source.html#l01544">yubihsm_pkcs11.c:1544</a></div></div>
 </div><!-- fragment --></div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->

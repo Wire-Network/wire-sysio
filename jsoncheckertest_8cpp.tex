@@ -2,7 +2,8 @@
 \hypertarget{jsoncheckertest_8cpp}{}\label{jsoncheckertest_8cpp}\index{libraries/fc/include/fc/crypto/webauthn\_json/test/unittest/jsoncheckertest.cpp@{libraries/fc/include/fc/crypto/webauthn\_json/test/unittest/jsoncheckertest.cpp}}
 {\ttfamily \#include "{}unittest.\+h"{}}\newline
 {\ttfamily \#include "{}rapidjson/document.\+h"{}}\newline
-Include dependency graph for jsoncheckertest.\+cpp\+:\nopagebreak
+Include dependency graph for jsoncheckertest.\+cpp\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -35,7 +36,7 @@ Definition at line \mbox{\hyperlink{jsoncheckertest_8cpp_source_l00069}{69}} of 
 
 \begin{DoxyCode}{0}
 \DoxyCodeLine{00069\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
-\DoxyCodeLine{00070\ \ \ \ \ \textcolor{keywordtype}{char}\ \mbox{\hyperlink{namespaceembed_clara_a1e1bd594f85f58f5dca6c41c0ac720fb}{filename}}[256];}
+\DoxyCodeLine{00070\ \ \ \ \ \textcolor{keywordtype}{char}\ filename[256];}
 \DoxyCodeLine{00071\ }
 \DoxyCodeLine{00072\ \ \ \ \ \textcolor{comment}{//\ jsonchecker/failXX.json}}
 \DoxyCodeLine{00073\ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{int}\ i\ =\ 1;\ i\ <=\ 33;\ i++)\ \{}
@@ -56,11 +57,11 @@ Definition at line \mbox{\hyperlink{jsoncheckertest_8cpp_source_l00069}{69}} of 
 \DoxyCodeLine{00088\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Test\ stack-\/based\ parsing.}}
 \DoxyCodeLine{00089\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_generic_document}{GenericDocument<UTF8<>}},\ \mbox{\hyperlink{class_crt_allocator}{CrtAllocator}}>\ document;\ \textcolor{comment}{//\ Use\ Crt\ allocator\ to\ check\ exception-\/safety\ (no\ memory\ leak)}}
 \DoxyCodeLine{00090\ \ \ \ \ \ \ \ \ document.\mbox{\hyperlink{class_generic_document_a901db1678f99a1b550003eed75bc380a}{Parse}}(json);}
-\DoxyCodeLine{00091\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(document.\mbox{\hyperlink{class_generic_document_a510a0588db4eb372f5d81bc3646578fb}{HasParseError}}())\ <<\ \mbox{\hyperlink{namespaceembed_clara_a1e1bd594f85f58f5dca6c41c0ac720fb}{filename}};}
+\DoxyCodeLine{00091\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(document.\mbox{\hyperlink{class_generic_document_a510a0588db4eb372f5d81bc3646578fb}{HasParseError}}())\ <<\ filename;}
 \DoxyCodeLine{00092\ }
 \DoxyCodeLine{00093\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Test\ iterative\ parsing.}}
 \DoxyCodeLine{00094\ \ \ \ \ \ \ \ \ document.\mbox{\hyperlink{class_generic_document_a901db1678f99a1b550003eed75bc380a}{Parse}}<\mbox{\hyperlink{reader_8h_ab7be7dabe6ffcba60fad441505583450aadb14f5a3b6b33e28055e913a2eae5e9}{kParseIterativeFlag}}>(json);}
-\DoxyCodeLine{00095\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(document.\mbox{\hyperlink{class_generic_document_a510a0588db4eb372f5d81bc3646578fb}{HasParseError}}())\ <<\ \mbox{\hyperlink{namespaceembed_clara_a1e1bd594f85f58f5dca6c41c0ac720fb}{filename}};}
+\DoxyCodeLine{00095\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(document.\mbox{\hyperlink{class_generic_document_a510a0588db4eb372f5d81bc3646578fb}{HasParseError}}())\ <<\ filename;}
 \DoxyCodeLine{00096\ }
 \DoxyCodeLine{00097\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Test\ iterative\ pull-\/parsing.}}
 \DoxyCodeLine{00098\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_generic_reader}{Reader}}\ reader;}
@@ -71,7 +72,7 @@ Definition at line \mbox{\hyperlink{jsoncheckertest_8cpp_source_l00069}{69}} of 
 \DoxyCodeLine{00103\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!reader.\mbox{\hyperlink{class_generic_reader_a257891331e0c259903e7066fb4cebf92}{IterativeParseNext}}<\mbox{\hyperlink{reader_8h_ab7be7dabe6ffcba60fad441505583450a9104b0946d648e9467cb7a967401ec80}{kParseDefaultFlags}}>(ss,\ h))}
 \DoxyCodeLine{00104\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
 \DoxyCodeLine{00105\ \ \ \ \ \ \ \ \ \}}
-\DoxyCodeLine{00106\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(reader.\mbox{\hyperlink{class_generic_reader_ac417441794477ea747b63adb6d3653a9}{HasParseError}}())\ <<\ \mbox{\hyperlink{namespaceembed_clara_a1e1bd594f85f58f5dca6c41c0ac720fb}{filename}};}
+\DoxyCodeLine{00106\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(reader.\mbox{\hyperlink{class_generic_reader_ac417441794477ea747b63adb6d3653a9}{HasParseError}}())\ <<\ filename;}
 \DoxyCodeLine{00107\ \ \ \ \ \ \ \ \ }
 \DoxyCodeLine{00108\ \ \ \ \ \ \ \ \ free(json);}
 \DoxyCodeLine{00109\ \ \ \ \ \}}
@@ -89,11 +90,11 @@ Definition at line \mbox{\hyperlink{jsoncheckertest_8cpp_source_l00069}{69}} of 
 \DoxyCodeLine{00121\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Test\ stack-\/based\ parsing.}}
 \DoxyCodeLine{00122\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_generic_document}{GenericDocument<UTF8<>}},\ \mbox{\hyperlink{class_crt_allocator}{CrtAllocator}}>\ document;\ \textcolor{comment}{//\ Use\ Crt\ allocator\ to\ check\ exception-\/safety\ (no\ memory\ leak)}}
 \DoxyCodeLine{00123\ \ \ \ \ \ \ \ \ document.\mbox{\hyperlink{class_generic_document_a901db1678f99a1b550003eed75bc380a}{Parse}}(json);}
-\DoxyCodeLine{00124\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{gtest_8h_aeb6c7ae89f440c90c1a1815951c836da}{EXPECT\_FALSE}}(document.\mbox{\hyperlink{class_generic_document_a510a0588db4eb372f5d81bc3646578fb}{HasParseError}}())\ <<\ \mbox{\hyperlink{namespaceembed_clara_a1e1bd594f85f58f5dca6c41c0ac720fb}{filename}};}
+\DoxyCodeLine{00124\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{gtest_8h_aeb6c7ae89f440c90c1a1815951c836da}{EXPECT\_FALSE}}(document.\mbox{\hyperlink{class_generic_document_a510a0588db4eb372f5d81bc3646578fb}{HasParseError}}())\ <<\ filename;}
 \DoxyCodeLine{00125\ }
 \DoxyCodeLine{00126\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Test\ iterative\ parsing.}}
 \DoxyCodeLine{00127\ \ \ \ \ \ \ \ \ document.\mbox{\hyperlink{class_generic_document_a901db1678f99a1b550003eed75bc380a}{Parse}}<\mbox{\hyperlink{reader_8h_ab7be7dabe6ffcba60fad441505583450aadb14f5a3b6b33e28055e913a2eae5e9}{kParseIterativeFlag}}>(json);}
-\DoxyCodeLine{00128\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{gtest_8h_aeb6c7ae89f440c90c1a1815951c836da}{EXPECT\_FALSE}}(document.\mbox{\hyperlink{class_generic_document_a510a0588db4eb372f5d81bc3646578fb}{HasParseError}}())\ <<\ \mbox{\hyperlink{namespaceembed_clara_a1e1bd594f85f58f5dca6c41c0ac720fb}{filename}};}
+\DoxyCodeLine{00128\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{gtest_8h_aeb6c7ae89f440c90c1a1815951c836da}{EXPECT\_FALSE}}(document.\mbox{\hyperlink{class_generic_document_a510a0588db4eb372f5d81bc3646578fb}{HasParseError}}())\ <<\ filename;}
 \DoxyCodeLine{00129\ \ \ \ \ \ \ \ \ }
 \DoxyCodeLine{00130\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Test\ iterative\ pull-\/parsing.}}
 \DoxyCodeLine{00131\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_generic_reader}{Reader}}\ reader;}
@@ -104,14 +105,15 @@ Definition at line \mbox{\hyperlink{jsoncheckertest_8cpp_source_l00069}{69}} of 
 \DoxyCodeLine{00136\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!reader.\mbox{\hyperlink{class_generic_reader_a257891331e0c259903e7066fb4cebf92}{IterativeParseNext}}<\mbox{\hyperlink{reader_8h_ab7be7dabe6ffcba60fad441505583450a9104b0946d648e9467cb7a967401ec80}{kParseDefaultFlags}}>(ss,\ h))}
 \DoxyCodeLine{00137\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
 \DoxyCodeLine{00138\ \ \ \ \ \ \ \ \ \}}
-\DoxyCodeLine{00139\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{gtest_8h_aeb6c7ae89f440c90c1a1815951c836da}{EXPECT\_FALSE}}(reader.\mbox{\hyperlink{class_generic_reader_ac417441794477ea747b63adb6d3653a9}{HasParseError}}())\ <<\ \mbox{\hyperlink{namespaceembed_clara_a1e1bd594f85f58f5dca6c41c0ac720fb}{filename}};}
+\DoxyCodeLine{00139\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{gtest_8h_aeb6c7ae89f440c90c1a1815951c836da}{EXPECT\_FALSE}}(reader.\mbox{\hyperlink{class_generic_reader_ac417441794477ea747b63adb6d3653a9}{HasParseError}}())\ <<\ filename;}
 \DoxyCodeLine{00140\ }
 \DoxyCodeLine{00141\ \ \ \ \ \ \ \ \ free(json);}
 \DoxyCodeLine{00142\ \ \ \ \ \}}
 \DoxyCodeLine{00143\ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode

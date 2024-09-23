@@ -6,7 +6,8 @@
 
 
 
-Inheritance diagram for sysio\+::http\+\_\+client\+\_\+plugin\+:\nopagebreak
+Inheritance diagram for sysio\+::http\+\_\+client\+\_\+plugin\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -15,7 +16,8 @@ Inheritance diagram for sysio\+::http\+\_\+client\+\_\+plugin\+:\nopagebreak
 \end{figure}
 
 
-Collaboration diagram for sysio\+::http\+\_\+client\+\_\+plugin\+:\nopagebreak
+Collaboration diagram for sysio\+::http\+\_\+client\+\_\+plugin\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -154,15 +156,15 @@ Definition at line \mbox{\hyperlink{http__client__plugin_8cpp_source_l00021}{21}
 \begin{DoxyCode}{0}
 \DoxyCodeLine{00021\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
 \DoxyCodeLine{00022\ \ \ \ \textcolor{keywordflow}{try}\ \{}
-\DoxyCodeLine{00023\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ \mbox{\hyperlink{namespacebenchmark_compile_acf738bbf3b8391aa78929ceeceb8a03b}{options}}.count(\ \textcolor{stringliteral}{"{}https-\/client-\/root-\/cert"{}}\ ))\ \{}
-\DoxyCodeLine{00024\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ std::vector<std::string>\ root\_pems\ =\ \mbox{\hyperlink{namespacebenchmark_compile_acf738bbf3b8391aa78929ceeceb8a03b}{options}}[\textcolor{stringliteral}{"{}https-\/client-\/root-\/cert"{}}].as<std::vector<std::string>>();}
+\DoxyCodeLine{00023\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ options.count(\ \textcolor{stringliteral}{"{}https-\/client-\/root-\/cert"{}}\ ))\ \{}
+\DoxyCodeLine{00024\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ std::vector<std::string>\ root\_pems\ =\ options[\textcolor{stringliteral}{"{}https-\/client-\/root-\/cert"{}}].as<std::vector<std::string>>();}
 \DoxyCodeLine{00025\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}(\ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ root\_pem\ :\ root\_pems\ )\ \{}
 \DoxyCodeLine{00026\ \ \ \ \ \ \ \ \ \ \ \ \ std::string\ pem\_str\ =\ root\_pem;}
 \DoxyCodeLine{00027\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ !boost::algorithm::starts\_with(\ pem\_str,\ \textcolor{stringliteral}{"{}-\/-\/-\/-\/-\/BEGIN\ CERTIFICATE-\/-\/-\/-\/-\/\(\backslash\)n"{}}\ ))\ \{}
 \DoxyCodeLine{00028\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{try}\ \{}
-\DoxyCodeLine{00029\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ \mbox{\hyperlink{namespacetypes__types__array_a6a15abb8fc90c9264cf17d3465578387}{infile}}\ =\ std::ifstream(\ pem\_str\ );}
+\DoxyCodeLine{00029\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ infile\ =\ std::ifstream(\ pem\_str\ );}
 \DoxyCodeLine{00030\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ std::stringstream\ sstr;}
-\DoxyCodeLine{00031\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ sstr\ <<\ \mbox{\hyperlink{namespacetypes__types__array_a6a15abb8fc90c9264cf17d3465578387}{infile}}.rdbuf();}
+\DoxyCodeLine{00031\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ sstr\ <<\ infile.rdbuf();}
 \DoxyCodeLine{00032\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ pem\_str\ =\ sstr.str();}
 \DoxyCodeLine{00033\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp_a40c2826a6fba35c1ffbf912bdf559792}{SYS\_ASSERT}}(\ boost::algorithm::starts\_with(\ pem\_str,\ \textcolor{stringliteral}{"{}-\/-\/-\/-\/-\/BEGIN\ CERTIFICATE-\/-\/-\/-\/-\/\(\backslash\)n"{}}\ ),}
 \DoxyCodeLine{00034\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ chain::invalid\_http\_client\_root\_cert,}
@@ -192,12 +194,13 @@ Definition at line \mbox{\hyperlink{http__client__plugin_8cpp_source_l00021}{21}
 \DoxyCodeLine{00058\ \ \ \ \ \ \ \ \ \ \}}
 \DoxyCodeLine{00059\ \ \ \ \ \ \ \}}
 \DoxyCodeLine{00060\ }
-\DoxyCodeLine{00061\ \ \ \ \ \ \ my-\/>set\_verify\_peers(\ \mbox{\hyperlink{namespacebenchmark_compile_acf738bbf3b8391aa78929ceeceb8a03b}{options}}.at(\ \textcolor{stringliteral}{"{}https-\/client-\/validate-\/peers"{}}\ ).as<\textcolor{keywordtype}{bool}>());}
+\DoxyCodeLine{00061\ \ \ \ \ \ \ my-\/>set\_verify\_peers(\ options.at(\ \textcolor{stringliteral}{"{}https-\/client-\/validate-\/peers"{}}\ ).as<\textcolor{keywordtype}{bool}>());}
 \DoxyCodeLine{00062\ \ \ \ \}\ \mbox{\hyperlink{exception_8hpp_ae70bfa24f5a3bc0917382b3c17fc033c}{FC\_LOG\_AND\_RETHROW}}()}
 \DoxyCodeLine{00063\ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode

@@ -143,7 +143,7 @@ Static Public Member Functions</h2></td></tr>
 <div class="fragment"><div class="line"><span class="lineno">   73</span>                                                        {</div>
 <div class="line"><span class="lineno">   74</span>    UnitTest&amp; unit_test = *<a class="code hl_function" href="classtesting_1_1_unit_test.html#a24192400b70b3b946746954e9574fb8e">UnitTest::GetInstance</a>();</div>
 <div class="line"><span class="lineno">   75</span>    <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i = 0; i &lt; unit_test.total_test_case_count(); ++i) {</div>
-<div class="line"><span class="lineno">   76</span>      <span class="keyword">const</span> <a class="code hl_variable" href="namespacegmock__test__utils.html#a959c5af591e4d49b6d35745205b64509">TestCase</a>* test_case = unit_test.GetTestCase(i);</div>
+<div class="line"><span class="lineno">   76</span>      <span class="keyword">const</span> TestCase* test_case = unit_test.GetTestCase(i);</div>
 <div class="line"><span class="lineno">   77</span>      <span class="keywordflow">if</span> (0 == strcmp(test_case-&gt;name(), <a class="code hl_variable" href="catch__reporter__console_8cpp.html#a9b45b3e13bd9167aab02e17e08916231">name</a>))</div>
 <div class="line"><span class="lineno">   78</span>        <span class="keywordflow">return</span> test_case;</div>
 <div class="line"><span class="lineno">   79</span>    }</div>
@@ -151,7 +151,6 @@ Static Public Member Functions</h2></td></tr>
 <div class="line"><span class="lineno">   81</span>  }</div>
 <div class="ttc" id="acatch__reporter__console_8cpp_html_a9b45b3e13bd9167aab02e17e08916231"><div class="ttname"><a href="catch__reporter__console_8cpp.html#a9b45b3e13bd9167aab02e17e08916231">name</a></div><div class="ttdeci">std::string name</div><div class="ttdef"><b>Definition</b> <a href="catch__reporter__console_8cpp_source.html#l00186">catch_reporter_console.cpp:186</a></div></div>
 <div class="ttc" id="aclasstesting_1_1_unit_test_html_a24192400b70b3b946746954e9574fb8e"><div class="ttname"><a href="classtesting_1_1_unit_test.html#a24192400b70b3b946746954e9574fb8e">testing::UnitTest::GetInstance</a></div><div class="ttdeci">static UnitTest * GetInstance()</div><div class="ttdef"><b>Definition</b> <a href="gtest_8cc_source.html#l04374">gtest.cc:4374</a></div></div>
-<div class="ttc" id="anamespacegmock__test__utils_html_a959c5af591e4d49b6d35745205b64509"><div class="ttname"><a href="namespacegmock__test__utils.html#a959c5af591e4d49b6d35745205b64509">gmock_test_utils.TestCase</a></div><div class="ttdeci">TestCase</div><div class="ttdef"><b>Definition</b> <a href="gmock__test__utils_8py_source.html#l00099">gmock_test_utils.py:99</a></div></div>
 </div><!-- fragment --><div class="dynheader">
 Here is the call graph for this function:</div>
 <div class="dyncontent">
@@ -211,8 +210,8 @@ Here is the caller graph for this function:</div>
 <p class="definition">Definition at line <a class="el" href="gtest-unittest-api__test_8cc_source.html#l00057">57</a> of file <a class="el" href="gtest-unittest-api__test_8cc_source.html">gtest-unittest-api_test.cc</a>.</p>
 <div class="fragment"><div class="line"><span class="lineno">   57</span>                                               {</div>
 <div class="line"><span class="lineno">   58</span>    UnitTest&amp; unit_test = *<a class="code hl_function" href="classtesting_1_1_unit_test.html#a24192400b70b3b946746954e9574fb8e">UnitTest::GetInstance</a>();</div>
-<div class="line"><span class="lineno">   59</span>    <a class="code hl_variable" href="namespacegmock__test__utils.html#a959c5af591e4d49b6d35745205b64509">TestCase</a> <span class="keyword">const</span>** <span class="keyword">const</span> test_cases =</div>
-<div class="line"><span class="lineno">   60</span>        <span class="keyword">new</span> <span class="keyword">const</span> <a class="code hl_variable" href="namespacegmock__test__utils.html#a959c5af591e4d49b6d35745205b64509">TestCase</a>*[unit_test.total_test_case_count()];</div>
+<div class="line"><span class="lineno">   59</span>    TestCase <span class="keyword">const</span>** <span class="keyword">const</span> test_cases =</div>
+<div class="line"><span class="lineno">   60</span>        <span class="keyword">new</span> <span class="keyword">const</span> TestCase*[unit_test.total_test_case_count()];</div>
 <div class="line"><span class="lineno">   61</span> </div>
 <div class="line"><span class="lineno">   62</span>    <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i = 0; i &lt; unit_test.total_test_case_count(); ++i)</div>
 <div class="line"><span class="lineno">   63</span>      test_cases[i] = unit_test.GetTestCase(i);</div>

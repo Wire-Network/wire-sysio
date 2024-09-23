@@ -6,7 +6,8 @@
 
 
 
-Inheritance diagram for testing\+::internal\+::Unordered\+Elements\+Are\+Matcher\+Impl\+Base\+:\nopagebreak
+Inheritance diagram for testing\+::internal\+::Unordered\+Elements\+Are\+Matcher\+Impl\+Base\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -23,9 +24,9 @@ typedef \+::std\+::vector$<$ const \mbox{\hyperlink{classtesting_1_1_matcher_des
 \item 
 \mbox{\hyperlink{classtesting_1_1internal_1_1_unordered_elements_are_matcher_impl_base_abf3fa0fbc1891c891bc9f3708b242397}{Unordered\+Elements\+Are\+Matcher\+Impl\+Base}} (\mbox{\hyperlink{structtesting_1_1internal_1_1_unordered_matcher_require_ac393ce539a8090501b5ea3dbd541444c}{Unordered\+Matcher\+Require\+::\+Flags}} matcher\+\_\+flags)
 \item 
-void \mbox{\hyperlink{classtesting_1_1internal_1_1_unordered_elements_are_matcher_impl_base_a40318adf9a89d830a26a96b2eb06b4e3}{Describe\+To\+Impl}} (\+::std\+::ostream \texorpdfstring{$\ast$}{*}os) const
+void \mbox{\hyperlink{classtesting_1_1internal_1_1_unordered_elements_are_matcher_impl_base_a40318adf9a89d830a26a96b2eb06b4e3}{Describe\+To\+Impl}} (\+::std\+::ostream \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}) const
 \item 
-void \mbox{\hyperlink{classtesting_1_1internal_1_1_unordered_elements_are_matcher_impl_base_ab3ca5ae4aef146b093a3fb35f53d1a38}{Describe\+Negation\+To\+Impl}} (\+::std\+::ostream \texorpdfstring{$\ast$}{*}os) const
+void \mbox{\hyperlink{classtesting_1_1internal_1_1_unordered_elements_are_matcher_impl_base_ab3ca5ae4aef146b093a3fb35f53d1a38}{Describe\+Negation\+To\+Impl}} (\+::std\+::ostream \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}) const
 \item 
 bool \mbox{\hyperlink{classtesting_1_1internal_1_1_unordered_elements_are_matcher_impl_base_a6b3fcd5efa2a234c8ce67bfd04282b05}{Verify\+Match\+Matrix}} (const \+::std\+::vector$<$ std\+::string $>$ \&element\+\_\+printouts, const \mbox{\hyperlink{classtesting_1_1internal_1_1_match_matrix}{Match\+Matrix}} \&matrix, \mbox{\hyperlink{classtesting_1_1_match_result_listener}{Match\+Result\+Listener}} \texorpdfstring{$\ast$}{*}listener) const
 \item 
@@ -97,34 +98,34 @@ Definition at line \mbox{\hyperlink{gmock-matchers_8cc_source_l00435}{435}} of f
 \DoxyCodeLine{00437\ \ \ \textcolor{keywordflow}{switch}\ (\mbox{\hyperlink{classtesting_1_1internal_1_1_unordered_elements_are_matcher_impl_base_ac410af5f63726dfbf9a4f63cfd893eb9}{match\_flags}}())\ \{}
 \DoxyCodeLine{00438\ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{structtesting_1_1internal_1_1_unordered_matcher_require_ac393ce539a8090501b5ea3dbd541444caff31503b584408bbb15972c232d3377f}{UnorderedMatcherRequire::ExactMatch}}:}
 \DoxyCodeLine{00439\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (matcher\_describers\_.empty())\ \{}
-\DoxyCodeLine{00440\ \ \ \ \ \ \ \ \ *os\ <<\ \textcolor{stringliteral}{"{}isn't\ empty"{}};}
+\DoxyCodeLine{00440\ \ \ \ \ \ \ \ \ *\mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}\ <<\ \textcolor{stringliteral}{"{}isn't\ empty"{}};}
 \DoxyCodeLine{00441\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return};}
 \DoxyCodeLine{00442\ \ \ \ \ \ \ \}}
 \DoxyCodeLine{00443\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (matcher\_describers\_.size()\ ==\ 1)\ \{}
-\DoxyCodeLine{00444\ \ \ \ \ \ \ \ \ *os\ <<\ \textcolor{stringliteral}{"{}doesn't\ have\ "{}}\ <<\ \mbox{\hyperlink{classtesting_1_1internal_1_1_unordered_elements_are_matcher_impl_base_ab6d5a2342e07730b913f419cf662d16a}{Elements}}(1)\ <<\ \textcolor{stringliteral}{"{},\ or\ has\ "{}}\ <<\ \mbox{\hyperlink{classtesting_1_1internal_1_1_unordered_elements_are_matcher_impl_base_ab6d5a2342e07730b913f419cf662d16a}{Elements}}(1)}
+\DoxyCodeLine{00444\ \ \ \ \ \ \ \ \ *\mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}\ <<\ \textcolor{stringliteral}{"{}doesn't\ have\ "{}}\ <<\ \mbox{\hyperlink{classtesting_1_1internal_1_1_unordered_elements_are_matcher_impl_base_ab6d5a2342e07730b913f419cf662d16a}{Elements}}(1)\ <<\ \textcolor{stringliteral}{"{},\ or\ has\ "{}}\ <<\ \mbox{\hyperlink{classtesting_1_1internal_1_1_unordered_elements_are_matcher_impl_base_ab6d5a2342e07730b913f419cf662d16a}{Elements}}(1)}
 \DoxyCodeLine{00445\ \ \ \ \ \ \ \ \ \ \ \ \ <<\ \textcolor{stringliteral}{"{}\ that\ "{}};}
-\DoxyCodeLine{00446\ \ \ \ \ \ \ \ \ matcher\_describers\_[0]-\/>DescribeNegationTo(os);}
+\DoxyCodeLine{00446\ \ \ \ \ \ \ \ \ matcher\_describers\_[0]-\/>DescribeNegationTo(\mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}});}
 \DoxyCodeLine{00447\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return};}
 \DoxyCodeLine{00448\ \ \ \ \ \ \ \}}
-\DoxyCodeLine{00449\ \ \ \ \ \ \ *os\ <<\ \textcolor{stringliteral}{"{}doesn't\ have\ "{}}\ <<\ \mbox{\hyperlink{classtesting_1_1internal_1_1_unordered_elements_are_matcher_impl_base_ab6d5a2342e07730b913f419cf662d16a}{Elements}}(matcher\_describers\_.size())}
+\DoxyCodeLine{00449\ \ \ \ \ \ \ *\mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}\ <<\ \textcolor{stringliteral}{"{}doesn't\ have\ "{}}\ <<\ \mbox{\hyperlink{classtesting_1_1internal_1_1_unordered_elements_are_matcher_impl_base_ab6d5a2342e07730b913f419cf662d16a}{Elements}}(matcher\_describers\_.size())}
 \DoxyCodeLine{00450\ \ \ \ \ \ \ \ \ \ \ <<\ \textcolor{stringliteral}{"{},\ or\ there\ exists\ no\ permutation\ of\ elements\ such\ that:\(\backslash\)n"{}};}
 \DoxyCodeLine{00451\ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
 \DoxyCodeLine{00452\ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{structtesting_1_1internal_1_1_unordered_matcher_require_ac393ce539a8090501b5ea3dbd541444ca4f993da76b70d97af98384a3dbf5e33c}{UnorderedMatcherRequire::Superset}}:}
-\DoxyCodeLine{00453\ \ \ \ \ \ \ *os\ <<\ \textcolor{stringliteral}{"{}no\ surjection\ from\ elements\ to\ requirements\ exists\ such\ that:\(\backslash\)n"{}};}
+\DoxyCodeLine{00453\ \ \ \ \ \ \ *\mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}\ <<\ \textcolor{stringliteral}{"{}no\ surjection\ from\ elements\ to\ requirements\ exists\ such\ that:\(\backslash\)n"{}};}
 \DoxyCodeLine{00454\ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
 \DoxyCodeLine{00455\ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{structtesting_1_1internal_1_1_unordered_matcher_require_ac393ce539a8090501b5ea3dbd541444caccf1a25f8fb7283319497bc59c8bb8a6}{UnorderedMatcherRequire::Subset}}:}
-\DoxyCodeLine{00456\ \ \ \ \ \ \ *os\ <<\ \textcolor{stringliteral}{"{}no\ injection\ from\ elements\ to\ requirements\ exists\ such\ that:\(\backslash\)n"{}};}
+\DoxyCodeLine{00456\ \ \ \ \ \ \ *\mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}\ <<\ \textcolor{stringliteral}{"{}no\ injection\ from\ elements\ to\ requirements\ exists\ such\ that:\(\backslash\)n"{}};}
 \DoxyCodeLine{00457\ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
 \DoxyCodeLine{00458\ \ \ \}}
 \DoxyCodeLine{00459\ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ sep\ =\ \textcolor{stringliteral}{"{}"{}};}
 \DoxyCodeLine{00460\ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{size\_t}\ i\ =\ 0;\ i\ !=\ matcher\_describers\_.size();\ ++i)\ \{}
-\DoxyCodeLine{00461\ \ \ \ \ *os\ <<\ sep;}
+\DoxyCodeLine{00461\ \ \ \ \ *\mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}\ <<\ sep;}
 \DoxyCodeLine{00462\ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{classtesting_1_1internal_1_1_unordered_elements_are_matcher_impl_base_ac410af5f63726dfbf9a4f63cfd893eb9}{match\_flags}}()\ ==\ \mbox{\hyperlink{structtesting_1_1internal_1_1_unordered_matcher_require_ac393ce539a8090501b5ea3dbd541444caff31503b584408bbb15972c232d3377f}{UnorderedMatcherRequire::ExactMatch}})\ \{}
-\DoxyCodeLine{00463\ \ \ \ \ \ \ *os\ <<\ \textcolor{stringliteral}{"{}\ -\/\ element\ \#"{}}\ <<\ i\ <<\ \textcolor{stringliteral}{"{}\ "{}};}
+\DoxyCodeLine{00463\ \ \ \ \ \ \ *\mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}\ <<\ \textcolor{stringliteral}{"{}\ -\/\ element\ \#"{}}\ <<\ i\ <<\ \textcolor{stringliteral}{"{}\ "{}};}
 \DoxyCodeLine{00464\ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
-\DoxyCodeLine{00465\ \ \ \ \ \ \ *os\ <<\ \textcolor{stringliteral}{"{}\ -\/\ an\ element\ "{}};}
+\DoxyCodeLine{00465\ \ \ \ \ \ \ *\mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}\ <<\ \textcolor{stringliteral}{"{}\ -\/\ an\ element\ "{}};}
 \DoxyCodeLine{00466\ \ \ \ \ \}}
-\DoxyCodeLine{00467\ \ \ \ \ matcher\_describers\_[i]-\/>DescribeTo(os);}
+\DoxyCodeLine{00467\ \ \ \ \ matcher\_describers\_[i]-\/>DescribeTo(\mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}});}
 \DoxyCodeLine{00468\ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{classtesting_1_1internal_1_1_unordered_elements_are_matcher_impl_base_ac410af5f63726dfbf9a4f63cfd893eb9}{match\_flags}}()\ ==\ \mbox{\hyperlink{structtesting_1_1internal_1_1_unordered_matcher_require_ac393ce539a8090501b5ea3dbd541444caff31503b584408bbb15972c232d3377f}{UnorderedMatcherRequire::ExactMatch}})\ \{}
 \DoxyCodeLine{00469\ \ \ \ \ \ \ sep\ =\ \textcolor{stringliteral}{"{},\ and\(\backslash\)n"{}};}
 \DoxyCodeLine{00470\ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
@@ -134,14 +135,16 @@ Definition at line \mbox{\hyperlink{gmock-matchers_8cc_source_l00435}{435}} of f
 \DoxyCodeLine{00474\ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
 \includegraphics[width=350pt]{classtesting_1_1internal_1_1_unordered_elements_are_matcher_impl_base_ab3ca5ae4aef146b093a3fb35f53d1a38_cgraph}
 \end{center}
 \end{figure}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -164,34 +167,34 @@ Definition at line \mbox{\hyperlink{gmock-matchers_8cc_source_l00394}{394}} of f
 \DoxyCodeLine{00396\ \ \ \textcolor{keywordflow}{switch}\ (\mbox{\hyperlink{classtesting_1_1internal_1_1_unordered_elements_are_matcher_impl_base_ac410af5f63726dfbf9a4f63cfd893eb9}{match\_flags}}())\ \{}
 \DoxyCodeLine{00397\ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{structtesting_1_1internal_1_1_unordered_matcher_require_ac393ce539a8090501b5ea3dbd541444caff31503b584408bbb15972c232d3377f}{UnorderedMatcherRequire::ExactMatch}}:}
 \DoxyCodeLine{00398\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (matcher\_describers\_.empty())\ \{}
-\DoxyCodeLine{00399\ \ \ \ \ \ \ \ \ *os\ <<\ \textcolor{stringliteral}{"{}is\ empty"{}};}
+\DoxyCodeLine{00399\ \ \ \ \ \ \ \ \ *\mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}\ <<\ \textcolor{stringliteral}{"{}is\ empty"{}};}
 \DoxyCodeLine{00400\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return};}
 \DoxyCodeLine{00401\ \ \ \ \ \ \ \}}
 \DoxyCodeLine{00402\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (matcher\_describers\_.size()\ ==\ 1)\ \{}
-\DoxyCodeLine{00403\ \ \ \ \ \ \ \ \ *os\ <<\ \textcolor{stringliteral}{"{}has\ "{}}\ <<\ \mbox{\hyperlink{classtesting_1_1internal_1_1_unordered_elements_are_matcher_impl_base_ab6d5a2342e07730b913f419cf662d16a}{Elements}}(1)\ <<\ \textcolor{stringliteral}{"{}\ and\ that\ element\ "{}};}
-\DoxyCodeLine{00404\ \ \ \ \ \ \ \ \ matcher\_describers\_[0]-\/>DescribeTo(os);}
+\DoxyCodeLine{00403\ \ \ \ \ \ \ \ \ *\mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}\ <<\ \textcolor{stringliteral}{"{}has\ "{}}\ <<\ \mbox{\hyperlink{classtesting_1_1internal_1_1_unordered_elements_are_matcher_impl_base_ab6d5a2342e07730b913f419cf662d16a}{Elements}}(1)\ <<\ \textcolor{stringliteral}{"{}\ and\ that\ element\ "{}};}
+\DoxyCodeLine{00404\ \ \ \ \ \ \ \ \ matcher\_describers\_[0]-\/>DescribeTo(\mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}});}
 \DoxyCodeLine{00405\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return};}
 \DoxyCodeLine{00406\ \ \ \ \ \ \ \}}
-\DoxyCodeLine{00407\ \ \ \ \ \ \ *os\ <<\ \textcolor{stringliteral}{"{}has\ "{}}\ <<\ \mbox{\hyperlink{classtesting_1_1internal_1_1_unordered_elements_are_matcher_impl_base_ab6d5a2342e07730b913f419cf662d16a}{Elements}}(matcher\_describers\_.size())}
+\DoxyCodeLine{00407\ \ \ \ \ \ \ *\mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}\ <<\ \textcolor{stringliteral}{"{}has\ "{}}\ <<\ \mbox{\hyperlink{classtesting_1_1internal_1_1_unordered_elements_are_matcher_impl_base_ab6d5a2342e07730b913f419cf662d16a}{Elements}}(matcher\_describers\_.size())}
 \DoxyCodeLine{00408\ \ \ \ \ \ \ \ \ \ \ <<\ \textcolor{stringliteral}{"{}\ and\ there\ exists\ some\ permutation\ of\ elements\ such\ that:\(\backslash\)n"{}};}
 \DoxyCodeLine{00409\ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
 \DoxyCodeLine{00410\ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{structtesting_1_1internal_1_1_unordered_matcher_require_ac393ce539a8090501b5ea3dbd541444ca4f993da76b70d97af98384a3dbf5e33c}{UnorderedMatcherRequire::Superset}}:}
-\DoxyCodeLine{00411\ \ \ \ \ \ \ *os\ <<\ \textcolor{stringliteral}{"{}a\ surjection\ from\ elements\ to\ requirements\ exists\ such\ that:\(\backslash\)n"{}};}
+\DoxyCodeLine{00411\ \ \ \ \ \ \ *\mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}\ <<\ \textcolor{stringliteral}{"{}a\ surjection\ from\ elements\ to\ requirements\ exists\ such\ that:\(\backslash\)n"{}};}
 \DoxyCodeLine{00412\ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
 \DoxyCodeLine{00413\ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{structtesting_1_1internal_1_1_unordered_matcher_require_ac393ce539a8090501b5ea3dbd541444caccf1a25f8fb7283319497bc59c8bb8a6}{UnorderedMatcherRequire::Subset}}:}
-\DoxyCodeLine{00414\ \ \ \ \ \ \ *os\ <<\ \textcolor{stringliteral}{"{}an\ injection\ from\ elements\ to\ requirements\ exists\ such\ that:\(\backslash\)n"{}};}
+\DoxyCodeLine{00414\ \ \ \ \ \ \ *\mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}\ <<\ \textcolor{stringliteral}{"{}an\ injection\ from\ elements\ to\ requirements\ exists\ such\ that:\(\backslash\)n"{}};}
 \DoxyCodeLine{00415\ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
 \DoxyCodeLine{00416\ \ \ \}}
 \DoxyCodeLine{00417\ }
 \DoxyCodeLine{00418\ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ sep\ =\ \textcolor{stringliteral}{"{}"{}};}
 \DoxyCodeLine{00419\ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{size\_t}\ i\ =\ 0;\ i\ !=\ matcher\_describers\_.size();\ ++i)\ \{}
-\DoxyCodeLine{00420\ \ \ \ \ *os\ <<\ sep;}
+\DoxyCodeLine{00420\ \ \ \ \ *\mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}\ <<\ sep;}
 \DoxyCodeLine{00421\ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{classtesting_1_1internal_1_1_unordered_elements_are_matcher_impl_base_ac410af5f63726dfbf9a4f63cfd893eb9}{match\_flags}}()\ ==\ \mbox{\hyperlink{structtesting_1_1internal_1_1_unordered_matcher_require_ac393ce539a8090501b5ea3dbd541444caff31503b584408bbb15972c232d3377f}{UnorderedMatcherRequire::ExactMatch}})\ \{}
-\DoxyCodeLine{00422\ \ \ \ \ \ \ *os\ <<\ \textcolor{stringliteral}{"{}\ -\/\ element\ \#"{}}\ <<\ i\ <<\ \textcolor{stringliteral}{"{}\ "{}};}
+\DoxyCodeLine{00422\ \ \ \ \ \ \ *\mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}\ <<\ \textcolor{stringliteral}{"{}\ -\/\ element\ \#"{}}\ <<\ i\ <<\ \textcolor{stringliteral}{"{}\ "{}};}
 \DoxyCodeLine{00423\ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
-\DoxyCodeLine{00424\ \ \ \ \ \ \ *os\ <<\ \textcolor{stringliteral}{"{}\ -\/\ an\ element\ "{}};}
+\DoxyCodeLine{00424\ \ \ \ \ \ \ *\mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}\ <<\ \textcolor{stringliteral}{"{}\ -\/\ an\ element\ "{}};}
 \DoxyCodeLine{00425\ \ \ \ \ \}}
-\DoxyCodeLine{00426\ \ \ \ \ matcher\_describers\_[i]-\/>DescribeTo(os);}
+\DoxyCodeLine{00426\ \ \ \ \ matcher\_describers\_[i]-\/>DescribeTo(\mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}});}
 \DoxyCodeLine{00427\ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{classtesting_1_1internal_1_1_unordered_elements_are_matcher_impl_base_ac410af5f63726dfbf9a4f63cfd893eb9}{match\_flags}}()\ ==\ \mbox{\hyperlink{structtesting_1_1internal_1_1_unordered_matcher_require_ac393ce539a8090501b5ea3dbd541444caff31503b584408bbb15972c232d3377f}{UnorderedMatcherRequire::ExactMatch}})\ \{}
 \DoxyCodeLine{00428\ \ \ \ \ \ \ sep\ =\ \textcolor{stringliteral}{"{},\ and\(\backslash\)n"{}};}
 \DoxyCodeLine{00429\ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
@@ -201,14 +204,16 @@ Definition at line \mbox{\hyperlink{gmock-matchers_8cc_source_l00394}{394}} of f
 \DoxyCodeLine{00433\ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
 \includegraphics[width=350pt]{classtesting_1_1internal_1_1_unordered_elements_are_matcher_impl_base_a40318adf9a89d830a26a96b2eb06b4e3_cgraph}
 \end{center}
 \end{figure}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -232,7 +237,8 @@ Definition at line \mbox{\hyperlink{gmock-matchers_8h_source_l03696}{3696}} of f
 \DoxyCodeLine{03698\ \ \ \}}
 
 \end{DoxyCode}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -292,14 +298,16 @@ Definition at line \mbox{\hyperlink{gmock-matchers_8cc_source_l00531}{531}} of f
 \DoxyCodeLine{00570\ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
 \includegraphics[width=350pt]{classtesting_1_1internal_1_1_unordered_elements_are_matcher_impl_base_a4855d62932e1e2a268c05f0edf6d86a5_cgraph}
 \end{center}
 \end{figure}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -321,7 +329,8 @@ Definition at line \mbox{\hyperlink{gmock-matchers_8h_source_l03700}{3700}} of f
 \DoxyCodeLine{03700\ \{\ \textcolor{keywordflow}{return}\ match\_flags\_;\ \}}
 
 \end{DoxyCode}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -345,7 +354,8 @@ Definition at line \mbox{\hyperlink{gmock-matchers_8h_source_l03692}{3692}} of f
 \DoxyCodeLine{03694\ \ \ \}}
 
 \end{DoxyCode}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -413,14 +423,16 @@ Definition at line \mbox{\hyperlink{gmock-matchers_8cc_source_l00481}{481}} of f
 \DoxyCodeLine{00529\ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
 \includegraphics[width=350pt]{classtesting_1_1internal_1_1_unordered_elements_are_matcher_impl_base_a6b3fcd5efa2a234c8ce67bfd04282b05_cgraph}
 \end{center}
 \end{figure}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode

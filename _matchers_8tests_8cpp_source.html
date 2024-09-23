@@ -306,10 +306,10 @@ $(function(){initNavTree('_matchers_8tests_8cpp_source.html',''); initResizable(
 <div class="line"><a id="l00204" name="l00204"></a><span class="lineno">  204</span>        }</div>
 <div class="line"><a id="l00205" name="l00205"></a><span class="lineno">  205</span> </div>
 <div class="line"><a id="l00206" name="l00206"></a><span class="lineno">  206</span>        <a class="code hl_define" href="include_2catch_8hpp.html#abd6e2aec703006b3da62cf7860c9808f">TEST_CASE</a>(<span class="stringliteral">&quot;Vector matchers&quot;</span>, <span class="stringliteral">&quot;[matchers][vector]&quot;</span>) {</div>
-<div class="line"><a id="l00207" name="l00207"></a><span class="lineno">  207</span>            std::vector&lt;int&gt; <a class="code hl_variable" href="namespacedevelop_build.html#ade64cd34608f9442ef3049116a2da428">v</a>;</div>
-<div class="line"><a id="l00208" name="l00208"></a><span class="lineno">  208</span>            <a class="code hl_variable" href="namespacedevelop_build.html#ade64cd34608f9442ef3049116a2da428">v</a>.push_back(1);</div>
-<div class="line"><a id="l00209" name="l00209"></a><span class="lineno">  209</span>            <a class="code hl_variable" href="namespacedevelop_build.html#ade64cd34608f9442ef3049116a2da428">v</a>.push_back(2);</div>
-<div class="line"><a id="l00210" name="l00210"></a><span class="lineno">  210</span>            <a class="code hl_variable" href="namespacedevelop_build.html#ade64cd34608f9442ef3049116a2da428">v</a>.push_back(3);</div>
+<div class="line"><a id="l00207" name="l00207"></a><span class="lineno">  207</span>            std::vector&lt;int&gt; v;</div>
+<div class="line"><a id="l00208" name="l00208"></a><span class="lineno">  208</span>            v.push_back(1);</div>
+<div class="line"><a id="l00209" name="l00209"></a><span class="lineno">  209</span>            v.push_back(2);</div>
+<div class="line"><a id="l00210" name="l00210"></a><span class="lineno">  210</span>            v.push_back(3);</div>
 <div class="line"><a id="l00211" name="l00211"></a><span class="lineno">  211</span> </div>
 <div class="line"><a id="l00212" name="l00212"></a><span class="lineno">  212</span>            std::vector&lt;int&gt; v2;</div>
 <div class="line"><a id="l00213" name="l00213"></a><span class="lineno">  213</span>            v2.push_back(1);</div>
@@ -358,7 +358,7 @@ $(function(){initNavTree('_matchers_8tests_8cpp_source.html',''); initResizable(
 <div class="line"><a id="l00256" name="l00256"></a><span class="lineno">  256</span>                <a class="code hl_define" href="include_2catch_8hpp.html#a5b8c33c63e0804d4458e2c761370b75d">CHECK_THAT</a>(v, <a class="code hl_function" href="namespace_catch_1_1_matchers.html#acd42da14d75497b3ef635e5e096b0c77">UnorderedEquals</a>(v));</div>
 <div class="line"><a id="l00257" name="l00257"></a><span class="lineno">  257</span>                <a class="code hl_define" href="include_2catch_8hpp.html#a5b8c33c63e0804d4458e2c761370b75d">CHECK_THAT</a>(empty, <a class="code hl_function" href="namespace_catch_1_1_matchers.html#acd42da14d75497b3ef635e5e096b0c77">UnorderedEquals</a>(empty));</div>
 <div class="line"><a id="l00258" name="l00258"></a><span class="lineno">  258</span> </div>
-<div class="line"><a id="l00259" name="l00259"></a><span class="lineno">  259</span>                <span class="keyword">auto</span> permuted = <a class="code hl_variable" href="namespacedevelop_build.html#ade64cd34608f9442ef3049116a2da428">v</a>;</div>
+<div class="line"><a id="l00259" name="l00259"></a><span class="lineno">  259</span>                <span class="keyword">auto</span> permuted = v;</div>
 <div class="line"><a id="l00260" name="l00260"></a><span class="lineno">  260</span>                std::next_permutation(begin(permuted), end(permuted));</div>
 <div class="line"><a id="l00261" name="l00261"></a><span class="lineno">  261</span>                <a class="code hl_define" href="include_2catch_8hpp.html#ac1354db6f3e9c1e0a8eda0eea7ff1f0a">REQUIRE_THAT</a>(permuted, <a class="code hl_function" href="namespace_catch_1_1_matchers.html#acd42da14d75497b3ef635e5e096b0c77">UnorderedEquals</a>(v));</div>
 <div class="line"><a id="l00262" name="l00262"></a><span class="lineno">  262</span> </div>
@@ -368,10 +368,10 @@ $(function(){initNavTree('_matchers_8tests_8cpp_source.html',''); initResizable(
 <div class="line"><a id="l00266" name="l00266"></a><span class="lineno">  266</span>        }</div>
 <div class="line"><a id="l00267" name="l00267"></a><span class="lineno">  267</span> </div>
 <div class="line"><a id="l00268" name="l00268"></a><span class="lineno">  268</span>        <a class="code hl_define" href="include_2catch_8hpp.html#abd6e2aec703006b3da62cf7860c9808f">TEST_CASE</a>(<span class="stringliteral">&quot;Vector matchers that fail&quot;</span>, <span class="stringliteral">&quot;[matchers][vector][.][failing]&quot;</span>) {</div>
-<div class="line"><a id="l00269" name="l00269"></a><span class="lineno">  269</span>            std::vector&lt;int&gt; <a class="code hl_variable" href="namespacedevelop_build.html#ade64cd34608f9442ef3049116a2da428">v</a>;</div>
-<div class="line"><a id="l00270" name="l00270"></a><span class="lineno">  270</span>            <a class="code hl_variable" href="namespacedevelop_build.html#ade64cd34608f9442ef3049116a2da428">v</a>.push_back(1);</div>
-<div class="line"><a id="l00271" name="l00271"></a><span class="lineno">  271</span>            <a class="code hl_variable" href="namespacedevelop_build.html#ade64cd34608f9442ef3049116a2da428">v</a>.push_back(2);</div>
-<div class="line"><a id="l00272" name="l00272"></a><span class="lineno">  272</span>            <a class="code hl_variable" href="namespacedevelop_build.html#ade64cd34608f9442ef3049116a2da428">v</a>.push_back(3);</div>
+<div class="line"><a id="l00269" name="l00269"></a><span class="lineno">  269</span>            std::vector&lt;int&gt; v;</div>
+<div class="line"><a id="l00270" name="l00270"></a><span class="lineno">  270</span>            v.push_back(1);</div>
+<div class="line"><a id="l00271" name="l00271"></a><span class="lineno">  271</span>            v.push_back(2);</div>
+<div class="line"><a id="l00272" name="l00272"></a><span class="lineno">  272</span>            v.push_back(3);</div>
 <div class="line"><a id="l00273" name="l00273"></a><span class="lineno">  273</span> </div>
 <div class="line"><a id="l00274" name="l00274"></a><span class="lineno">  274</span>            std::vector&lt;int&gt; v2;</div>
 <div class="line"><a id="l00275" name="l00275"></a><span class="lineno">  275</span>            v2.push_back(1);</div>
@@ -410,7 +410,7 @@ $(function(){initNavTree('_matchers_8tests_8cpp_source.html',''); initResizable(
 <div class="line"><a id="l00308" name="l00308"></a><span class="lineno">  308</span>                <a class="code hl_define" href="include_2catch_8hpp.html#a5b8c33c63e0804d4458e2c761370b75d">CHECK_THAT</a>(v, <a class="code hl_function" href="namespace_catch_1_1_matchers.html#acd42da14d75497b3ef635e5e096b0c77">UnorderedEquals</a>(empty));</div>
 <div class="line"><a id="l00309" name="l00309"></a><span class="lineno">  309</span>                <a class="code hl_define" href="include_2catch_8hpp.html#a5b8c33c63e0804d4458e2c761370b75d">CHECK_THAT</a>(empty, <a class="code hl_function" href="namespace_catch_1_1_matchers.html#acd42da14d75497b3ef635e5e096b0c77">UnorderedEquals</a>(v));</div>
 <div class="line"><a id="l00310" name="l00310"></a><span class="lineno">  310</span> </div>
-<div class="line"><a id="l00311" name="l00311"></a><span class="lineno">  311</span>                <span class="keyword">auto</span> permuted = <a class="code hl_variable" href="namespacedevelop_build.html#ade64cd34608f9442ef3049116a2da428">v</a>;</div>
+<div class="line"><a id="l00311" name="l00311"></a><span class="lineno">  311</span>                <span class="keyword">auto</span> permuted = v;</div>
 <div class="line"><a id="l00312" name="l00312"></a><span class="lineno">  312</span>                std::next_permutation(begin(permuted), end(permuted));</div>
 <div class="line"><a id="l00313" name="l00313"></a><span class="lineno">  313</span>                permuted.pop_back();</div>
 <div class="line"><a id="l00314" name="l00314"></a><span class="lineno">  314</span>                <a class="code hl_define" href="include_2catch_8hpp.html#a5b8c33c63e0804d4458e2c761370b75d">CHECK_THAT</a>(permuted, <a class="code hl_function" href="namespace_catch_1_1_matchers.html#acd42da14d75497b3ef635e5e096b0c77">UnorderedEquals</a>(v));</div>
@@ -627,7 +627,6 @@ $(function(){initNavTree('_matchers_8tests_8cpp_source.html',''); initResizable(
 <div class="ttc" id="anamespace_catch_1_1_matchers_html_ae895591bd78a7d0ce4cdf3cf40d89ab5"><div class="ttname"><a href="namespace_catch_1_1_matchers.html#ae895591bd78a7d0ce4cdf3cf40d89ab5">Catch::Matchers::WithinULP</a></div><div class="ttdeci">Floating::WithinUlpsMatcher WithinULP(double target, int maxUlpDiff)</div><div class="ttdef"><b>Definition</b> <a href="catch__matchers__floating_8cpp_source.html#l00135">catch_matchers_floating.cpp:135</a></div></div>
 <div class="ttc" id="anamespace_matchers_tests_html"><div class="ttname"><a href="namespace_matchers_tests.html">MatchersTests</a></div><div class="ttdef"><b>Definition</b> <a href="#l00020">Matchers.tests.cpp:20</a></div></div>
 <div class="ttc" id="anamespace_xbyak_1_1util_html_a67cd5471fb751b186b53fdab6da7d3f7"><div class="ttname"><a href="namespace_xbyak_1_1util.html#a67cd5471fb751b186b53fdab6da7d3f7">Xbyak::util::ss</a></div><div class="ttdeci">static const Segment ss(Segment::ss)</div></div>
-<div class="ttc" id="anamespacedevelop_build_html_ade64cd34608f9442ef3049116a2da428"><div class="ttname"><a href="namespacedevelop_build.html#ade64cd34608f9442ef3049116a2da428">developBuild.v</a></div><div class="ttdeci">v</div><div class="ttdef"><b>Definition</b> <a href="develop_build_8py_source.html#l00006">developBuild.py:6</a></div></div>
 <div class="ttc" id="astruct_catch_1_1_case_sensitive_html_aad49d3aee2d97066642fffa919685c6aaeabe15dea2b2d0ea0847e88a9b2a99eb"><div class="ttname"><a href="struct_catch_1_1_case_sensitive.html#aad49d3aee2d97066642fffa919685c6aaeabe15dea2b2d0ea0847e88a9b2a99eb">Catch::CaseSensitive::No</a></div><div class="ttdeci">@ No</div><div class="ttdef"><b>Definition</b> <a href="catch__common_8h_source.html#l00034">catch_common.h:33</a></div></div>
 <div class="ttc" id="astruct_catch_1_1_matchers_1_1_impl_1_1_matcher_base_html"><div class="ttname"><a href="struct_catch_1_1_matchers_1_1_impl_1_1_matcher_base.html">Catch::Matchers::Impl::MatcherBase</a></div><div class="ttdef"><b>Definition</b> <a href="single__include_2catch2_2catch_8hpp_source.html#l02925">catch.hpp:2925</a></div></div>
 </div><!-- fragment --></div><!-- contents -->

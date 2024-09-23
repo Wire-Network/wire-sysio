@@ -11,7 +11,8 @@
 {\ttfamily \#include $<$openssl/evp.\+h$>$}\newline
 {\ttfamily \#include "{}util.\+h"{}}\newline
 {\ttfamily \#include $<$yubihsm.\+h$>$}\newline
-Include dependency graph for import\+\_\+ec.\+c\+:\nopagebreak
+Include dependency graph for import\+\_\+ec.\+c\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -178,7 +179,7 @@ Definition at line \mbox{\hyperlink{import__ec_8c_source_l00044}{44}} of file \m
 \DoxyCodeLine{00152\ \ \ EC\_KEY\ *eckey\ =\ EC\_KEY\_new();}
 \DoxyCodeLine{00153\ \ \ \textcolor{keywordtype}{int}\ nid\ =\ \mbox{\hyperlink{util_8c_a4e9f3e93eb6ebbc74d142d6a490de752}{algo2nid}}(\mbox{\hyperlink{yubihsm_8h_a498937b5a72accbb0ef21bb1dcdd55caae4b191baf5c65f9234120080264d129b}{YH\_ALGO\_EC\_P256}});}
 \DoxyCodeLine{00154\ \ \ EC\_POINT\ *\mbox{\hyperlink{structpoint}{point}};}
-\DoxyCodeLine{00155\ \ \ EC\_GROUP\ *\mbox{\hyperlink{namespaceupload_a9d33d66de17175dced88ffe95f079226}{group}}\ =\ EC\_GROUP\_new\_by\_curve\_name(nid);}
+\DoxyCodeLine{00155\ \ \ EC\_GROUP\ *group\ =\ EC\_GROUP\_new\_by\_curve\_name(nid);}
 \DoxyCodeLine{00156\ }
 \DoxyCodeLine{00157\ \ \ EC\_GROUP\_set\_asn1\_flag(group,\ nid);}
 \DoxyCodeLine{00158\ \ \ EC\_KEY\_set\_group(eckey,\ group);}
@@ -219,7 +220,8 @@ Definition at line \mbox{\hyperlink{import__ec_8c_source_l00044}{44}} of file \m
 \DoxyCodeLine{00193\ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode

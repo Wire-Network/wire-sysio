@@ -555,11 +555,10 @@ template&lt;typename Context , typename Iter &gt; </div>
 <div class="line"><span class="lineno">  794</span>      <span class="keywordflow">if</span> (!ctx.parse_array_item(in, idx)) {</div>
 <div class="line"><span class="lineno">  795</span>         <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
 <div class="line"><span class="lineno">  796</span>      }</div>
-<div class="line"><span class="lineno">  797</span>      <a class="code hl_variable" href="namespacehost__functions__tests__1.html#a8496a24b5236a2dc07bb4f2930d88342">idx</a>++;</div>
+<div class="line"><span class="lineno">  797</span>      idx++;</div>
 <div class="line"><span class="lineno">  798</span>   } <span class="keywordflow">while</span> (in.expect(<span class="charliteral">&#39;,&#39;</span>));</div>
 <div class="line"><span class="lineno">  799</span>   <span class="keywordflow">return</span> in.expect(<span class="charliteral">&#39;]&#39;</span>) &amp;&amp; ctx.parse_array_stop(idx);</div>
 <div class="line"><span class="lineno">  800</span>}</div>
-<div class="ttc" id="anamespacehost__functions__tests__1_html_a8496a24b5236a2dc07bb4f2930d88342"><div class="ttname"><a href="namespacehost__functions__tests__1.html#a8496a24b5236a2dc07bb4f2930d88342">host_functions_tests_1.idx</a></div><div class="ttdeci">int idx</div><div class="ttdef"><b>Definition</b> <a href="host__functions__tests__1_8py_source.html#l00021">host_functions_tests_1.py:21</a></div></div>
 </div><!-- fragment --><div class="dynheader">
 Here is the caller graph for this function:</div>
 <div class="dyncontent">

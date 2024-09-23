@@ -125,7 +125,7 @@ $(function(){initNavTree('vm_2signals_8hpp_source.html',''); initResizable(true)
 <div class="line"><a id="l00024" name="l00024"></a><span class="lineno">   24</span>   <span class="keyword">inline</span> <span class="keyword">struct </span>sigaction <a class="code hl_variable" href="namespacesysio_1_1vm.html#a1066b30cdd1da122a6405a37fd63f75a">prev_signal_handler</a>;</div>
 <div class="line"><a id="l00025" name="l00025"></a><span class="lineno">   25</span> </div>
 <div class="line"><a id="l00026" name="l00026"></a><span class="lineno">   26</span>   <span class="keyword">inline</span> <span class="keywordtype">void</span> <a class="code hl_function" href="namespacesysio_1_1vm.html#aa2e30fac0f99c3450ef6d78aa934490f">signal_handler</a>(<span class="keywordtype">int</span> sig, siginfo_t* info, <span class="keywordtype">void</span>* uap) {</div>
-<div class="line"><a id="l00027" name="l00027"></a><span class="lineno">   27</span>      sigjmp_buf* <a class="code hl_variable" href="namespaceupload.html#a770d9c7b49b1fede80de6078d5e49af7">dest</a> = std::atomic_load(&amp;signal_dest);</div>
+<div class="line"><a id="l00027" name="l00027"></a><span class="lineno">   27</span>      sigjmp_buf* dest = std::atomic_load(&amp;signal_dest);</div>
 <div class="line"><a id="l00028" name="l00028"></a><span class="lineno">   28</span>      <span class="keywordflow">if</span> (dest) {</div>
 <div class="line"><a id="l00029" name="l00029"></a><span class="lineno">   29</span>         siglongjmp(*dest, sig);</div>
 <div class="line"><a id="l00030" name="l00030"></a><span class="lineno">   30</span>      } <span class="keywordflow">else</span> {</div>
@@ -176,7 +176,7 @@ $(function(){initNavTree('vm_2signals_8hpp_source.html',''); initResizable(true)
 <div class="line"><a id="l00075" name="l00075"></a><span class="lineno">   75</span>         sigemptyset(&amp;block_mask);</div>
 <div class="line"><a id="l00076" name="l00076"></a><span class="lineno">   76</span>         sigaddset(&amp;block_mask, SIGPROF);</div>
 <div class="line"><a id="l00077" name="l00077"></a><span class="lineno">   77</span>         pthread_sigmask(SIG_BLOCK, &amp;block_mask, <span class="keyword">nullptr</span>);</div>
-<div class="line"><a id="l00078" name="l00078"></a><span class="lineno">   78</span>         sigjmp_buf* <a class="code hl_variable" href="namespaceupload.html#a770d9c7b49b1fede80de6078d5e49af7">dest</a> = std::atomic_load(&amp;signal_dest);</div>
+<div class="line"><a id="l00078" name="l00078"></a><span class="lineno">   78</span>         sigjmp_buf* dest = std::atomic_load(&amp;signal_dest);</div>
 <div class="line"><a id="l00079" name="l00079"></a><span class="lineno">   79</span>         siglongjmp(*dest, -1);</div>
 <div class="line"><a id="l00080" name="l00080"></a><span class="lineno">   80</span>      }</div>
 <div class="line"><a id="l00081" name="l00081"></a><span class="lineno">   81</span>   }</div>
@@ -188,7 +188,7 @@ $(function(){initNavTree('vm_2signals_8hpp_source.html',''); initResizable(true)
 <div class="line"><a id="l00087" name="l00087"></a><span class="lineno">   87</span>      sigemptyset(&amp;block_mask);</div>
 <div class="line"><a id="l00088" name="l00088"></a><span class="lineno">   88</span>      sigaddset(&amp;block_mask, SIGPROF);</div>
 <div class="line"><a id="l00089" name="l00089"></a><span class="lineno">   89</span>      pthread_sigmask(SIG_BLOCK, &amp;block_mask, <span class="keyword">nullptr</span>);</div>
-<div class="line"><a id="l00090" name="l00090"></a><span class="lineno">   90</span>      sigjmp_buf* <a class="code hl_variable" href="namespaceupload.html#a770d9c7b49b1fede80de6078d5e49af7">dest</a> = std::atomic_load(&amp;signal_dest);</div>
+<div class="line"><a id="l00090" name="l00090"></a><span class="lineno">   90</span>      sigjmp_buf* dest = std::atomic_load(&amp;signal_dest);</div>
 <div class="line"><a id="l00091" name="l00091"></a><span class="lineno">   91</span>      siglongjmp(*dest, -1);</div>
 <div class="line"><a id="l00092" name="l00092"></a><span class="lineno">   92</span>   }</div>
 <div class="line"><a id="l00093" name="l00093"></a><span class="lineno">   93</span> </div>
@@ -215,7 +215,7 @@ $(function(){initNavTree('vm_2signals_8hpp_source.html',''); initResizable(true)
 <div class="line"><a id="l00122" name="l00122"></a><span class="lineno">  122</span>   <span class="keyword">template</span>&lt;<span class="keyword">typename</span> F, <span class="keyword">typename</span> E&gt;</div>
 <div class="line"><a id="l00123" name="l00123"></a><span class="lineno">  123</span>   [[gnu::noinline]] <span class="keyword">auto</span> <a class="code hl_function" href="namespacesysio_1_1vm.html#a071298ad9404d4cd62434edde161b767">invoke_with_signal_handler</a>(F&amp;&amp; <a class="code hl_variable" href="_x02-_disabled_macros_8cpp.html#ae28240b98d91d6eb7da702b770490f39">f</a>, E&amp;&amp; e) {</div>
 <div class="line"><a id="l00124" name="l00124"></a><span class="lineno">  124</span>      <a class="code hl_function" href="namespacesysio_1_1vm.html#a2bf040912c32fbb2ea68f5338bb304fe">setup_signal_handler</a>();</div>
-<div class="line"><a id="l00125" name="l00125"></a><span class="lineno">  125</span>      sigjmp_buf <a class="code hl_variable" href="namespaceupload.html#a770d9c7b49b1fede80de6078d5e49af7">dest</a>;</div>
+<div class="line"><a id="l00125" name="l00125"></a><span class="lineno">  125</span>      sigjmp_buf dest;</div>
 <div class="line"><a id="l00126" name="l00126"></a><span class="lineno">  126</span>      sigjmp_buf* <span class="keyword">volatile</span> old_signal_handler = <span class="keyword">nullptr</span>;</div>
 <div class="line"><a id="l00127" name="l00127"></a><span class="lineno">  127</span>      <span class="keywordtype">int</span> sig;</div>
 <div class="line"><a id="l00128" name="l00128"></a><span class="lineno">  128</span>      <span class="keywordflow">if</span>((sig = sigsetjmp(dest, 1)) == 0) {</div>
@@ -269,7 +269,6 @@ $(function(){initNavTree('vm_2signals_8hpp_source.html',''); initResizable(true)
 <div class="ttc" id="anamespacesysio_1_1vm_html_a96dfdf06dbb657c55b510cd09ee321e6"><div class="ttname"><a href="namespacesysio_1_1vm.html#a96dfdf06dbb657c55b510cd09ee321e6">sysio::vm::throw_</a></div><div class="ttdeci">void throw_(const char *msg)</div><div class="ttdef"><b>Definition</b> <a href="sysio_2vm_2signals_8hpp_source.html#l00084">signals.hpp:84</a></div></div>
 <div class="ttc" id="anamespacesysio_1_1vm_html_aa2e30fac0f99c3450ef6d78aa934490f"><div class="ttname"><a href="namespacesysio_1_1vm.html#aa2e30fac0f99c3450ef6d78aa934490f">sysio::vm::signal_handler</a></div><div class="ttdeci">void signal_handler(int sig, siginfo_t *info, void *uap)</div><div class="ttdef"><b>Definition</b> <a href="sysio_2vm_2signals_8hpp_source.html#l00026">signals.hpp:26</a></div></div>
 <div class="ttc" id="anamespacesysio_html"><div class="ttname"><a href="namespacesysio.html">sysio</a></div><div class="ttdef"><b>Definition</b> <a href="abi__serializer_8cpp_source.html#l00008">abi_serializer.cpp:8</a></div></div>
-<div class="ttc" id="anamespaceupload_html_a770d9c7b49b1fede80de6078d5e49af7"><div class="ttname"><a href="namespaceupload.html#a770d9c7b49b1fede80de6078d5e49af7">upload.dest</a></div><div class="ttdeci">dest</div><div class="ttdef"><b>Definition</b> <a href="googlemock_2scripts_2upload_8py_source.html#l00394">upload.py:394</a></div></div>
 </div><!-- fragment --></div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->

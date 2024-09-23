@@ -6,7 +6,8 @@
 
 
 
-Inheritance diagram for CLI\+::Formatter\+:\nopagebreak
+Inheritance diagram for CLI\+::Formatter\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -15,7 +16,8 @@ Inheritance diagram for CLI\+::Formatter\+:\nopagebreak
 \end{figure}
 
 
-Collaboration diagram for CLI\+::Formatter\+:\nopagebreak
+Collaboration diagram for CLI\+::Formatter\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -170,7 +172,8 @@ Definition at line \mbox{\hyperlink{_c_l_i11_8hpp_source_l08005}{8005}} of file 
 \DoxyCodeLine{08029\ \}}
 
 \end{DoxyCode}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -207,14 +210,16 @@ Definition at line \mbox{\hyperlink{_c_l_i11_8hpp_source_l08153}{8153}} of file 
 \DoxyCodeLine{08168\ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
 \includegraphics[width=350pt]{class_c_l_i_1_1_formatter_ade54fd392e2c9f5364744dca82408e60_cgraph}
 \end{center}
 \end{figure}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -242,7 +247,8 @@ Definition at line \mbox{\hyperlink{_c_l_i11_8hpp_source_l08073}{8073}} of file 
 \DoxyCodeLine{08079\ \}}
 
 \end{DoxyCode}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -264,7 +270,7 @@ Definition at line \mbox{\hyperlink{_c_l_i11_8hpp_source_l07960}{7960}} of file 
 \DoxyCodeLine{07960\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
 \DoxyCodeLine{07961\ \ \ \ \ std::stringstream\ out;}
 \DoxyCodeLine{07962\ }
-\DoxyCodeLine{07963\ \ \ \ \ out\ <<\ \textcolor{stringliteral}{"{}\(\backslash\)n"{}}\ <<\ \mbox{\hyperlink{namespaceupload_a9d33d66de17175dced88ffe95f079226}{group}}\ <<\ \textcolor{stringliteral}{"{}:\(\backslash\)n"{}};}
+\DoxyCodeLine{07963\ \ \ \ \ out\ <<\ \textcolor{stringliteral}{"{}\(\backslash\)n"{}}\ <<\ group\ <<\ \textcolor{stringliteral}{"{}:\(\backslash\)n"{}};}
 \DoxyCodeLine{07964\ \ \ \ \ \textcolor{keywordflow}{for}(\textcolor{keyword}{const}\ Option\ *opt\ :\ opts)\ \{}
 \DoxyCodeLine{07965\ \ \ \ \ \ \ \ \ out\ <<\ \mbox{\hyperlink{class_c_l_i_1_1_formatter_a1503e498cef1cab66a01d84bac59b5d8}{make\_option}}(opt,\ is\_positional);}
 \DoxyCodeLine{07966\ \ \ \ \ \}}
@@ -273,14 +279,16 @@ Definition at line \mbox{\hyperlink{_c_l_i11_8hpp_source_l07960}{7960}} of file 
 \DoxyCodeLine{07969\ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
 \includegraphics[width=350pt]{class_c_l_i_1_1_formatter_aebbdf79e2615ea7d16fe8f30fb6551fc_cgraph}
 \end{center}
 \end{figure}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -306,13 +314,13 @@ Definition at line \mbox{\hyperlink{_c_l_i11_8hpp_source_l07981}{7981}} of file 
 \DoxyCodeLine{07985\ \ \ \ \ \textcolor{comment}{//\ Options}}
 \DoxyCodeLine{07986\ \ \ \ \ \textcolor{keywordflow}{for}(\textcolor{keyword}{const}\ std::string\ \&group\ :\ groups)\ \{}
 \DoxyCodeLine{07987\ \ \ \ \ \ \ \ \ std::vector<const\ Option\ *>\ opts\ =\ \mbox{\hyperlink{namespaceappbase_a99374dc23934f008a09f2f79be9eae40}{app}}-\/>\mbox{\hyperlink{classappbase_1_1application_a1cd05ae43f6400f07f9c60a09cc610cb}{get\_options}}([app,\ mode,\ \&group](\textcolor{keyword}{const}\ Option\ *opt)\ \{}
-\DoxyCodeLine{07988\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ opt-\/>get\_group()\ ==\ \mbox{\hyperlink{namespaceupload_a9d33d66de17175dced88ffe95f079226}{group}}\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Must\ be\ in\ the\ right\ group}}
+\DoxyCodeLine{07988\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ opt-\/>get\_group()\ ==\ group\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Must\ be\ in\ the\ right\ group}}
 \DoxyCodeLine{07989\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \&\&\ opt-\/>nonpositional()\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Must\ not\ be\ a\ positional}}
 \DoxyCodeLine{07990\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \&\&\ (mode\ !=\ \mbox{\hyperlink{namespace_c_l_i_a97e7d97131e3889f32b721570eca119cae80155eceb940c89e2de63ad05868db2}{AppFormatMode::Sub}}\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ If\ mode\ is\ Sub,\ then}}
 \DoxyCodeLine{07991\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ||\ (\mbox{\hyperlink{namespaceappbase_a99374dc23934f008a09f2f79be9eae40}{app}}-\/>get\_help\_ptr()\ !=\ opt\ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Ignore\ help\ pointer}}
 \DoxyCodeLine{07992\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \&\&\ \mbox{\hyperlink{namespaceappbase_a99374dc23934f008a09f2f79be9eae40}{app}}-\/>get\_help\_all\_ptr()\ !=\ opt));\ \textcolor{comment}{//\ Ignore\ help\ all\ pointer}}
 \DoxyCodeLine{07993\ \ \ \ \ \ \ \ \ \});}
-\DoxyCodeLine{07994\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(!\mbox{\hyperlink{namespaceupload_a9d33d66de17175dced88ffe95f079226}{group}}.empty()\ \&\&\ !opts.empty())\ \{}
+\DoxyCodeLine{07994\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(!group.empty()\ \&\&\ !opts.empty())\ \{}
 \DoxyCodeLine{07995\ \ \ \ \ \ \ \ \ \ \ \ \ out\ <<\ \mbox{\hyperlink{class_c_l_i_1_1_formatter_aebbdf79e2615ea7d16fe8f30fb6551fc}{make\_group}}(group,\ \textcolor{keyword}{false},\ opts);}
 \DoxyCodeLine{07996\ }
 \DoxyCodeLine{07997\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(group\ !=\ groups.back())}
@@ -324,14 +332,16 @@ Definition at line \mbox{\hyperlink{_c_l_i11_8hpp_source_l07981}{7981}} of file 
 \DoxyCodeLine{08003\ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
 \includegraphics[width=350pt]{class_c_l_i_1_1_formatter_ad48dd6b9432babc0037d6726230221f0_cgraph}
 \end{center}
 \end{figure}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -379,7 +389,8 @@ Definition at line \mbox{\hyperlink{_c_l_i11_8hpp_source_l08081}{8081}} of file 
 \DoxyCodeLine{08103\ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -406,14 +417,16 @@ Definition at line \mbox{\hyperlink{_c_l_i11_8hpp_source_l03299}{3299}} of file 
 \DoxyCodeLine{03304\ \ \ \ \ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
 \includegraphics[width=350pt]{class_c_l_i_1_1_formatter_a1503e498cef1cab66a01d84bac59b5d8_cgraph}
 \end{center}
 \end{figure}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -435,14 +448,16 @@ Definition at line \mbox{\hyperlink{_c_l_i11_8hpp_source_l08208}{8208}} of file 
 \DoxyCodeLine{08208\ \{\ \textcolor{keywordflow}{return}\ opt-\/>get\_description();\ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
 \includegraphics[width=350pt]{class_c_l_i_1_1_formatter_acf6c56689b56533dad59f8e1ff71c7ce_cgraph}
 \end{center}
 \end{figure}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -469,14 +484,16 @@ Definition at line \mbox{\hyperlink{_c_l_i11_8hpp_source_l08170}{8170}} of file 
 \DoxyCodeLine{08175\ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
 \includegraphics[width=350pt]{class_c_l_i_1_1_formatter_ad29eb726bf961560f0c6419fd74332d0_cgraph}
 \end{center}
 \end{figure}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -527,14 +544,16 @@ Definition at line \mbox{\hyperlink{_c_l_i11_8hpp_source_l08177}{8177}} of file 
 \DoxyCodeLine{08206\ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
 \includegraphics[width=350pt]{class_c_l_i_1_1_formatter_a9f11b9ee12c8ccb8bf9670be1b47a3b1_cgraph}
 \end{center}
 \end{figure}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -566,7 +585,8 @@ Definition at line \mbox{\hyperlink{_c_l_i11_8hpp_source_l08210}{8210}} of file 
 \DoxyCodeLine{08220\ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -596,14 +616,16 @@ Definition at line \mbox{\hyperlink{_c_l_i11_8hpp_source_l07971}{7971}} of file 
 \DoxyCodeLine{07979\ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
 \includegraphics[width=350pt]{class_c_l_i_1_1_formatter_aab5f07a6d3154ace0be4d9dbf85f795b_cgraph}
 \end{center}
 \end{figure}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -629,14 +651,16 @@ Definition at line \mbox{\hyperlink{_c_l_i11_8hpp_source_l08147}{8147}} of file 
 \DoxyCodeLine{08151\ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
 \includegraphics[width=344pt]{class_c_l_i_1_1_formatter_a82a62cd4b9833cab20e82c4d099c0c7f_cgraph}
 \end{center}
 \end{figure}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -679,7 +703,7 @@ Definition at line \mbox{\hyperlink{_c_l_i11_8hpp_source_l08105}{8105}} of file 
 \DoxyCodeLine{08126\ }
 \DoxyCodeLine{08127\ \ \ \ \ \textcolor{comment}{//\ For\ each\ group,\ filter\ out\ and\ print\ subcommands}}
 \DoxyCodeLine{08128\ \ \ \ \ \textcolor{keywordflow}{for}(\textcolor{keyword}{const}\ std::string\ \&group\ :\ subcmd\_groups\_seen)\ \{}
-\DoxyCodeLine{08129\ \ \ \ \ \ \ \ \ out\ <<\ \textcolor{stringliteral}{"{}\(\backslash\)n"{}}\ <<\ \mbox{\hyperlink{namespaceupload_a9d33d66de17175dced88ffe95f079226}{group}}\ <<\ \textcolor{stringliteral}{"{}:\(\backslash\)n"{}};}
+\DoxyCodeLine{08129\ \ \ \ \ \ \ \ \ out\ <<\ \textcolor{stringliteral}{"{}\(\backslash\)n"{}}\ <<\ group\ <<\ \textcolor{stringliteral}{"{}:\(\backslash\)n"{}};}
 \DoxyCodeLine{08130\ \ \ \ \ \ \ \ \ std::vector<const\ App\ *>\ subcommands\_group\ =\ \mbox{\hyperlink{namespaceappbase_a99374dc23934f008a09f2f79be9eae40}{app}}-\/>get\_subcommands(}
 \DoxyCodeLine{08131\ \ \ \ \ \ \ \ \ \ \ \ \ [\&group](\textcolor{keyword}{const}\ App\ *sub\_app)\ \{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespace_c_l_i_1_1detail_ae83709ec148057ec53df4383645727e9}{detail::to\_lower}}(sub\_app-\/>get\_group())\ ==\ \mbox{\hyperlink{namespace_c_l_i_1_1detail_ae83709ec148057ec53df4383645727e9}{detail::to\_lower}}(group);\ \});}
 \DoxyCodeLine{08132\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}(\textcolor{keyword}{const}\ App\ *new\_com\ :\ subcommands\_group)\ \{}
@@ -698,14 +722,16 @@ Definition at line \mbox{\hyperlink{_c_l_i11_8hpp_source_l08105}{8105}} of file 
 \DoxyCodeLine{08145\ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
 \includegraphics[width=350pt]{class_c_l_i_1_1_formatter_a9e6b7c4c6eee50b11fe1ca785002db04_cgraph}
 \end{center}
 \end{figure}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -767,14 +793,16 @@ Definition at line \mbox{\hyperlink{_c_l_i11_8hpp_source_l08031}{8031}} of file 
 \DoxyCodeLine{08071\ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
 \includegraphics[width=350pt]{class_c_l_i_1_1_formatter_a3aac4a7ce4ca139704e632915892024c_cgraph}
 \end{center}
 \end{figure}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode

@@ -117,7 +117,7 @@
 \DoxyCodeLine{\Hypertarget{flat_8hpp_source_l00113}00113\ }
 \DoxyCodeLine{\Hypertarget{flat_8hpp_source_l00114}00114\ \ \ \ \textcolor{keyword}{template}<\textcolor{keyword}{typename}\ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}},\ \textcolor{keyword}{typename}...\ \mbox{\hyperlink{union_u}{U}}>}
 \DoxyCodeLine{\Hypertarget{flat_8hpp_source_l00115}\mbox{\hyperlink{namespacefc_ab247b4ea9d32198003796cf907f60c25}{00115}}\ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespacefc_accef08adf4ee05c36ccc550d8101b08f}{from\_variant}}(\ \textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1variant}{fc::variant}}\&\ v,\ boost::container::vector<T,\ U...>\&\ vec\ )\ \{}
-\DoxyCodeLine{\Hypertarget{flat_8hpp_source_l00116}00116\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{namespacefc_a9148361f6aaa3d739990a75ac557fe59}{variants}}\&\ vars\ =\ v.get\_array();}
+\DoxyCodeLine{\Hypertarget{flat_8hpp_source_l00116}00116\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{namespacefc_a9148361f6aaa3d739990a75ac557fe59}{variants}}\&\ vars\ =\ v.\mbox{\hyperlink{classfc_1_1variant_aea83c87e4e1b1e185f57717b4bd683a5}{get\_array}}();}
 \DoxyCodeLine{\Hypertarget{flat_8hpp_source_l00117}00117\ \ \ \ \ \ \ \mbox{\hyperlink{exception_8hpp_abed525eeff3ae581be7e4e2fcd3b7bf4}{FC\_ASSERT}}(\ vars.size()\ <=\ \mbox{\hyperlink{utility_8hpp_ad647a8ed8233ea2357905dde291af0f6}{MAX\_NUM\_ARRAY\_ELEMENTS}}\ );}
 \DoxyCodeLine{\Hypertarget{flat_8hpp_source_l00118}00118\ \ \ \ \ \ \ vec.clear();}
 \DoxyCodeLine{\Hypertarget{flat_8hpp_source_l00119}00119\ \ \ \ \ \ \ vec.resize(\ vars.size()\ );}
@@ -138,7 +138,7 @@
 \DoxyCodeLine{\Hypertarget{flat_8hpp_source_l00134}00134\ \ \ \ \textcolor{keyword}{template}<\textcolor{keyword}{typename}...\ \mbox{\hyperlink{union_u}{U}}>}
 \DoxyCodeLine{\Hypertarget{flat_8hpp_source_l00135}\mbox{\hyperlink{namespacefc_a09adf404a3918a96fb6a7024fc6331f5}{00135}}\ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespacefc_accef08adf4ee05c36ccc550d8101b08f}{from\_variant}}(\ \textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1variant}{fc::variant}}\&\ v,\ boost::container::vector<char,\ U...>\&\ vec\ )}
 \DoxyCodeLine{\Hypertarget{flat_8hpp_source_l00136}00136\ \ \ \ \{}
-\DoxyCodeLine{\Hypertarget{flat_8hpp_source_l00137}00137\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ str\ =\ v.get\_string();}
+\DoxyCodeLine{\Hypertarget{flat_8hpp_source_l00137}00137\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ str\ =\ v.\mbox{\hyperlink{classfc_1_1variant_a2ca9f4d2feb8c9743da4128b18bfa886}{get\_string}}();}
 \DoxyCodeLine{\Hypertarget{flat_8hpp_source_l00138}00138\ \ \ \ \ \ \ \mbox{\hyperlink{exception_8hpp_abed525eeff3ae581be7e4e2fcd3b7bf4}{FC\_ASSERT}}(\ str.size()\ <=\ 2*\mbox{\hyperlink{utility_8hpp_a5e3c645782d12166c98f3654471efd61}{MAX\_SIZE\_OF\_BYTE\_ARRAYS}}\ );\ \textcolor{comment}{//\ Doubled\ because\ hex\ strings\ needs\ two\ characters\ per\ byte}}
 \DoxyCodeLine{\Hypertarget{flat_8hpp_source_l00139}00139\ \ \ \ \ \ \ vec.resize(\ str.size()\ /\ 2\ );}
 \DoxyCodeLine{\Hypertarget{flat_8hpp_source_l00140}00140\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ vec.size()\ )\ \{}

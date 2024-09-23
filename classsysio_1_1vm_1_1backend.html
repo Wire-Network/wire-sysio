@@ -280,11 +280,10 @@ template&lt;typename HostFunctions  = std::nullptr_t, typename Impl  = interpret
 
 <p class="definition">Definition at line <a class="el" href="sysio_2vm_2backend_8hpp_source.html#l00076">76</a> of file <a class="el" href="sysio_2vm_2backend_8hpp_source.html">backend.hpp</a>.</p>
 <div class="fragment"><div class="line"><span class="lineno">   76</span>                                                                                                     {})</div>
-<div class="line"><span class="lineno">   77</span>         : memory_alloc(alloc), ctx(parser_t{ mod.<a class="code hl_typedef" href="namespacechainbase.html#add7d4cf66ab3f2808fe613e6b0343b89">allocator</a>, <a class="code hl_variable" href="namespacebenchmark_compile.html#acf738bbf3b8391aa78929ceeceb8a03b">options</a> }.parse_module(code, mod, debug), <a class="code hl_namespace" href="namespacedetail.html">detail</a>::get_max_call_depth(<a class="code hl_variable" href="namespacebenchmark_compile.html#acf738bbf3b8391aa78929ceeceb8a03b">options</a>)) {</div>
+<div class="line"><span class="lineno">   77</span>         : memory_alloc(alloc), ctx(parser_t{ mod.<a class="code hl_typedef" href="namespacechainbase.html#add7d4cf66ab3f2808fe613e6b0343b89">allocator</a>, options }.parse_module(code, mod, debug), <a class="code hl_namespace" href="namespacedetail.html">detail</a>::get_max_call_depth(options)) {</div>
 <div class="line"><span class="lineno">   78</span>         ctx.set_max_pages(detail::get_max_pages(options));</div>
 <div class="line"><span class="lineno">   79</span>         construct(&amp;host);</div>
 <div class="line"><span class="lineno">   80</span>      }</div>
-<div class="ttc" id="anamespacebenchmark_compile_html_acf738bbf3b8391aa78929ceeceb8a03b"><div class="ttname"><a href="namespacebenchmark_compile.html#acf738bbf3b8391aa78929ceeceb8a03b">benchmarkCompile.options</a></div><div class="ttdeci">list options</div><div class="ttdef"><b>Definition</b> <a href="benchmark_compile_8py_source.html#l00107">benchmarkCompile.py:107</a></div></div>
 <div class="ttc" id="anamespacechainbase_html_add7d4cf66ab3f2808fe613e6b0343b89"><div class="ttname"><a href="namespacechainbase.html#add7d4cf66ab3f2808fe613e6b0343b89">chainbase::allocator</a></div><div class="ttdeci">bip::allocator&lt; T, pinnable_mapped_file::segment_manager &gt; allocator</div><div class="ttdef"><b>Definition</b> <a href="chainbase_8hpp_source.html#l00056">chainbase.hpp:56</a></div></div>
 <div class="ttc" id="anamespacedetail_html"><div class="ttname"><a href="namespacedetail.html">detail</a></div><div class="ttdef"><b>Definition</b> <a href="programs_2nodeop_2main_8cpp_source.html#l00023">main.cpp:23</a></div></div>
 </div><!-- fragment -->
@@ -326,7 +325,7 @@ template&lt;typename HostFunctions  = std::nullptr_t, typename Impl  = interpret
 
 <p class="definition">Definition at line <a class="el" href="sysio_2vm_2backend_8hpp_source.html#l00081">81</a> of file <a class="el" href="sysio_2vm_2backend_8hpp_source.html">backend.hpp</a>.</p>
 <div class="fragment"><div class="line"><span class="lineno">   81</span>                                                                                       {})</div>
-<div class="line"><span class="lineno">   82</span>         : memory_alloc(alloc), ctx(parser_t{ mod.<a class="code hl_typedef" href="namespacechainbase.html#add7d4cf66ab3f2808fe613e6b0343b89">allocator</a>, <a class="code hl_variable" href="namespacebenchmark_compile.html#acf738bbf3b8391aa78929ceeceb8a03b">options</a> }.parse_module(code, mod, debug), <a class="code hl_namespace" href="namespacedetail.html">detail</a>::get_max_call_depth(<a class="code hl_variable" href="namespacebenchmark_compile.html#acf738bbf3b8391aa78929ceeceb8a03b">options</a>)) {</div>
+<div class="line"><span class="lineno">   82</span>         : memory_alloc(alloc), ctx(parser_t{ mod.<a class="code hl_typedef" href="namespacechainbase.html#add7d4cf66ab3f2808fe613e6b0343b89">allocator</a>, options }.parse_module(code, mod, debug), <a class="code hl_namespace" href="namespacedetail.html">detail</a>::get_max_call_depth(options)) {</div>
 <div class="line"><span class="lineno">   83</span>         ctx.set_max_pages(detail::get_max_pages(options));</div>
 <div class="line"><span class="lineno">   84</span>         construct();</div>
 <div class="line"><span class="lineno">   85</span>      }</div>
@@ -374,7 +373,7 @@ template&lt;typename HostFunctions  = std::nullptr_t, typename Impl  = interpret
 
 <p class="definition">Definition at line <a class="el" href="sysio_2vm_2backend_8hpp_source.html#l00086">86</a> of file <a class="el" href="sysio_2vm_2backend_8hpp_source.html">backend.hpp</a>.</p>
 <div class="fragment"><div class="line"><span class="lineno">   86</span>                                                                                                    {})</div>
-<div class="line"><span class="lineno">   87</span>         : memory_alloc(alloc), ctx(parser_t{ mod.<a class="code hl_typedef" href="namespacechainbase.html#add7d4cf66ab3f2808fe613e6b0343b89">allocator</a>, <a class="code hl_variable" href="namespacebenchmark_compile.html#acf738bbf3b8391aa78929ceeceb8a03b">options</a> }.parse_module(code, mod, debug), <a class="code hl_namespace" href="namespacedetail.html">detail</a>::get_max_call_depth(<a class="code hl_variable" href="namespacebenchmark_compile.html#acf738bbf3b8391aa78929ceeceb8a03b">options</a>)) {</div>
+<div class="line"><span class="lineno">   87</span>         : memory_alloc(alloc), ctx(parser_t{ mod.<a class="code hl_typedef" href="namespacechainbase.html#add7d4cf66ab3f2808fe613e6b0343b89">allocator</a>, options }.parse_module(code, mod, debug), <a class="code hl_namespace" href="namespacedetail.html">detail</a>::get_max_call_depth(options)) {</div>
 <div class="line"><span class="lineno">   88</span>         ctx.set_max_pages(detail::get_max_pages(options));</div>
 <div class="line"><span class="lineno">   89</span>         construct(&amp;host);</div>
 <div class="line"><span class="lineno">   90</span>      }</div>
@@ -417,7 +416,7 @@ template&lt;typename HostFunctions  = std::nullptr_t, typename Impl  = interpret
 
 <p class="definition">Definition at line <a class="el" href="sysio_2vm_2backend_8hpp_source.html#l00091">91</a> of file <a class="el" href="sysio_2vm_2backend_8hpp_source.html">backend.hpp</a>.</p>
 <div class="fragment"><div class="line"><span class="lineno">   91</span>                                                                                      {})</div>
-<div class="line"><span class="lineno">   92</span>         : memory_alloc(alloc), ctx(parser_t{ mod.<a class="code hl_typedef" href="namespacechainbase.html#add7d4cf66ab3f2808fe613e6b0343b89">allocator</a>, <a class="code hl_variable" href="namespacebenchmark_compile.html#acf738bbf3b8391aa78929ceeceb8a03b">options</a> }.parse_module(code, mod, debug), <a class="code hl_namespace" href="namespacedetail.html">detail</a>::get_max_call_depth(<a class="code hl_variable" href="namespacebenchmark_compile.html#acf738bbf3b8391aa78929ceeceb8a03b">options</a>)) {</div>
+<div class="line"><span class="lineno">   92</span>         : memory_alloc(alloc), ctx(parser_t{ mod.<a class="code hl_typedef" href="namespacechainbase.html#add7d4cf66ab3f2808fe613e6b0343b89">allocator</a>, options }.parse_module(code, mod, debug), <a class="code hl_namespace" href="namespacedetail.html">detail</a>::get_max_call_depth(options)) {</div>
 <div class="line"><span class="lineno">   93</span>         ctx.set_max_pages(detail::get_max_pages(options));</div>
 <div class="line"><span class="lineno">   94</span>         construct();</div>
 <div class="line"><span class="lineno">   95</span>      }</div>
@@ -470,7 +469,7 @@ template&lt;typename HostFunctions  = std::nullptr_t, typename Impl  = interpret
 
 <p class="definition">Definition at line <a class="el" href="sysio_2vm_2backend_8hpp_source.html#l00096">96</a> of file <a class="el" href="sysio_2vm_2backend_8hpp_source.html">backend.hpp</a>.</p>
 <div class="fragment"><div class="line"><span class="lineno">   96</span>                                                                                                                  {})</div>
-<div class="line"><span class="lineno">   97</span>         : memory_alloc(alloc), ctx(parser_t{ mod.<a class="code hl_typedef" href="namespacechainbase.html#add7d4cf66ab3f2808fe613e6b0343b89">allocator</a>, <a class="code hl_variable" href="namespacebenchmark_compile.html#acf738bbf3b8391aa78929ceeceb8a03b">options</a> }.parse_module2(ptr, sz, mod, debug), <a class="code hl_namespace" href="namespacedetail.html">detail</a>::get_max_call_depth(<a class="code hl_variable" href="namespacebenchmark_compile.html#acf738bbf3b8391aa78929ceeceb8a03b">options</a>)) {</div>
+<div class="line"><span class="lineno">   97</span>         : memory_alloc(alloc), ctx(parser_t{ mod.<a class="code hl_typedef" href="namespacechainbase.html#add7d4cf66ab3f2808fe613e6b0343b89">allocator</a>, options }.parse_module2(ptr, sz, mod, debug), <a class="code hl_namespace" href="namespacedetail.html">detail</a>::get_max_call_depth(options)) {</div>
 <div class="line"><span class="lineno">   98</span>         ctx.set_max_pages(detail::get_max_pages(options));</div>
 <div class="line"><span class="lineno">   99</span>         construct(&amp;host);</div>
 <div class="line"><span class="lineno">  100</span>      }</div>
@@ -518,7 +517,7 @@ template&lt;typename HostFunctions  = std::nullptr_t, typename Impl  = interpret
 
 <p class="definition">Definition at line <a class="el" href="sysio_2vm_2backend_8hpp_source.html#l00101">101</a> of file <a class="el" href="sysio_2vm_2backend_8hpp_source.html">backend.hpp</a>.</p>
 <div class="fragment"><div class="line"><span class="lineno">  101</span>                                                                                                    {})</div>
-<div class="line"><span class="lineno">  102</span>         : memory_alloc(alloc), ctx(parser_t{ mod.<a class="code hl_typedef" href="namespacechainbase.html#add7d4cf66ab3f2808fe613e6b0343b89">allocator</a>, <a class="code hl_variable" href="namespacebenchmark_compile.html#acf738bbf3b8391aa78929ceeceb8a03b">options</a> }.parse_module2(ptr, sz, mod, debug), <a class="code hl_namespace" href="namespacedetail.html">detail</a>::get_max_call_depth(<a class="code hl_variable" href="namespacebenchmark_compile.html#acf738bbf3b8391aa78929ceeceb8a03b">options</a>)) {</div>
+<div class="line"><span class="lineno">  102</span>         : memory_alloc(alloc), ctx(parser_t{ mod.<a class="code hl_typedef" href="namespacechainbase.html#add7d4cf66ab3f2808fe613e6b0343b89">allocator</a>, options }.parse_module2(ptr, sz, mod, debug), <a class="code hl_namespace" href="namespacedetail.html">detail</a>::get_max_call_depth(options)) {</div>
 <div class="line"><span class="lineno">  103</span>         ctx.set_max_pages(detail::get_max_pages(options));</div>
 <div class="line"><span class="lineno">  104</span>         construct();</div>
 <div class="line"><span class="lineno">  105</span>      }</div>
@@ -566,7 +565,7 @@ template&lt;typename HostFunctions  = std::nullptr_t, typename Impl  = interpret
 
 <p class="definition">Definition at line <a class="el" href="vm_2backend_8hpp_source.html#l00076">76</a> of file <a class="el" href="vm_2backend_8hpp_source.html">backend.hpp</a>.</p>
 <div class="fragment"><div class="line"><span class="lineno">   76</span>                                                                                                     {})</div>
-<div class="line"><span class="lineno">   77</span>         : memory_alloc(alloc), ctx(parser_t{ mod.<a class="code hl_typedef" href="namespacechainbase.html#add7d4cf66ab3f2808fe613e6b0343b89">allocator</a>, <a class="code hl_variable" href="namespacebenchmark_compile.html#acf738bbf3b8391aa78929ceeceb8a03b">options</a> }.parse_module(code, mod, debug), <a class="code hl_namespace" href="namespacedetail.html">detail</a>::get_max_call_depth(<a class="code hl_variable" href="namespacebenchmark_compile.html#acf738bbf3b8391aa78929ceeceb8a03b">options</a>)) {</div>
+<div class="line"><span class="lineno">   77</span>         : memory_alloc(alloc), ctx(parser_t{ mod.<a class="code hl_typedef" href="namespacechainbase.html#add7d4cf66ab3f2808fe613e6b0343b89">allocator</a>, options }.parse_module(code, mod, debug), <a class="code hl_namespace" href="namespacedetail.html">detail</a>::get_max_call_depth(options)) {</div>
 <div class="line"><span class="lineno">   78</span>         ctx.set_max_pages(detail::get_max_pages(options));</div>
 <div class="line"><span class="lineno">   79</span>         construct(&amp;host);</div>
 <div class="line"><span class="lineno">   80</span>      }</div>
@@ -609,7 +608,7 @@ template&lt;typename HostFunctions  = std::nullptr_t, typename Impl  = interpret
 
 <p class="definition">Definition at line <a class="el" href="vm_2backend_8hpp_source.html#l00081">81</a> of file <a class="el" href="vm_2backend_8hpp_source.html">backend.hpp</a>.</p>
 <div class="fragment"><div class="line"><span class="lineno">   81</span>                                                                                       {})</div>
-<div class="line"><span class="lineno">   82</span>         : memory_alloc(alloc), ctx(parser_t{ mod.<a class="code hl_typedef" href="namespacechainbase.html#add7d4cf66ab3f2808fe613e6b0343b89">allocator</a>, <a class="code hl_variable" href="namespacebenchmark_compile.html#acf738bbf3b8391aa78929ceeceb8a03b">options</a> }.parse_module(code, mod, debug), <a class="code hl_namespace" href="namespacedetail.html">detail</a>::get_max_call_depth(<a class="code hl_variable" href="namespacebenchmark_compile.html#acf738bbf3b8391aa78929ceeceb8a03b">options</a>)) {</div>
+<div class="line"><span class="lineno">   82</span>         : memory_alloc(alloc), ctx(parser_t{ mod.<a class="code hl_typedef" href="namespacechainbase.html#add7d4cf66ab3f2808fe613e6b0343b89">allocator</a>, options }.parse_module(code, mod, debug), <a class="code hl_namespace" href="namespacedetail.html">detail</a>::get_max_call_depth(options)) {</div>
 <div class="line"><span class="lineno">   83</span>         ctx.set_max_pages(detail::get_max_pages(options));</div>
 <div class="line"><span class="lineno">   84</span>         construct();</div>
 <div class="line"><span class="lineno">   85</span>      }</div>
@@ -657,7 +656,7 @@ template&lt;typename HostFunctions  = std::nullptr_t, typename Impl  = interpret
 
 <p class="definition">Definition at line <a class="el" href="vm_2backend_8hpp_source.html#l00086">86</a> of file <a class="el" href="vm_2backend_8hpp_source.html">backend.hpp</a>.</p>
 <div class="fragment"><div class="line"><span class="lineno">   86</span>                                                                                                    {})</div>
-<div class="line"><span class="lineno">   87</span>         : memory_alloc(alloc), ctx(parser_t{ mod.<a class="code hl_typedef" href="namespacechainbase.html#add7d4cf66ab3f2808fe613e6b0343b89">allocator</a>, <a class="code hl_variable" href="namespacebenchmark_compile.html#acf738bbf3b8391aa78929ceeceb8a03b">options</a> }.parse_module(code, mod, debug), <a class="code hl_namespace" href="namespacedetail.html">detail</a>::get_max_call_depth(<a class="code hl_variable" href="namespacebenchmark_compile.html#acf738bbf3b8391aa78929ceeceb8a03b">options</a>)) {</div>
+<div class="line"><span class="lineno">   87</span>         : memory_alloc(alloc), ctx(parser_t{ mod.<a class="code hl_typedef" href="namespacechainbase.html#add7d4cf66ab3f2808fe613e6b0343b89">allocator</a>, options }.parse_module(code, mod, debug), <a class="code hl_namespace" href="namespacedetail.html">detail</a>::get_max_call_depth(options)) {</div>
 <div class="line"><span class="lineno">   88</span>         ctx.set_max_pages(detail::get_max_pages(options));</div>
 <div class="line"><span class="lineno">   89</span>         construct(&amp;host);</div>
 <div class="line"><span class="lineno">   90</span>      }</div>
@@ -700,7 +699,7 @@ template&lt;typename HostFunctions  = std::nullptr_t, typename Impl  = interpret
 
 <p class="definition">Definition at line <a class="el" href="vm_2backend_8hpp_source.html#l00091">91</a> of file <a class="el" href="vm_2backend_8hpp_source.html">backend.hpp</a>.</p>
 <div class="fragment"><div class="line"><span class="lineno">   91</span>                                                                                      {})</div>
-<div class="line"><span class="lineno">   92</span>         : memory_alloc(alloc), ctx(parser_t{ mod.<a class="code hl_typedef" href="namespacechainbase.html#add7d4cf66ab3f2808fe613e6b0343b89">allocator</a>, <a class="code hl_variable" href="namespacebenchmark_compile.html#acf738bbf3b8391aa78929ceeceb8a03b">options</a> }.parse_module(code, mod, debug), <a class="code hl_namespace" href="namespacedetail.html">detail</a>::get_max_call_depth(<a class="code hl_variable" href="namespacebenchmark_compile.html#acf738bbf3b8391aa78929ceeceb8a03b">options</a>)) {</div>
+<div class="line"><span class="lineno">   92</span>         : memory_alloc(alloc), ctx(parser_t{ mod.<a class="code hl_typedef" href="namespacechainbase.html#add7d4cf66ab3f2808fe613e6b0343b89">allocator</a>, options }.parse_module(code, mod, debug), <a class="code hl_namespace" href="namespacedetail.html">detail</a>::get_max_call_depth(options)) {</div>
 <div class="line"><span class="lineno">   93</span>         ctx.set_max_pages(detail::get_max_pages(options));</div>
 <div class="line"><span class="lineno">   94</span>         construct();</div>
 <div class="line"><span class="lineno">   95</span>      }</div>
@@ -753,7 +752,7 @@ template&lt;typename HostFunctions  = std::nullptr_t, typename Impl  = interpret
 
 <p class="definition">Definition at line <a class="el" href="vm_2backend_8hpp_source.html#l00096">96</a> of file <a class="el" href="vm_2backend_8hpp_source.html">backend.hpp</a>.</p>
 <div class="fragment"><div class="line"><span class="lineno">   96</span>                                                                                                                  {})</div>
-<div class="line"><span class="lineno">   97</span>         : memory_alloc(alloc), ctx(parser_t{ mod.<a class="code hl_typedef" href="namespacechainbase.html#add7d4cf66ab3f2808fe613e6b0343b89">allocator</a>, <a class="code hl_variable" href="namespacebenchmark_compile.html#acf738bbf3b8391aa78929ceeceb8a03b">options</a> }.parse_module2(ptr, sz, mod, debug), <a class="code hl_namespace" href="namespacedetail.html">detail</a>::get_max_call_depth(<a class="code hl_variable" href="namespacebenchmark_compile.html#acf738bbf3b8391aa78929ceeceb8a03b">options</a>)) {</div>
+<div class="line"><span class="lineno">   97</span>         : memory_alloc(alloc), ctx(parser_t{ mod.<a class="code hl_typedef" href="namespacechainbase.html#add7d4cf66ab3f2808fe613e6b0343b89">allocator</a>, options }.parse_module2(ptr, sz, mod, debug), <a class="code hl_namespace" href="namespacedetail.html">detail</a>::get_max_call_depth(options)) {</div>
 <div class="line"><span class="lineno">   98</span>         ctx.set_max_pages(detail::get_max_pages(options));</div>
 <div class="line"><span class="lineno">   99</span>         construct(&amp;host);</div>
 <div class="line"><span class="lineno">  100</span>      }</div>
@@ -801,7 +800,7 @@ template&lt;typename HostFunctions  = std::nullptr_t, typename Impl  = interpret
 
 <p class="definition">Definition at line <a class="el" href="vm_2backend_8hpp_source.html#l00101">101</a> of file <a class="el" href="vm_2backend_8hpp_source.html">backend.hpp</a>.</p>
 <div class="fragment"><div class="line"><span class="lineno">  101</span>                                                                                                    {})</div>
-<div class="line"><span class="lineno">  102</span>         : memory_alloc(alloc), ctx(parser_t{ mod.<a class="code hl_typedef" href="namespacechainbase.html#add7d4cf66ab3f2808fe613e6b0343b89">allocator</a>, <a class="code hl_variable" href="namespacebenchmark_compile.html#acf738bbf3b8391aa78929ceeceb8a03b">options</a> }.parse_module2(ptr, sz, mod, debug), <a class="code hl_namespace" href="namespacedetail.html">detail</a>::get_max_call_depth(<a class="code hl_variable" href="namespacebenchmark_compile.html#acf738bbf3b8391aa78929ceeceb8a03b">options</a>)) {</div>
+<div class="line"><span class="lineno">  102</span>         : memory_alloc(alloc), ctx(parser_t{ mod.<a class="code hl_typedef" href="namespacechainbase.html#add7d4cf66ab3f2808fe613e6b0343b89">allocator</a>, options }.parse_module2(ptr, sz, mod, debug), <a class="code hl_namespace" href="namespacedetail.html">detail</a>::get_max_call_depth(options)) {</div>
 <div class="line"><span class="lineno">  103</span>         ctx.set_max_pages(detail::get_max_pages(options));</div>
 <div class="line"><span class="lineno">  104</span>         construct();</div>
 <div class="line"><span class="lineno">  105</span>      }</div>
@@ -848,13 +847,12 @@ template&lt;typename... Args&gt; </div>
 <p class="definition">Definition at line <a class="el" href="sysio_2vm_2backend_8hpp_source.html#l00168">168</a> of file <a class="el" href="sysio_2vm_2backend_8hpp_source.html">backend.hpp</a>.</p>
 <div class="fragment"><div class="line"><span class="lineno">  168</span>                                                                                            {</div>
 <div class="line"><span class="lineno">  169</span>         <span class="keywordflow">if</span> <span class="keyword">constexpr</span> (<a class="code hl_variable" href="namespacesysio_1_1vm.html#a0d45725098444708753594d0d210ad27">eos_vm_debug</a>) {</div>
-<div class="line"><span class="lineno">  170</span>            ctx.execute(<span class="keyword">nullptr</span>, debug_visitor(ctx), <a class="code hl_enumvalue" href="namespacesysio_1_1vm.html#aea2b0c85e98f4073b07115a97b46ae55a6b56c53a1b24e55124ff7f71bb9817d2">func</a>, <a class="code hl_variable" href="namespacebenchmark_compile.html#ad0ed96ae1454e4347ca61ac3887c379e">args</a>...);</div>
+<div class="line"><span class="lineno">  170</span>            ctx.execute(<span class="keyword">nullptr</span>, debug_visitor(ctx), <a class="code hl_enumvalue" href="namespacesysio_1_1vm.html#aea2b0c85e98f4073b07115a97b46ae55a6b56c53a1b24e55124ff7f71bb9817d2">func</a>, args...);</div>
 <div class="line"><span class="lineno">  171</span>         } <span class="keywordflow">else</span> {</div>
-<div class="line"><span class="lineno">  172</span>            ctx.execute(<span class="keyword">nullptr</span>, interpret_visitor(ctx), <a class="code hl_enumvalue" href="namespacesysio_1_1vm.html#aea2b0c85e98f4073b07115a97b46ae55a6b56c53a1b24e55124ff7f71bb9817d2">func</a>, <a class="code hl_variable" href="namespacebenchmark_compile.html#ad0ed96ae1454e4347ca61ac3887c379e">args</a>...);</div>
+<div class="line"><span class="lineno">  172</span>            ctx.execute(<span class="keyword">nullptr</span>, interpret_visitor(ctx), <a class="code hl_enumvalue" href="namespacesysio_1_1vm.html#aea2b0c85e98f4073b07115a97b46ae55a6b56c53a1b24e55124ff7f71bb9817d2">func</a>, args...);</div>
 <div class="line"><span class="lineno">  173</span>         }</div>
 <div class="line"><span class="lineno">  174</span>         <span class="keywordflow">return</span> <span class="keyword">true</span>;</div>
 <div class="line"><span class="lineno">  175</span>      }</div>
-<div class="ttc" id="anamespacebenchmark_compile_html_ad0ed96ae1454e4347ca61ac3887c379e"><div class="ttname"><a href="namespacebenchmark_compile.html#ad0ed96ae1454e4347ca61ac3887c379e">benchmarkCompile.args</a></div><div class="ttdeci">args</div><div class="ttdef"><b>Definition</b> <a href="benchmark_compile_8py_source.html#l00122">benchmarkCompile.py:122</a></div></div>
 <div class="ttc" id="anamespacesysio_1_1vm_html_a0d45725098444708753594d0d210ad27"><div class="ttname"><a href="namespacesysio_1_1vm.html#a0d45725098444708753594d0d210ad27">sysio::vm::eos_vm_debug</a></div><div class="ttdeci">constexpr bool eos_vm_debug</div><div class="ttdef"><b>Definition</b> <a href="sys-vm_2include_2sysio_2sysio_2vm_2config_8hpp_source.html#l00022">config.hpp:22</a></div></div>
 <div class="ttc" id="anamespacesysio_1_1vm_html_aea2b0c85e98f4073b07115a97b46ae55a6b56c53a1b24e55124ff7f71bb9817d2"><div class="ttname"><a href="namespacesysio_1_1vm.html#aea2b0c85e98f4073b07115a97b46ae55a6b56c53a1b24e55124ff7f71bb9817d2">sysio::vm::func</a></div><div class="ttdeci">@ func</div><div class="ttdef"><b>Definition</b> <a href="sys-vm_2include_2sysio_2sysio_2vm_2types_8hpp_source.html#l00020">types.hpp:20</a></div></div>
 </div><!-- fragment -->
@@ -899,9 +897,9 @@ template&lt;typename... Args&gt; </div>
 <p class="definition">Definition at line <a class="el" href="vm_2backend_8hpp_source.html#l00168">168</a> of file <a class="el" href="vm_2backend_8hpp_source.html">backend.hpp</a>.</p>
 <div class="fragment"><div class="line"><span class="lineno">  168</span>                                                                                            {</div>
 <div class="line"><span class="lineno">  169</span>         <span class="keywordflow">if</span> <span class="keyword">constexpr</span> (<a class="code hl_variable" href="namespacesysio_1_1vm.html#a0d45725098444708753594d0d210ad27">eos_vm_debug</a>) {</div>
-<div class="line"><span class="lineno">  170</span>            ctx.execute(<span class="keyword">nullptr</span>, debug_visitor(ctx), <a class="code hl_enumvalue" href="namespacesysio_1_1vm.html#aea2b0c85e98f4073b07115a97b46ae55a6b56c53a1b24e55124ff7f71bb9817d2">func</a>, <a class="code hl_variable" href="namespacebenchmark_compile.html#ad0ed96ae1454e4347ca61ac3887c379e">args</a>...);</div>
+<div class="line"><span class="lineno">  170</span>            ctx.execute(<span class="keyword">nullptr</span>, debug_visitor(ctx), <a class="code hl_enumvalue" href="namespacesysio_1_1vm.html#aea2b0c85e98f4073b07115a97b46ae55a6b56c53a1b24e55124ff7f71bb9817d2">func</a>, args...);</div>
 <div class="line"><span class="lineno">  171</span>         } <span class="keywordflow">else</span> {</div>
-<div class="line"><span class="lineno">  172</span>            ctx.execute(<span class="keyword">nullptr</span>, interpret_visitor(ctx), <a class="code hl_enumvalue" href="namespacesysio_1_1vm.html#aea2b0c85e98f4073b07115a97b46ae55a6b56c53a1b24e55124ff7f71bb9817d2">func</a>, <a class="code hl_variable" href="namespacebenchmark_compile.html#ad0ed96ae1454e4347ca61ac3887c379e">args</a>...);</div>
+<div class="line"><span class="lineno">  172</span>            ctx.execute(<span class="keyword">nullptr</span>, interpret_visitor(ctx), <a class="code hl_enumvalue" href="namespacesysio_1_1vm.html#aea2b0c85e98f4073b07115a97b46ae55a6b56c53a1b24e55124ff7f71bb9817d2">func</a>, args...);</div>
 <div class="line"><span class="lineno">  173</span>         }</div>
 <div class="line"><span class="lineno">  174</span>         <span class="keywordflow">return</span> <span class="keyword">true</span>;</div>
 <div class="line"><span class="lineno">  175</span>      }</div>
@@ -952,9 +950,9 @@ template&lt;typename... Args&gt; </div>
 <p class="definition">Definition at line <a class="el" href="sysio_2vm_2backend_8hpp_source.html#l00158">158</a> of file <a class="el" href="sysio_2vm_2backend_8hpp_source.html">backend.hpp</a>.</p>
 <div class="fragment"><div class="line"><span class="lineno">  158</span>                                                                                                          {</div>
 <div class="line"><span class="lineno">  159</span>         <span class="keywordflow">if</span> <span class="keyword">constexpr</span> (<a class="code hl_variable" href="namespacesysio_1_1vm.html#a0d45725098444708753594d0d210ad27">eos_vm_debug</a>) {</div>
-<div class="line"><span class="lineno">  160</span>            ctx.execute(&amp;host, debug_visitor(ctx), <a class="code hl_enumvalue" href="namespacesysio_1_1vm.html#aea2b0c85e98f4073b07115a97b46ae55a6b56c53a1b24e55124ff7f71bb9817d2">func</a>, <a class="code hl_variable" href="namespacebenchmark_compile.html#ad0ed96ae1454e4347ca61ac3887c379e">args</a>...);</div>
+<div class="line"><span class="lineno">  160</span>            ctx.execute(&amp;host, debug_visitor(ctx), <a class="code hl_enumvalue" href="namespacesysio_1_1vm.html#aea2b0c85e98f4073b07115a97b46ae55a6b56c53a1b24e55124ff7f71bb9817d2">func</a>, args...);</div>
 <div class="line"><span class="lineno">  161</span>         } <span class="keywordflow">else</span> {</div>
-<div class="line"><span class="lineno">  162</span>            ctx.execute(&amp;host, interpret_visitor(ctx), <a class="code hl_enumvalue" href="namespacesysio_1_1vm.html#aea2b0c85e98f4073b07115a97b46ae55a6b56c53a1b24e55124ff7f71bb9817d2">func</a>, <a class="code hl_variable" href="namespacebenchmark_compile.html#ad0ed96ae1454e4347ca61ac3887c379e">args</a>...);</div>
+<div class="line"><span class="lineno">  162</span>            ctx.execute(&amp;host, interpret_visitor(ctx), <a class="code hl_enumvalue" href="namespacesysio_1_1vm.html#aea2b0c85e98f4073b07115a97b46ae55a6b56c53a1b24e55124ff7f71bb9817d2">func</a>, args...);</div>
 <div class="line"><span class="lineno">  163</span>         }</div>
 <div class="line"><span class="lineno">  164</span>         <span class="keywordflow">return</span> <span class="keyword">true</span>;</div>
 <div class="line"><span class="lineno">  165</span>      }</div>
@@ -1005,9 +1003,9 @@ template&lt;typename... Args&gt; </div>
 <p class="definition">Definition at line <a class="el" href="vm_2backend_8hpp_source.html#l00158">158</a> of file <a class="el" href="vm_2backend_8hpp_source.html">backend.hpp</a>.</p>
 <div class="fragment"><div class="line"><span class="lineno">  158</span>                                                                                                          {</div>
 <div class="line"><span class="lineno">  159</span>         <span class="keywordflow">if</span> <span class="keyword">constexpr</span> (<a class="code hl_variable" href="namespacesysio_1_1vm.html#a0d45725098444708753594d0d210ad27">eos_vm_debug</a>) {</div>
-<div class="line"><span class="lineno">  160</span>            ctx.execute(&amp;host, debug_visitor(ctx), <a class="code hl_enumvalue" href="namespacesysio_1_1vm.html#aea2b0c85e98f4073b07115a97b46ae55a6b56c53a1b24e55124ff7f71bb9817d2">func</a>, <a class="code hl_variable" href="namespacebenchmark_compile.html#ad0ed96ae1454e4347ca61ac3887c379e">args</a>...);</div>
+<div class="line"><span class="lineno">  160</span>            ctx.execute(&amp;host, debug_visitor(ctx), <a class="code hl_enumvalue" href="namespacesysio_1_1vm.html#aea2b0c85e98f4073b07115a97b46ae55a6b56c53a1b24e55124ff7f71bb9817d2">func</a>, args...);</div>
 <div class="line"><span class="lineno">  161</span>         } <span class="keywordflow">else</span> {</div>
-<div class="line"><span class="lineno">  162</span>            ctx.execute(&amp;host, interpret_visitor(ctx), <a class="code hl_enumvalue" href="namespacesysio_1_1vm.html#aea2b0c85e98f4073b07115a97b46ae55a6b56c53a1b24e55124ff7f71bb9817d2">func</a>, <a class="code hl_variable" href="namespacebenchmark_compile.html#ad0ed96ae1454e4347ca61ac3887c379e">args</a>...);</div>
+<div class="line"><span class="lineno">  162</span>            ctx.execute(&amp;host, interpret_visitor(ctx), <a class="code hl_enumvalue" href="namespacesysio_1_1vm.html#aea2b0c85e98f4073b07115a97b46ae55a6b56c53a1b24e55124ff7f71bb9817d2">func</a>, args...);</div>
 <div class="line"><span class="lineno">  163</span>         }</div>
 <div class="line"><span class="lineno">  164</span>         <span class="keywordflow">return</span> <span class="keyword">true</span>;</div>
 <div class="line"><span class="lineno">  165</span>      }</div>
@@ -1053,9 +1051,9 @@ template&lt;typename... Args&gt; </div>
 <p class="definition">Definition at line <a class="el" href="sysio_2vm_2backend_8hpp_source.html#l00148">148</a> of file <a class="el" href="sysio_2vm_2backend_8hpp_source.html">backend.hpp</a>.</p>
 <div class="fragment"><div class="line"><span class="lineno">  148</span>                                                                        {</div>
 <div class="line"><span class="lineno">  149</span>         <span class="keywordflow">if</span> <span class="keyword">constexpr</span> (<a class="code hl_variable" href="namespacesysio_1_1vm.html#a0d45725098444708753594d0d210ad27">eos_vm_debug</a>) {</div>
-<div class="line"><span class="lineno">  150</span>            ctx.execute(host, debug_visitor(ctx), func_index, <a class="code hl_variable" href="namespacebenchmark_compile.html#ad0ed96ae1454e4347ca61ac3887c379e">args</a>...);</div>
+<div class="line"><span class="lineno">  150</span>            ctx.execute(host, debug_visitor(ctx), func_index, args...);</div>
 <div class="line"><span class="lineno">  151</span>         } <span class="keywordflow">else</span> {</div>
-<div class="line"><span class="lineno">  152</span>            ctx.execute(host, interpret_visitor(ctx), func_index, <a class="code hl_variable" href="namespacebenchmark_compile.html#ad0ed96ae1454e4347ca61ac3887c379e">args</a>...);</div>
+<div class="line"><span class="lineno">  152</span>            ctx.execute(host, interpret_visitor(ctx), func_index, args...);</div>
 <div class="line"><span class="lineno">  153</span>         }</div>
 <div class="line"><span class="lineno">  154</span>         <span class="keywordflow">return</span> <span class="keyword">true</span>;</div>
 <div class="line"><span class="lineno">  155</span>      }</div>
@@ -1142,9 +1140,9 @@ template&lt;typename... Args&gt; </div>
 <p class="definition">Definition at line <a class="el" href="vm_2backend_8hpp_source.html#l00148">148</a> of file <a class="el" href="vm_2backend_8hpp_source.html">backend.hpp</a>.</p>
 <div class="fragment"><div class="line"><span class="lineno">  148</span>                                                                        {</div>
 <div class="line"><span class="lineno">  149</span>         <span class="keywordflow">if</span> <span class="keyword">constexpr</span> (<a class="code hl_variable" href="namespacesysio_1_1vm.html#a0d45725098444708753594d0d210ad27">eos_vm_debug</a>) {</div>
-<div class="line"><span class="lineno">  150</span>            ctx.execute(host, debug_visitor(ctx), func_index, <a class="code hl_variable" href="namespacebenchmark_compile.html#ad0ed96ae1454e4347ca61ac3887c379e">args</a>...);</div>
+<div class="line"><span class="lineno">  150</span>            ctx.execute(host, debug_visitor(ctx), func_index, args...);</div>
 <div class="line"><span class="lineno">  151</span>         } <span class="keywordflow">else</span> {</div>
-<div class="line"><span class="lineno">  152</span>            ctx.execute(host, interpret_visitor(ctx), func_index, <a class="code hl_variable" href="namespacebenchmark_compile.html#ad0ed96ae1454e4347ca61ac3887c379e">args</a>...);</div>
+<div class="line"><span class="lineno">  152</span>            ctx.execute(host, interpret_visitor(ctx), func_index, args...);</div>
 <div class="line"><span class="lineno">  153</span>         }</div>
 <div class="line"><span class="lineno">  154</span>         <span class="keywordflow">return</span> <span class="keyword">true</span>;</div>
 <div class="line"><span class="lineno">  155</span>      }</div>
@@ -1190,9 +1188,9 @@ template&lt;typename... Args&gt; </div>
 <p class="definition">Definition at line <a class="el" href="sysio_2vm_2backend_8hpp_source.html#l00138">138</a> of file <a class="el" href="sysio_2vm_2backend_8hpp_source.html">backend.hpp</a>.</p>
 <div class="fragment"><div class="line"><span class="lineno">  138</span>                                                                                 {</div>
 <div class="line"><span class="lineno">  139</span>         <span class="keywordflow">if</span> <span class="keyword">constexpr</span> (<a class="code hl_variable" href="namespacesysio_1_1vm.html#a0d45725098444708753594d0d210ad27">eos_vm_debug</a>) {</div>
-<div class="line"><span class="lineno">  140</span>            ctx.execute_func_table(host, debug_visitor(ctx), func_index, <a class="code hl_variable" href="namespacebenchmark_compile.html#ad0ed96ae1454e4347ca61ac3887c379e">args</a>...);</div>
+<div class="line"><span class="lineno">  140</span>            ctx.execute_func_table(host, debug_visitor(ctx), func_index, args...);</div>
 <div class="line"><span class="lineno">  141</span>         } <span class="keywordflow">else</span> {</div>
-<div class="line"><span class="lineno">  142</span>            ctx.execute_func_table(host, interpret_visitor(ctx), func_index, <a class="code hl_variable" href="namespacebenchmark_compile.html#ad0ed96ae1454e4347ca61ac3887c379e">args</a>...);</div>
+<div class="line"><span class="lineno">  142</span>            ctx.execute_func_table(host, interpret_visitor(ctx), func_index, args...);</div>
 <div class="line"><span class="lineno">  143</span>         }</div>
 <div class="line"><span class="lineno">  144</span>         <span class="keywordflow">return</span> <span class="keyword">true</span>;</div>
 <div class="line"><span class="lineno">  145</span>      }</div>
@@ -1238,9 +1236,9 @@ template&lt;typename... Args&gt; </div>
 <p class="definition">Definition at line <a class="el" href="vm_2backend_8hpp_source.html#l00138">138</a> of file <a class="el" href="vm_2backend_8hpp_source.html">backend.hpp</a>.</p>
 <div class="fragment"><div class="line"><span class="lineno">  138</span>                                                                                 {</div>
 <div class="line"><span class="lineno">  139</span>         <span class="keywordflow">if</span> <span class="keyword">constexpr</span> (<a class="code hl_variable" href="namespacesysio_1_1vm.html#a0d45725098444708753594d0d210ad27">eos_vm_debug</a>) {</div>
-<div class="line"><span class="lineno">  140</span>            ctx.execute_func_table(host, debug_visitor(ctx), func_index, <a class="code hl_variable" href="namespacebenchmark_compile.html#ad0ed96ae1454e4347ca61ac3887c379e">args</a>...);</div>
+<div class="line"><span class="lineno">  140</span>            ctx.execute_func_table(host, debug_visitor(ctx), func_index, args...);</div>
 <div class="line"><span class="lineno">  141</span>         } <span class="keywordflow">else</span> {</div>
-<div class="line"><span class="lineno">  142</span>            ctx.execute_func_table(host, interpret_visitor(ctx), func_index, <a class="code hl_variable" href="namespacebenchmark_compile.html#ad0ed96ae1454e4347ca61ac3887c379e">args</a>...);</div>
+<div class="line"><span class="lineno">  142</span>            ctx.execute_func_table(host, interpret_visitor(ctx), func_index, args...);</div>
 <div class="line"><span class="lineno">  143</span>         }</div>
 <div class="line"><span class="lineno">  144</span>         <span class="keywordflow">return</span> <span class="keyword">true</span>;</div>
 <div class="line"><span class="lineno">  145</span>      }</div>
@@ -1286,9 +1284,9 @@ template&lt;typename... Args&gt; </div>
 <p class="definition">Definition at line <a class="el" href="sysio_2vm_2backend_8hpp_source.html#l00187">187</a> of file <a class="el" href="sysio_2vm_2backend_8hpp_source.html">backend.hpp</a>.</p>
 <div class="fragment"><div class="line"><span class="lineno">  187</span>                                                                                                        {</div>
 <div class="line"><span class="lineno">  188</span>         <span class="keywordflow">if</span> <span class="keyword">constexpr</span> (<a class="code hl_variable" href="namespacesysio_1_1vm.html#a0d45725098444708753594d0d210ad27">eos_vm_debug</a>) {</div>
-<div class="line"><span class="lineno">  189</span>            <span class="keywordflow">return</span> ctx.execute(<span class="keyword">nullptr</span>, debug_visitor(ctx), <a class="code hl_enumvalue" href="namespacesysio_1_1vm.html#aea2b0c85e98f4073b07115a97b46ae55a6b56c53a1b24e55124ff7f71bb9817d2">func</a>, <a class="code hl_variable" href="namespacebenchmark_compile.html#ad0ed96ae1454e4347ca61ac3887c379e">args</a>...);</div>
+<div class="line"><span class="lineno">  189</span>            <span class="keywordflow">return</span> ctx.execute(<span class="keyword">nullptr</span>, debug_visitor(ctx), <a class="code hl_enumvalue" href="namespacesysio_1_1vm.html#aea2b0c85e98f4073b07115a97b46ae55a6b56c53a1b24e55124ff7f71bb9817d2">func</a>, args...);</div>
 <div class="line"><span class="lineno">  190</span>         } <span class="keywordflow">else</span> {</div>
-<div class="line"><span class="lineno">  191</span>            <span class="keywordflow">return</span> ctx.execute(<span class="keyword">nullptr</span>, interpret_visitor(ctx), <a class="code hl_enumvalue" href="namespacesysio_1_1vm.html#aea2b0c85e98f4073b07115a97b46ae55a6b56c53a1b24e55124ff7f71bb9817d2">func</a>, <a class="code hl_variable" href="namespacebenchmark_compile.html#ad0ed96ae1454e4347ca61ac3887c379e">args</a>...);</div>
+<div class="line"><span class="lineno">  191</span>            <span class="keywordflow">return</span> ctx.execute(<span class="keyword">nullptr</span>, interpret_visitor(ctx), <a class="code hl_enumvalue" href="namespacesysio_1_1vm.html#aea2b0c85e98f4073b07115a97b46ae55a6b56c53a1b24e55124ff7f71bb9817d2">func</a>, args...);</div>
 <div class="line"><span class="lineno">  192</span>         }</div>
 <div class="line"><span class="lineno">  193</span>      }</div>
 </div><!-- fragment -->
@@ -1333,9 +1331,9 @@ template&lt;typename... Args&gt; </div>
 <p class="definition">Definition at line <a class="el" href="vm_2backend_8hpp_source.html#l00187">187</a> of file <a class="el" href="vm_2backend_8hpp_source.html">backend.hpp</a>.</p>
 <div class="fragment"><div class="line"><span class="lineno">  187</span>                                                                                                        {</div>
 <div class="line"><span class="lineno">  188</span>         <span class="keywordflow">if</span> <span class="keyword">constexpr</span> (<a class="code hl_variable" href="namespacesysio_1_1vm.html#a0d45725098444708753594d0d210ad27">eos_vm_debug</a>) {</div>
-<div class="line"><span class="lineno">  189</span>            <span class="keywordflow">return</span> ctx.execute(<span class="keyword">nullptr</span>, debug_visitor(ctx), <a class="code hl_enumvalue" href="namespacesysio_1_1vm.html#aea2b0c85e98f4073b07115a97b46ae55a6b56c53a1b24e55124ff7f71bb9817d2">func</a>, <a class="code hl_variable" href="namespacebenchmark_compile.html#ad0ed96ae1454e4347ca61ac3887c379e">args</a>...);</div>
+<div class="line"><span class="lineno">  189</span>            <span class="keywordflow">return</span> ctx.execute(<span class="keyword">nullptr</span>, debug_visitor(ctx), <a class="code hl_enumvalue" href="namespacesysio_1_1vm.html#aea2b0c85e98f4073b07115a97b46ae55a6b56c53a1b24e55124ff7f71bb9817d2">func</a>, args...);</div>
 <div class="line"><span class="lineno">  190</span>         } <span class="keywordflow">else</span> {</div>
-<div class="line"><span class="lineno">  191</span>            <span class="keywordflow">return</span> ctx.execute(<span class="keyword">nullptr</span>, interpret_visitor(ctx), <a class="code hl_enumvalue" href="namespacesysio_1_1vm.html#aea2b0c85e98f4073b07115a97b46ae55a6b56c53a1b24e55124ff7f71bb9817d2">func</a>, <a class="code hl_variable" href="namespacebenchmark_compile.html#ad0ed96ae1454e4347ca61ac3887c379e">args</a>...);</div>
+<div class="line"><span class="lineno">  191</span>            <span class="keywordflow">return</span> ctx.execute(<span class="keyword">nullptr</span>, interpret_visitor(ctx), <a class="code hl_enumvalue" href="namespacesysio_1_1vm.html#aea2b0c85e98f4073b07115a97b46ae55a6b56c53a1b24e55124ff7f71bb9817d2">func</a>, args...);</div>
 <div class="line"><span class="lineno">  192</span>         }</div>
 <div class="line"><span class="lineno">  193</span>      }</div>
 </div><!-- fragment -->
@@ -1385,9 +1383,9 @@ template&lt;typename... Args&gt; </div>
 <p class="definition">Definition at line <a class="el" href="sysio_2vm_2backend_8hpp_source.html#l00178">178</a> of file <a class="el" href="sysio_2vm_2backend_8hpp_source.html">backend.hpp</a>.</p>
 <div class="fragment"><div class="line"><span class="lineno">  178</span>                                                                                                                       {</div>
 <div class="line"><span class="lineno">  179</span>         <span class="keywordflow">if</span> <span class="keyword">constexpr</span> (<a class="code hl_variable" href="namespacesysio_1_1vm.html#a0d45725098444708753594d0d210ad27">eos_vm_debug</a>) {</div>
-<div class="line"><span class="lineno">  180</span>            <span class="keywordflow">return</span> ctx.execute(&amp;host, debug_visitor(ctx), <a class="code hl_enumvalue" href="namespacesysio_1_1vm.html#aea2b0c85e98f4073b07115a97b46ae55a6b56c53a1b24e55124ff7f71bb9817d2">func</a>, <a class="code hl_variable" href="namespacebenchmark_compile.html#ad0ed96ae1454e4347ca61ac3887c379e">args</a>...);</div>
+<div class="line"><span class="lineno">  180</span>            <span class="keywordflow">return</span> ctx.execute(&amp;host, debug_visitor(ctx), <a class="code hl_enumvalue" href="namespacesysio_1_1vm.html#aea2b0c85e98f4073b07115a97b46ae55a6b56c53a1b24e55124ff7f71bb9817d2">func</a>, args...);</div>
 <div class="line"><span class="lineno">  181</span>         } <span class="keywordflow">else</span> {</div>
-<div class="line"><span class="lineno">  182</span>            <span class="keywordflow">return</span> ctx.execute(&amp;host, interpret_visitor(ctx), <a class="code hl_enumvalue" href="namespacesysio_1_1vm.html#aea2b0c85e98f4073b07115a97b46ae55a6b56c53a1b24e55124ff7f71bb9817d2">func</a>, <a class="code hl_variable" href="namespacebenchmark_compile.html#ad0ed96ae1454e4347ca61ac3887c379e">args</a>...);</div>
+<div class="line"><span class="lineno">  182</span>            <span class="keywordflow">return</span> ctx.execute(&amp;host, interpret_visitor(ctx), <a class="code hl_enumvalue" href="namespacesysio_1_1vm.html#aea2b0c85e98f4073b07115a97b46ae55a6b56c53a1b24e55124ff7f71bb9817d2">func</a>, args...);</div>
 <div class="line"><span class="lineno">  183</span>         }</div>
 <div class="line"><span class="lineno">  184</span>      }</div>
 </div><!-- fragment -->
@@ -1437,9 +1435,9 @@ template&lt;typename... Args&gt; </div>
 <p class="definition">Definition at line <a class="el" href="vm_2backend_8hpp_source.html#l00178">178</a> of file <a class="el" href="vm_2backend_8hpp_source.html">backend.hpp</a>.</p>
 <div class="fragment"><div class="line"><span class="lineno">  178</span>                                                                                                                       {</div>
 <div class="line"><span class="lineno">  179</span>         <span class="keywordflow">if</span> <span class="keyword">constexpr</span> (<a class="code hl_variable" href="namespacesysio_1_1vm.html#a0d45725098444708753594d0d210ad27">eos_vm_debug</a>) {</div>
-<div class="line"><span class="lineno">  180</span>            <span class="keywordflow">return</span> ctx.execute(&amp;host, debug_visitor(ctx), <a class="code hl_enumvalue" href="namespacesysio_1_1vm.html#aea2b0c85e98f4073b07115a97b46ae55a6b56c53a1b24e55124ff7f71bb9817d2">func</a>, <a class="code hl_variable" href="namespacebenchmark_compile.html#ad0ed96ae1454e4347ca61ac3887c379e">args</a>...);</div>
+<div class="line"><span class="lineno">  180</span>            <span class="keywordflow">return</span> ctx.execute(&amp;host, debug_visitor(ctx), <a class="code hl_enumvalue" href="namespacesysio_1_1vm.html#aea2b0c85e98f4073b07115a97b46ae55a6b56c53a1b24e55124ff7f71bb9817d2">func</a>, args...);</div>
 <div class="line"><span class="lineno">  181</span>         } <span class="keywordflow">else</span> {</div>
-<div class="line"><span class="lineno">  182</span>            <span class="keywordflow">return</span> ctx.execute(&amp;host, interpret_visitor(ctx), <a class="code hl_enumvalue" href="namespacesysio_1_1vm.html#aea2b0c85e98f4073b07115a97b46ae55a6b56c53a1b24e55124ff7f71bb9817d2">func</a>, <a class="code hl_variable" href="namespacebenchmark_compile.html#ad0ed96ae1454e4347ca61ac3887c379e">args</a>...);</div>
+<div class="line"><span class="lineno">  182</span>            <span class="keywordflow">return</span> ctx.execute(&amp;host, interpret_visitor(ctx), <a class="code hl_enumvalue" href="namespacesysio_1_1vm.html#aea2b0c85e98f4073b07115a97b46ae55a6b56c53a1b24e55124ff7f71bb9817d2">func</a>, args...);</div>
 <div class="line"><span class="lineno">  183</span>         }</div>
 <div class="line"><span class="lineno">  184</span>      }</div>
 </div><!-- fragment -->
@@ -2340,7 +2338,7 @@ template&lt;typename... Args&gt; </div>
 
 <p class="definition">Definition at line <a class="el" href="sysio_2vm_2backend_8hpp_source.html#l00113">113</a> of file <a class="el" href="sysio_2vm_2backend_8hpp_source.html">backend.hpp</a>.</p>
 <div class="fragment"><div class="line"><span class="lineno">  113</span>                                                                                                  {</div>
-<div class="line"><span class="lineno">  114</span>         <span class="keywordflow">return</span> <a class="code hl_function" href="#a63fc40356b116cdac6cd50788b25eab1">call</a>(mod, <a class="code hl_enumvalue" href="namespacesysio_1_1vm.html#aea2b0c85e98f4073b07115a97b46ae55a6b56c53a1b24e55124ff7f71bb9817d2">func</a>, <a class="code hl_variable" href="namespacebenchmark_compile.html#ad0ed96ae1454e4347ca61ac3887c379e">args</a>...);</div>
+<div class="line"><span class="lineno">  114</span>         <span class="keywordflow">return</span> <a class="code hl_function" href="#a63fc40356b116cdac6cd50788b25eab1">call</a>(mod, <a class="code hl_enumvalue" href="namespacesysio_1_1vm.html#aea2b0c85e98f4073b07115a97b46ae55a6b56c53a1b24e55124ff7f71bb9817d2">func</a>, args...);</div>
 <div class="line"><span class="lineno">  115</span>      }</div>
 <div class="ttc" id="aclasssysio_1_1vm_1_1backend_html_a63fc40356b116cdac6cd50788b25eab1"><div class="ttname"><a href="#a63fc40356b116cdac6cd50788b25eab1">sysio::vm::backend::call</a></div><div class="ttdeci">bool call(host_t *host, uint32_t func_index, Args... args)</div><div class="ttdef"><b>Definition</b> <a href="sysio_2vm_2backend_8hpp_source.html#l00148">backend.hpp:148</a></div></div>
 </div><!-- fragment --><div class="dynheader">
@@ -2394,7 +2392,7 @@ template&lt;typename... Args&gt; </div>
 
 <p class="definition">Definition at line <a class="el" href="vm_2backend_8hpp_source.html#l00113">113</a> of file <a class="el" href="vm_2backend_8hpp_source.html">backend.hpp</a>.</p>
 <div class="fragment"><div class="line"><span class="lineno">  113</span>                                                                                                  {</div>
-<div class="line"><span class="lineno">  114</span>         <span class="keywordflow">return</span> <a class="code hl_function" href="#a63fc40356b116cdac6cd50788b25eab1">call</a>(mod, <a class="code hl_enumvalue" href="namespacesysio_1_1vm.html#aea2b0c85e98f4073b07115a97b46ae55a6b56c53a1b24e55124ff7f71bb9817d2">func</a>, <a class="code hl_variable" href="namespacebenchmark_compile.html#ad0ed96ae1454e4347ca61ac3887c379e">args</a>...);</div>
+<div class="line"><span class="lineno">  114</span>         <span class="keywordflow">return</span> <a class="code hl_function" href="#a63fc40356b116cdac6cd50788b25eab1">call</a>(mod, <a class="code hl_enumvalue" href="namespacesysio_1_1vm.html#aea2b0c85e98f4073b07115a97b46ae55a6b56c53a1b24e55124ff7f71bb9817d2">func</a>, args...);</div>
 <div class="line"><span class="lineno">  115</span>      }</div>
 </div><!-- fragment --><div class="dynheader">
 Here is the call graph for this function:</div>
@@ -2452,7 +2450,7 @@ template&lt;typename... Args&gt; </div>
 
 <p class="definition">Definition at line <a class="el" href="sysio_2vm_2backend_8hpp_source.html#l00108">108</a> of file <a class="el" href="sysio_2vm_2backend_8hpp_source.html">backend.hpp</a>.</p>
 <div class="fragment"><div class="line"><span class="lineno">  108</span>                                                                                                                {</div>
-<div class="line"><span class="lineno">  109</span>         <span class="keywordflow">return</span> <a class="code hl_function" href="#a63fc40356b116cdac6cd50788b25eab1">call</a>(host, mod, <a class="code hl_enumvalue" href="namespacesysio_1_1vm.html#aea2b0c85e98f4073b07115a97b46ae55a6b56c53a1b24e55124ff7f71bb9817d2">func</a>, <a class="code hl_variable" href="namespacebenchmark_compile.html#ad0ed96ae1454e4347ca61ac3887c379e">args</a>...);</div>
+<div class="line"><span class="lineno">  109</span>         <span class="keywordflow">return</span> <a class="code hl_function" href="#a63fc40356b116cdac6cd50788b25eab1">call</a>(host, mod, <a class="code hl_enumvalue" href="namespacesysio_1_1vm.html#aea2b0c85e98f4073b07115a97b46ae55a6b56c53a1b24e55124ff7f71bb9817d2">func</a>, args...);</div>
 <div class="line"><span class="lineno">  110</span>      }</div>
 </div><!-- fragment --><div class="dynheader">
 Here is the call graph for this function:</div>
@@ -2510,7 +2508,7 @@ template&lt;typename... Args&gt; </div>
 
 <p class="definition">Definition at line <a class="el" href="vm_2backend_8hpp_source.html#l00108">108</a> of file <a class="el" href="vm_2backend_8hpp_source.html">backend.hpp</a>.</p>
 <div class="fragment"><div class="line"><span class="lineno">  108</span>                                                                                                                {</div>
-<div class="line"><span class="lineno">  109</span>         <span class="keywordflow">return</span> <a class="code hl_function" href="#a63fc40356b116cdac6cd50788b25eab1">call</a>(host, mod, <a class="code hl_enumvalue" href="namespacesysio_1_1vm.html#aea2b0c85e98f4073b07115a97b46ae55a6b56c53a1b24e55124ff7f71bb9817d2">func</a>, <a class="code hl_variable" href="namespacebenchmark_compile.html#ad0ed96ae1454e4347ca61ac3887c379e">args</a>...);</div>
+<div class="line"><span class="lineno">  109</span>         <span class="keywordflow">return</span> <a class="code hl_function" href="#a63fc40356b116cdac6cd50788b25eab1">call</a>(host, mod, <a class="code hl_enumvalue" href="namespacesysio_1_1vm.html#aea2b0c85e98f4073b07115a97b46ae55a6b56c53a1b24e55124ff7f71bb9817d2">func</a>, args...);</div>
 <div class="line"><span class="lineno">  110</span>      }</div>
 </div><!-- fragment --><div class="dynheader">
 Here is the call graph for this function:</div>

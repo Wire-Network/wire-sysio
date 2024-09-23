@@ -250,12 +250,11 @@ Functions</h2></td></tr>
 <div class="line"><span class="lineno">   57</span>   };</div>
 <div class="line"><span class="lineno">   58</span> </div>
 <div class="line"><span class="lineno">   59</span>   <span class="keyword">using </span><a class="code hl_class" href="classsysio_1_1vm_1_1backend.html">backend_t</a> = <a class="code hl_class" href="classsysio_1_1vm_1_1backend.html">backend&lt;registered_host_functions&lt;standalone_function_t&gt;</a>, TestType&gt;;</div>
-<div class="line"><span class="lineno">   60</span>   std::list&lt;backend_t&gt; <a class="code hl_variable" href="namespacedevelop_build.html#ade64cd34608f9442ef3049116a2da428">v</a>;</div>
+<div class="line"><span class="lineno">   60</span>   std::list&lt;backend_t&gt; v;</div>
 <div class="line"><span class="lineno">   61</span>   <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i=0; i &lt; 8193; i++)</div>
-<div class="line"><span class="lineno">   62</span>      <a class="code hl_variable" href="namespacedevelop_build.html#ade64cd34608f9442ef3049116a2da428">v</a>.emplace_back(test_wasm, <a class="code hl_function" href="sys-vm_2tests_2utils_8hpp.html#a4c503c4f3ca9f4afce322078d5a33f3e">get_wasm_allocator</a>());</div>
+<div class="line"><span class="lineno">   62</span>      v.emplace_back(test_wasm, <a class="code hl_function" href="sys-vm_2tests_2utils_8hpp.html#a4c503c4f3ca9f4afce322078d5a33f3e">get_wasm_allocator</a>());</div>
 <div class="line"><span class="lineno">   63</span>}</div>
 <div class="ttc" id="aclasssysio_1_1vm_1_1backend_html"><div class="ttname"><a href="classsysio_1_1vm_1_1backend.html">sysio::vm::backend</a></div><div class="ttdef"><b>Definition</b> <a href="vm_2backend_8hpp_source.html#l00062">backend.hpp:62</a></div></div>
-<div class="ttc" id="anamespacedevelop_build_html_ade64cd34608f9442ef3049116a2da428"><div class="ttname"><a href="namespacedevelop_build.html#ade64cd34608f9442ef3049116a2da428">developBuild.v</a></div><div class="ttdeci">v</div><div class="ttdef"><b>Definition</b> <a href="develop_build_8py_source.html#l00006">developBuild.py:6</a></div></div>
 <div class="ttc" id="asys-vm_2tests_2utils_8hpp_html_a4c503c4f3ca9f4afce322078d5a33f3e"><div class="ttname"><a href="sys-vm_2tests_2utils_8hpp.html#a4c503c4f3ca9f4afce322078d5a33f3e">get_wasm_allocator</a></div><div class="ttdeci">sysio::vm::wasm_allocator * get_wasm_allocator()</div><div class="ttdef"><b>Definition</b> <a href="sys-vm_2tests_2utils_8hpp_source.html#l00050">utils.hpp:50</a></div></div>
 </div><!-- fragment --><div class="dynheader">
 Here is the call graph for this function:</div>

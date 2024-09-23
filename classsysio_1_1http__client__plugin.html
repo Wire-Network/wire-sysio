@@ -282,15 +282,15 @@ Additional Inherited Members</h2></td></tr>
 <p class="definition">Definition at line <a class="el" href="http__client__plugin_8cpp_source.html#l00021">21</a> of file <a class="el" href="http__client__plugin_8cpp_source.html">http_client_plugin.cpp</a>.</p>
 <div class="fragment"><div class="line"><span class="lineno">   21</span>                                                                       {</div>
 <div class="line"><span class="lineno">   22</span>   <span class="keywordflow">try</span> {</div>
-<div class="line"><span class="lineno">   23</span>      <span class="keywordflow">if</span>( <a class="code hl_variable" href="namespacebenchmark_compile.html#acf738bbf3b8391aa78929ceeceb8a03b">options</a>.count( <span class="stringliteral">&quot;https-client-root-cert&quot;</span> )) {</div>
-<div class="line"><span class="lineno">   24</span>         <span class="keyword">const</span> std::vector&lt;std::string&gt; root_pems = <a class="code hl_variable" href="namespacebenchmark_compile.html#acf738bbf3b8391aa78929ceeceb8a03b">options</a>[<span class="stringliteral">&quot;https-client-root-cert&quot;</span>].as&lt;std::vector&lt;std::string&gt;&gt;();</div>
+<div class="line"><span class="lineno">   23</span>      <span class="keywordflow">if</span>( options.count( <span class="stringliteral">&quot;https-client-root-cert&quot;</span> )) {</div>
+<div class="line"><span class="lineno">   24</span>         <span class="keyword">const</span> std::vector&lt;std::string&gt; root_pems = options[<span class="stringliteral">&quot;https-client-root-cert&quot;</span>].as&lt;std::vector&lt;std::string&gt;&gt;();</div>
 <div class="line"><span class="lineno">   25</span>         <span class="keywordflow">for</span>( <span class="keyword">const</span> <span class="keyword">auto</span>&amp; root_pem : root_pems ) {</div>
 <div class="line"><span class="lineno">   26</span>            std::string pem_str = root_pem;</div>
 <div class="line"><span class="lineno">   27</span>            <span class="keywordflow">if</span>( !boost::algorithm::starts_with( pem_str, <span class="stringliteral">&quot;-----BEGIN CERTIFICATE-----\n&quot;</span> )) {</div>
 <div class="line"><span class="lineno">   28</span>               <span class="keywordflow">try</span> {</div>
-<div class="line"><span class="lineno">   29</span>                  <span class="keyword">auto</span> <a class="code hl_variable" href="namespacetypes__types__array.html#a6a15abb8fc90c9264cf17d3465578387">infile</a> = std::ifstream( pem_str );</div>
+<div class="line"><span class="lineno">   29</span>                  <span class="keyword">auto</span> infile = std::ifstream( pem_str );</div>
 <div class="line"><span class="lineno">   30</span>                  std::stringstream sstr;</div>
-<div class="line"><span class="lineno">   31</span>                  sstr &lt;&lt; <a class="code hl_variable" href="namespacetypes__types__array.html#a6a15abb8fc90c9264cf17d3465578387">infile</a>.rdbuf();</div>
+<div class="line"><span class="lineno">   31</span>                  sstr &lt;&lt; infile.rdbuf();</div>
 <div class="line"><span class="lineno">   32</span>                  pem_str = sstr.str();</div>
 <div class="line"><span class="lineno">   33</span>                  <a class="code hl_define" href="chain_2include_2sysio_2chain_2exceptions_8hpp.html#a40c2826a6fba35c1ffbf912bdf559792">SYS_ASSERT</a>( boost::algorithm::starts_with( pem_str, <span class="stringliteral">&quot;-----BEGIN CERTIFICATE-----\n&quot;</span> ),</div>
 <div class="line"><span class="lineno">   34</span>                              chain::invalid_http_client_root_cert,</div>
@@ -320,7 +320,7 @@ Additional Inherited Members</h2></td></tr>
 <div class="line"><span class="lineno">   58</span>         }</div>
 <div class="line"><span class="lineno">   59</span>      }</div>
 <div class="line"><span class="lineno">   60</span> </div>
-<div class="line"><span class="lineno">   61</span>      my-&gt;set_verify_peers( <a class="code hl_variable" href="namespacebenchmark_compile.html#acf738bbf3b8391aa78929ceeceb8a03b">options</a>.at( <span class="stringliteral">&quot;https-client-validate-peers&quot;</span> ).as&lt;<span class="keywordtype">bool</span>&gt;());</div>
+<div class="line"><span class="lineno">   61</span>      my-&gt;set_verify_peers( options.at( <span class="stringliteral">&quot;https-client-validate-peers&quot;</span> ).as&lt;<span class="keywordtype">bool</span>&gt;());</div>
 <div class="line"><span class="lineno">   62</span>   } <a class="code hl_define" href="exception_8hpp.html#ae70bfa24f5a3bc0917382b3c17fc033c">FC_LOG_AND_RETHROW</a>()</div>
 <div class="line"><span class="lineno">   63</span>}</div>
 <div class="ttc" id="achain_2include_2sysio_2chain_2exceptions_8hpp_html_a40c2826a6fba35c1ffbf912bdf559792"><div class="ttname"><a href="chain_2include_2sysio_2chain_2exceptions_8hpp.html#a40c2826a6fba35c1ffbf912bdf559792">SYS_ASSERT</a></div><div class="ttdeci">#define SYS_ASSERT(expr, exc_type, FORMAT,...)</div><div class="ttdef"><b>Definition</b> <a href="chain_2include_2sysio_2chain_2exceptions_8hpp_source.html#l00007">exceptions.hpp:7</a></div></div>
@@ -329,8 +329,6 @@ Additional Inherited Members</h2></td></tr>
 <div class="ttc" id="aclassfc_1_1std__exception__wrapper_html_ae5ad64f84b1d373f5b92031566284c7c"><div class="ttname"><a href="classfc_1_1std__exception__wrapper.html#ae5ad64f84b1d373f5b92031566284c7c">fc::std_exception_wrapper::from_current_exception</a></div><div class="ttdeci">static std_exception_wrapper from_current_exception(const std::exception &amp;e)</div><div class="ttdef"><b>Definition</b> <a href="exception_8cpp_source.html#l00335">exception.cpp:335</a></div></div>
 <div class="ttc" id="aexception_8hpp_html_ae70bfa24f5a3bc0917382b3c17fc033c"><div class="ttname"><a href="exception_8hpp.html#ae70bfa24f5a3bc0917382b3c17fc033c">FC_LOG_AND_RETHROW</a></div><div class="ttdeci">#define FC_LOG_AND_RETHROW()</div><div class="ttdef"><b>Definition</b> <a href="exception_8hpp_source.html#l00411">exception.hpp:411</a></div></div>
 <div class="ttc" id="alogger_8hpp_html_a9e3cdbaecd5a34b42956e888f7326fad"><div class="ttname"><a href="logger_8hpp.html#a9e3cdbaecd5a34b42956e888f7326fad">elog</a></div><div class="ttdeci">#define elog(FORMAT,...)</div><div class="ttdef"><b>Definition</b> <a href="logger_8hpp_source.html#l00130">logger.hpp:130</a></div></div>
-<div class="ttc" id="anamespacebenchmark_compile_html_acf738bbf3b8391aa78929ceeceb8a03b"><div class="ttname"><a href="namespacebenchmark_compile.html#acf738bbf3b8391aa78929ceeceb8a03b">benchmarkCompile.options</a></div><div class="ttdeci">list options</div><div class="ttdef"><b>Definition</b> <a href="benchmark_compile_8py_source.html#l00107">benchmarkCompile.py:107</a></div></div>
-<div class="ttc" id="anamespacetypes__types__array_html_a6a15abb8fc90c9264cf17d3465578387"><div class="ttname"><a href="namespacetypes__types__array.html#a6a15abb8fc90c9264cf17d3465578387">types_types_array.infile</a></div><div class="ttdeci">infile</div><div class="ttdef"><b>Definition</b> <a href="types__types__array_8py_source.html#l00005">types_types_array.py:5</a></div></div>
 </div><!-- fragment --><div class="dynheader">
 Here is the call graph for this function:</div>
 <div class="dyncontent">

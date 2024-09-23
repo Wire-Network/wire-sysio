@@ -107,7 +107,7 @@ $(function(){initNavTree('classtesting_1_1internal_1_1_universal_terse_printer_3
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-static-methods" name="pub-static-methods"></a>
 Static Public Member Functions</h2></td></tr>
-<tr class="memitem:a37a3be2d26dc07b24d16c2b5eb88ecda" id="r_a37a3be2d26dc07b24d16c2b5eb88ecda"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a37a3be2d26dc07b24d16c2b5eb88ecda">Print</a> (const char *str, ::std::ostream *os)</td></tr>
+<tr class="memitem:a37a3be2d26dc07b24d16c2b5eb88ecda" id="r_a37a3be2d26dc07b24d16c2b5eb88ecda"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a37a3be2d26dc07b24d16c2b5eb88ecda">Print</a> (const char *str, ::std::ostream *<a class="el" href="environment_8hpp.html#a3951483d0b31c29ca95336206cd35238">os</a>)</td></tr>
 <tr class="separator:a37a3be2d26dc07b24d16c2b5eb88ecda"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
@@ -144,11 +144,12 @@ Static Public Member Functions</h2></td></tr>
 <p class="definition">Definition at line <a class="el" href="gtest-printers_8h_source.html#l00883">883</a> of file <a class="el" href="gtest-printers_8h_source.html">gtest-printers.h</a>.</p>
 <div class="fragment"><div class="line"><span class="lineno">  883</span>                                                     {</div>
 <div class="line"><span class="lineno">  884</span>    <span class="keywordflow">if</span> (str == NULL) {</div>
-<div class="line"><span class="lineno">  885</span>      *os &lt;&lt; <span class="stringliteral">&quot;NULL&quot;</span>;</div>
+<div class="line"><span class="lineno">  885</span>      *<a class="code hl_variable" href="environment_8hpp.html#a3951483d0b31c29ca95336206cd35238">os</a> &lt;&lt; <span class="stringliteral">&quot;NULL&quot;</span>;</div>
 <div class="line"><span class="lineno">  886</span>    } <span class="keywordflow">else</span> {</div>
-<div class="line"><span class="lineno">  887</span>      <a class="code hl_function" href="namespacetesting_1_1internal.html#a30708fa2bacf11895b03bdb21eb72309">UniversalPrint</a>(std::string(str), os);</div>
+<div class="line"><span class="lineno">  887</span>      <a class="code hl_function" href="namespacetesting_1_1internal.html#a30708fa2bacf11895b03bdb21eb72309">UniversalPrint</a>(std::string(str), <a class="code hl_variable" href="environment_8hpp.html#a3951483d0b31c29ca95336206cd35238">os</a>);</div>
 <div class="line"><span class="lineno">  888</span>    }</div>
 <div class="line"><span class="lineno">  889</span>  }</div>
+<div class="ttc" id="aenvironment_8hpp_html_a3951483d0b31c29ca95336206cd35238"><div class="ttname"><a href="environment_8hpp.html#a3951483d0b31c29ca95336206cd35238">os</a></div><div class="ttdeci">os_t os</div><div class="ttdef"><b>Definition</b> <a href="environment_8hpp_source.html#l00023">environment.hpp:23</a></div></div>
 <div class="ttc" id="anamespacetesting_1_1internal_html_a30708fa2bacf11895b03bdb21eb72309"><div class="ttname"><a href="namespacetesting_1_1internal.html#a30708fa2bacf11895b03bdb21eb72309">testing::internal::UniversalPrint</a></div><div class="ttdeci">void UniversalPrint(const T &amp;value, ::std::ostream *os)</div><div class="ttdef"><b>Definition</b> <a href="gtest-printers_8h_source.html#l00931">gtest-printers.h:931</a></div></div>
 </div><!-- fragment --><div class="dynheader">
 Here is the call graph for this function:</div>

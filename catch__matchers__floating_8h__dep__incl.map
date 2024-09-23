@@ -2,17 +2,14 @@
 <area shape="rect" id="Node000001" title=" " alt="" coords="312,5,491,61"/>
 <area shape="rect" id="Node000002" href="$catch__capture__matchers_8h.html" title=" " alt="" coords="208,109,387,165"/>
 <area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="365,74,327,110,324,106,361,70"/>
-<area shape="rect" id="Node000008" href="$catch__matchers__floating_8cpp.html" title=" " alt="" coords="411,109,603,165"/>
-<area shape="poly" id="edge8_Node000001_Node000008" title=" " alt="" coords="442,70,481,106,477,110,439,74"/>
+<area shape="rect" id="Node000007" href="$catch__matchers__floating_8cpp.html" title=" " alt="" coords="411,109,603,165"/>
+<area shape="poly" id="edge6_Node000001_Node000007" title=" " alt="" coords="442,70,481,106,477,110,439,74"/>
 <area shape="rect" id="Node000003" href="$include_2catch_8hpp.html" title=" " alt="" coords="8,220,182,261"/>
 <area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="231,174,135,222,133,217,229,169"/>
 <area shape="rect" id="Node000005" href="$catch__assertionhandler_8cpp.html" title=" " alt="" coords="206,213,389,268"/>
 <area shape="poly" id="edge4_Node000002_Node000005" title=" " alt="" coords="300,180,300,212,295,212,295,180"/>
-<area shape="rect" id="Node000007" href="$catch__capture__matchers_8cpp.html" title=" " alt="" coords="413,213,606,268"/>
-<area shape="poly" id="edge6_Node000002_Node000007" title=" " alt="" coords="369,169,454,210,452,214,367,174"/>
+<area shape="rect" id="Node000006" href="$catch__capture__matchers_8cpp.html" title=" " alt="" coords="413,213,606,268"/>
+<area shape="poly" id="edge5_Node000002_Node000006" title=" " alt="" coords="369,169,454,210,452,214,367,174"/>
 <area shape="rect" id="Node000004" href="$catch__with__main_8hpp.html" title=" " alt="" coords="5,316,185,372"/>
 <area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="98,276,98,316,92,316,92,276"/>
-<area shape="rect" id="Node000006" href="$catch__objc__impl_8mm.html" title=" " alt="" coords="310,316,504,372"/>
-<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="340,277,379,314,376,318,336,281"/>
-<area shape="poly" id="edge7_Node000007_Node000006" title=" " alt="" coords="473,281,436,318,433,314,469,278"/>
 </map>

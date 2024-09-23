@@ -165,7 +165,7 @@ Array 与 {\ttfamily std\+::vector} 相似，除了使用索引，也可使用�
 
 \begin{DoxyCode}{0}
 \DoxyCodeLine{\textcolor{keywordflow}{for}\ (\textcolor{keyword}{auto}\&\ v\ :\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}.GetArray())}
-\DoxyCodeLine{\ \ \ \ \mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{printf}}(\textcolor{stringliteral}{"{}\%d\ "{}},\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.GetInt());}
+\DoxyCodeLine{\ \ \ \ \mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{printf}}(\textcolor{stringliteral}{"{}\%d\ "{}},\ v.GetInt());}
 
 \end{DoxyCode}
 \hypertarget{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2tutorial_8zh-cn_QueryObject}{}\doxysubsection{\texorpdfstring{Query Object}{Query Object}}\label{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2tutorial_8zh-cn_QueryObject}
@@ -325,9 +325,9 @@ Array／\+Object 顺序以它们的元素／成员作比较。当且仅当它们
 \DoxyCodeLine{\mbox{\hyperlink{class_generic_document}{Document}}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a107648633008a7f2d872b4b3d98c2f96}{d}};\ \textcolor{comment}{//\ Null}}
 \DoxyCodeLine{\mbox{\hyperlink{yubihsm__pkcs11_8c_a107648633008a7f2d872b4b3d98c2f96}{d}}.SetObject();}
 \DoxyCodeLine{}
-\DoxyCodeLine{\mbox{\hyperlink{class_generic_value}{Value}}\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}};\ \ \ \ \textcolor{comment}{//\ Null}}
-\DoxyCodeLine{\mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.SetInt(10);}
-\DoxyCodeLine{\mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}\ =\ 10;\ \ \ \ \ \textcolor{comment}{//\ 简写，和上面的相同}}
+\DoxyCodeLine{\mbox{\hyperlink{class_generic_value}{Value}}\ v;\ \ \ \ \textcolor{comment}{//\ Null}}
+\DoxyCodeLine{v.SetInt(10);}
+\DoxyCodeLine{v\ =\ 10;\ \ \ \ \ \textcolor{comment}{//\ 简写，和上面的相同}}
 
 \end{DoxyCode}
 

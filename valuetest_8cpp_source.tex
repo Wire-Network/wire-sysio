@@ -930,13 +930,13 @@
 \DoxyCodeLine{\Hypertarget{valuetest_8cpp_source_l00926}00926\ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}\&\ \mbox{\hyperlink{namespacefc_ab199a7c94624123911206db59ebe45da}{y}}\ =\ x;}
 \DoxyCodeLine{\Hypertarget{valuetest_8cpp_source_l00927}00927\ }
 \DoxyCodeLine{\Hypertarget{valuetest_8cpp_source_l00928}00928\ \ \ \ \ \textcolor{comment}{//\ PushBack()}}
-\DoxyCodeLine{\Hypertarget{valuetest_8cpp_source_l00929}00929\ \ \ \ \ \mbox{\hyperlink{class_generic_value}{Value}}\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}};}
+\DoxyCodeLine{\Hypertarget{valuetest_8cpp_source_l00929}00929\ \ \ \ \ \mbox{\hyperlink{class_generic_value}{Value}}\ v;}
 \DoxyCodeLine{\Hypertarget{valuetest_8cpp_source_l00930}00930\ \ \ \ \ x.PushBack(v,\ allocator);}
-\DoxyCodeLine{\Hypertarget{valuetest_8cpp_source_l00931}00931\ \ \ \ \ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.SetBool(\textcolor{keyword}{true});}
+\DoxyCodeLine{\Hypertarget{valuetest_8cpp_source_l00931}00931\ \ \ \ \ v.SetBool(\textcolor{keyword}{true});}
 \DoxyCodeLine{\Hypertarget{valuetest_8cpp_source_l00932}00932\ \ \ \ \ x.PushBack(v,\ allocator);}
-\DoxyCodeLine{\Hypertarget{valuetest_8cpp_source_l00933}00933\ \ \ \ \ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.SetBool(\textcolor{keyword}{false});}
+\DoxyCodeLine{\Hypertarget{valuetest_8cpp_source_l00933}00933\ \ \ \ \ v.SetBool(\textcolor{keyword}{false});}
 \DoxyCodeLine{\Hypertarget{valuetest_8cpp_source_l00934}00934\ \ \ \ \ x.PushBack(v,\ allocator);}
-\DoxyCodeLine{\Hypertarget{valuetest_8cpp_source_l00935}00935\ \ \ \ \ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.SetInt(123);}
+\DoxyCodeLine{\Hypertarget{valuetest_8cpp_source_l00935}00935\ \ \ \ \ v.SetInt(123);}
 \DoxyCodeLine{\Hypertarget{valuetest_8cpp_source_l00936}00936\ \ \ \ \ x.PushBack(v,\ allocator);}
 \DoxyCodeLine{\Hypertarget{valuetest_8cpp_source_l00937}00937\ \ \ \ \ \textcolor{comment}{//x.PushBack((const\ char*)"{}foo"{},\ allocator);\ //\ should\ not\ compile}}
 \DoxyCodeLine{\Hypertarget{valuetest_8cpp_source_l00938}00938\ \ \ \ \ x.PushBack(\textcolor{stringliteral}{"{}foo"{}},\ allocator);}
@@ -1197,7 +1197,7 @@
 \DoxyCodeLine{\Hypertarget{valuetest_8cpp_source_l01193}01193\ \ \ \ \ \{}
 \DoxyCodeLine{\Hypertarget{valuetest_8cpp_source_l01194}01194\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ i\ =\ 0;}
 \DoxyCodeLine{\Hypertarget{valuetest_8cpp_source_l01195}01195\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keyword}{auto}\&\ v\ :\ x.GetArray())\ \{}
-\DoxyCodeLine{\Hypertarget{valuetest_8cpp_source_l01196}01196\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{gtest_8h_a4159019abda84f5366acdb7604ff220a}{EXPECT\_EQ}}(i,\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.GetInt());}
+\DoxyCodeLine{\Hypertarget{valuetest_8cpp_source_l01196}01196\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{gtest_8h_a4159019abda84f5366acdb7604ff220a}{EXPECT\_EQ}}(i,\ v.GetInt());}
 \DoxyCodeLine{\Hypertarget{valuetest_8cpp_source_l01197}01197\ \ \ \ \ \ \ \ \ \ \ \ \ i++;}
 \DoxyCodeLine{\Hypertarget{valuetest_8cpp_source_l01198}01198\ \ \ \ \ \ \ \ \ \}}
 \DoxyCodeLine{\Hypertarget{valuetest_8cpp_source_l01199}01199\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{gtest_8h_a4159019abda84f5366acdb7604ff220a}{EXPECT\_EQ}}(i,\ 10);}
@@ -1205,7 +1205,7 @@
 \DoxyCodeLine{\Hypertarget{valuetest_8cpp_source_l01201}01201\ \ \ \ \ \{}
 \DoxyCodeLine{\Hypertarget{valuetest_8cpp_source_l01202}01202\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ i\ =\ 0;}
 \DoxyCodeLine{\Hypertarget{valuetest_8cpp_source_l01203}01203\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ v\ :\ \textcolor{keyword}{const\_cast<}\textcolor{keyword}{const\ }\mbox{\hyperlink{class_generic_value}{Value}}\&\textcolor{keyword}{>}(x).GetArray())\ \{}
-\DoxyCodeLine{\Hypertarget{valuetest_8cpp_source_l01204}01204\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{gtest_8h_a4159019abda84f5366acdb7604ff220a}{EXPECT\_EQ}}(i,\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.GetInt());}
+\DoxyCodeLine{\Hypertarget{valuetest_8cpp_source_l01204}01204\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{gtest_8h_a4159019abda84f5366acdb7604ff220a}{EXPECT\_EQ}}(i,\ v.GetInt());}
 \DoxyCodeLine{\Hypertarget{valuetest_8cpp_source_l01205}01205\ \ \ \ \ \ \ \ \ \ \ \ \ i++;}
 \DoxyCodeLine{\Hypertarget{valuetest_8cpp_source_l01206}01206\ \ \ \ \ \ \ \ \ \}}
 \DoxyCodeLine{\Hypertarget{valuetest_8cpp_source_l01207}01207\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{gtest_8h_a4159019abda84f5366acdb7604ff220a}{EXPECT\_EQ}}(i,\ 10);}
@@ -1792,31 +1792,31 @@
 \DoxyCodeLine{\Hypertarget{valuetest_8cpp_source_l01788}01788\ \textcolor{comment}{//\ http://stackoverflow.com/questions/35222230/}}
 \DoxyCodeLine{\Hypertarget{valuetest_8cpp_source_l01789}01789\ }
 \DoxyCodeLine{\Hypertarget{valuetest_8cpp_source_l01790}01790\ \textcolor{keyword}{static}\ \textcolor{keywordtype}{void}\ MergeDuplicateKey(\mbox{\hyperlink{class_generic_value}{Value}}\&\ v,\ \mbox{\hyperlink{class_memory_pool_allocator}{Value::AllocatorType}}\&\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}})\ \{}
-\DoxyCodeLine{\Hypertarget{valuetest_8cpp_source_l01791}01791\ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.IsObject())\ \{}
+\DoxyCodeLine{\Hypertarget{valuetest_8cpp_source_l01791}01791\ \ \ \ \ \textcolor{keywordflow}{if}\ (v.IsObject())\ \{}
 \DoxyCodeLine{\Hypertarget{valuetest_8cpp_source_l01792}01792\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Convert\ all\ key:value\ into\ key:[value]}}
-\DoxyCodeLine{\Hypertarget{valuetest_8cpp_source_l01793}01793\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\mbox{\hyperlink{class_generic_member_iterator}{Value::MemberIterator}}\ itr\ =\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.MemberBegin();\ itr\ !=\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.MemberEnd();\ ++itr)}
+\DoxyCodeLine{\Hypertarget{valuetest_8cpp_source_l01793}01793\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\mbox{\hyperlink{class_generic_member_iterator}{Value::MemberIterator}}\ itr\ =\ v.MemberBegin();\ itr\ !=\ v.MemberEnd();\ ++itr)}
 \DoxyCodeLine{\Hypertarget{valuetest_8cpp_source_l01794}01794\ \ \ \ \ \ \ \ \ \ \ \ \ itr-\/>value\ =\ \mbox{\hyperlink{document_8h_a071cf97155ba72ac9a1fc4ad7e63d481}{Value}}(\mbox{\hyperlink{rapidjson_8h_a1d1cfd8ffb84e947f82999c682b666a7af41527d6925efa3c5c3dadb23dfef7c8}{kArrayType}}).Move().PushBack(itr-\/>value,\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}});}
 \DoxyCodeLine{\Hypertarget{valuetest_8cpp_source_l01795}01795\ \ \ \ \ \ \ \ \ }
 \DoxyCodeLine{\Hypertarget{valuetest_8cpp_source_l01796}01796\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Merge\ arrays\ if\ key\ is\ duplicated}}
-\DoxyCodeLine{\Hypertarget{valuetest_8cpp_source_l01797}01797\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\mbox{\hyperlink{class_generic_member_iterator}{Value::MemberIterator}}\ itr\ =\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.MemberBegin();\ itr\ !=\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.MemberEnd();)\ \{}
-\DoxyCodeLine{\Hypertarget{valuetest_8cpp_source_l01798}01798\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_generic_member_iterator}{Value::MemberIterator}}\ itr2\ =\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.FindMember(itr-\/>name);}
+\DoxyCodeLine{\Hypertarget{valuetest_8cpp_source_l01797}01797\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\mbox{\hyperlink{class_generic_member_iterator}{Value::MemberIterator}}\ itr\ =\ v.MemberBegin();\ itr\ !=\ v.MemberEnd();)\ \{}
+\DoxyCodeLine{\Hypertarget{valuetest_8cpp_source_l01798}01798\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_generic_member_iterator}{Value::MemberIterator}}\ itr2\ =\ v.FindMember(itr-\/>name);}
 \DoxyCodeLine{\Hypertarget{valuetest_8cpp_source_l01799}01799\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (itr\ !=\ itr2)\ \{}
 \DoxyCodeLine{\Hypertarget{valuetest_8cpp_source_l01800}01800\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ itr2-\/>value.PushBack(itr-\/>value[0],\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}});}
-\DoxyCodeLine{\Hypertarget{valuetest_8cpp_source_l01801}01801\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ itr\ =\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.EraseMember(itr);}
+\DoxyCodeLine{\Hypertarget{valuetest_8cpp_source_l01801}01801\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ itr\ =\ v.EraseMember(itr);}
 \DoxyCodeLine{\Hypertarget{valuetest_8cpp_source_l01802}01802\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
 \DoxyCodeLine{\Hypertarget{valuetest_8cpp_source_l01803}01803\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}}
 \DoxyCodeLine{\Hypertarget{valuetest_8cpp_source_l01804}01804\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ++itr;}
 \DoxyCodeLine{\Hypertarget{valuetest_8cpp_source_l01805}01805\ \ \ \ \ \ \ \ \ \}}
 \DoxyCodeLine{\Hypertarget{valuetest_8cpp_source_l01806}01806\ }
 \DoxyCodeLine{\Hypertarget{valuetest_8cpp_source_l01807}01807\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Convert\ key:[values]\ back\ to\ key:value\ if\ there\ is\ only\ one\ value}}
-\DoxyCodeLine{\Hypertarget{valuetest_8cpp_source_l01808}01808\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\mbox{\hyperlink{class_generic_member_iterator}{Value::MemberIterator}}\ itr\ =\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.MemberBegin();\ itr\ !=\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.MemberEnd();\ ++itr)\ \{}
+\DoxyCodeLine{\Hypertarget{valuetest_8cpp_source_l01808}01808\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\mbox{\hyperlink{class_generic_member_iterator}{Value::MemberIterator}}\ itr\ =\ v.MemberBegin();\ itr\ !=\ v.MemberEnd();\ ++itr)\ \{}
 \DoxyCodeLine{\Hypertarget{valuetest_8cpp_source_l01809}01809\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (itr-\/>value.Size()\ ==\ 1)}
 \DoxyCodeLine{\Hypertarget{valuetest_8cpp_source_l01810}01810\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ itr-\/>value\ =\ itr-\/>value[0];}
 \DoxyCodeLine{\Hypertarget{valuetest_8cpp_source_l01811}01811\ \ \ \ \ \ \ \ \ \ \ \ \ MergeDuplicateKey(itr-\/>value,\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}});\ \textcolor{comment}{//\ Recursion\ on\ the\ value}}
 \DoxyCodeLine{\Hypertarget{valuetest_8cpp_source_l01812}01812\ \ \ \ \ \ \ \ \ \}}
 \DoxyCodeLine{\Hypertarget{valuetest_8cpp_source_l01813}01813\ \ \ \ \ \}}
-\DoxyCodeLine{\Hypertarget{valuetest_8cpp_source_l01814}01814\ \ \ \ \ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.IsArray())}
-\DoxyCodeLine{\Hypertarget{valuetest_8cpp_source_l01815}01815\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\mbox{\hyperlink{class_generic_value}{Value::ValueIterator}}\ itr\ =\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.Begin();\ itr\ !=\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.End();\ ++itr)}
+\DoxyCodeLine{\Hypertarget{valuetest_8cpp_source_l01814}01814\ \ \ \ \ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}\ (v.IsArray())}
+\DoxyCodeLine{\Hypertarget{valuetest_8cpp_source_l01815}01815\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\mbox{\hyperlink{class_generic_value}{Value::ValueIterator}}\ itr\ =\ v.Begin();\ itr\ !=\ v.End();\ ++itr)}
 \DoxyCodeLine{\Hypertarget{valuetest_8cpp_source_l01816}01816\ \ \ \ \ \ \ \ \ \ \ \ \ MergeDuplicateKey(*itr,\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}});}
 \DoxyCodeLine{\Hypertarget{valuetest_8cpp_source_l01817}01817\ \}}
 \DoxyCodeLine{\Hypertarget{valuetest_8cpp_source_l01818}01818\ }

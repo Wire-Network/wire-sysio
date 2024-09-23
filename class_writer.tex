@@ -11,7 +11,8 @@ JSON writer.
 
 
 
-Collaboration diagram for Writer\texorpdfstring{$<$}{<} Output\+Stream, Source\+Encoding, Target\+Encoding, Stack\+Allocator, write\+Flags \texorpdfstring{$>$}{>}\+:\nopagebreak
+Collaboration diagram for Writer\texorpdfstring{$<$}{<} Output\+Stream, Source\+Encoding, Target\+Encoding, Stack\+Allocator, write\+Flags \texorpdfstring{$>$}{>}\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -31,11 +32,11 @@ typedef Source\+Encoding\+::\+Ch \mbox{\hyperlink{class_writer_a265c76a2263d4465
 \doxysubsubsection*{Public Member Functions}
 \begin{DoxyCompactItemize}
 \item 
-\mbox{\hyperlink{class_writer_af4f54830d6927d9daf5bd53bfd134dd3}{Writer}} (Output\+Stream \&os, Stack\+Allocator \texorpdfstring{$\ast$}{*}stack\+Allocator=0, size\+\_\+t level\+Depth=\mbox{\hyperlink{class_writer_a9cb4caeb9d8971f305edff1d70e67acb}{k\+Default\+Level\+Depth}})
+\mbox{\hyperlink{class_writer_af4f54830d6927d9daf5bd53bfd134dd3}{Writer}} (Output\+Stream \&\mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}, Stack\+Allocator \texorpdfstring{$\ast$}{*}stack\+Allocator=0, size\+\_\+t level\+Depth=\mbox{\hyperlink{class_writer_a9cb4caeb9d8971f305edff1d70e67acb}{k\+Default\+Level\+Depth}})
 \begin{DoxyCompactList}\small\item\em Constructor. \end{DoxyCompactList}\item 
 \mbox{\hyperlink{class_writer_a7b885cea71542fc436be80eff447fb64}{Writer}} (Stack\+Allocator \texorpdfstring{$\ast$}{*}allocator=0, size\+\_\+t level\+Depth=\mbox{\hyperlink{class_writer_a9cb4caeb9d8971f305edff1d70e67acb}{k\+Default\+Level\+Depth}})
 \item 
-void \mbox{\hyperlink{class_writer_a8b53e8f137f7fcf694f5500711b3f58d}{Reset}} (Output\+Stream \&os)
+void \mbox{\hyperlink{class_writer_a8b53e8f137f7fcf694f5500711b3f58d}{Reset}} (Output\+Stream \&\mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}})
 \begin{DoxyCompactList}\small\item\em \doxylink{struct_reset}{Reset} the writer with a new stream. \end{DoxyCompactList}\item 
 bool \mbox{\hyperlink{class_writer_a07d74d36dd3191b06e0aab678c246157}{Is\+Complete}} () const
 \begin{DoxyCompactList}\small\item\em Checks whether the output is a complete JSON. \end{DoxyCompactList}\item 
@@ -220,7 +221,7 @@ Definition at line \mbox{\hyperlink{writer_8h_source_l00101}{101}} of file \mbox
 
 \begin{DoxyCode}{0}
 \DoxyCodeLine{00101\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ :\ }
-\DoxyCodeLine{00102\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_writer_a3a3f60140f78dd67b5274978fd3a33ff}{os\_}}(\&os),\ \mbox{\hyperlink{class_writer_a9e6c13c06fc721dfd8486f17b9ff29de}{level\_stack\_}}(stackAllocator,\ levelDepth\ *\ \textcolor{keyword}{sizeof}(Level)),\ \mbox{\hyperlink{class_writer_a3d4ef664c3cdf34a286b13d27adcdd4d}{maxDecimalPlaces\_}}(\mbox{\hyperlink{class_writer_ab46d66ae0ca78cb03ab7fb865d129934}{kDefaultMaxDecimalPlaces}}),\ \mbox{\hyperlink{class_writer_affc6b9e0332b50bee0d33f8b1841c9a6}{hasRoot\_}}(\textcolor{keyword}{false})\ \{\}}
+\DoxyCodeLine{00102\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_writer_a3a3f60140f78dd67b5274978fd3a33ff}{os\_}}(\&\mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}),\ \mbox{\hyperlink{class_writer_a9e6c13c06fc721dfd8486f17b9ff29de}{level\_stack\_}}(stackAllocator,\ levelDepth\ *\ \textcolor{keyword}{sizeof}(Level)),\ \mbox{\hyperlink{class_writer_a3d4ef664c3cdf34a286b13d27adcdd4d}{maxDecimalPlaces\_}}(\mbox{\hyperlink{class_writer_ab46d66ae0ca78cb03ab7fb865d129934}{kDefaultMaxDecimalPlaces}}),\ \mbox{\hyperlink{class_writer_affc6b9e0332b50bee0d33f8b1841c9a6}{hasRoot\_}}(\textcolor{keyword}{false})\ \{\}}
 
 \end{DoxyCode}
 \Hypertarget{class_writer_a7b885cea71542fc436be80eff447fb64}\index{Writer$<$ OutputStream, SourceEncoding, TargetEncoding, StackAllocator, writeFlags $>$@{Writer$<$ OutputStream, SourceEncoding, TargetEncoding, StackAllocator, writeFlags $>$}!Writer@{Writer}}
@@ -259,14 +260,16 @@ Definition at line \mbox{\hyperlink{writer_8h_source_l00182}{182}} of file \mbox
 \DoxyCodeLine{00182\ \{\ \mbox{\hyperlink{class_writer_a1fc40f8b9f3abc2548c0c5782ce1755d}{Prefix}}(b\ ?\ \mbox{\hyperlink{rapidjson_8h_a1d1cfd8ffb84e947f82999c682b666a7a209434e5edd66630011ca19d710d7cd6}{kTrueType}}\ :\ \mbox{\hyperlink{rapidjson_8h_a1d1cfd8ffb84e947f82999c682b666a7a062b8296274a258acf0e142868684c54}{kFalseType}});\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{class_writer_adc1cadbabc309d31f19cf7463251d879}{EndValue}}(\mbox{\hyperlink{class_writer_a42ad68b6950431bb8ca0199568546eaf}{WriteBool}}(b));\ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
 \includegraphics[width=350pt]{class_writer_ad7491f4dedb02e7456b240b23ef8c1ad_cgraph}
 \end{center}
 \end{figure}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -297,14 +300,16 @@ Definition at line \mbox{\hyperlink{writer_8h_source_l00193}{193}} of file \mbox
 \DoxyCodeLine{00193\ \{\ \mbox{\hyperlink{class_writer_a1fc40f8b9f3abc2548c0c5782ce1755d}{Prefix}}(\mbox{\hyperlink{rapidjson_8h_a1d1cfd8ffb84e947f82999c682b666a7afc9f813b7aaf71911bdae20a86b2702d}{kNumberType}});\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{class_writer_adc1cadbabc309d31f19cf7463251d879}{EndValue}}(\mbox{\hyperlink{class_writer_ae7a0fc4740681d845d92c1213bd25aa1}{WriteDouble}}(d));\ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
 \includegraphics[width=350pt]{class_writer_a22a43e8a7193105deec6b808736f7a1a_cgraph}
 \end{center}
 \end{figure}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -333,14 +338,16 @@ Definition at line \mbox{\hyperlink{writer_8h_source_l00245}{245}} of file \mbox
 \DoxyCodeLine{00251\ \ \ \ \ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
 \includegraphics[width=350pt]{class_writer_ac88d533095591a878500b63b351d4013_cgraph}
 \end{center}
 \end{figure}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -370,14 +377,16 @@ Definition at line \mbox{\hyperlink{writer_8h_source_l00230}{230}} of file \mbox
 \DoxyCodeLine{00237\ \ \ \ \ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
 \includegraphics[width=350pt]{class_writer_a0771a565261564c27676b7300b11f2b5_cgraph}
 \end{center}
 \end{figure}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -404,14 +413,16 @@ Definition at line \mbox{\hyperlink{writer_8h_source_l00493}{493}} of file \mbox
 \DoxyCodeLine{00497\ \ \ \ \ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
 \includegraphics[width=318pt]{class_writer_adc1cadbabc309d31f19cf7463251d879_cgraph}
 \end{center}
 \end{figure}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -436,7 +447,8 @@ Definition at line \mbox{\hyperlink{writer_8h_source_l00281}{281}} of file \mbox
 \DoxyCodeLine{00283\ \ \ \ \ \}}
 
 \end{DoxyCode}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -477,14 +489,16 @@ Definition at line \mbox{\hyperlink{writer_8h_source_l00183}{183}} of file \mbox
 \DoxyCodeLine{00183\ \{\ \mbox{\hyperlink{class_writer_a1fc40f8b9f3abc2548c0c5782ce1755d}{Prefix}}(\mbox{\hyperlink{rapidjson_8h_a1d1cfd8ffb84e947f82999c682b666a7afc9f813b7aaf71911bdae20a86b2702d}{kNumberType}});\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{class_writer_adc1cadbabc309d31f19cf7463251d879}{EndValue}}(\mbox{\hyperlink{class_writer_a31d0feda654ca245c41462be7dc59998}{WriteInt}}(i));\ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
 \includegraphics[width=350pt]{class_writer_ad471415aa7741e732bab0bcfbb9522a8_cgraph}
 \end{center}
 \end{figure}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -507,7 +521,8 @@ Definition at line \mbox{\hyperlink{writer_8h_source_l00185}{185}} of file \mbox
 \DoxyCodeLine{00185\ \{\ \mbox{\hyperlink{class_writer_a1fc40f8b9f3abc2548c0c5782ce1755d}{Prefix}}(\mbox{\hyperlink{rapidjson_8h_a1d1cfd8ffb84e947f82999c682b666a7afc9f813b7aaf71911bdae20a86b2702d}{kNumberType}});\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{class_writer_adc1cadbabc309d31f19cf7463251d879}{EndValue}}(\mbox{\hyperlink{class_writer_aa58d3f80c06394648de5055ecfb41587}{WriteInt64}}(i64));\ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -532,14 +547,16 @@ Definition at line \mbox{\hyperlink{writer_8h_source_l00143}{143}} of file \mbox
 \DoxyCodeLine{00145\ \ \ \ \ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
 \includegraphics[width=327pt]{class_writer_a07d74d36dd3191b06e0aab678c246157_cgraph}
 \end{center}
 \end{figure}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -562,14 +579,16 @@ Definition at line \mbox{\hyperlink{writer_8h_source_l00259}{259}} of file \mbox
 \DoxyCodeLine{00259\ \{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{class_writer_a19096d2ccb90761f63ab1240337bf90a}{Key}}(str,\ \mbox{\hyperlink{namespaceinternal_a86326fb0c9d7c7ea8edd7deedbb2b26e}{internal::StrLen}}(str));\ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
 \includegraphics[width=263pt]{class_writer_ab6057b7fa9737edb4da55a7afefa966d_cgraph}
 \end{center}
 \end{figure}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -592,14 +611,16 @@ Definition at line \mbox{\hyperlink{writer_8h_source_l00221}{221}} of file \mbox
 \DoxyCodeLine{00221\ \{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{class_writer_a8b4dc44f471403a83c9959575796ceab}{String}}(str,\ length,\ copy);\ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
 \includegraphics[width=350pt]{class_writer_a19096d2ccb90761f63ab1240337bf90a_cgraph}
 \end{center}
 \end{figure}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -622,14 +643,16 @@ Definition at line \mbox{\hyperlink{writer_8h_source_l00181}{181}} of file \mbox
 \DoxyCodeLine{00181\ \{\ \mbox{\hyperlink{class_writer_a1fc40f8b9f3abc2548c0c5782ce1755d}{Prefix}}(\mbox{\hyperlink{rapidjson_8h_a1d1cfd8ffb84e947f82999c682b666a7aa09befbfb4f2e1409f237817979d8087}{kNullType}});\ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{class_writer_adc1cadbabc309d31f19cf7463251d879}{EndValue}}(\mbox{\hyperlink{class_writer_a44862b3eba8d84b909c69aba875c9f4d}{WriteNull}}());\ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
 \includegraphics[width=350pt]{class_writer_af700ed03c8810d48a4aaa3c5baeaf26c_cgraph}
 \end{center}
 \end{figure}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -670,14 +693,16 @@ Definition at line \mbox{\hyperlink{writer_8h_source_l00472}{472}} of file \mbox
 \DoxyCodeLine{00490\ \ \ \ \ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
 \includegraphics[width=309pt]{class_writer_a1fc40f8b9f3abc2548c0c5782ce1755d_cgraph}
 \end{center}
 \end{figure}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -705,7 +730,8 @@ Definition at line \mbox{\hyperlink{writer_8h_source_l00195}{195}} of file \mbox
 \DoxyCodeLine{00200\ \ \ \ \ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -743,14 +769,16 @@ Definition at line \mbox{\hyperlink{writer_8h_source_l00271}{271}} of file \mbox
 \DoxyCodeLine{00275\ \ \ \ \ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
 \includegraphics[width=350pt]{class_writer_ae0d1615104e4e88040b9640e6784008a_cgraph}
 \end{center}
 \end{figure}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -797,14 +825,16 @@ Definition at line \mbox{\hyperlink{writer_8h_source_l00133}{133}} of file \mbox
 \DoxyCodeLine{00137\ \ \ \ \ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
 \includegraphics[width=298pt]{class_writer_a8b53e8f137f7fcf694f5500711b3f58d_cgraph}
 \end{center}
 \end{figure}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -829,7 +859,8 @@ Definition at line \mbox{\hyperlink{writer_8h_source_l00450}{450}} of file \mbox
 \DoxyCodeLine{00452\ \ \ \ \ \}}
 
 \end{DoxyCode}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -896,14 +927,16 @@ Definition at line \mbox{\hyperlink{writer_8h_source_l00239}{239}} of file \mbox
 \DoxyCodeLine{00243\ \ \ \ \ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
 \includegraphics[width=350pt]{class_writer_a38715785194b42cd67ba5dd52bf7967e_cgraph}
 \end{center}
 \end{figure}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -930,14 +963,16 @@ Definition at line \mbox{\hyperlink{writer_8h_source_l00215}{215}} of file \mbox
 \DoxyCodeLine{00219\ \ \ \ \ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
 \includegraphics[width=350pt]{class_writer_aec3200b2fc80ec87d1c37f775256b2e1_cgraph}
 \end{center}
 \end{figure}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -960,14 +995,16 @@ Definition at line \mbox{\hyperlink{writer_8h_source_l00258}{258}} of file \mbox
 \DoxyCodeLine{00258\ \{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{class_writer_a8b4dc44f471403a83c9959575796ceab}{String}}(str,\ \mbox{\hyperlink{namespaceinternal_a86326fb0c9d7c7ea8edd7deedbb2b26e}{internal::StrLen}}(str));\ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
 \includegraphics[width=271pt]{class_writer_a2a2c6f51644b2013471aec4dac0d7466_cgraph}
 \end{center}
 \end{figure}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -995,14 +1032,16 @@ Definition at line \mbox{\hyperlink{writer_8h_source_l00202}{202}} of file \mbox
 \DoxyCodeLine{00207\ \ \ \ \ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
 \includegraphics[width=350pt]{class_writer_a8b4dc44f471403a83c9959575796ceab_cgraph}
 \end{center}
 \end{figure}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -1025,14 +1064,16 @@ Definition at line \mbox{\hyperlink{writer_8h_source_l00184}{184}} of file \mbox
 \DoxyCodeLine{00184\ \{\ \mbox{\hyperlink{class_writer_a1fc40f8b9f3abc2548c0c5782ce1755d}{Prefix}}(\mbox{\hyperlink{rapidjson_8h_a1d1cfd8ffb84e947f82999c682b666a7afc9f813b7aaf71911bdae20a86b2702d}{kNumberType}});\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{class_writer_adc1cadbabc309d31f19cf7463251d879}{EndValue}}(\mbox{\hyperlink{class_writer_a2861227e93707d1478d2cf56644dca3b}{WriteUint}}(u));\ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
 \includegraphics[width=350pt]{class_writer_a5fb0c3228f89f6f9bef15f3e6e6f1739_cgraph}
 \end{center}
 \end{figure}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -1055,7 +1096,8 @@ Definition at line \mbox{\hyperlink{writer_8h_source_l00186}{186}} of file \mbox
 \DoxyCodeLine{00186\ \{\ \mbox{\hyperlink{class_writer_a1fc40f8b9f3abc2548c0c5782ce1755d}{Prefix}}(\mbox{\hyperlink{rapidjson_8h_a1d1cfd8ffb84e947f82999c682b666a7afc9f813b7aaf71911bdae20a86b2702d}{kNumberType}});\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{class_writer_adc1cadbabc309d31f19cf7463251d879}{EndValue}}(\mbox{\hyperlink{class_writer_ad07b325157220e3aa791c1c8c904021e}{WriteUint64}}(u64));\ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -1088,14 +1130,16 @@ Definition at line \mbox{\hyperlink{writer_8h_source_l00300}{300}} of file \mbox
 \DoxyCodeLine{00310\ \ \ \ \ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
 \includegraphics[width=273pt]{class_writer_a42ad68b6950431bb8ca0199568546eaf_cgraph}
 \end{center}
 \end{figure}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -1144,14 +1188,16 @@ Definition at line \mbox{\hyperlink{writer_8h_source_l00348}{348}} of file \mbox
 \DoxyCodeLine{00374\ \ \ \ \ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
 \includegraphics[width=350pt]{class_writer_ae7a0fc4740681d845d92c1213bd25aa1_cgraph}
 \end{center}
 \end{figure}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -1198,7 +1244,8 @@ Definition at line \mbox{\hyperlink{writer_8h_source_l00545}{545}} of file \mbox
 \DoxyCodeLine{00570\ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -1221,7 +1268,8 @@ Definition at line \mbox{\hyperlink{writer_8h_source_l00457}{457}} of file \mbox
 \DoxyCodeLine{00457\ \{\ \mbox{\hyperlink{class_writer_a3a3f60140f78dd67b5274978fd3a33ff}{os\_}}-\/>Put(\textcolor{charliteral}{']'});\ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};\ \}}
 
 \end{DoxyCode}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -1244,7 +1292,8 @@ Definition at line \mbox{\hyperlink{writer_8h_source_l00455}{455}} of file \mbox
 \DoxyCodeLine{00455\ \{\ \mbox{\hyperlink{class_writer_a3a3f60140f78dd67b5274978fd3a33ff}{os\_}}-\/>Put(\textcolor{charliteral}{'\}'});\ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};\ \}}
 
 \end{DoxyCode}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -1274,14 +1323,16 @@ Definition at line \mbox{\hyperlink{writer_8h_source_l00312}{312}} of file \mbox
 \DoxyCodeLine{00319\ \ \ \ \ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
 \includegraphics[width=350pt]{class_writer_a31d0feda654ca245c41462be7dc59998_cgraph}
 \end{center}
 \end{figure}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -1308,7 +1359,8 @@ Definition at line \mbox{\hyperlink{writer_8h_source_l00513}{513}} of file \mbox
 \DoxyCodeLine{00518\ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -1338,14 +1390,16 @@ Definition at line \mbox{\hyperlink{writer_8h_source_l00330}{330}} of file \mbox
 \DoxyCodeLine{00337\ \ \ \ \ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
 \includegraphics[width=350pt]{class_writer_aa58d3f80c06394648de5055ecfb41587_cgraph}
 \end{center}
 \end{figure}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -1372,7 +1426,8 @@ Definition at line \mbox{\hyperlink{writer_8h_source_l00529}{529}} of file \mbox
 \DoxyCodeLine{00534\ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -1398,14 +1453,16 @@ Definition at line \mbox{\hyperlink{writer_8h_source_l00295}{295}} of file \mbox
 \DoxyCodeLine{00298\ \ \ \ \ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
 \includegraphics[width=271pt]{class_writer_a44862b3eba8d84b909c69aba875c9f4d_cgraph}
 \end{center}
 \end{figure}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -1439,14 +1496,16 @@ Definition at line \mbox{\hyperlink{writer_8h_source_l00459}{459}} of file \mbox
 \DoxyCodeLine{00470\ \ \ \ \ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
 \includegraphics[width=298pt]{class_writer_a8ee1135b2595261819b134907f67614e_cgraph}
 \end{center}
 \end{figure}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -1469,7 +1528,8 @@ Definition at line \mbox{\hyperlink{writer_8h_source_l00456}{456}} of file \mbox
 \DoxyCodeLine{00456\ \{\ \mbox{\hyperlink{class_writer_a3a3f60140f78dd67b5274978fd3a33ff}{os\_}}-\/>Put(\textcolor{charliteral}{'['});\ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};\ \}}
 
 \end{DoxyCode}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -1492,7 +1552,8 @@ Definition at line \mbox{\hyperlink{writer_8h_source_l00454}{454}} of file \mbox
 \DoxyCodeLine{00454\ \{\ \mbox{\hyperlink{class_writer_a3a3f60140f78dd67b5274978fd3a33ff}{os\_}}-\/>Put(\textcolor{charliteral}{'\{'});\ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};\ \}}
 
 \end{DoxyCode}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -1587,14 +1648,16 @@ Definition at line \mbox{\hyperlink{writer_8h_source_l00376}{376}} of file \mbox
 \DoxyCodeLine{00448\ \ \ \ \ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
 \includegraphics[width=350pt]{class_writer_acda4412ef5f4cac6e89f9544e4b10f70_cgraph}
 \end{center}
 \end{figure}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -1624,14 +1687,16 @@ Definition at line \mbox{\hyperlink{writer_8h_source_l00321}{321}} of file \mbox
 \DoxyCodeLine{00328\ \ \ \ \ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
 \includegraphics[width=350pt]{class_writer_a2861227e93707d1478d2cf56644dca3b_cgraph}
 \end{center}
 \end{figure}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -1658,7 +1723,8 @@ Definition at line \mbox{\hyperlink{writer_8h_source_l00521}{521}} of file \mbox
 \DoxyCodeLine{00526\ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -1685,7 +1751,8 @@ Definition at line \mbox{\hyperlink{writer_8h_source_l00537}{537}} of file \mbox
 \DoxyCodeLine{00542\ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -1715,14 +1782,16 @@ Definition at line \mbox{\hyperlink{writer_8h_source_l00339}{339}} of file \mbox
 \DoxyCodeLine{00346\ \ \ \ \ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
 \includegraphics[width=350pt]{class_writer_ad07b325157220e3aa791c1c8c904021e_cgraph}
 \end{center}
 \end{figure}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode

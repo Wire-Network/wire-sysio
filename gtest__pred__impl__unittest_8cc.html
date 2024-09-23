@@ -352,7 +352,7 @@ Typedefs</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="func-members" name="func-members"></a>
 Functions</h2></td></tr>
-<tr class="memitem:a5f45eafac0eb1e73929abdd45cb54026" id="r_a5f45eafac0eb1e73929abdd45cb54026"><td class="memItemLeft" align="right" valign="top">std::ostream &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a5f45eafac0eb1e73929abdd45cb54026">operator&lt;&lt;</a> (std::ostream &amp;os, const <a class="el" href="struct_bool.html">Bool</a> &amp;x)</td></tr>
+<tr class="memitem:a5f45eafac0eb1e73929abdd45cb54026" id="r_a5f45eafac0eb1e73929abdd45cb54026"><td class="memItemLeft" align="right" valign="top">std::ostream &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a5f45eafac0eb1e73929abdd45cb54026">operator&lt;&lt;</a> (std::ostream &amp;<a class="el" href="environment_8hpp.html#a3951483d0b31c29ca95336206cd35238">os</a>, const <a class="el" href="struct_bool.html">Bool</a> &amp;x)</td></tr>
 <tr class="separator:a5f45eafac0eb1e73929abdd45cb54026"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa8827b7fab495de26f406affdf47a697" id="r_aa8827b7fab495de26f406affdf47a697"><td class="memTemplParams" colspan="2">template&lt;typename T1 &gt; </td></tr>
 <tr class="memitem:aa8827b7fab495de26f406affdf47a697"><td class="memTemplItemLeft" align="right" valign="top">bool&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="#aa8827b7fab495de26f406affdf47a697">PredFunction1</a> (T1 v1)</td></tr>
@@ -828,8 +828,9 @@ Functions</h2></td></tr>
 
 <p class="definition">Definition at line <a class="el" href="gtest__pred__impl__unittest_8cc_source.html#l00069">69</a> of file <a class="el" href="gtest__pred__impl__unittest_8cc_source.html">gtest_pred_impl_unittest.cc</a>.</p>
 <div class="fragment"><div class="line"><span class="lineno">   69</span>                                                      {</div>
-<div class="line"><span class="lineno">   70</span>  <span class="keywordflow">return</span> os &lt;&lt; (x.<a class="code hl_variable" href="struct_bool.html#a16be863c269f988cdcbe59f9d846a141">value</a> ? <span class="stringliteral">&quot;true&quot;</span> : <span class="stringliteral">&quot;false&quot;</span>);</div>
+<div class="line"><span class="lineno">   70</span>  <span class="keywordflow">return</span> <a class="code hl_variable" href="environment_8hpp.html#a3951483d0b31c29ca95336206cd35238">os</a> &lt;&lt; (x.<a class="code hl_variable" href="struct_bool.html#a16be863c269f988cdcbe59f9d846a141">value</a> ? <span class="stringliteral">&quot;true&quot;</span> : <span class="stringliteral">&quot;false&quot;</span>);</div>
 <div class="line"><span class="lineno">   71</span>}</div>
+<div class="ttc" id="aenvironment_8hpp_html_a3951483d0b31c29ca95336206cd35238"><div class="ttname"><a href="environment_8hpp.html#a3951483d0b31c29ca95336206cd35238">os</a></div><div class="ttdeci">os_t os</div><div class="ttdef"><b>Definition</b> <a href="environment_8hpp_source.html#l00023">environment.hpp:23</a></div></div>
 <div class="ttc" id="astruct_bool_html_a16be863c269f988cdcbe59f9d846a141"><div class="ttname"><a href="struct_bool.html#a16be863c269f988cdcbe59f9d846a141">Bool::value</a></div><div class="ttdeci">bool value</div><div class="ttdef"><b>Definition</b> <a href="gtest__pred__impl__unittest_8cc_source.html#l00065">gtest_pred_impl_unittest.cc:65</a></div></div>
 </div><!-- fragment -->
 </div>

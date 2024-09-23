@@ -159,7 +159,7 @@
 \DoxyCodeLine{\Hypertarget{database__utils_8hpp_source_l00155}00155\ \ \ \ \ \ \ \textcolor{comment}{//\ Temporarily\ hold\ the\ binary\ in\ uint128\_t\ before\ casting\ it\ to\ float128\_t}}
 \DoxyCodeLine{\Hypertarget{database__utils_8hpp_source_l00156}00156\ \ \ \ \ \ \ \textcolor{keywordtype}{char}\ temp[\textcolor{keyword}{sizeof}(\mbox{\hyperlink{namespacesysio_1_1chain_a896515137d9a7844105786ee3a6b1d47}{sysio::chain::uint128\_t}})];}
 \DoxyCodeLine{\Hypertarget{database__utils_8hpp_source_l00157}00157\ \ \ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_adc4bd59a60361844aa0e852efa210105}{memset}}(temp,\ 0,\ \textcolor{keyword}{sizeof}(temp));}
-\DoxyCodeLine{\Hypertarget{database__utils_8hpp_source_l00158}00158\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}\ =\ v.as\_string();\ \ }
+\DoxyCodeLine{\Hypertarget{database__utils_8hpp_source_l00158}00158\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}\ =\ v.\mbox{\hyperlink{classfc_1_1variant_acbd70a93184e4277631f2a261acb707c}{as\_string}}();\ }
 \DoxyCodeLine{\Hypertarget{database__utils_8hpp_source_l00159}00159\ \ \ \ \ \ \ \mbox{\hyperlink{exception_8hpp_abed525eeff3ae581be7e4e2fcd3b7bf4}{FC\_ASSERT}}(\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}.size()\ ==\ 2\ +\ 2\ *\ \textcolor{keyword}{sizeof}(temp)\ \&\&\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}.find(\textcolor{stringliteral}{"{}0x"{}})\ ==\ 0,\ \ \textcolor{stringliteral}{"{}Failure\ in\ converting\ hex\ data\ into\ a\ float128\_t"{}});\ \ \ \ }
 \DoxyCodeLine{\Hypertarget{database__utils_8hpp_source_l00160}00160\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ sz\ =\ \mbox{\hyperlink{namespacefc_a6a0fb5b79914774be4ab66462362b292}{from\_hex}}(\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}.substr(2),\ temp,\ \textcolor{keyword}{sizeof}(temp)\ );}
 \DoxyCodeLine{\Hypertarget{database__utils_8hpp_source_l00161}00161\ \ \ \ \ \ \ \textcolor{comment}{//\ Assumes\ platform\ is\ little\ endian\ and\ hex\ representation\ of\ 128-\/bit\ integer\ is\ in\ little\ endian\ order.\ }}
@@ -186,7 +186,7 @@
 \DoxyCodeLine{\Hypertarget{database__utils_8hpp_source_l00182}00182\ }
 \DoxyCodeLine{\Hypertarget{database__utils_8hpp_source_l00183}00183\ \ \ \ \textcolor{keyword}{inline}}
 \DoxyCodeLine{\Hypertarget{database__utils_8hpp_source_l00184}\mbox{\hyperlink{namespacefc_af6289a855139562122177becefa48296}{00184}}\ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespacefc_accef08adf4ee05c36ccc550d8101b08f}{from\_variant}}(\ \textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1variant}{variant}}\&\ v,\ \mbox{\hyperlink{classsysio_1_1chain_1_1shared__blob}{sysio::chain::shared\_blob}}\&\ b\ )\ \{}
-\DoxyCodeLine{\Hypertarget{database__utils_8hpp_source_l00185}00185\ \ \ \ \ \ \ \textcolor{keywordtype}{string}\ \_s\ =\ \mbox{\hyperlink{namespacefc_ae8deb03ba4f32aa68c5dcc62578ea2de}{base64\_decode}}(v.as\_string());}
+\DoxyCodeLine{\Hypertarget{database__utils_8hpp_source_l00185}00185\ \ \ \ \ \ \ \textcolor{keywordtype}{string}\ \_s\ =\ \mbox{\hyperlink{namespacefc_ae8deb03ba4f32aa68c5dcc62578ea2de}{base64\_decode}}(v.\mbox{\hyperlink{classfc_1_1variant_acbd70a93184e4277631f2a261acb707c}{as\_string}}());}
 \DoxyCodeLine{\Hypertarget{database__utils_8hpp_source_l00186}00186\ \ \ \ \ \ \ b\ =\ \mbox{\hyperlink{classsysio_1_1chain_1_1shared__blob}{sysio::chain::shared\_blob}}(\_s.begin(),\ \_s.end(),\ b.\mbox{\hyperlink{classchainbase_1_1shared__cow__string_a404330337dd73ab339cd10047a802918}{get\_allocator}}());}
 \DoxyCodeLine{\Hypertarget{database__utils_8hpp_source_l00187}00187\ \ \ \ \}}
 \DoxyCodeLine{\Hypertarget{database__utils_8hpp_source_l00188}00188\ }
@@ -197,7 +197,7 @@
 \DoxyCodeLine{\Hypertarget{database__utils_8hpp_source_l00193}00193\ }
 \DoxyCodeLine{\Hypertarget{database__utils_8hpp_source_l00194}00194\ \ \ \ \textcolor{keyword}{inline}}
 \DoxyCodeLine{\Hypertarget{database__utils_8hpp_source_l00195}\mbox{\hyperlink{namespacefc_ac2c1cdb7900b6ed71097bfffafd30886}{00195}}\ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespacefc_accef08adf4ee05c36ccc550d8101b08f}{from\_variant}}(\ \textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1variant}{variant}}\&\ v,\ \mbox{\hyperlink{structfc_1_1blob}{blob}}\&\ b\ )\ \{}
-\DoxyCodeLine{\Hypertarget{database__utils_8hpp_source_l00196}00196\ \ \ \ \ \ \ \textcolor{keywordtype}{string}\ \_s\ =\ \mbox{\hyperlink{namespacefc_ae8deb03ba4f32aa68c5dcc62578ea2de}{base64\_decode}}(v.as\_string());}
+\DoxyCodeLine{\Hypertarget{database__utils_8hpp_source_l00196}00196\ \ \ \ \ \ \ \textcolor{keywordtype}{string}\ \_s\ =\ \mbox{\hyperlink{namespacefc_ae8deb03ba4f32aa68c5dcc62578ea2de}{base64\_decode}}(v.\mbox{\hyperlink{classfc_1_1variant_acbd70a93184e4277631f2a261acb707c}{as\_string}}());}
 \DoxyCodeLine{\Hypertarget{database__utils_8hpp_source_l00197}00197\ \ \ \ \ \ \ b.\mbox{\hyperlink{structfc_1_1blob_a88a9325abb9edd4766c3292e7fd89380}{data}}\ =\ std::vector<char>(\_s.begin(),\ \_s.end());}
 \DoxyCodeLine{\Hypertarget{database__utils_8hpp_source_l00198}00198\ \ \ \ \}}
 \DoxyCodeLine{\Hypertarget{database__utils_8hpp_source_l00199}00199\ }

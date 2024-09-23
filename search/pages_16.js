@@ -9,6 +9,5 @@ var searchData=
   ['todo_20list_6',['Todo List',['../todo.html',1,'']]],
   ['tostring_7',['tostring',['../md_libraries_2sys-vm_2external_2_catch2_2docs_2tostring.html',1,'']]],
   ['tutorial_8',['Tutorial',['../md_libraries_2fc_2vendor_2websocketpp_2tutorials_2broadcast__tutorial_2broadcast__tutorial.html',1,'Broadcast Tutorial'],['../md_libraries_2fc_2vendor_2websocketpp_2tutorials_2chat__tutorial_2chat__tutorial.html',1,'Chat Tutorial'],['../md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2tutorial.html',1,'Tutorial'],['../md_libraries_2fc_2vendor_2websocketpp_2tutorials_2utility__client_2utility__client.html',1,'Utility Client Example Application Tutorial'],['../md_libraries_2fc_2vendor_2websocketpp_2tutorials_2utility__server_2utility__server.html',1,'Utility Server Example Application Tutorial']]],
-  ['tutorial_9',['tutorial',['../md_libraries_2sys-vm_2external_2_catch2_2docs_2tutorial.html',1,'']]],
-  ['tutorials_10',['Tutorials',['../tutorials.html',1,'index']]]
+  ['tutorial_9',['tutorial',['../md_libraries_2sys-vm_2external_2_catch2_2docs_2tutorial.html',1,'']]]
 ];

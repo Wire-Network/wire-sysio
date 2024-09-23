@@ -171,12 +171,12 @@ Functions</h2></td></tr>
 <p class="definition">Definition at line <a class="el" href="sortline_8cpp_source.html#l00008">8</a> of file <a class="el" href="sortline_8cpp_source.html">sortline.cpp</a>.</p>
 <div class="fragment"><div class="line"><span class="lineno">    9</span>{</div>
 <div class="line"><span class="lineno">   10</span>    <a class="code hl_typedef" href="#a146b3b56e358a0e30ee6e00227e85767">StrSet</a> <a class="code hl_function" href="namespace_xbyak_1_1util.html#a67cd5471fb751b186b53fdab6da7d3f7">ss</a>;</div>
-<div class="line"><span class="lineno">   11</span>    std::string <a class="code hl_variable" href="namespacevalidate__reflection.html#a54d4e98ade8417b88a7e3859a693630a">line</a>;</div>
+<div class="line"><span class="lineno">   11</span>    std::string line;</div>
 <div class="line"><span class="lineno">   12</span>    <span class="keywordflow">while</span> (std::getline(std::cin, line)) {</div>
-<div class="line"><span class="lineno">   13</span>        <span class="keywordflow">if</span> (!<a class="code hl_variable" href="namespacevalidate__reflection.html#a54d4e98ade8417b88a7e3859a693630a">line</a>.empty() &amp;&amp; line[<a class="code hl_variable" href="namespacevalidate__reflection.html#a54d4e98ade8417b88a7e3859a693630a">line</a>.size() - 1] == <span class="charliteral">&#39;\n&#39;</span>) {</div>
-<div class="line"><span class="lineno">   14</span>            <a class="code hl_variable" href="namespacevalidate__reflection.html#a54d4e98ade8417b88a7e3859a693630a">line</a>.resize(<a class="code hl_variable" href="namespacevalidate__reflection.html#a54d4e98ade8417b88a7e3859a693630a">line</a>.size() - 1);</div>
+<div class="line"><span class="lineno">   13</span>        <span class="keywordflow">if</span> (!line.empty() &amp;&amp; line[line.size() - 1] == <span class="charliteral">&#39;\n&#39;</span>) {</div>
+<div class="line"><span class="lineno">   14</span>            line.resize(line.size() - 1);</div>
 <div class="line"><span class="lineno">   15</span>        }</div>
-<div class="line"><span class="lineno">   16</span>        <span class="keywordflow">if</span> (!<a class="code hl_variable" href="namespacevalidate__reflection.html#a54d4e98ade8417b88a7e3859a693630a">line</a>.empty()) {</div>
+<div class="line"><span class="lineno">   16</span>        <span class="keywordflow">if</span> (!line.empty()) {</div>
 <div class="line"><span class="lineno">   17</span>            <a class="code hl_function" href="namespace_xbyak_1_1util.html#a67cd5471fb751b186b53fdab6da7d3f7">ss</a>.insert(line);</div>
 <div class="line"><span class="lineno">   18</span>        }</div>
 <div class="line"><span class="lineno">   19</span>    }</div>
@@ -185,7 +185,6 @@ Functions</h2></td></tr>
 <div class="line"><span class="lineno">   22</span>    }</div>
 <div class="line"><span class="lineno">   23</span>}</div>
 <div class="ttc" id="anamespace_xbyak_1_1util_html_a67cd5471fb751b186b53fdab6da7d3f7"><div class="ttname"><a href="namespace_xbyak_1_1util.html#a67cd5471fb751b186b53fdab6da7d3f7">Xbyak::util::ss</a></div><div class="ttdeci">static const Segment ss(Segment::ss)</div></div>
-<div class="ttc" id="anamespacevalidate__reflection_html_a54d4e98ade8417b88a7e3859a693630a"><div class="ttname"><a href="namespacevalidate__reflection.html#a54d4e98ade8417b88a7e3859a693630a">validate_reflection.line</a></div><div class="ttdeci">line</div><div class="ttdef"><b>Definition</b> <a href="validate__reflection_8py_source.html#l00735">validate_reflection.py:735</a></div></div>
 <div class="ttc" id="asortline_8cpp_html_a146b3b56e358a0e30ee6e00227e85767"><div class="ttname"><a href="#a146b3b56e358a0e30ee6e00227e85767">StrSet</a></div><div class="ttdeci">std::set&lt; std::string &gt; StrSet</div><div class="ttdef"><b>Definition</b> <a href="sortline_8cpp_source.html#l00006">sortline.cpp:6</a></div></div>
 </div><!-- fragment -->
 </div>

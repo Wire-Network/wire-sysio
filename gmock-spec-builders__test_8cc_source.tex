@@ -122,7 +122,7 @@
 \DoxyCodeLine{\Hypertarget{gmock-spec-builders__test_8cc_source_l00118}00118\ \};}
 \DoxyCodeLine{\Hypertarget{gmock-spec-builders__test_8cc_source_l00119}00119\ }
 \DoxyCodeLine{\Hypertarget{gmock-spec-builders__test_8cc_source_l00120}00120\ \textcolor{comment}{//\ Tells\ Google\ Mock\ how\ to\ print\ a\ value\ of\ type\ Incomplete.}}
-\DoxyCodeLine{\Hypertarget{gmock-spec-builders__test_8cc_source_l00121}00121\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{gtest-printers__test_8cc_aad8245a4b48cd65607b86153d0f9dbe6}{PrintTo}}(\textcolor{keyword}{const}\ Incomplete\&\ x,\ ::std::ostream*\ os);}
+\DoxyCodeLine{\Hypertarget{gmock-spec-builders__test_8cc_source_l00121}00121\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{gtest-printers__test_8cc_aad8245a4b48cd65607b86153d0f9dbe6}{PrintTo}}(\textcolor{keyword}{const}\ Incomplete\&\ x,\ ::std::ostream*\ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}});}
 \DoxyCodeLine{\Hypertarget{gmock-spec-builders__test_8cc_source_l00122}00122\ }
 \DoxyCodeLine{\Hypertarget{gmock-spec-builders__test_8cc_source_l00123}00123\ \mbox{\hyperlink{gtest_8h_ad8b332753515c0ab8baada563c2547eb}{TEST}}(MockMethodTest,\ CanInstantiateWithIncompleteArgType)\ \{}
 \DoxyCodeLine{\Hypertarget{gmock-spec-builders__test_8cc_source_l00124}00124\ \ \ \textcolor{comment}{//\ Even\ though\ this\ mock\ class\ contains\ a\ mock\ method\ that\ takes}}
@@ -136,8 +136,8 @@
 \DoxyCodeLine{\Hypertarget{gmock-spec-builders__test_8cc_source_l00132}00132\ }
 \DoxyCodeLine{\Hypertarget{gmock-spec-builders__test_8cc_source_l00133}00133\ \textcolor{comment}{//\ The\ definition\ of\ the\ printer\ for\ the\ argument\ type\ doesn't\ have\ to}}
 \DoxyCodeLine{\Hypertarget{gmock-spec-builders__test_8cc_source_l00134}00134\ \textcolor{comment}{//\ be\ visible\ where\ the\ mock\ is\ used.}}
-\DoxyCodeLine{\Hypertarget{gmock-spec-builders__test_8cc_source_l00135}00135\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{gtest-printers__test_8cc_aad8245a4b48cd65607b86153d0f9dbe6}{PrintTo}}(\textcolor{keyword}{const}\ Incomplete\&\ \textcolor{comment}{/*\ x\ */},\ ::std::ostream*\ os)\ \{}
-\DoxyCodeLine{\Hypertarget{gmock-spec-builders__test_8cc_source_l00136}00136\ \ \ *os\ <<\ \textcolor{stringliteral}{"{}incomplete"{}};}
+\DoxyCodeLine{\Hypertarget{gmock-spec-builders__test_8cc_source_l00135}00135\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{gtest-printers__test_8cc_aad8245a4b48cd65607b86153d0f9dbe6}{PrintTo}}(\textcolor{keyword}{const}\ Incomplete\&\ \textcolor{comment}{/*\ x\ */},\ ::std::ostream*\ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}})\ \{}
+\DoxyCodeLine{\Hypertarget{gmock-spec-builders__test_8cc_source_l00136}00136\ \ \ *\mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}\ <<\ \textcolor{stringliteral}{"{}incomplete"{}};}
 \DoxyCodeLine{\Hypertarget{gmock-spec-builders__test_8cc_source_l00137}00137\ \}}
 \DoxyCodeLine{\Hypertarget{gmock-spec-builders__test_8cc_source_l00138}00138\ }
 \DoxyCodeLine{\Hypertarget{gmock-spec-builders__test_8cc_source_l00139}00139\ \textcolor{keyword}{class\ }Result\ \{\};}
@@ -1967,8 +1967,8 @@
 \DoxyCodeLine{\Hypertarget{gmock-spec-builders__test_8cc_source_l01963}01963\ \ \ \}}
 \DoxyCodeLine{\Hypertarget{gmock-spec-builders__test_8cc_source_l01964}01964\ }
 \DoxyCodeLine{\Hypertarget{gmock-spec-builders__test_8cc_source_l01965}01965\ \ \ \textcolor{comment}{//\ Describes\ self\ to\ an\ ostream.}}
-\DoxyCodeLine{\Hypertarget{gmock-spec-builders__test_8cc_source_l01966}01966\ \ \ \textcolor{keyword}{virtual}\ \textcolor{keywordtype}{void}\ DescribeTo(::std::ostream*\ os)\textcolor{keyword}{\ const\ }\{}
-\DoxyCodeLine{\Hypertarget{gmock-spec-builders__test_8cc_source_l01967}01967\ \ \ \ \ *os\ <<\ \textcolor{stringliteral}{"{}called\ even\ number\ of\ times"{}};}
+\DoxyCodeLine{\Hypertarget{gmock-spec-builders__test_8cc_source_l01966}01966\ \ \ \textcolor{keyword}{virtual}\ \textcolor{keywordtype}{void}\ DescribeTo(::std::ostream*\ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}})\textcolor{keyword}{\ const\ }\{}
+\DoxyCodeLine{\Hypertarget{gmock-spec-builders__test_8cc_source_l01967}01967\ \ \ \ \ *\mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}\ <<\ \textcolor{stringliteral}{"{}called\ even\ number\ of\ times"{}};}
 \DoxyCodeLine{\Hypertarget{gmock-spec-builders__test_8cc_source_l01968}01968\ \ \ \}}
 \DoxyCodeLine{\Hypertarget{gmock-spec-builders__test_8cc_source_l01969}01969\ \};}
 \DoxyCodeLine{\Hypertarget{gmock-spec-builders__test_8cc_source_l01970}01970\ }
@@ -2002,8 +2002,8 @@
 \DoxyCodeLine{\Hypertarget{gmock-spec-builders__test_8cc_source_l01998}01998\ \textcolor{keyword}{struct\ }Printable\ \{}
 \DoxyCodeLine{\Hypertarget{gmock-spec-builders__test_8cc_source_l01999}01999\ \};}
 \DoxyCodeLine{\Hypertarget{gmock-spec-builders__test_8cc_source_l02000}02000\ }
-\DoxyCodeLine{\Hypertarget{gmock-spec-builders__test_8cc_source_l02001}02001\ \textcolor{keyword}{inline}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{database__utils_8hpp_a9c651062fd345156256e69573165086c}{operator<<}}(::std::ostream\&\ os,\ \textcolor{keyword}{const}\ Printable\&)\ \{}
-\DoxyCodeLine{\Hypertarget{gmock-spec-builders__test_8cc_source_l02002}02002\ \ \ os\ <<\ \textcolor{stringliteral}{"{}Printable"{}};}
+\DoxyCodeLine{\Hypertarget{gmock-spec-builders__test_8cc_source_l02001}02001\ \textcolor{keyword}{inline}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{database__utils_8hpp_a9c651062fd345156256e69573165086c}{operator<<}}(::std::ostream\&\ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}},\ \textcolor{keyword}{const}\ Printable\&)\ \{}
+\DoxyCodeLine{\Hypertarget{gmock-spec-builders__test_8cc_source_l02002}02002\ \ \ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}\ <<\ \textcolor{stringliteral}{"{}Printable"{}};}
 \DoxyCodeLine{\Hypertarget{gmock-spec-builders__test_8cc_source_l02003}02003\ \}}
 \DoxyCodeLine{\Hypertarget{gmock-spec-builders__test_8cc_source_l02004}02004\ }
 \DoxyCodeLine{\Hypertarget{gmock-spec-builders__test_8cc_source_l02005}02005\ \textcolor{keyword}{struct\ }Unprintable\ \{}

@@ -7526,7 +7526,7 @@ Here is the caller graph for this function:</div>
 <div class="line"><span class="lineno"> 2097</span>            };</div>
 <div class="line"><span class="lineno"> 2098</span>            <span class="keywordflow">for</span> (<span class="keywordtype">size_t</span> i = 0; i &lt; <a class="code hl_define" href="bench_8cpp.html#a21ff7c588b94b603f37cc3cb3f21cb6a">NUM_OF_ARRAY</a>(<a class="code hl_variable" href="cvt__test_8cpp.html#af73a49a9258b274934a51f5b17b0d1be">tbl</a>); i++) {</div>
 <div class="line"><span class="lineno"> 2099</span>                <span class="keywordtype">char</span> xs[128], ns[128];</div>
-<div class="line"><span class="lineno"> 2100</span>                <span class="keywordtype">int</span> <a class="code hl_variable" href="namespacedevelop_build.html#ade64cd34608f9442ef3049116a2da428">v</a> = <a class="code hl_variable" href="cvt__test_8cpp.html#af73a49a9258b274934a51f5b17b0d1be">tbl</a>[i];</div>
+<div class="line"><span class="lineno"> 2100</span>                <span class="keywordtype">int</span> v = <a class="code hl_variable" href="cvt__test_8cpp.html#af73a49a9258b274934a51f5b17b0d1be">tbl</a>[i];</div>
 <div class="line"><span class="lineno"> 2101</span>                <a class="code hl_define" href="ate-pairing_2include_2cybozu_2inttype_8hpp.html#a6ff8eedb77b726a888b05c967e5d270e">CYBOZU_SNPRINTF</a>(xs, <span class="keyword">sizeof</span>(xs), <span class="stringliteral">&quot;xmm0, ptr[eax%+d]&quot;</span>, v);</div>
 <div class="line"><span class="lineno"> 2102</span>                <a class="code hl_define" href="ate-pairing_2include_2cybozu_2inttype_8hpp.html#a6ff8eedb77b726a888b05c967e5d270e">CYBOZU_SNPRINTF</a>(ns, <span class="keyword">sizeof</span>(ns), <span class="stringliteral">&quot;xmm0,    [eax%+d]&quot;</span>, v);</div>
 <div class="line"><span class="lineno"> 2103</span>                <a class="code hl_function" href="#add7b7259a4124a0a69532b2d7da2f5c9">put</a>(<span class="stringliteral">&quot;vpbroadcastb&quot;</span>, xs, ns);</div>
@@ -7539,7 +7539,7 @@ Here is the caller graph for this function:</div>
 <div class="line"><span class="lineno"> 2110</span>            };</div>
 <div class="line"><span class="lineno"> 2111</span>            <span class="keywordflow">for</span> (<span class="keywordtype">size_t</span> i = 0; i &lt; <a class="code hl_define" href="bench_8cpp.html#a21ff7c588b94b603f37cc3cb3f21cb6a">NUM_OF_ARRAY</a>(<a class="code hl_variable" href="cvt__test_8cpp.html#af73a49a9258b274934a51f5b17b0d1be">tbl</a>); i++) {</div>
 <div class="line"><span class="lineno"> 2112</span>                <span class="keywordtype">char</span> xs[128], ns[128];</div>
-<div class="line"><span class="lineno"> 2113</span>                <span class="keywordtype">int</span> <a class="code hl_variable" href="namespacedevelop_build.html#ade64cd34608f9442ef3049116a2da428">v</a> = <a class="code hl_variable" href="cvt__test_8cpp.html#af73a49a9258b274934a51f5b17b0d1be">tbl</a>[i];</div>
+<div class="line"><span class="lineno"> 2113</span>                <span class="keywordtype">int</span> v = <a class="code hl_variable" href="cvt__test_8cpp.html#af73a49a9258b274934a51f5b17b0d1be">tbl</a>[i];</div>
 <div class="line"><span class="lineno"> 2114</span>                <a class="code hl_define" href="ate-pairing_2include_2cybozu_2inttype_8hpp.html#a6ff8eedb77b726a888b05c967e5d270e">CYBOZU_SNPRINTF</a>(xs, <span class="keyword">sizeof</span>(xs), <span class="stringliteral">&quot;zmm0, zmm1, ptr_b[eax%+d]&quot;</span>, v);</div>
 <div class="line"><span class="lineno"> 2115</span>                <a class="code hl_define" href="ate-pairing_2include_2cybozu_2inttype_8hpp.html#a6ff8eedb77b726a888b05c967e5d270e">CYBOZU_SNPRINTF</a>(ns, <span class="keyword">sizeof</span>(ns), <span class="stringliteral">&quot;zmm0, zmm1, [eax%+d]{1to16}&quot;</span>, v);</div>
 <div class="line"><span class="lineno"> 2116</span>                <a class="code hl_function" href="#add7b7259a4124a0a69532b2d7da2f5c9">put</a>(<span class="stringliteral">&quot;vaddps&quot;</span>, xs, ns);</div>
@@ -7549,7 +7549,6 @@ Here is the caller graph for this function:</div>
 <div class="line"><span class="lineno"> 2120</span>        <a class="code hl_function" href="#add7b7259a4124a0a69532b2d7da2f5c9">put</a>(<span class="stringliteral">&quot;vfmadd231ps&quot;</span>, <span class="stringliteral">&quot;zmm8, zmm31, ptr_b[r14+rbp-0x1e4]&quot;</span>, <span class="stringliteral">&quot;zmm8, zmm31, [r14+rbp-0x1e4]{1to16}&quot;</span>);</div>
 <div class="line"><span class="lineno"> 2121</span><span class="preprocessor">#endif</span></div>
 <div class="line"><span class="lineno"> 2122</span>    }</div>
-<div class="ttc" id="anamespacedevelop_build_html_ade64cd34608f9442ef3049116a2da428"><div class="ttname"><a href="namespacedevelop_build.html#ade64cd34608f9442ef3049116a2da428">developBuild.v</a></div><div class="ttdeci">v</div><div class="ttdef"><b>Definition</b> <a href="develop_build_8py_source.html#l00006">developBuild.py:6</a></div></div>
 </div><!-- fragment --><div class="dynheader">
 Here is the call graph for this function:</div>
 <div class="dyncontent">

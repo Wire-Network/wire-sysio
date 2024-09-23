@@ -63,7 +63,8 @@ Definition at line \mbox{\hyperlink{resource__monitor__plugin_8cpp_source_l00132
 \DoxyCodeLine{00135\ \ \ \ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -85,19 +86,19 @@ Definition at line \mbox{\hyperlink{resource__monitor__plugin_8cpp_source_l00060
 \DoxyCodeLine{00060\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
 \DoxyCodeLine{00061\ \ \ \ \ \ \ \mbox{\hyperlink{logger_8hpp_a3da1571bad6ca6c94df9a3660b2115ee}{dlog}}(\textcolor{stringliteral}{"{}plugin\_initialize"{}});}
 \DoxyCodeLine{00062\ \ \ \ }
-\DoxyCodeLine{00063\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ interval\ =\ \mbox{\hyperlink{namespacebenchmark_compile_acf738bbf3b8391aa78929ceeceb8a03b}{options}}.at(\textcolor{stringliteral}{"{}resource-\/monitor-\/interval-\/seconds"{}}).as<\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}>();}
+\DoxyCodeLine{00063\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ interval\ =\ options.at(\textcolor{stringliteral}{"{}resource-\/monitor-\/interval-\/seconds"{}}).as<\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}>();}
 \DoxyCodeLine{00064\ \ \ \ \ \ \ \mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp_a40c2826a6fba35c1ffbf912bdf559792}{SYS\_ASSERT}}(interval\ >=\ monitor\_interval\_min\ \&\&\ interval\ <=\ monitor\_interval\_max,\ chain::plugin\_config\_exception,}
 \DoxyCodeLine{00065\ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}\(\backslash\)"{}resource-\/monitor-\/interval-\/seconds\(\backslash\)"{}\ must\ be\ between\ \$\{monitor\_interval\_min\}\ and\ \$\{monitor\_interval\_max\}"{}},\ (\textcolor{stringliteral}{"{}monitor\_interval\_min"{}},\ monitor\_interval\_min)\ (\textcolor{stringliteral}{"{}monitor\_interval\_max"{}},\ monitor\_interval\_max));}
 \DoxyCodeLine{00066\ \ \ \ \ \ \ space\_handler.\mbox{\hyperlink{classsysio_1_1resource__monitor_1_1file__space__handler_af1ad683111aac7f94733e3866db0149e}{set\_sleep\_time}}(interval);}
 \DoxyCodeLine{00067\ \ \ \ \ \ \ \mbox{\hyperlink{logger_8hpp_a831cf08dc63704c11fd154132c6e8bdb}{ilog}}(\textcolor{stringliteral}{"{}Monitoring\ interval\ set\ to\ \$\{interval\}"{}},\ (\textcolor{stringliteral}{"{}interval"{}},\ interval));}
 \DoxyCodeLine{00068\ \ \ \ }
-\DoxyCodeLine{00069\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ threshold\ =\ \mbox{\hyperlink{namespacebenchmark_compile_acf738bbf3b8391aa78929ceeceb8a03b}{options}}.at(\textcolor{stringliteral}{"{}resource-\/monitor-\/space-\/threshold"{}}).as<\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}>();}
+\DoxyCodeLine{00069\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ threshold\ =\ options.at(\textcolor{stringliteral}{"{}resource-\/monitor-\/space-\/threshold"{}}).as<\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}>();}
 \DoxyCodeLine{00070\ \ \ \ \ \ \ \mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp_a40c2826a6fba35c1ffbf912bdf559792}{SYS\_ASSERT}}(threshold\ >=\ space\_threshold\_min\ \ \&\&\ threshold\ <=\ space\_threshold\_max,\ chain::plugin\_config\_exception,}
 \DoxyCodeLine{00071\ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}\(\backslash\)"{}resource-\/monitor-\/space-\/threshold\(\backslash\)"{}\ must\ be\ between\ \$\{space\_threshold\_min\}\ and\ \$\{space\_threshold\_max\}"{}},\ (\textcolor{stringliteral}{"{}space\_threshold\_min"{}},\ space\_threshold\_min)\ (\textcolor{stringliteral}{"{}space\_threshold\_max"{}},\ space\_threshold\_max));}
 \DoxyCodeLine{00072\ \ \ \ \ \ \ space\_handler.\mbox{\hyperlink{classsysio_1_1resource__monitor_1_1file__space__handler_a51eaff9443b1a88e06cbbd1344a78071}{set\_threshold}}(threshold,\ threshold\ -\/\ space\_threshold\_warning\_diff);}
 \DoxyCodeLine{00073\ \ \ \ \ \ \ \mbox{\hyperlink{logger_8hpp_a831cf08dc63704c11fd154132c6e8bdb}{ilog}}(\textcolor{stringliteral}{"{}Space\ usage\ threshold\ set\ to\ \$\{threshold\}"{}},\ (\textcolor{stringliteral}{"{}threshold"{}},\ threshold));}
 \DoxyCodeLine{00074\ \ \ \ }
-\DoxyCodeLine{00075\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{namespacebenchmark_compile_acf738bbf3b8391aa78929ceeceb8a03b}{options}}.count(\textcolor{stringliteral}{"{}resource-\/monitor-\/not-\/shutdown-\/on-\/threshold-\/exceeded"{}}))\ \{}
+\DoxyCodeLine{00075\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (options.count(\textcolor{stringliteral}{"{}resource-\/monitor-\/not-\/shutdown-\/on-\/threshold-\/exceeded"{}}))\ \{}
 \DoxyCodeLine{00076\ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ If\ set,\ not\ shutdown}}
 \DoxyCodeLine{00077\ \ \ \ \ \ \ \ \ \ space\_handler.\mbox{\hyperlink{classsysio_1_1resource__monitor_1_1file__space__handler_ac0f510cb0298b9cefe68102772fc5db7}{set\_shutdown\_on\_exceeded}}(\textcolor{keyword}{false});}
 \DoxyCodeLine{00078\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{logger_8hpp_a831cf08dc63704c11fd154132c6e8bdb}{ilog}}(\textcolor{stringliteral}{"{}Shutdown\ flag\ when\ threshold\ exceeded\ set\ to\ false"{}});}
@@ -107,7 +108,7 @@ Definition at line \mbox{\hyperlink{resource__monitor__plugin_8cpp_source_l00060
 \DoxyCodeLine{00082\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{logger_8hpp_a831cf08dc63704c11fd154132c6e8bdb}{ilog}}(\textcolor{stringliteral}{"{}Shutdown\ flag\ when\ threshold\ exceeded\ set\ to\ true"{}});}
 \DoxyCodeLine{00083\ \ \ \ \ \ \ \}}
 \DoxyCodeLine{00084\ }
-\DoxyCodeLine{00085\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ warning\_interval\ =\ \mbox{\hyperlink{namespacebenchmark_compile_acf738bbf3b8391aa78929ceeceb8a03b}{options}}.at(\textcolor{stringliteral}{"{}resource-\/monitor-\/warning-\/interval"{}}).as<\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}>();}
+\DoxyCodeLine{00085\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ warning\_interval\ =\ options.at(\textcolor{stringliteral}{"{}resource-\/monitor-\/warning-\/interval"{}}).as<\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}>();}
 \DoxyCodeLine{00086\ \ \ \ \ \ \ \mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp_a40c2826a6fba35c1ffbf912bdf559792}{SYS\_ASSERT}}(warning\_interval\ >=\ warning\_interval\_min\ \&\&\ warning\_interval\ <=\ warning\_interval\_max,\ chain::plugin\_config\_exception,}
 \DoxyCodeLine{00087\ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}\(\backslash\)"{}resource-\/monitor-\/warning-\/interval\(\backslash\)"{}\ must\ be\ between\ \$\{warning\_interval\_min\}\ and\ \$\{warning\_interval\_max\}"{}},\ (\textcolor{stringliteral}{"{}warning\_interval\_min"{}},\ warning\_interval\_min)\ (\textcolor{stringliteral}{"{}warning\_interval\_max"{}},\ warning\_interval\_max));}
 \DoxyCodeLine{00088\ \ \ \ \ \ \ space\_handler.\mbox{\hyperlink{classsysio_1_1resource__monitor_1_1file__space__handler_a5465fcb7ca6562cdb3622c5ef09b29a9}{set\_warning\_interval}}(warning\_interval);}
@@ -115,7 +116,8 @@ Definition at line \mbox{\hyperlink{resource__monitor__plugin_8cpp_source_l00060
 \DoxyCodeLine{00090\ \ \ \ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -186,7 +188,8 @@ Definition at line \mbox{\hyperlink{resource__monitor__plugin_8cpp_source_l00093
 \DoxyCodeLine{00118\ \ \ \ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode

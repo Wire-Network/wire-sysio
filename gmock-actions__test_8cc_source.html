@@ -656,15 +656,15 @@ $(function(){initNavTree('gmock-actions__test_8cc_source.html',''); initResizabl
 <div class="line"><a id="l00555" name="l00555"></a><span class="lineno">  555</span><span class="comment">// Test struct which wraps a vector of integers. Used in</span></div>
 <div class="line"><a id="l00556" name="l00556"></a><span class="lineno">  556</span><span class="comment">// &#39;SupportsWrapperReturnType&#39; test.</span></div>
 <div class="line"><a id="l00557" name="l00557"></a><span class="lineno">  557</span><span class="keyword">struct </span>IntegerVectorWrapper {</div>
-<div class="line"><a id="l00558" name="l00558"></a><span class="lineno">  558</span>  std::vector&lt;int&gt; * <a class="code hl_variable" href="namespacedevelop_build.html#ade64cd34608f9442ef3049116a2da428">v</a>;</div>
-<div class="line"><a id="l00559" name="l00559"></a><span class="lineno">  559</span>  IntegerVectorWrapper(std::vector&lt;int&gt;&amp; _v) : <a class="code hl_variable" href="namespacedevelop_build.html#ade64cd34608f9442ef3049116a2da428">v</a>(&amp;_v) {}  <span class="comment">// NOLINT</span></div>
+<div class="line"><a id="l00558" name="l00558"></a><span class="lineno">  558</span>  std::vector&lt;int&gt; * v;</div>
+<div class="line"><a id="l00559" name="l00559"></a><span class="lineno">  559</span>  IntegerVectorWrapper(std::vector&lt;int&gt;&amp; _v) : v(&amp;_v) {}  <span class="comment">// NOLINT</span></div>
 <div class="line"><a id="l00560" name="l00560"></a><span class="lineno">  560</span>};</div>
 <div class="line"><a id="l00561" name="l00561"></a><span class="lineno">  561</span> </div>
 <div class="line"><a id="l00562" name="l00562"></a><span class="lineno">  562</span><span class="comment">// Tests that Return() works when return type is a wrapper type.</span></div>
 <div class="line"><a id="l00563" name="l00563"></a><span class="lineno">  563</span><a class="code hl_define" href="gtest_8h.html#ad8b332753515c0ab8baada563c2547eb">TEST</a>(ReturnTest, SupportsWrapperReturnType) {</div>
 <div class="line"><a id="l00564" name="l00564"></a><span class="lineno">  564</span>  <span class="comment">// Initialize vector of integers.</span></div>
-<div class="line"><a id="l00565" name="l00565"></a><span class="lineno">  565</span>  std::vector&lt;int&gt; <a class="code hl_variable" href="namespacedevelop_build.html#ade64cd34608f9442ef3049116a2da428">v</a>;</div>
-<div class="line"><a id="l00566" name="l00566"></a><span class="lineno">  566</span>  <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i = 0; i &lt; 5; ++i) <a class="code hl_variable" href="namespacedevelop_build.html#ade64cd34608f9442ef3049116a2da428">v</a>.push_back(i);</div>
+<div class="line"><a id="l00565" name="l00565"></a><span class="lineno">  565</span>  std::vector&lt;int&gt; v;</div>
+<div class="line"><a id="l00566" name="l00566"></a><span class="lineno">  566</span>  <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i = 0; i &lt; 5; ++i) v.push_back(i);</div>
 <div class="line"><a id="l00567" name="l00567"></a><span class="lineno">  567</span> </div>
 <div class="line"><a id="l00568" name="l00568"></a><span class="lineno">  568</span>  <span class="comment">// Return() called with &#39;v&#39; as argument. The Action will return the same data</span></div>
 <div class="line"><a id="l00569" name="l00569"></a><span class="lineno">  569</span>  <span class="comment">// as &#39;v&#39; (copy) but it will be wrapped in an IntegerVectorWrapper.</span></div>
@@ -1013,7 +1013,7 @@ $(function(){initNavTree('gmock-actions__test_8cc_source.html',''); initResizabl
 <div class="line"><a id="l00912" name="l00912"></a><span class="lineno">  912</span>  <span class="comment">// action.</span></div>
 <div class="line"><a id="l00913" name="l00913"></a><span class="lineno">  913</span>  <span class="keyword">delete</span> msg;</div>
 <div class="line"><a id="l00914" name="l00914"></a><span class="lineno">  914</span> </div>
-<div class="line"><a id="l00915" name="l00915"></a><span class="lineno">  915</span>  TestMessage <a class="code hl_variable" href="namespaceupload.html#a770d9c7b49b1fede80de6078d5e49af7">dest</a>;</div>
+<div class="line"><a id="l00915" name="l00915"></a><span class="lineno">  915</span>  TestMessage dest;</div>
 <div class="line"><a id="l00916" name="l00916"></a><span class="lineno">  916</span>  <a class="code hl_define" href="gtest_8h.html#aeb6c7ae89f440c90c1a1815951c836da">EXPECT_FALSE</a>(orig_msg.Equals(dest));</div>
 <div class="line"><a id="l00917" name="l00917"></a><span class="lineno">  917</span>  <a class="code hl_variable" href="pointer_8h.html#aeeddce917cf130d62c370b8f216026dd">a</a>.Perform(make_tuple(<span class="keyword">true</span>, &amp;dest));</div>
 <div class="line"><a id="l00918" name="l00918"></a><span class="lineno">  918</span>  <a class="code hl_define" href="gtest_8h.html#ac33e7cdfb5d44a7a0f0ab552eb5c3c6a">EXPECT_TRUE</a>(orig_msg.Equals(dest));</div>
@@ -1035,8 +1035,8 @@ $(function(){initNavTree('gmock-actions__test_8cc_source.html',''); initResizabl
 <div class="line"><a id="l00934" name="l00934"></a><span class="lineno">  934</span>  <span class="comment">// action.</span></div>
 <div class="line"><a id="l00935" name="l00935"></a><span class="lineno">  935</span>  <span class="keyword">delete</span> msg;</div>
 <div class="line"><a id="l00936" name="l00936"></a><span class="lineno">  936</span> </div>
-<div class="line"><a id="l00937" name="l00937"></a><span class="lineno">  937</span>  TestMessage <a class="code hl_variable" href="namespaceupload.html#a770d9c7b49b1fede80de6078d5e49af7">dest</a>;</div>
-<div class="line"><a id="l00938" name="l00938"></a><span class="lineno">  938</span>  ::ProtocolMessage* <span class="keyword">const</span> dest_base = &amp;<a class="code hl_variable" href="namespaceupload.html#a770d9c7b49b1fede80de6078d5e49af7">dest</a>;</div>
+<div class="line"><a id="l00937" name="l00937"></a><span class="lineno">  937</span>  TestMessage dest;</div>
+<div class="line"><a id="l00938" name="l00938"></a><span class="lineno">  938</span>  ::ProtocolMessage* <span class="keyword">const</span> dest_base = &amp;dest;</div>
 <div class="line"><a id="l00939" name="l00939"></a><span class="lineno">  939</span>  <a class="code hl_define" href="gtest_8h.html#aeb6c7ae89f440c90c1a1815951c836da">EXPECT_FALSE</a>(orig_msg.Equals(dest));</div>
 <div class="line"><a id="l00940" name="l00940"></a><span class="lineno">  940</span>  <a class="code hl_variable" href="pointer_8h.html#aeeddce917cf130d62c370b8f216026dd">a</a>.Perform(make_tuple(<span class="keyword">true</span>, dest_base));</div>
 <div class="line"><a id="l00941" name="l00941"></a><span class="lineno">  941</span>  <a class="code hl_define" href="gtest_8h.html#ac33e7cdfb5d44a7a0f0ab552eb5c3c6a">EXPECT_TRUE</a>(orig_msg.Equals(dest));</div>
@@ -1060,11 +1060,11 @@ $(function(){initNavTree('gmock-actions__test_8cc_source.html',''); initResizabl
 <div class="line"><a id="l00959" name="l00959"></a><span class="lineno">  959</span>  <span class="comment">// before using the action.</span></div>
 <div class="line"><a id="l00960" name="l00960"></a><span class="lineno">  960</span>  <span class="keyword">delete</span> msg;</div>
 <div class="line"><a id="l00961" name="l00961"></a><span class="lineno">  961</span> </div>
-<div class="line"><a id="l00962" name="l00962"></a><span class="lineno">  962</span>  FooMessage <a class="code hl_variable" href="namespaceupload.html#a770d9c7b49b1fede80de6078d5e49af7">dest</a>;</div>
-<div class="line"><a id="l00963" name="l00963"></a><span class="lineno">  963</span>  <a class="code hl_variable" href="namespaceupload.html#a770d9c7b49b1fede80de6078d5e49af7">dest</a>.set_int_field(0);</div>
+<div class="line"><a id="l00962" name="l00962"></a><span class="lineno">  962</span>  FooMessage dest;</div>
+<div class="line"><a id="l00963" name="l00963"></a><span class="lineno">  963</span>  dest.set_int_field(0);</div>
 <div class="line"><a id="l00964" name="l00964"></a><span class="lineno">  964</span>  <a class="code hl_variable" href="pointer_8h.html#aeeddce917cf130d62c370b8f216026dd">a</a>.Perform(make_tuple(<span class="keyword">true</span>, &amp;dest));</div>
-<div class="line"><a id="l00965" name="l00965"></a><span class="lineno">  965</span>  <a class="code hl_define" href="gtest_8h.html#a4159019abda84f5366acdb7604ff220a">EXPECT_EQ</a>(2, <a class="code hl_variable" href="namespaceupload.html#a770d9c7b49b1fede80de6078d5e49af7">dest</a>.int_field());</div>
-<div class="line"><a id="l00966" name="l00966"></a><span class="lineno">  966</span>  <a class="code hl_define" href="gtest_8h.html#a4159019abda84f5366acdb7604ff220a">EXPECT_EQ</a>(<span class="stringliteral">&quot;hi&quot;</span>, <a class="code hl_variable" href="namespaceupload.html#a770d9c7b49b1fede80de6078d5e49af7">dest</a>.string_field());</div>
+<div class="line"><a id="l00965" name="l00965"></a><span class="lineno">  965</span>  <a class="code hl_define" href="gtest_8h.html#a4159019abda84f5366acdb7604ff220a">EXPECT_EQ</a>(2, dest.int_field());</div>
+<div class="line"><a id="l00966" name="l00966"></a><span class="lineno">  966</span>  <a class="code hl_define" href="gtest_8h.html#a4159019abda84f5366acdb7604ff220a">EXPECT_EQ</a>(<span class="stringliteral">&quot;hi&quot;</span>, dest.string_field());</div>
 <div class="line"><a id="l00967" name="l00967"></a><span class="lineno">  967</span>}</div>
 <div class="line"><a id="l00968" name="l00968"></a><span class="lineno">  968</span> </div>
 <div class="line"><a id="l00969" name="l00969"></a><span class="lineno">  969</span><span class="comment">// Tests that SetArgPointee&lt;N&gt;(proto2_buffer) sets the</span></div>
@@ -1085,12 +1085,12 @@ $(function(){initNavTree('gmock-actions__test_8cc_source.html',''); initResizabl
 <div class="line"><a id="l00984" name="l00984"></a><span class="lineno">  984</span>  <span class="comment">// before using the action.</span></div>
 <div class="line"><a id="l00985" name="l00985"></a><span class="lineno">  985</span>  <span class="keyword">delete</span> msg;</div>
 <div class="line"><a id="l00986" name="l00986"></a><span class="lineno">  986</span> </div>
-<div class="line"><a id="l00987" name="l00987"></a><span class="lineno">  987</span>  FooMessage <a class="code hl_variable" href="namespaceupload.html#a770d9c7b49b1fede80de6078d5e49af7">dest</a>;</div>
-<div class="line"><a id="l00988" name="l00988"></a><span class="lineno">  988</span>  <a class="code hl_variable" href="namespaceupload.html#a770d9c7b49b1fede80de6078d5e49af7">dest</a>.set_int_field(0);</div>
-<div class="line"><a id="l00989" name="l00989"></a><span class="lineno">  989</span>  ::proto2::Message* <span class="keyword">const</span> dest_base = &amp;<a class="code hl_variable" href="namespaceupload.html#a770d9c7b49b1fede80de6078d5e49af7">dest</a>;</div>
+<div class="line"><a id="l00987" name="l00987"></a><span class="lineno">  987</span>  FooMessage dest;</div>
+<div class="line"><a id="l00988" name="l00988"></a><span class="lineno">  988</span>  dest.set_int_field(0);</div>
+<div class="line"><a id="l00989" name="l00989"></a><span class="lineno">  989</span>  ::proto2::Message* <span class="keyword">const</span> dest_base = &amp;dest;</div>
 <div class="line"><a id="l00990" name="l00990"></a><span class="lineno">  990</span>  <a class="code hl_variable" href="pointer_8h.html#aeeddce917cf130d62c370b8f216026dd">a</a>.Perform(make_tuple(<span class="keyword">true</span>, dest_base));</div>
-<div class="line"><a id="l00991" name="l00991"></a><span class="lineno">  991</span>  <a class="code hl_define" href="gtest_8h.html#a4159019abda84f5366acdb7604ff220a">EXPECT_EQ</a>(2, <a class="code hl_variable" href="namespaceupload.html#a770d9c7b49b1fede80de6078d5e49af7">dest</a>.int_field());</div>
-<div class="line"><a id="l00992" name="l00992"></a><span class="lineno">  992</span>  <a class="code hl_define" href="gtest_8h.html#a4159019abda84f5366acdb7604ff220a">EXPECT_EQ</a>(<span class="stringliteral">&quot;hi&quot;</span>, <a class="code hl_variable" href="namespaceupload.html#a770d9c7b49b1fede80de6078d5e49af7">dest</a>.string_field());</div>
+<div class="line"><a id="l00991" name="l00991"></a><span class="lineno">  991</span>  <a class="code hl_define" href="gtest_8h.html#a4159019abda84f5366acdb7604ff220a">EXPECT_EQ</a>(2, dest.int_field());</div>
+<div class="line"><a id="l00992" name="l00992"></a><span class="lineno">  992</span>  <a class="code hl_define" href="gtest_8h.html#a4159019abda84f5366acdb7604ff220a">EXPECT_EQ</a>(<span class="stringliteral">&quot;hi&quot;</span>, dest.string_field());</div>
 <div class="line"><a id="l00993" name="l00993"></a><span class="lineno">  993</span>}</div>
 <div class="line"><a id="l00994" name="l00994"></a><span class="lineno">  994</span> </div>
 <div class="line"><a id="l00995" name="l00995"></a><span class="lineno">  995</span><span class="preprocessor">#endif  </span><span class="comment">// GTEST_HAS_PROTOBUF_</span></div>
@@ -1132,7 +1132,7 @@ $(function(){initNavTree('gmock-actions__test_8cc_source.html',''); initResizabl
 <div class="line"><a id="l01031" name="l01031"></a><span class="lineno"> 1031</span>  <span class="comment">// action.</span></div>
 <div class="line"><a id="l01032" name="l01032"></a><span class="lineno"> 1032</span>  <span class="keyword">delete</span> msg;</div>
 <div class="line"><a id="l01033" name="l01033"></a><span class="lineno"> 1033</span> </div>
-<div class="line"><a id="l01034" name="l01034"></a><span class="lineno"> 1034</span>  TestMessage <a class="code hl_variable" href="namespaceupload.html#a770d9c7b49b1fede80de6078d5e49af7">dest</a>;</div>
+<div class="line"><a id="l01034" name="l01034"></a><span class="lineno"> 1034</span>  TestMessage dest;</div>
 <div class="line"><a id="l01035" name="l01035"></a><span class="lineno"> 1035</span>  <a class="code hl_define" href="gtest_8h.html#aeb6c7ae89f440c90c1a1815951c836da">EXPECT_FALSE</a>(orig_msg.Equals(dest));</div>
 <div class="line"><a id="l01036" name="l01036"></a><span class="lineno"> 1036</span>  <a class="code hl_variable" href="pointer_8h.html#aeeddce917cf130d62c370b8f216026dd">a</a>.Perform(make_tuple(<span class="keyword">true</span>, &amp;dest));</div>
 <div class="line"><a id="l01037" name="l01037"></a><span class="lineno"> 1037</span>  <a class="code hl_define" href="gtest_8h.html#ac33e7cdfb5d44a7a0f0ab552eb5c3c6a">EXPECT_TRUE</a>(orig_msg.Equals(dest));</div>
@@ -1154,8 +1154,8 @@ $(function(){initNavTree('gmock-actions__test_8cc_source.html',''); initResizabl
 <div class="line"><a id="l01053" name="l01053"></a><span class="lineno"> 1053</span>  <span class="comment">// action.</span></div>
 <div class="line"><a id="l01054" name="l01054"></a><span class="lineno"> 1054</span>  <span class="keyword">delete</span> msg;</div>
 <div class="line"><a id="l01055" name="l01055"></a><span class="lineno"> 1055</span> </div>
-<div class="line"><a id="l01056" name="l01056"></a><span class="lineno"> 1056</span>  TestMessage <a class="code hl_variable" href="namespaceupload.html#a770d9c7b49b1fede80de6078d5e49af7">dest</a>;</div>
-<div class="line"><a id="l01057" name="l01057"></a><span class="lineno"> 1057</span>  ::ProtocolMessage* <span class="keyword">const</span> dest_base = &amp;<a class="code hl_variable" href="namespaceupload.html#a770d9c7b49b1fede80de6078d5e49af7">dest</a>;</div>
+<div class="line"><a id="l01056" name="l01056"></a><span class="lineno"> 1056</span>  TestMessage dest;</div>
+<div class="line"><a id="l01057" name="l01057"></a><span class="lineno"> 1057</span>  ::ProtocolMessage* <span class="keyword">const</span> dest_base = &amp;dest;</div>
 <div class="line"><a id="l01058" name="l01058"></a><span class="lineno"> 1058</span>  <a class="code hl_define" href="gtest_8h.html#aeb6c7ae89f440c90c1a1815951c836da">EXPECT_FALSE</a>(orig_msg.Equals(dest));</div>
 <div class="line"><a id="l01059" name="l01059"></a><span class="lineno"> 1059</span>  <a class="code hl_variable" href="pointer_8h.html#aeeddce917cf130d62c370b8f216026dd">a</a>.Perform(make_tuple(<span class="keyword">true</span>, dest_base));</div>
 <div class="line"><a id="l01060" name="l01060"></a><span class="lineno"> 1060</span>  <a class="code hl_define" href="gtest_8h.html#ac33e7cdfb5d44a7a0f0ab552eb5c3c6a">EXPECT_TRUE</a>(orig_msg.Equals(dest));</div>
@@ -1179,11 +1179,11 @@ $(function(){initNavTree('gmock-actions__test_8cc_source.html',''); initResizabl
 <div class="line"><a id="l01078" name="l01078"></a><span class="lineno"> 1078</span>  <span class="comment">// before using the action.</span></div>
 <div class="line"><a id="l01079" name="l01079"></a><span class="lineno"> 1079</span>  <span class="keyword">delete</span> msg;</div>
 <div class="line"><a id="l01080" name="l01080"></a><span class="lineno"> 1080</span> </div>
-<div class="line"><a id="l01081" name="l01081"></a><span class="lineno"> 1081</span>  FooMessage <a class="code hl_variable" href="namespaceupload.html#a770d9c7b49b1fede80de6078d5e49af7">dest</a>;</div>
-<div class="line"><a id="l01082" name="l01082"></a><span class="lineno"> 1082</span>  <a class="code hl_variable" href="namespaceupload.html#a770d9c7b49b1fede80de6078d5e49af7">dest</a>.set_int_field(0);</div>
+<div class="line"><a id="l01081" name="l01081"></a><span class="lineno"> 1081</span>  FooMessage dest;</div>
+<div class="line"><a id="l01082" name="l01082"></a><span class="lineno"> 1082</span>  dest.set_int_field(0);</div>
 <div class="line"><a id="l01083" name="l01083"></a><span class="lineno"> 1083</span>  <a class="code hl_variable" href="pointer_8h.html#aeeddce917cf130d62c370b8f216026dd">a</a>.Perform(make_tuple(<span class="keyword">true</span>, &amp;dest));</div>
-<div class="line"><a id="l01084" name="l01084"></a><span class="lineno"> 1084</span>  <a class="code hl_define" href="gtest_8h.html#a4159019abda84f5366acdb7604ff220a">EXPECT_EQ</a>(2, <a class="code hl_variable" href="namespaceupload.html#a770d9c7b49b1fede80de6078d5e49af7">dest</a>.int_field());</div>
-<div class="line"><a id="l01085" name="l01085"></a><span class="lineno"> 1085</span>  <a class="code hl_define" href="gtest_8h.html#a4159019abda84f5366acdb7604ff220a">EXPECT_EQ</a>(<span class="stringliteral">&quot;hi&quot;</span>, <a class="code hl_variable" href="namespaceupload.html#a770d9c7b49b1fede80de6078d5e49af7">dest</a>.string_field());</div>
+<div class="line"><a id="l01084" name="l01084"></a><span class="lineno"> 1084</span>  <a class="code hl_define" href="gtest_8h.html#a4159019abda84f5366acdb7604ff220a">EXPECT_EQ</a>(2, dest.int_field());</div>
+<div class="line"><a id="l01085" name="l01085"></a><span class="lineno"> 1085</span>  <a class="code hl_define" href="gtest_8h.html#a4159019abda84f5366acdb7604ff220a">EXPECT_EQ</a>(<span class="stringliteral">&quot;hi&quot;</span>, dest.string_field());</div>
 <div class="line"><a id="l01086" name="l01086"></a><span class="lineno"> 1086</span>}</div>
 <div class="line"><a id="l01087" name="l01087"></a><span class="lineno"> 1087</span> </div>
 <div class="line"><a id="l01088" name="l01088"></a><span class="lineno"> 1088</span><span class="comment">// Tests that SetArgumentPointee&lt;N&gt;(proto2_buffer) sets the</span></div>
@@ -1204,12 +1204,12 @@ $(function(){initNavTree('gmock-actions__test_8cc_source.html',''); initResizabl
 <div class="line"><a id="l01103" name="l01103"></a><span class="lineno"> 1103</span>  <span class="comment">// before using the action.</span></div>
 <div class="line"><a id="l01104" name="l01104"></a><span class="lineno"> 1104</span>  <span class="keyword">delete</span> msg;</div>
 <div class="line"><a id="l01105" name="l01105"></a><span class="lineno"> 1105</span> </div>
-<div class="line"><a id="l01106" name="l01106"></a><span class="lineno"> 1106</span>  FooMessage <a class="code hl_variable" href="namespaceupload.html#a770d9c7b49b1fede80de6078d5e49af7">dest</a>;</div>
-<div class="line"><a id="l01107" name="l01107"></a><span class="lineno"> 1107</span>  <a class="code hl_variable" href="namespaceupload.html#a770d9c7b49b1fede80de6078d5e49af7">dest</a>.set_int_field(0);</div>
-<div class="line"><a id="l01108" name="l01108"></a><span class="lineno"> 1108</span>  ::proto2::Message* <span class="keyword">const</span> dest_base = &amp;<a class="code hl_variable" href="namespaceupload.html#a770d9c7b49b1fede80de6078d5e49af7">dest</a>;</div>
+<div class="line"><a id="l01106" name="l01106"></a><span class="lineno"> 1106</span>  FooMessage dest;</div>
+<div class="line"><a id="l01107" name="l01107"></a><span class="lineno"> 1107</span>  dest.set_int_field(0);</div>
+<div class="line"><a id="l01108" name="l01108"></a><span class="lineno"> 1108</span>  ::proto2::Message* <span class="keyword">const</span> dest_base = &amp;dest;</div>
 <div class="line"><a id="l01109" name="l01109"></a><span class="lineno"> 1109</span>  <a class="code hl_variable" href="pointer_8h.html#aeeddce917cf130d62c370b8f216026dd">a</a>.Perform(make_tuple(<span class="keyword">true</span>, dest_base));</div>
-<div class="line"><a id="l01110" name="l01110"></a><span class="lineno"> 1110</span>  <a class="code hl_define" href="gtest_8h.html#a4159019abda84f5366acdb7604ff220a">EXPECT_EQ</a>(2, <a class="code hl_variable" href="namespaceupload.html#a770d9c7b49b1fede80de6078d5e49af7">dest</a>.int_field());</div>
-<div class="line"><a id="l01111" name="l01111"></a><span class="lineno"> 1111</span>  <a class="code hl_define" href="gtest_8h.html#a4159019abda84f5366acdb7604ff220a">EXPECT_EQ</a>(<span class="stringliteral">&quot;hi&quot;</span>, <a class="code hl_variable" href="namespaceupload.html#a770d9c7b49b1fede80de6078d5e49af7">dest</a>.string_field());</div>
+<div class="line"><a id="l01110" name="l01110"></a><span class="lineno"> 1110</span>  <a class="code hl_define" href="gtest_8h.html#a4159019abda84f5366acdb7604ff220a">EXPECT_EQ</a>(2, dest.int_field());</div>
+<div class="line"><a id="l01111" name="l01111"></a><span class="lineno"> 1111</span>  <a class="code hl_define" href="gtest_8h.html#a4159019abda84f5366acdb7604ff220a">EXPECT_EQ</a>(<span class="stringliteral">&quot;hi&quot;</span>, dest.string_field());</div>
 <div class="line"><a id="l01112" name="l01112"></a><span class="lineno"> 1112</span>}</div>
 <div class="line"><a id="l01113" name="l01113"></a><span class="lineno"> 1113</span> </div>
 <div class="line"><a id="l01114" name="l01114"></a><span class="lineno"> 1114</span><span class="preprocessor">#endif  </span><span class="comment">// GTEST_HAS_PROTOBUF_</span></div>
@@ -1714,7 +1714,6 @@ $(function(){initNavTree('gmock-actions__test_8cc_source.html',''); initResizabl
 <div class="ttc" id="anamespace_c_l_i_1_1detail_html_a01c35a876e2917ffdc1ee618e0c06619"><div class="ttname"><a href="namespace_c_l_i_1_1detail.html#a01c35a876e2917ffdc1ee618e0c06619">CLI::detail::dummy</a></div><div class="ttdeci">constexpr enabler dummy</div><div class="ttdoc">An instance to use in EnableIf.</div><div class="ttdef"><b>Definition</b> <a href="_c_l_i11_8hpp_source.html#l00856">CLI11.hpp:856</a></div></div>
 <div class="ttc" id="anamespace_c_l_i_1_1detail_html_ab4542375c903302c3876ce0403d55596"><div class="ttname"><a href="namespace_c_l_i_1_1detail.html#ab4542375c903302c3876ce0403d55596">CLI::detail::str</a></div><div class="ttdeci">return str</div><div class="ttdef"><b>Definition</b> <a href="_c_l_i11_8hpp_source.html#l01359">CLI11.hpp:1359</a></div></div>
 <div class="ttc" id="anamespace_xbyak_1_1util_html_a36c093c7b6cc66981a18fcbfebc2a225"><div class="ttname"><a href="namespace_xbyak_1_1util.html#a36c093c7b6cc66981a18fcbfebc2a225">Xbyak::util::ch</a></div><div class="ttdeci">static const Reg8 ch(Operand::CH)</div></div>
-<div class="ttc" id="anamespacedevelop_build_html_ade64cd34608f9442ef3049116a2da428"><div class="ttname"><a href="namespacedevelop_build.html#ade64cd34608f9442ef3049116a2da428">developBuild.v</a></div><div class="ttdeci">v</div><div class="ttdef"><b>Definition</b> <a href="develop_build_8py_source.html#l00006">developBuild.py:6</a></div></div>
 <div class="ttc" id="anamespacefc_html_ab199a7c94624123911206db59ebe45da"><div class="ttname"><a href="namespacefc.html#ab199a7c94624123911206db59ebe45da">fc::y</a></div><div class="ttdeci">uint64_t y</div><div class="ttdef"><b>Definition</b> <a href="sha3_8cpp_source.html#l00034">sha3.cpp:34</a></div></div>
 <div class="ttc" id="anamespacefoo_html"><div class="ttname"><a href="namespacefoo.html">foo</a></div><div class="ttdef"><b>Definition</b> <a href="gtest-printers__test_8cc_source.html#l00126">gtest-printers_test.cc:126</a></div></div>
 <div class="ttc" id="anamespacetesting_1_1gmock__generated__actions__test_html_a5f828d39e27f0615498d5aa31c96916e"><div class="ttname"><a href="namespacetesting_1_1gmock__generated__actions__test.html#a5f828d39e27f0615498d5aa31c96916e">testing::gmock_generated_actions_test::g_done</a></div><div class="ttdeci">bool g_done</div><div class="ttdef"><b>Definition</b> <a href="gmock-generated-actions__test_8cc_source.html#l00078">gmock-generated-actions_test.cc:78</a></div></div>
@@ -1748,7 +1747,6 @@ $(function(){initNavTree('gmock-actions__test_8cc_source.html',''); initResizabl
 <div class="ttc" id="anamespacetesting_html_ae041df61ff61ccb9753ba15b4309e1a6"><div class="ttname"><a href="namespacetesting.html#ae041df61ff61ccb9753ba15b4309e1a6">testing::DoDefault</a></div><div class="ttdeci">internal::DoDefaultAction DoDefault()</div><div class="ttdef"><b>Definition</b> <a href="gmock-actions_8h_source.html#l01156">gmock-actions.h:1156</a></div></div>
 <div class="ttc" id="anamespacetesting_html_af05e07c0484961f2a30ba44d1d1816fe"><div class="ttname"><a href="namespacetesting.html#af05e07c0484961f2a30ba44d1d1816fe">testing::ReturnNull</a></div><div class="ttdeci">PolymorphicAction&lt; internal::ReturnNullAction &gt; ReturnNull()</div><div class="ttdef"><b>Definition</b> <a href="gmock-actions_8h_source.html#l01123">gmock-actions.h:1123</a></div></div>
 <div class="ttc" id="anamespacetesting_html_af21d760823080bb69a4bc1718f90d5a8"><div class="ttname"><a href="namespacetesting.html#af21d760823080bb69a4bc1718f90d5a8">testing::Pointee</a></div><div class="ttdeci">internal::PointeeMatcher&lt; InnerMatcher &gt; Pointee(const InnerMatcher &amp;inner_matcher)</div><div class="ttdef"><b>Definition</b> <a href="gmock-matchers_8h_source.html#l04437">gmock-matchers.h:4437</a></div></div>
-<div class="ttc" id="anamespaceupload_html_a770d9c7b49b1fede80de6078d5e49af7"><div class="ttname"><a href="namespaceupload.html#a770d9c7b49b1fede80de6078d5e49af7">upload.dest</a></div><div class="ttdeci">dest</div><div class="ttdef"><b>Definition</b> <a href="googlemock_2scripts_2upload_8py_source.html#l00394">upload.py:394</a></div></div>
 <div class="ttc" id="apkcs11_8h_html_a32aff7c6c4cd253fdf6563677afab5ce"><div class="ttname"><a href="pkcs11_8h.html#a32aff7c6c4cd253fdf6563677afab5ce">value</a></div><div class="ttdeci">#define value</div><div class="ttdef"><b>Definition</b> <a href="pkcs11_8h_source.html#l00157">pkcs11.h:157</a></div></div>
 <div class="ttc" id="apointer_8h_html_aeeddce917cf130d62c370b8f216026dd"><div class="ttname"><a href="pointer_8h.html#aeeddce917cf130d62c370b8f216026dd">a</a></div><div class="ttdeci">const GenericPointer&lt; typename T::ValueType &gt; T2 T::AllocatorType &amp; a</div><div class="ttdef"><b>Definition</b> <a href="pointer_8h_source.html#l01181">pointer.h:1181</a></div></div>
 <div class="ttc" id="aprettywritertest_8cpp_html_a6283df8c4e365cc8a01727e2d7ad44bf"><div class="ttname"><a href="prettywritertest_8cpp.html#a6283df8c4e365cc8a01727e2d7ad44bf">T</a></div><div class="ttdeci">#define T(meth, val, expected)</div></div>

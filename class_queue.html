@@ -250,12 +250,12 @@ template&lt;typename E &gt; </div>
 <div class="line"><span class="lineno">   84</span>    <span class="keywordflow">if</span> (size_ &gt; 0) {</div>
 <div class="line"><span class="lineno">   85</span>      <span class="comment">// 1. Deletes every node.</span></div>
 <div class="line"><span class="lineno">   86</span>      <a class="code hl_class" href="class_queue_node.html">QueueNode&lt;E&gt;</a>* node = head_;</div>
-<div class="line"><span class="lineno">   87</span>      <a class="code hl_class" href="class_queue_node.html">QueueNode&lt;E&gt;</a>* <a class="code hl_function" href="namespacecpp_1_1ast.html#a25b104cfd21fb8487a07063b6ce62062">next</a> = node-&gt;<a class="code hl_function" href="class_queue_node.html#a55ab43663e363a44c7d8ccb511aa87e2">next</a>();</div>
+<div class="line"><span class="lineno">   87</span>      <a class="code hl_class" href="class_queue_node.html">QueueNode&lt;E&gt;</a>* <a class="code hl_function" href="namespaceutf8.html#afc093dfde66a6f52cb4a5caefe0e580d">next</a> = node-&gt;<a class="code hl_function" href="class_queue_node.html#a55ab43663e363a44c7d8ccb511aa87e2">next</a>();</div>
 <div class="line"><span class="lineno">   88</span>      <span class="keywordflow">for</span> (; ;) {</div>
 <div class="line"><span class="lineno">   89</span>        <span class="keyword">delete</span> node;</div>
-<div class="line"><span class="lineno">   90</span>        node = <a class="code hl_function" href="namespacecpp_1_1ast.html#a25b104cfd21fb8487a07063b6ce62062">next</a>;</div>
+<div class="line"><span class="lineno">   90</span>        node = <a class="code hl_function" href="namespaceutf8.html#afc093dfde66a6f52cb4a5caefe0e580d">next</a>;</div>
 <div class="line"><span class="lineno">   91</span>        <span class="keywordflow">if</span> (node == NULL) <span class="keywordflow">break</span>;</div>
-<div class="line"><span class="lineno">   92</span>        <a class="code hl_function" href="namespacecpp_1_1ast.html#a25b104cfd21fb8487a07063b6ce62062">next</a> = node-&gt;<a class="code hl_function" href="class_queue_node.html#a55ab43663e363a44c7d8ccb511aa87e2">next</a>();</div>
+<div class="line"><span class="lineno">   92</span>        <a class="code hl_function" href="namespaceutf8.html#afc093dfde66a6f52cb4a5caefe0e580d">next</a> = node-&gt;<a class="code hl_function" href="class_queue_node.html#a55ab43663e363a44c7d8ccb511aa87e2">next</a>();</div>
 <div class="line"><span class="lineno">   93</span>      }</div>
 <div class="line"><span class="lineno">   94</span> </div>
 <div class="line"><span class="lineno">   95</span>      <span class="comment">// 2. Resets the member variables.</span></div>
@@ -265,7 +265,7 @@ template&lt;typename E &gt; </div>
 <div class="line"><span class="lineno">   99</span>  }</div>
 <div class="ttc" id="aclass_queue_node_html"><div class="ttname"><a href="class_queue_node.html">QueueNode</a></div><div class="ttdef"><b>Definition</b> <a href="sample3-inl_8h_source.html#l00049">sample3-inl.h:49</a></div></div>
 <div class="ttc" id="aclass_queue_node_html_a55ab43663e363a44c7d8ccb511aa87e2"><div class="ttname"><a href="class_queue_node.html#a55ab43663e363a44c7d8ccb511aa87e2">QueueNode::next</a></div><div class="ttdeci">QueueNode * next()</div><div class="ttdef"><b>Definition</b> <a href="sample3-inl_8h_source.html#l00057">sample3-inl.h:57</a></div></div>
-<div class="ttc" id="anamespacecpp_1_1ast_html_a25b104cfd21fb8487a07063b6ce62062"><div class="ttname"><a href="namespacecpp_1_1ast.html#a25b104cfd21fb8487a07063b6ce62062">cpp.ast.next</a></div><div class="ttdeci">next(obj)</div><div class="ttdef"><b>Definition</b> <a href="ast_8py_source.html#l00058">ast.py:58</a></div></div>
+<div class="ttc" id="anamespaceutf8_html_afc093dfde66a6f52cb4a5caefe0e580d"><div class="ttname"><a href="namespaceutf8.html#afc093dfde66a6f52cb4a5caefe0e580d">utf8::next</a></div><div class="ttdeci">uint32_t next(octet_iterator &amp;it, octet_iterator end)</div><div class="ttdef"><b>Definition</b> <a href="checked_8h_source.html#l00137">checked.h:137</a></div></div>
 </div><!-- fragment --><div class="dynheader">
 Here is the call graph for this function:</div>
 <div class="dyncontent">

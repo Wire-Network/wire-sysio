@@ -20,13 +20,13 @@ typedef Char\+Type \mbox{\hyperlink{struct_auto_u_t_f_a1dcd687806dff36d9e8310238
 \doxysubsubsection*{Static Public Member Functions}
 \begin{DoxyCompactItemize}
 \item 
-{\footnotesize template$<$typename Output\+Stream $>$ }\\static RAPIDJSON\+\_\+\+FORCEINLINE void \mbox{\hyperlink{struct_auto_u_t_f_a414946115261f886e74dd42cb4b98781}{Encode}} (Output\+Stream \&os, unsigned codepoint)
+{\footnotesize template$<$typename Output\+Stream $>$ }\\static RAPIDJSON\+\_\+\+FORCEINLINE void \mbox{\hyperlink{struct_auto_u_t_f_a414946115261f886e74dd42cb4b98781}{Encode}} (Output\+Stream \&\mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}, unsigned codepoint)
 \item 
-{\footnotesize template$<$typename Output\+Stream $>$ }\\static RAPIDJSON\+\_\+\+FORCEINLINE void \mbox{\hyperlink{struct_auto_u_t_f_a05f5dcd1f153b61b763e44ed452de251}{Encode\+Unsafe}} (Output\+Stream \&os, unsigned codepoint)
+{\footnotesize template$<$typename Output\+Stream $>$ }\\static RAPIDJSON\+\_\+\+FORCEINLINE void \mbox{\hyperlink{struct_auto_u_t_f_a05f5dcd1f153b61b763e44ed452de251}{Encode\+Unsafe}} (Output\+Stream \&\mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}, unsigned codepoint)
 \item 
 {\footnotesize template$<$typename Input\+Stream $>$ }\\static RAPIDJSON\+\_\+\+FORCEINLINE bool \mbox{\hyperlink{struct_auto_u_t_f_aa5e3c1dc23dbb75f6442ff69500a35b0}{Decode}} (Input\+Stream \&is, unsigned \texorpdfstring{$\ast$}{*}codepoint)
 \item 
-{\footnotesize template$<$typename Input\+Stream , typename Output\+Stream $>$ }\\static RAPIDJSON\+\_\+\+FORCEINLINE bool \mbox{\hyperlink{struct_auto_u_t_f_a36dd6f226d6a07c12161e21c0aff20b1}{Validate}} (Input\+Stream \&is, Output\+Stream \&os)
+{\footnotesize template$<$typename Input\+Stream , typename Output\+Stream $>$ }\\static RAPIDJSON\+\_\+\+FORCEINLINE bool \mbox{\hyperlink{struct_auto_u_t_f_a36dd6f226d6a07c12161e21c0aff20b1}{Validate}} (Input\+Stream \&is, Output\+Stream \&\mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}})
 \end{DoxyCompactItemize}
 
 
@@ -101,14 +101,16 @@ Definition at line \mbox{\hyperlink{encodings_8h_source_l00637}{637}} of file \m
 \DoxyCodeLine{00641\ \ \ \ \ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
 \includegraphics[width=176pt]{struct_auto_u_t_f_aa5e3c1dc23dbb75f6442ff69500a35b0_cgraph}
 \end{center}
 \end{figure}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -132,18 +134,20 @@ Definition at line \mbox{\hyperlink{encodings_8h_source_l00623}{623}} of file \m
 \DoxyCodeLine{00623\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
 \DoxyCodeLine{00624\ \ \ \ \ \ \ \ \ \textcolor{keyword}{typedef}\ void\ (*EncodeFunc)(OutputStream\&,\ unsigned);}
 \DoxyCodeLine{00625\ \ \ \ \ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{const}\ EncodeFunc\ \mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}}[]\ =\ \{\ \mbox{\hyperlink{encodings_8h_a6530c8834a049a0ff230b56072df6c24}{RAPIDJSON\_ENCODINGS\_FUNC}}(\mbox{\hyperlink{struct_auto_u_t_f_a414946115261f886e74dd42cb4b98781}{Encode}})\ \};}
-\DoxyCodeLine{00626\ \ \ \ \ \ \ \ \ (*\mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}}[os.GetType()])(\mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}},\ codepoint);}
+\DoxyCodeLine{00626\ \ \ \ \ \ \ \ \ (*\mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}}[\mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}.GetType()])(\mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}},\ codepoint);}
 \DoxyCodeLine{00627\ \ \ \ \ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
 \includegraphics[width=175pt]{struct_auto_u_t_f_a414946115261f886e74dd42cb4b98781_cgraph}
 \end{center}
 \end{figure}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -167,18 +171,20 @@ Definition at line \mbox{\hyperlink{encodings_8h_source_l00630}{630}} of file \m
 \DoxyCodeLine{00630\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
 \DoxyCodeLine{00631\ \ \ \ \ \ \ \ \ \textcolor{keyword}{typedef}\ void\ (*EncodeFunc)(OutputStream\&,\ unsigned);}
 \DoxyCodeLine{00632\ \ \ \ \ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{const}\ EncodeFunc\ \mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}}[]\ =\ \{\ \mbox{\hyperlink{encodings_8h_a6530c8834a049a0ff230b56072df6c24}{RAPIDJSON\_ENCODINGS\_FUNC}}(\mbox{\hyperlink{struct_auto_u_t_f_a05f5dcd1f153b61b763e44ed452de251}{EncodeUnsafe}})\ \};}
-\DoxyCodeLine{00633\ \ \ \ \ \ \ \ \ (*\mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}}[os.GetType()])(\mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}},\ codepoint);}
+\DoxyCodeLine{00633\ \ \ \ \ \ \ \ \ (*\mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}}[\mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}.GetType()])(\mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}},\ codepoint);}
 \DoxyCodeLine{00634\ \ \ \ \ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
 \includegraphics[width=206pt]{struct_auto_u_t_f_a05f5dcd1f153b61b763e44ed452de251_cgraph}
 \end{center}
 \end{figure}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -206,14 +212,16 @@ Definition at line \mbox{\hyperlink{encodings_8h_source_l00644}{644}} of file \m
 \DoxyCodeLine{00648\ \ \ \ \ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
 \includegraphics[width=176pt]{struct_auto_u_t_f_a36dd6f226d6a07c12161e21c0aff20b1_cgraph}
 \end{center}
 \end{figure}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode

@@ -96,7 +96,7 @@
 \DoxyCodeLine{\Hypertarget{src_2crypto_2sha1_8cpp_source_l00092}00092\ \ \ \}}
 \DoxyCodeLine{\Hypertarget{src_2crypto_2sha1_8cpp_source_l00093}\mbox{\hyperlink{namespacefc_a44ad4b9aef689cc656d4e404b3f481c4}{00093}}\ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespacefc_accef08adf4ee05c36ccc550d8101b08f}{from\_variant}}(\ \textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1variant}{variant}}\&\ v,\ \mbox{\hyperlink{classfc_1_1sha1}{sha1}}\&\ bi\ )}
 \DoxyCodeLine{\Hypertarget{src_2crypto_2sha1_8cpp_source_l00094}00094\ \ \ \{}
-\DoxyCodeLine{\Hypertarget{src_2crypto_2sha1_8cpp_source_l00095}00095\ \ \ \ \ std::vector<char>\ ve\ =\ v.as<\ std::vector<char>\ >();}
+\DoxyCodeLine{\Hypertarget{src_2crypto_2sha1_8cpp_source_l00095}00095\ \ \ \ \ std::vector<char>\ ve\ =\ v.\mbox{\hyperlink{classfc_1_1variant_a82edd1f33199355d3a1f19bbb92909cc}{as}}<\ std::vector<char>\ >();}
 \DoxyCodeLine{\Hypertarget{src_2crypto_2sha1_8cpp_source_l00096}00096\ \ \ \ \ \textcolor{keywordflow}{if}(\ ve.size()\ )}
 \DoxyCodeLine{\Hypertarget{src_2crypto_2sha1_8cpp_source_l00097}00097\ \ \ \ \ \{}
 \DoxyCodeLine{\Hypertarget{src_2crypto_2sha1_8cpp_source_l00098}00098\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_ae785d5badbf1f08b491af31f32a135a1}{memcpy}}(\&bi,\ ve.\mbox{\hyperlink{classfc_1_1sha1_ad42682578a1b910dfffc9ab11c672a5c}{data}}(),\ \mbox{\hyperlink{namespacefc_aa3ea11c18de71ec23b19c3cc571fb8ff}{fc::min<size\_t>}}(ve.size(),\textcolor{keyword}{sizeof}(bi))\ );}

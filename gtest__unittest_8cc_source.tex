@@ -304,13 +304,13 @@
 \DoxyCodeLine{\Hypertarget{gtest__unittest_8cc_source_l00300}\mbox{\hyperlink{class_testing_vector}{00300}}\ \textcolor{keyword}{class\ }\mbox{\hyperlink{class_testing_vector}{TestingVector}}\ :\ \textcolor{keyword}{public}\ std::vector<int>\ \{}
 \DoxyCodeLine{\Hypertarget{gtest__unittest_8cc_source_l00301}\mbox{\hyperlink{gtest__unittest_8cc_abdba99e22dc5893cd638902542f87c06}{00301}}\ \};}
 \DoxyCodeLine{\Hypertarget{gtest__unittest_8cc_source_l00302}00302\ }
-\DoxyCodeLine{\Hypertarget{gtest__unittest_8cc_source_l00303}00303\ ::std::ostream\&\ \mbox{\hyperlink{gtest__unittest_8cc_abdba99e22dc5893cd638902542f87c06}{operator<<}}(::std::ostream\&\ os,}
+\DoxyCodeLine{\Hypertarget{gtest__unittest_8cc_source_l00303}00303\ ::std::ostream\&\ \mbox{\hyperlink{gtest__unittest_8cc_abdba99e22dc5893cd638902542f87c06}{operator<<}}(::std::ostream\&\ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}},}
 \DoxyCodeLine{\Hypertarget{gtest__unittest_8cc_source_l00304}00304\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{class_testing_vector}{TestingVector}}\&\ vector)\ \{}
-\DoxyCodeLine{\Hypertarget{gtest__unittest_8cc_source_l00305}00305\ \ \ os\ <<\ \textcolor{stringliteral}{"{}\{\ "{}};}
+\DoxyCodeLine{\Hypertarget{gtest__unittest_8cc_source_l00305}00305\ \ \ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}\ <<\ \textcolor{stringliteral}{"{}\{\ "{}};}
 \DoxyCodeLine{\Hypertarget{gtest__unittest_8cc_source_l00306}00306\ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{size\_t}\ i\ =\ 0;\ i\ <\ vector.size();\ i++)\ \{}
-\DoxyCodeLine{\Hypertarget{gtest__unittest_8cc_source_l00307}00307\ \ \ \ \ os\ <<\ vector[i]\ <<\ \textcolor{stringliteral}{"{}\ "{}};}
+\DoxyCodeLine{\Hypertarget{gtest__unittest_8cc_source_l00307}00307\ \ \ \ \ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}\ <<\ vector[i]\ <<\ \textcolor{stringliteral}{"{}\ "{}};}
 \DoxyCodeLine{\Hypertarget{gtest__unittest_8cc_source_l00308}00308\ \ \ \}}
-\DoxyCodeLine{\Hypertarget{gtest__unittest_8cc_source_l00309}00309\ \ \ os\ <<\ \textcolor{stringliteral}{"{}\}"{}};}
+\DoxyCodeLine{\Hypertarget{gtest__unittest_8cc_source_l00309}00309\ \ \ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}\ <<\ \textcolor{stringliteral}{"{}\}"{}};}
 \DoxyCodeLine{\Hypertarget{gtest__unittest_8cc_source_l00310}00310\ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}};}
 \DoxyCodeLine{\Hypertarget{gtest__unittest_8cc_source_l00311}00311\ \}}
 \DoxyCodeLine{\Hypertarget{gtest__unittest_8cc_source_l00312}00312\ }
@@ -784,16 +784,16 @@
 \DoxyCodeLine{\Hypertarget{gtest__unittest_8cc_source_l00780}00780\ \textcolor{keyword}{static}\ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{namespacetesting_1_1gmock__matchers__test_a70e728cf67d0224c3ebb9eb8959cc39d}{IsPositive}}(\textcolor{keywordtype}{int}\ n)\ \{\ \textcolor{keywordflow}{return}\ n\ >\ 0;\ \}}
 \DoxyCodeLine{\Hypertarget{gtest__unittest_8cc_source_l00781}00781\ }
 \DoxyCodeLine{\Hypertarget{gtest__unittest_8cc_source_l00782}00782\ \mbox{\hyperlink{gtest_8h_ad8b332753515c0ab8baada563c2547eb}{TEST}}(ContainerUtilityTest,\ CountIf)\ \{}
-\DoxyCodeLine{\Hypertarget{gtest__unittest_8cc_source_l00783}00783\ \ \ std::vector<int>\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}};}
+\DoxyCodeLine{\Hypertarget{gtest__unittest_8cc_source_l00783}00783\ \ \ std::vector<int>\ v;}
 \DoxyCodeLine{\Hypertarget{gtest__unittest_8cc_source_l00784}00784\ \ \ \mbox{\hyperlink{gtest_8h_a4159019abda84f5366acdb7604ff220a}{EXPECT\_EQ}}(0,\ CountIf(v,\ IsPositive));\ \ \textcolor{comment}{//\ Works\ for\ an\ empty\ container.}}
 \DoxyCodeLine{\Hypertarget{gtest__unittest_8cc_source_l00785}00785\ }
-\DoxyCodeLine{\Hypertarget{gtest__unittest_8cc_source_l00786}00786\ \ \ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.push\_back(-\/1);}
-\DoxyCodeLine{\Hypertarget{gtest__unittest_8cc_source_l00787}00787\ \ \ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.push\_back(0);}
+\DoxyCodeLine{\Hypertarget{gtest__unittest_8cc_source_l00786}00786\ \ \ v.push\_back(-\/1);}
+\DoxyCodeLine{\Hypertarget{gtest__unittest_8cc_source_l00787}00787\ \ \ v.push\_back(0);}
 \DoxyCodeLine{\Hypertarget{gtest__unittest_8cc_source_l00788}00788\ \ \ \mbox{\hyperlink{gtest_8h_a4159019abda84f5366acdb7604ff220a}{EXPECT\_EQ}}(0,\ CountIf(v,\ IsPositive));\ \ \textcolor{comment}{//\ Works\ when\ no\ value\ satisfies.}}
 \DoxyCodeLine{\Hypertarget{gtest__unittest_8cc_source_l00789}00789\ }
-\DoxyCodeLine{\Hypertarget{gtest__unittest_8cc_source_l00790}00790\ \ \ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.push\_back(2);}
-\DoxyCodeLine{\Hypertarget{gtest__unittest_8cc_source_l00791}00791\ \ \ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.push\_back(-\/10);}
-\DoxyCodeLine{\Hypertarget{gtest__unittest_8cc_source_l00792}00792\ \ \ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.push\_back(10);}
+\DoxyCodeLine{\Hypertarget{gtest__unittest_8cc_source_l00790}00790\ \ \ v.push\_back(2);}
+\DoxyCodeLine{\Hypertarget{gtest__unittest_8cc_source_l00791}00791\ \ \ v.push\_back(-\/10);}
+\DoxyCodeLine{\Hypertarget{gtest__unittest_8cc_source_l00792}00792\ \ \ v.push\_back(10);}
 \DoxyCodeLine{\Hypertarget{gtest__unittest_8cc_source_l00793}00793\ \ \ \mbox{\hyperlink{gtest_8h_a4159019abda84f5366acdb7604ff220a}{EXPECT\_EQ}}(2,\ CountIf(v,\ IsPositive));}
 \DoxyCodeLine{\Hypertarget{gtest__unittest_8cc_source_l00794}00794\ \}}
 \DoxyCodeLine{\Hypertarget{gtest__unittest_8cc_source_l00795}00795\ }
@@ -803,19 +803,19 @@
 \DoxyCodeLine{\Hypertarget{gtest__unittest_8cc_source_l00799}00799\ \textcolor{keyword}{static}\ \textcolor{keywordtype}{void}\ Accumulate(\textcolor{keywordtype}{int}\ n)\ \{\ g\_sum\ +=\ n;\ \}}
 \DoxyCodeLine{\Hypertarget{gtest__unittest_8cc_source_l00800}00800\ }
 \DoxyCodeLine{\Hypertarget{gtest__unittest_8cc_source_l00801}00801\ \mbox{\hyperlink{gtest_8h_ad8b332753515c0ab8baada563c2547eb}{TEST}}(ContainerUtilityTest,\ ForEach)\ \{}
-\DoxyCodeLine{\Hypertarget{gtest__unittest_8cc_source_l00802}00802\ \ \ std::vector<int>\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}};}
+\DoxyCodeLine{\Hypertarget{gtest__unittest_8cc_source_l00802}00802\ \ \ std::vector<int>\ v;}
 \DoxyCodeLine{\Hypertarget{gtest__unittest_8cc_source_l00803}00803\ \ \ g\_sum\ =\ 0;}
 \DoxyCodeLine{\Hypertarget{gtest__unittest_8cc_source_l00804}00804\ \ \ ForEach(v,\ Accumulate);}
 \DoxyCodeLine{\Hypertarget{gtest__unittest_8cc_source_l00805}00805\ \ \ \mbox{\hyperlink{gtest_8h_a4159019abda84f5366acdb7604ff220a}{EXPECT\_EQ}}(0,\ g\_sum);\ \ \textcolor{comment}{//\ Works\ for\ an\ empty\ container;}}
 \DoxyCodeLine{\Hypertarget{gtest__unittest_8cc_source_l00806}00806\ }
 \DoxyCodeLine{\Hypertarget{gtest__unittest_8cc_source_l00807}00807\ \ \ g\_sum\ =\ 0;}
-\DoxyCodeLine{\Hypertarget{gtest__unittest_8cc_source_l00808}00808\ \ \ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.push\_back(1);}
+\DoxyCodeLine{\Hypertarget{gtest__unittest_8cc_source_l00808}00808\ \ \ v.push\_back(1);}
 \DoxyCodeLine{\Hypertarget{gtest__unittest_8cc_source_l00809}00809\ \ \ ForEach(v,\ Accumulate);}
 \DoxyCodeLine{\Hypertarget{gtest__unittest_8cc_source_l00810}00810\ \ \ \mbox{\hyperlink{gtest_8h_a4159019abda84f5366acdb7604ff220a}{EXPECT\_EQ}}(1,\ g\_sum);\ \ \textcolor{comment}{//\ Works\ for\ a\ container\ with\ one\ element.}}
 \DoxyCodeLine{\Hypertarget{gtest__unittest_8cc_source_l00811}00811\ }
 \DoxyCodeLine{\Hypertarget{gtest__unittest_8cc_source_l00812}00812\ \ \ g\_sum\ =\ 0;}
-\DoxyCodeLine{\Hypertarget{gtest__unittest_8cc_source_l00813}00813\ \ \ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.push\_back(20);}
-\DoxyCodeLine{\Hypertarget{gtest__unittest_8cc_source_l00814}00814\ \ \ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.push\_back(300);}
+\DoxyCodeLine{\Hypertarget{gtest__unittest_8cc_source_l00813}00813\ \ \ v.push\_back(20);}
+\DoxyCodeLine{\Hypertarget{gtest__unittest_8cc_source_l00814}00814\ \ \ v.push\_back(300);}
 \DoxyCodeLine{\Hypertarget{gtest__unittest_8cc_source_l00815}00815\ \ \ ForEach(v,\ Accumulate);}
 \DoxyCodeLine{\Hypertarget{gtest__unittest_8cc_source_l00816}00816\ \ \ \mbox{\hyperlink{gtest_8h_a4159019abda84f5366acdb7604ff220a}{EXPECT\_EQ}}(321,\ g\_sum);}
 \DoxyCodeLine{\Hypertarget{gtest__unittest_8cc_source_l00817}00817\ \}}
@@ -2798,15 +2798,15 @@
 \DoxyCodeLine{\Hypertarget{gtest__unittest_8cc_source_l02794}02794\ \ \ \textcolor{comment}{//\ We\ use\ the\ assignment\ syntax\ since\ some\ compilers,\ like\ Sun\ Studio,}}
 \DoxyCodeLine{\Hypertarget{gtest__unittest_8cc_source_l02795}02795\ \ \ \textcolor{comment}{//\ don't\ allow\ initializing\ references\ using\ construction\ syntax}}
 \DoxyCodeLine{\Hypertarget{gtest__unittest_8cc_source_l02796}02796\ \ \ \textcolor{comment}{//\ (parentheses).}}
-\DoxyCodeLine{\Hypertarget{gtest__unittest_8cc_source_l02797}02797\ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{const}\ FloatTest::TestValues\&\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}\ =\ this-\/>values\_;}
+\DoxyCodeLine{\Hypertarget{gtest__unittest_8cc_source_l02797}02797\ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{const}\ FloatTest::TestValues\&\ v\ =\ this-\/>values\_;}
 \DoxyCodeLine{\Hypertarget{gtest__unittest_8cc_source_l02798}02798\ }
-\DoxyCodeLine{\Hypertarget{gtest__unittest_8cc_source_l02799}02799\ \ \ \mbox{\hyperlink{gtest_8h_a981e552322fb084042d02d6dfa9860ca}{EXPECT\_FLOAT\_EQ}}(0.0,\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.close\_to\_positive\_zero);}
-\DoxyCodeLine{\Hypertarget{gtest__unittest_8cc_source_l02800}02800\ \ \ \mbox{\hyperlink{gtest_8h_a981e552322fb084042d02d6dfa9860ca}{EXPECT\_FLOAT\_EQ}}(-\/0.0,\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.close\_to\_negative\_zero);}
-\DoxyCodeLine{\Hypertarget{gtest__unittest_8cc_source_l02801}02801\ \ \ \mbox{\hyperlink{gtest_8h_a981e552322fb084042d02d6dfa9860ca}{EXPECT\_FLOAT\_EQ}}(\mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.close\_to\_positive\_zero,\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.close\_to\_negative\_zero);}
+\DoxyCodeLine{\Hypertarget{gtest__unittest_8cc_source_l02799}02799\ \ \ \mbox{\hyperlink{gtest_8h_a981e552322fb084042d02d6dfa9860ca}{EXPECT\_FLOAT\_EQ}}(0.0,\ v.close\_to\_positive\_zero);}
+\DoxyCodeLine{\Hypertarget{gtest__unittest_8cc_source_l02800}02800\ \ \ \mbox{\hyperlink{gtest_8h_a981e552322fb084042d02d6dfa9860ca}{EXPECT\_FLOAT\_EQ}}(-\/0.0,\ v.close\_to\_negative\_zero);}
+\DoxyCodeLine{\Hypertarget{gtest__unittest_8cc_source_l02801}02801\ \ \ \mbox{\hyperlink{gtest_8h_a981e552322fb084042d02d6dfa9860ca}{EXPECT\_FLOAT\_EQ}}(v.close\_to\_positive\_zero,\ v.close\_to\_negative\_zero);}
 \DoxyCodeLine{\Hypertarget{gtest__unittest_8cc_source_l02802}02802\ }
 \DoxyCodeLine{\Hypertarget{gtest__unittest_8cc_source_l02803}02803\ \ \ \mbox{\hyperlink{gtest-spi_8h_a819a3fd7f8b8cf24b6f1b3a26708973d}{EXPECT\_FATAL\_FAILURE}}(\{\ \ \textcolor{comment}{//\ NOLINT}}
-\DoxyCodeLine{\Hypertarget{gtest__unittest_8cc_source_l02804}02804\ \ \ \ \ \mbox{\hyperlink{gtest_8h_a4663ffbf844baa54bdb29f9148fd0f96}{ASSERT\_FLOAT\_EQ}}(\mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.close\_to\_positive\_zero,}
-\DoxyCodeLine{\Hypertarget{gtest__unittest_8cc_source_l02805}02805\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.further\_from\_negative\_zero);}
+\DoxyCodeLine{\Hypertarget{gtest__unittest_8cc_source_l02804}02804\ \ \ \ \ \mbox{\hyperlink{gtest_8h_a4663ffbf844baa54bdb29f9148fd0f96}{ASSERT\_FLOAT\_EQ}}(v.close\_to\_positive\_zero,}
+\DoxyCodeLine{\Hypertarget{gtest__unittest_8cc_source_l02805}02805\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ v.further\_from\_negative\_zero);}
 \DoxyCodeLine{\Hypertarget{gtest__unittest_8cc_source_l02806}02806\ \ \ \},\ \textcolor{stringliteral}{"{}v.further\_from\_negative\_zero"{}});}
 \DoxyCodeLine{\Hypertarget{gtest__unittest_8cc_source_l02807}02807\ \}}
 \DoxyCodeLine{\Hypertarget{gtest__unittest_8cc_source_l02808}02808\ }
@@ -2853,16 +2853,16 @@
 \DoxyCodeLine{\Hypertarget{gtest__unittest_8cc_source_l02849}02849\ \ \ \textcolor{comment}{//\ We\ use\ the\ assignment\ syntax\ since\ some\ compilers,\ like\ Sun\ Studio,}}
 \DoxyCodeLine{\Hypertarget{gtest__unittest_8cc_source_l02850}02850\ \ \ \textcolor{comment}{//\ don't\ allow\ initializing\ references\ using\ construction\ syntax}}
 \DoxyCodeLine{\Hypertarget{gtest__unittest_8cc_source_l02851}02851\ \ \ \textcolor{comment}{//\ (parentheses).}}
-\DoxyCodeLine{\Hypertarget{gtest__unittest_8cc_source_l02852}02852\ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{const}\ FloatTest::TestValues\&\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}\ =\ this-\/>values\_;}
+\DoxyCodeLine{\Hypertarget{gtest__unittest_8cc_source_l02852}02852\ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{const}\ FloatTest::TestValues\&\ v\ =\ this-\/>values\_;}
 \DoxyCodeLine{\Hypertarget{gtest__unittest_8cc_source_l02853}02853\ }
-\DoxyCodeLine{\Hypertarget{gtest__unittest_8cc_source_l02854}02854\ \ \ \mbox{\hyperlink{gtest-spi_8h_a8376fd6821bd88fd806697355e79e138}{EXPECT\_NONFATAL\_FAILURE}}(\mbox{\hyperlink{gtest_8h_a981e552322fb084042d02d6dfa9860ca}{EXPECT\_FLOAT\_EQ}}(\mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.nan1,\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.nan1),}
+\DoxyCodeLine{\Hypertarget{gtest__unittest_8cc_source_l02854}02854\ \ \ \mbox{\hyperlink{gtest-spi_8h_a8376fd6821bd88fd806697355e79e138}{EXPECT\_NONFATAL\_FAILURE}}(\mbox{\hyperlink{gtest_8h_a981e552322fb084042d02d6dfa9860ca}{EXPECT\_FLOAT\_EQ}}(v.nan1,\ v.nan1),}
 \DoxyCodeLine{\Hypertarget{gtest__unittest_8cc_source_l02855}02855\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}v.nan1"{}});}
-\DoxyCodeLine{\Hypertarget{gtest__unittest_8cc_source_l02856}02856\ \ \ \mbox{\hyperlink{gtest-spi_8h_a8376fd6821bd88fd806697355e79e138}{EXPECT\_NONFATAL\_FAILURE}}(\mbox{\hyperlink{gtest_8h_a981e552322fb084042d02d6dfa9860ca}{EXPECT\_FLOAT\_EQ}}(\mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.nan1,\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.nan2),}
+\DoxyCodeLine{\Hypertarget{gtest__unittest_8cc_source_l02856}02856\ \ \ \mbox{\hyperlink{gtest-spi_8h_a8376fd6821bd88fd806697355e79e138}{EXPECT\_NONFATAL\_FAILURE}}(\mbox{\hyperlink{gtest_8h_a981e552322fb084042d02d6dfa9860ca}{EXPECT\_FLOAT\_EQ}}(v.nan1,\ v.nan2),}
 \DoxyCodeLine{\Hypertarget{gtest__unittest_8cc_source_l02857}02857\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}v.nan2"{}});}
-\DoxyCodeLine{\Hypertarget{gtest__unittest_8cc_source_l02858}02858\ \ \ \mbox{\hyperlink{gtest-spi_8h_a8376fd6821bd88fd806697355e79e138}{EXPECT\_NONFATAL\_FAILURE}}(\mbox{\hyperlink{gtest_8h_a981e552322fb084042d02d6dfa9860ca}{EXPECT\_FLOAT\_EQ}}(1.0,\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.nan1),}
+\DoxyCodeLine{\Hypertarget{gtest__unittest_8cc_source_l02858}02858\ \ \ \mbox{\hyperlink{gtest-spi_8h_a8376fd6821bd88fd806697355e79e138}{EXPECT\_NONFATAL\_FAILURE}}(\mbox{\hyperlink{gtest_8h_a981e552322fb084042d02d6dfa9860ca}{EXPECT\_FLOAT\_EQ}}(1.0,\ v.nan1),}
 \DoxyCodeLine{\Hypertarget{gtest__unittest_8cc_source_l02859}02859\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}v.nan1"{}});}
 \DoxyCodeLine{\Hypertarget{gtest__unittest_8cc_source_l02860}02860\ }
-\DoxyCodeLine{\Hypertarget{gtest__unittest_8cc_source_l02861}02861\ \ \ \mbox{\hyperlink{gtest-spi_8h_a819a3fd7f8b8cf24b6f1b3a26708973d}{EXPECT\_FATAL\_FAILURE}}(\mbox{\hyperlink{gtest_8h_a4663ffbf844baa54bdb29f9148fd0f96}{ASSERT\_FLOAT\_EQ}}(\mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.nan1,\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.infinity),}
+\DoxyCodeLine{\Hypertarget{gtest__unittest_8cc_source_l02861}02861\ \ \ \mbox{\hyperlink{gtest-spi_8h_a819a3fd7f8b8cf24b6f1b3a26708973d}{EXPECT\_FATAL\_FAILURE}}(\mbox{\hyperlink{gtest_8h_a4663ffbf844baa54bdb29f9148fd0f96}{ASSERT\_FLOAT\_EQ}}(v.nan1,\ v.infinity),}
 \DoxyCodeLine{\Hypertarget{gtest__unittest_8cc_source_l02862}02862\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}v.infinity"{}});}
 \DoxyCodeLine{\Hypertarget{gtest__unittest_8cc_source_l02863}02863\ \textcolor{preprocessor}{\#endif\ \ }\textcolor{comment}{//\ !GTEST\_OS\_SYMBIAN}}
 \DoxyCodeLine{\Hypertarget{gtest__unittest_8cc_source_l02864}02864\ \}}
@@ -2971,15 +2971,15 @@
 \DoxyCodeLine{\Hypertarget{gtest__unittest_8cc_source_l02967}02967\ \ \ \textcolor{comment}{//\ We\ use\ the\ assignment\ syntax\ since\ some\ compilers,\ like\ Sun\ Studio,}}
 \DoxyCodeLine{\Hypertarget{gtest__unittest_8cc_source_l02968}02968\ \ \ \textcolor{comment}{//\ don't\ allow\ initializing\ references\ using\ construction\ syntax}}
 \DoxyCodeLine{\Hypertarget{gtest__unittest_8cc_source_l02969}02969\ \ \ \textcolor{comment}{//\ (parentheses).}}
-\DoxyCodeLine{\Hypertarget{gtest__unittest_8cc_source_l02970}02970\ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{const}\ DoubleTest::TestValues\&\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}\ =\ this-\/>values\_;}
+\DoxyCodeLine{\Hypertarget{gtest__unittest_8cc_source_l02970}02970\ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{const}\ DoubleTest::TestValues\&\ v\ =\ this-\/>values\_;}
 \DoxyCodeLine{\Hypertarget{gtest__unittest_8cc_source_l02971}02971\ }
-\DoxyCodeLine{\Hypertarget{gtest__unittest_8cc_source_l02972}02972\ \ \ \mbox{\hyperlink{gtest_8h_ab4852f9430cf656690256ea7fe6323b8}{EXPECT\_DOUBLE\_EQ}}(0.0,\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.close\_to\_positive\_zero);}
-\DoxyCodeLine{\Hypertarget{gtest__unittest_8cc_source_l02973}02973\ \ \ \mbox{\hyperlink{gtest_8h_ab4852f9430cf656690256ea7fe6323b8}{EXPECT\_DOUBLE\_EQ}}(-\/0.0,\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.close\_to\_negative\_zero);}
-\DoxyCodeLine{\Hypertarget{gtest__unittest_8cc_source_l02974}02974\ \ \ \mbox{\hyperlink{gtest_8h_ab4852f9430cf656690256ea7fe6323b8}{EXPECT\_DOUBLE\_EQ}}(\mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.close\_to\_positive\_zero,\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.close\_to\_negative\_zero);}
+\DoxyCodeLine{\Hypertarget{gtest__unittest_8cc_source_l02972}02972\ \ \ \mbox{\hyperlink{gtest_8h_ab4852f9430cf656690256ea7fe6323b8}{EXPECT\_DOUBLE\_EQ}}(0.0,\ v.close\_to\_positive\_zero);}
+\DoxyCodeLine{\Hypertarget{gtest__unittest_8cc_source_l02973}02973\ \ \ \mbox{\hyperlink{gtest_8h_ab4852f9430cf656690256ea7fe6323b8}{EXPECT\_DOUBLE\_EQ}}(-\/0.0,\ v.close\_to\_negative\_zero);}
+\DoxyCodeLine{\Hypertarget{gtest__unittest_8cc_source_l02974}02974\ \ \ \mbox{\hyperlink{gtest_8h_ab4852f9430cf656690256ea7fe6323b8}{EXPECT\_DOUBLE\_EQ}}(v.close\_to\_positive\_zero,\ v.close\_to\_negative\_zero);}
 \DoxyCodeLine{\Hypertarget{gtest__unittest_8cc_source_l02975}02975\ }
 \DoxyCodeLine{\Hypertarget{gtest__unittest_8cc_source_l02976}02976\ \ \ \mbox{\hyperlink{gtest-spi_8h_a819a3fd7f8b8cf24b6f1b3a26708973d}{EXPECT\_FATAL\_FAILURE}}(\{\ \ \textcolor{comment}{//\ NOLINT}}
-\DoxyCodeLine{\Hypertarget{gtest__unittest_8cc_source_l02977}02977\ \ \ \ \ \mbox{\hyperlink{gtest_8h_a6617da62e5ae5490995a3bfca1f331a9}{ASSERT\_DOUBLE\_EQ}}(\mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.close\_to\_positive\_zero,}
-\DoxyCodeLine{\Hypertarget{gtest__unittest_8cc_source_l02978}02978\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.further\_from\_negative\_zero);}
+\DoxyCodeLine{\Hypertarget{gtest__unittest_8cc_source_l02977}02977\ \ \ \ \ \mbox{\hyperlink{gtest_8h_a6617da62e5ae5490995a3bfca1f331a9}{ASSERT\_DOUBLE\_EQ}}(v.close\_to\_positive\_zero,}
+\DoxyCodeLine{\Hypertarget{gtest__unittest_8cc_source_l02978}02978\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ v.further\_from\_negative\_zero);}
 \DoxyCodeLine{\Hypertarget{gtest__unittest_8cc_source_l02979}02979\ \ \ \},\ \textcolor{stringliteral}{"{}v.further\_from\_negative\_zero"{}});}
 \DoxyCodeLine{\Hypertarget{gtest__unittest_8cc_source_l02980}02980\ \}}
 \DoxyCodeLine{\Hypertarget{gtest__unittest_8cc_source_l02981}02981\ }
@@ -3024,14 +3024,14 @@
 \DoxyCodeLine{\Hypertarget{gtest__unittest_8cc_source_l03020}03020\ \ \ \textcolor{comment}{//\ We\ use\ the\ assignment\ syntax\ since\ some\ compilers,\ like\ Sun\ Studio,}}
 \DoxyCodeLine{\Hypertarget{gtest__unittest_8cc_source_l03021}03021\ \ \ \textcolor{comment}{//\ don't\ allow\ initializing\ references\ using\ construction\ syntax}}
 \DoxyCodeLine{\Hypertarget{gtest__unittest_8cc_source_l03022}03022\ \ \ \textcolor{comment}{//\ (parentheses).}}
-\DoxyCodeLine{\Hypertarget{gtest__unittest_8cc_source_l03023}03023\ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{const}\ DoubleTest::TestValues\&\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}\ =\ this-\/>values\_;}
+\DoxyCodeLine{\Hypertarget{gtest__unittest_8cc_source_l03023}03023\ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{const}\ DoubleTest::TestValues\&\ v\ =\ this-\/>values\_;}
 \DoxyCodeLine{\Hypertarget{gtest__unittest_8cc_source_l03024}03024\ }
 \DoxyCodeLine{\Hypertarget{gtest__unittest_8cc_source_l03025}03025\ \ \ \textcolor{comment}{//\ Nokia's\ STLport\ crashes\ if\ we\ try\ to\ output\ infinity\ or\ NaN.}}
-\DoxyCodeLine{\Hypertarget{gtest__unittest_8cc_source_l03026}03026\ \ \ \mbox{\hyperlink{gtest-spi_8h_a8376fd6821bd88fd806697355e79e138}{EXPECT\_NONFATAL\_FAILURE}}(\mbox{\hyperlink{gtest_8h_ab4852f9430cf656690256ea7fe6323b8}{EXPECT\_DOUBLE\_EQ}}(\mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.nan1,\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.nan1),}
+\DoxyCodeLine{\Hypertarget{gtest__unittest_8cc_source_l03026}03026\ \ \ \mbox{\hyperlink{gtest-spi_8h_a8376fd6821bd88fd806697355e79e138}{EXPECT\_NONFATAL\_FAILURE}}(\mbox{\hyperlink{gtest_8h_ab4852f9430cf656690256ea7fe6323b8}{EXPECT\_DOUBLE\_EQ}}(v.nan1,\ v.nan1),}
 \DoxyCodeLine{\Hypertarget{gtest__unittest_8cc_source_l03027}03027\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}v.nan1"{}});}
-\DoxyCodeLine{\Hypertarget{gtest__unittest_8cc_source_l03028}03028\ \ \ \mbox{\hyperlink{gtest-spi_8h_a8376fd6821bd88fd806697355e79e138}{EXPECT\_NONFATAL\_FAILURE}}(\mbox{\hyperlink{gtest_8h_ab4852f9430cf656690256ea7fe6323b8}{EXPECT\_DOUBLE\_EQ}}(\mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.nan1,\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.nan2),\ \textcolor{stringliteral}{"{}v.nan2"{}});}
-\DoxyCodeLine{\Hypertarget{gtest__unittest_8cc_source_l03029}03029\ \ \ \mbox{\hyperlink{gtest-spi_8h_a8376fd6821bd88fd806697355e79e138}{EXPECT\_NONFATAL\_FAILURE}}(\mbox{\hyperlink{gtest_8h_ab4852f9430cf656690256ea7fe6323b8}{EXPECT\_DOUBLE\_EQ}}(1.0,\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.nan1),\ \textcolor{stringliteral}{"{}v.nan1"{}});}
-\DoxyCodeLine{\Hypertarget{gtest__unittest_8cc_source_l03030}03030\ \ \ \mbox{\hyperlink{gtest-spi_8h_a819a3fd7f8b8cf24b6f1b3a26708973d}{EXPECT\_FATAL\_FAILURE}}(\mbox{\hyperlink{gtest_8h_a6617da62e5ae5490995a3bfca1f331a9}{ASSERT\_DOUBLE\_EQ}}(\mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.nan1,\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.infinity),}
+\DoxyCodeLine{\Hypertarget{gtest__unittest_8cc_source_l03028}03028\ \ \ \mbox{\hyperlink{gtest-spi_8h_a8376fd6821bd88fd806697355e79e138}{EXPECT\_NONFATAL\_FAILURE}}(\mbox{\hyperlink{gtest_8h_ab4852f9430cf656690256ea7fe6323b8}{EXPECT\_DOUBLE\_EQ}}(v.nan1,\ v.nan2),\ \textcolor{stringliteral}{"{}v.nan2"{}});}
+\DoxyCodeLine{\Hypertarget{gtest__unittest_8cc_source_l03029}03029\ \ \ \mbox{\hyperlink{gtest-spi_8h_a8376fd6821bd88fd806697355e79e138}{EXPECT\_NONFATAL\_FAILURE}}(\mbox{\hyperlink{gtest_8h_ab4852f9430cf656690256ea7fe6323b8}{EXPECT\_DOUBLE\_EQ}}(1.0,\ v.nan1),\ \textcolor{stringliteral}{"{}v.nan1"{}});}
+\DoxyCodeLine{\Hypertarget{gtest__unittest_8cc_source_l03030}03030\ \ \ \mbox{\hyperlink{gtest-spi_8h_a819a3fd7f8b8cf24b6f1b3a26708973d}{EXPECT\_FATAL\_FAILURE}}(\mbox{\hyperlink{gtest_8h_a6617da62e5ae5490995a3bfca1f331a9}{ASSERT\_DOUBLE\_EQ}}(v.nan1,\ v.infinity),}
 \DoxyCodeLine{\Hypertarget{gtest__unittest_8cc_source_l03031}03031\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}v.infinity"{}});}
 \DoxyCodeLine{\Hypertarget{gtest__unittest_8cc_source_l03032}03032\ \textcolor{preprocessor}{\#endif\ \ }\textcolor{comment}{//\ !GTEST\_OS\_SYMBIAN}}
 \DoxyCodeLine{\Hypertarget{gtest__unittest_8cc_source_l03033}03033\ \}}
@@ -3502,7 +3502,7 @@
 \DoxyCodeLine{\Hypertarget{gtest__unittest_8cc_source_l03498}03498\ }
 \DoxyCodeLine{\Hypertarget{gtest__unittest_8cc_source_l03499}03499\ \mbox{\hyperlink{gtest_8h_ad8b332753515c0ab8baada563c2547eb}{TEST}}(EditDistance,\ TestCases)\ \{}
 \DoxyCodeLine{\Hypertarget{gtest__unittest_8cc_source_l03500}03500\ \ \ \textcolor{keyword}{struct\ }Case\ \{}
-\DoxyCodeLine{\Hypertarget{gtest__unittest_8cc_source_l03501}03501\ \ \ \ \ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{namespacevalidate__reflection_a54d4e98ade8417b88a7e3859a693630a}{line}};}
+\DoxyCodeLine{\Hypertarget{gtest__unittest_8cc_source_l03501}03501\ \ \ \ \ \textcolor{keywordtype}{int}\ line;}
 \DoxyCodeLine{\Hypertarget{gtest__unittest_8cc_source_l03502}03502\ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ left;}
 \DoxyCodeLine{\Hypertarget{gtest__unittest_8cc_source_l03503}03503\ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ right;}
 \DoxyCodeLine{\Hypertarget{gtest__unittest_8cc_source_l03504}03504\ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ expected\_edits;}
@@ -3867,8 +3867,8 @@
 \DoxyCodeLine{\Hypertarget{gtest__unittest_8cc_source_l03863}03863\ \ \ \textcolor{keywordtype}{int}\ value\_;}
 \DoxyCodeLine{\Hypertarget{gtest__unittest_8cc_source_l03864}03864\ \};}
 \DoxyCodeLine{\Hypertarget{gtest__unittest_8cc_source_l03865}03865\ }
-\DoxyCodeLine{\Hypertarget{gtest__unittest_8cc_source_l03866}03866\ ::std::ostream\&\ \mbox{\hyperlink{gtest__unittest_8cc_abdba99e22dc5893cd638902542f87c06}{operator<<}}(::std::ostream\&\ os,\ \textcolor{keyword}{const}\ Uncopyable\&\ \mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}})\ \{}
-\DoxyCodeLine{\Hypertarget{gtest__unittest_8cc_source_l03867}03867\ \ \ \textcolor{keywordflow}{return}\ os\ <<\ \mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}}.value();}
+\DoxyCodeLine{\Hypertarget{gtest__unittest_8cc_source_l03866}03866\ ::std::ostream\&\ \mbox{\hyperlink{gtest__unittest_8cc_abdba99e22dc5893cd638902542f87c06}{operator<<}}(::std::ostream\&\ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}},\ \textcolor{keyword}{const}\ Uncopyable\&\ \mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}})\ \{}
+\DoxyCodeLine{\Hypertarget{gtest__unittest_8cc_source_l03867}03867\ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}\ <<\ \mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}}.value();}
 \DoxyCodeLine{\Hypertarget{gtest__unittest_8cc_source_l03868}03868\ \}}
 \DoxyCodeLine{\Hypertarget{gtest__unittest_8cc_source_l03869}03869\ }
 \DoxyCodeLine{\Hypertarget{gtest__unittest_8cc_source_l03870}03870\ }
@@ -5196,13 +5196,13 @@
 \DoxyCodeLine{\Hypertarget{gtest__unittest_8cc_source_l05192}05192\ \ \textcolor{keyword}{private}:}
 \DoxyCodeLine{\Hypertarget{gtest__unittest_8cc_source_l05193}05193\ \ \ \textcolor{keywordtype}{int}\ x\_;}
 \DoxyCodeLine{\Hypertarget{gtest__unittest_8cc_source_l05194}05194\ \};}
-\DoxyCodeLine{\Hypertarget{gtest__unittest_8cc_source_l05195}\mbox{\hyperlink{gtest__unittest_8cc_a1d3d9493cb530ad09b4aa850f6f2ac06}{05195}}\ std::ostream\&\ \mbox{\hyperlink{gtest__unittest_8cc_abdba99e22dc5893cd638902542f87c06}{operator<<}}(std::ostream\&\ os,}
+\DoxyCodeLine{\Hypertarget{gtest__unittest_8cc_source_l05195}\mbox{\hyperlink{gtest__unittest_8cc_a1d3d9493cb530ad09b4aa850f6f2ac06}{05195}}\ std::ostream\&\ \mbox{\hyperlink{gtest__unittest_8cc_abdba99e22dc5893cd638902542f87c06}{operator<<}}(std::ostream\&\ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}},}
 \DoxyCodeLine{\Hypertarget{gtest__unittest_8cc_source_l05196}05196\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ Base\&\ val)\ \{}
-\DoxyCodeLine{\Hypertarget{gtest__unittest_8cc_source_l05197}05197\ \ \ \textcolor{keywordflow}{return}\ os\ <<\ val.x();}
+\DoxyCodeLine{\Hypertarget{gtest__unittest_8cc_source_l05197}05197\ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}\ <<\ val.x();}
 \DoxyCodeLine{\Hypertarget{gtest__unittest_8cc_source_l05198}05198\ \}}
-\DoxyCodeLine{\Hypertarget{gtest__unittest_8cc_source_l05199}\mbox{\hyperlink{gtest__unittest_8cc_a83c418983bc13cb694e585796a8b2335}{05199}}\ std::ostream\&\ \mbox{\hyperlink{gtest__unittest_8cc_abdba99e22dc5893cd638902542f87c06}{operator<<}}(std::ostream\&\ os,}
+\DoxyCodeLine{\Hypertarget{gtest__unittest_8cc_source_l05199}\mbox{\hyperlink{gtest__unittest_8cc_a83c418983bc13cb694e585796a8b2335}{05199}}\ std::ostream\&\ \mbox{\hyperlink{gtest__unittest_8cc_abdba99e22dc5893cd638902542f87c06}{operator<<}}(std::ostream\&\ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}},}
 \DoxyCodeLine{\Hypertarget{gtest__unittest_8cc_source_l05200}05200\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ Base*\ \mbox{\hyperlink{pointer_8h_aae1f8d263916ad71bd415381591549c0}{pointer}})\ \{}
-\DoxyCodeLine{\Hypertarget{gtest__unittest_8cc_source_l05201}05201\ \ \ \textcolor{keywordflow}{return}\ os\ <<\ \textcolor{stringliteral}{"{}("{}}\ <<\ \mbox{\hyperlink{pointer_8h_aae1f8d263916ad71bd415381591549c0}{pointer}}-\/>x()\ <<\ \textcolor{stringliteral}{"{})"{}};}
+\DoxyCodeLine{\Hypertarget{gtest__unittest_8cc_source_l05201}05201\ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}\ <<\ \textcolor{stringliteral}{"{}("{}}\ <<\ \mbox{\hyperlink{pointer_8h_aae1f8d263916ad71bd415381591549c0}{pointer}}-\/>x()\ <<\ \textcolor{stringliteral}{"{})"{}};}
 \DoxyCodeLine{\Hypertarget{gtest__unittest_8cc_source_l05202}05202\ \}}
 \DoxyCodeLine{\Hypertarget{gtest__unittest_8cc_source_l05203}05203\ }
 \DoxyCodeLine{\Hypertarget{gtest__unittest_8cc_source_l05204}\mbox{\hyperlink{gtest__unittest_8cc_a3cfb4c4e94683c4677706c53ab52fb8e}{05204}}\ \mbox{\hyperlink{gtest_8h_ad8b332753515c0ab8baada563c2547eb}{TEST}}(MessageTest,\ CanStreamUserTypeInGlobalNameSpace)\ \{}
@@ -5220,13 +5220,13 @@
 \DoxyCodeLine{\Hypertarget{gtest__unittest_8cc_source_l05216}05216\ \ \textcolor{keyword}{public}:}
 \DoxyCodeLine{\Hypertarget{gtest__unittest_8cc_source_l05217}05217\ \ \ \textcolor{keyword}{explicit}\ MyTypeInUnnamedNameSpace(\textcolor{keywordtype}{int}\ an\_x):\ Base(an\_x)\ \{\}}
 \DoxyCodeLine{\Hypertarget{gtest__unittest_8cc_source_l05218}05218\ \};}
-\DoxyCodeLine{\Hypertarget{gtest__unittest_8cc_source_l05219}05219\ std::ostream\&\ \mbox{\hyperlink{gtest__unittest_8cc_abdba99e22dc5893cd638902542f87c06}{operator<<}}(std::ostream\&\ os,}
+\DoxyCodeLine{\Hypertarget{gtest__unittest_8cc_source_l05219}05219\ std::ostream\&\ \mbox{\hyperlink{gtest__unittest_8cc_abdba99e22dc5893cd638902542f87c06}{operator<<}}(std::ostream\&\ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}},}
 \DoxyCodeLine{\Hypertarget{gtest__unittest_8cc_source_l05220}05220\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ MyTypeInUnnamedNameSpace\&\ val)\ \{}
-\DoxyCodeLine{\Hypertarget{gtest__unittest_8cc_source_l05221}05221\ \ \ \textcolor{keywordflow}{return}\ os\ <<\ val.x();}
+\DoxyCodeLine{\Hypertarget{gtest__unittest_8cc_source_l05221}05221\ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}\ <<\ val.x();}
 \DoxyCodeLine{\Hypertarget{gtest__unittest_8cc_source_l05222}05222\ \}}
-\DoxyCodeLine{\Hypertarget{gtest__unittest_8cc_source_l05223}05223\ std::ostream\&\ \mbox{\hyperlink{gtest__unittest_8cc_abdba99e22dc5893cd638902542f87c06}{operator<<}}(std::ostream\&\ os,}
+\DoxyCodeLine{\Hypertarget{gtest__unittest_8cc_source_l05223}05223\ std::ostream\&\ \mbox{\hyperlink{gtest__unittest_8cc_abdba99e22dc5893cd638902542f87c06}{operator<<}}(std::ostream\&\ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}},}
 \DoxyCodeLine{\Hypertarget{gtest__unittest_8cc_source_l05224}05224\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ MyTypeInUnnamedNameSpace*\ \mbox{\hyperlink{pointer_8h_aae1f8d263916ad71bd415381591549c0}{pointer}})\ \{}
-\DoxyCodeLine{\Hypertarget{gtest__unittest_8cc_source_l05225}05225\ \ \ \textcolor{keywordflow}{return}\ os\ <<\ \textcolor{stringliteral}{"{}("{}}\ <<\ \mbox{\hyperlink{pointer_8h_aae1f8d263916ad71bd415381591549c0}{pointer}}-\/>x()\ <<\ \textcolor{stringliteral}{"{})"{}};}
+\DoxyCodeLine{\Hypertarget{gtest__unittest_8cc_source_l05225}05225\ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}\ <<\ \textcolor{stringliteral}{"{}("{}}\ <<\ \mbox{\hyperlink{pointer_8h_aae1f8d263916ad71bd415381591549c0}{pointer}}-\/>x()\ <<\ \textcolor{stringliteral}{"{})"{}};}
 \DoxyCodeLine{\Hypertarget{gtest__unittest_8cc_source_l05226}05226\ \}}
 \DoxyCodeLine{\Hypertarget{gtest__unittest_8cc_source_l05227}05227\ \}\ \ \textcolor{comment}{//\ namespace}}
 \DoxyCodeLine{\Hypertarget{gtest__unittest_8cc_source_l05228}05228\ }
@@ -5245,13 +5245,13 @@
 \DoxyCodeLine{\Hypertarget{gtest__unittest_8cc_source_l05241}05241\ \ \textcolor{keyword}{public}:}
 \DoxyCodeLine{\Hypertarget{gtest__unittest_8cc_source_l05242}\mbox{\hyperlink{classnamespace1_1_1_my_type_in_name_space1_a2e4277aa118e9b83045a18392188a0d8}{05242}}\ \ \ \textcolor{keyword}{explicit}\ \mbox{\hyperlink{classnamespace1_1_1_my_type_in_name_space1_a2e4277aa118e9b83045a18392188a0d8}{MyTypeInNameSpace1}}(\textcolor{keywordtype}{int}\ an\_x):\ Base(an\_x)\ \{\}}
 \DoxyCodeLine{\Hypertarget{gtest__unittest_8cc_source_l05243}05243\ \};}
-\DoxyCodeLine{\Hypertarget{gtest__unittest_8cc_source_l05244}\mbox{\hyperlink{namespacenamespace1_a469f00dab6318267fb48fab73226ca95}{05244}}\ std::ostream\&\ \mbox{\hyperlink{namespacenamespace1_a469f00dab6318267fb48fab73226ca95}{operator<<}}(std::ostream\&\ os,}
+\DoxyCodeLine{\Hypertarget{gtest__unittest_8cc_source_l05244}\mbox{\hyperlink{namespacenamespace1_a469f00dab6318267fb48fab73226ca95}{05244}}\ std::ostream\&\ \mbox{\hyperlink{namespacenamespace1_a469f00dab6318267fb48fab73226ca95}{operator<<}}(std::ostream\&\ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}},}
 \DoxyCodeLine{\Hypertarget{gtest__unittest_8cc_source_l05245}05245\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{classnamespace1_1_1_my_type_in_name_space1}{MyTypeInNameSpace1}}\&\ val)\ \{}
-\DoxyCodeLine{\Hypertarget{gtest__unittest_8cc_source_l05246}05246\ \ \ \textcolor{keywordflow}{return}\ os\ <<\ val.x();}
+\DoxyCodeLine{\Hypertarget{gtest__unittest_8cc_source_l05246}05246\ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}\ <<\ val.x();}
 \DoxyCodeLine{\Hypertarget{gtest__unittest_8cc_source_l05247}05247\ \}}
-\DoxyCodeLine{\Hypertarget{gtest__unittest_8cc_source_l05248}\mbox{\hyperlink{namespacenamespace1_a9be9cab39b3a33a012040d70e1c86949}{05248}}\ std::ostream\&\ \mbox{\hyperlink{namespacenamespace1_a469f00dab6318267fb48fab73226ca95}{operator<<}}(std::ostream\&\ os,}
+\DoxyCodeLine{\Hypertarget{gtest__unittest_8cc_source_l05248}\mbox{\hyperlink{namespacenamespace1_a9be9cab39b3a33a012040d70e1c86949}{05248}}\ std::ostream\&\ \mbox{\hyperlink{namespacenamespace1_a469f00dab6318267fb48fab73226ca95}{operator<<}}(std::ostream\&\ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}},}
 \DoxyCodeLine{\Hypertarget{gtest__unittest_8cc_source_l05249}05249\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{classnamespace1_1_1_my_type_in_name_space1}{MyTypeInNameSpace1}}*\ \mbox{\hyperlink{pointer_8h_aae1f8d263916ad71bd415381591549c0}{pointer}})\ \{}
-\DoxyCodeLine{\Hypertarget{gtest__unittest_8cc_source_l05250}05250\ \ \ \textcolor{keywordflow}{return}\ os\ <<\ \textcolor{stringliteral}{"{}("{}}\ <<\ \mbox{\hyperlink{pointer_8h_aae1f8d263916ad71bd415381591549c0}{pointer}}-\/>x()\ <<\ \textcolor{stringliteral}{"{})"{}};}
+\DoxyCodeLine{\Hypertarget{gtest__unittest_8cc_source_l05250}05250\ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}\ <<\ \textcolor{stringliteral}{"{}("{}}\ <<\ \mbox{\hyperlink{pointer_8h_aae1f8d263916ad71bd415381591549c0}{pointer}}-\/>x()\ <<\ \textcolor{stringliteral}{"{})"{}};}
 \DoxyCodeLine{\Hypertarget{gtest__unittest_8cc_source_l05251}05251\ \}}
 \DoxyCodeLine{\Hypertarget{gtest__unittest_8cc_source_l05252}05252\ \}\ \ \textcolor{comment}{//\ namespace\ namespace1}}
 \DoxyCodeLine{\Hypertarget{gtest__unittest_8cc_source_l05253}05253\ }
@@ -5271,13 +5271,13 @@
 \DoxyCodeLine{\Hypertarget{gtest__unittest_8cc_source_l05267}\mbox{\hyperlink{classnamespace2_1_1_my_type_in_name_space2_a033025628289dbf29022b2bfbe66f53e}{05267}}\ \ \ \textcolor{keyword}{explicit}\ \mbox{\hyperlink{classnamespace2_1_1_my_type_in_name_space2_a033025628289dbf29022b2bfbe66f53e}{MyTypeInNameSpace2}}(\textcolor{keywordtype}{int}\ an\_x):\ Base(an\_x)\ \{\}}
 \DoxyCodeLine{\Hypertarget{gtest__unittest_8cc_source_l05268}05268\ \};}
 \DoxyCodeLine{\Hypertarget{gtest__unittest_8cc_source_l05269}05269\ \}\ \ \textcolor{comment}{//\ namespace\ namespace2}}
-\DoxyCodeLine{\Hypertarget{gtest__unittest_8cc_source_l05270}\mbox{\hyperlink{gtest__unittest_8cc_a10d6d9493171420b9402befca2f48a5c}{05270}}\ std::ostream\&\ \mbox{\hyperlink{gtest__unittest_8cc_abdba99e22dc5893cd638902542f87c06}{operator<<}}(std::ostream\&\ os,}
+\DoxyCodeLine{\Hypertarget{gtest__unittest_8cc_source_l05270}\mbox{\hyperlink{gtest__unittest_8cc_a10d6d9493171420b9402befca2f48a5c}{05270}}\ std::ostream\&\ \mbox{\hyperlink{gtest__unittest_8cc_abdba99e22dc5893cd638902542f87c06}{operator<<}}(std::ostream\&\ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}},}
 \DoxyCodeLine{\Hypertarget{gtest__unittest_8cc_source_l05271}05271\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{classnamespace2_1_1_my_type_in_name_space2}{namespace2::MyTypeInNameSpace2}}\&\ val)\ \{}
-\DoxyCodeLine{\Hypertarget{gtest__unittest_8cc_source_l05272}05272\ \ \ \textcolor{keywordflow}{return}\ os\ <<\ val.x();}
+\DoxyCodeLine{\Hypertarget{gtest__unittest_8cc_source_l05272}05272\ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}\ <<\ val.x();}
 \DoxyCodeLine{\Hypertarget{gtest__unittest_8cc_source_l05273}05273\ \}}
-\DoxyCodeLine{\Hypertarget{gtest__unittest_8cc_source_l05274}\mbox{\hyperlink{gtest__unittest_8cc_a9ae68b20809290f65f538a63547011ed}{05274}}\ std::ostream\&\ \mbox{\hyperlink{gtest__unittest_8cc_abdba99e22dc5893cd638902542f87c06}{operator<<}}(std::ostream\&\ os,}
+\DoxyCodeLine{\Hypertarget{gtest__unittest_8cc_source_l05274}\mbox{\hyperlink{gtest__unittest_8cc_a9ae68b20809290f65f538a63547011ed}{05274}}\ std::ostream\&\ \mbox{\hyperlink{gtest__unittest_8cc_abdba99e22dc5893cd638902542f87c06}{operator<<}}(std::ostream\&\ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}},}
 \DoxyCodeLine{\Hypertarget{gtest__unittest_8cc_source_l05275}05275\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{classnamespace2_1_1_my_type_in_name_space2}{namespace2::MyTypeInNameSpace2}}*\ \mbox{\hyperlink{pointer_8h_aae1f8d263916ad71bd415381591549c0}{pointer}})\ \{}
-\DoxyCodeLine{\Hypertarget{gtest__unittest_8cc_source_l05276}05276\ \ \ \textcolor{keywordflow}{return}\ os\ <<\ \textcolor{stringliteral}{"{}("{}}\ <<\ \mbox{\hyperlink{pointer_8h_aae1f8d263916ad71bd415381591549c0}{pointer}}-\/>x()\ <<\ \textcolor{stringliteral}{"{})"{}};}
+\DoxyCodeLine{\Hypertarget{gtest__unittest_8cc_source_l05276}05276\ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}\ <<\ \textcolor{stringliteral}{"{}("{}}\ <<\ \mbox{\hyperlink{pointer_8h_aae1f8d263916ad71bd415381591549c0}{pointer}}-\/>x()\ <<\ \textcolor{stringliteral}{"{})"{}};}
 \DoxyCodeLine{\Hypertarget{gtest__unittest_8cc_source_l05277}05277\ \}}
 \DoxyCodeLine{\Hypertarget{gtest__unittest_8cc_source_l05278}05278\ }
 \DoxyCodeLine{\Hypertarget{gtest__unittest_8cc_source_l05279}\mbox{\hyperlink{gtest__unittest_8cc_ad2b886ecfee880b5012c8d41b448f110}{05279}}\ \mbox{\hyperlink{gtest_8h_ad8b332753515c0ab8baada563c2547eb}{TEST}}(MessageTest,\ CanStreamUserTypeInUserNameSpaceWithStreamOperatorInGlobal)\ \{}

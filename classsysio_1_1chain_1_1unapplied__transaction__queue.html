@@ -342,16 +342,16 @@ Here is the caller graph for this function:</div>
 <div class="line"><span class="lineno">  186</span>      } <span class="keywordflow">else</span> {</div>
 <div class="line"><span class="lineno">  187</span>         <span class="keywordflow">if</span>( itr-&gt;trx_meta == trx ) <span class="keywordflow">return</span>; <span class="comment">// same trx meta pointer</span></div>
 <div class="line"><span class="lineno">  188</span>         <span class="keywordflow">if</span>( next ) {</div>
-<div class="line"><span class="lineno">  189</span>            <a class="code hl_function" href="namespacecpp_1_1ast.html#a25b104cfd21fb8487a07063b6ce62062">next</a>( std::static_pointer_cast&lt;fc::exception&gt;( std::make_shared&lt;tx_duplicate&gt;(</div>
+<div class="line"><span class="lineno">  189</span>            <a class="code hl_function" href="namespaceutf8.html#afc093dfde66a6f52cb4a5caefe0e580d">next</a>( std::static_pointer_cast&lt;fc::exception&gt;( std::make_shared&lt;tx_duplicate&gt;(</div>
 <div class="line"><span class="lineno">  190</span>                  <a class="code hl_define" href="log__message_8hpp.html#a4a4df4bb5cffbe07aadf7d29fd44c75e">FC_LOG_MESSAGE</a>( info, <span class="stringliteral">&quot;duplicate transaction ${id}&quot;</span>, (<span class="stringliteral">&quot;id&quot;</span>, trx-&gt;id()) ) ) ) );</div>
 <div class="line"><span class="lineno">  191</span>         }</div>
 <div class="line"><span class="lineno">  192</span>      }</div>
 <div class="line"><span class="lineno">  193</span>   }</div>
 <div class="ttc" id="alog__message_8hpp_html_a4a4df4bb5cffbe07aadf7d29fd44c75e"><div class="ttname"><a href="log__message_8hpp.html#a4a4df4bb5cffbe07aadf7d29fd44c75e">FC_LOG_MESSAGE</a></div><div class="ttdeci">#define FC_LOG_MESSAGE(LOG_LEVEL, FORMAT,...)</div><div class="ttdoc">A helper method for generating log messages.</div><div class="ttdef"><b>Definition</b> <a href="log__message_8hpp_source.html#l00165">log_message.hpp:165</a></div></div>
 <div class="ttc" id="anamespace_intrinsics_html_a7b30616029cc015f330ebf338c3fb454"><div class="ttname"><a href="namespace_intrinsics.html#a7b30616029cc015f330ebf338c3fb454">Intrinsics::find</a></div><div class="ttdeci">RUNTIME_API Runtime::ObjectInstance * find(const std::string &amp;name, const IR::ObjectType &amp;type)</div><div class="ttdef"><b>Definition</b> <a href="_intrinsics_8cpp_source.html#l00048">Intrinsics.cpp:48</a></div></div>
-<div class="ttc" id="anamespacecpp_1_1ast_html_a25b104cfd21fb8487a07063b6ce62062"><div class="ttname"><a href="namespacecpp_1_1ast.html#a25b104cfd21fb8487a07063b6ce62062">cpp.ast.next</a></div><div class="ttdeci">next(obj)</div><div class="ttdef"><b>Definition</b> <a href="ast_8py_source.html#l00058">ast.py:58</a></div></div>
 <div class="ttc" id="anamespacesysio_1_1chain_html_affd9603ab5a713a9762157b12c8f6b9ba19690ad10dec174fbc20e26d31019121"><div class="ttname"><a href="namespacesysio_1_1chain.html#affd9603ab5a713a9762157b12c8f6b9ba19690ad10dec174fbc20e26d31019121">sysio::chain::trx_enum_type::incoming_persisted</a></div><div class="ttdeci">@ incoming_persisted</div></div>
 <div class="ttc" id="anamespacesysio_1_1chain_html_affd9603ab5a713a9762157b12c8f6b9bad48f944ac6c78b97d544f98b89b506ca"><div class="ttname"><a href="namespacesysio_1_1chain.html#affd9603ab5a713a9762157b12c8f6b9bad48f944ac6c78b97d544f98b89b506ca">sysio::chain::trx_enum_type::incoming</a></div><div class="ttdeci">@ incoming</div></div>
+<div class="ttc" id="anamespaceutf8_html_afc093dfde66a6f52cb4a5caefe0e580d"><div class="ttname"><a href="namespaceutf8.html#afc093dfde66a6f52cb4a5caefe0e580d">utf8::next</a></div><div class="ttdeci">uint32_t next(octet_iterator &amp;it, octet_iterator end)</div><div class="ttdef"><b>Definition</b> <a href="checked_8h_source.html#l00137">checked.h:137</a></div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -514,24 +514,23 @@ Here is the caller graph for this function:</div>
 <p class="definition">Definition at line <a class="el" href="unapplied__transaction__queue_8hpp_source.html#l00124">124</a> of file <a class="el" href="unapplied__transaction__queue_8hpp_source.html">unapplied_transaction_queue.hpp</a>.</p>
 <div class="fragment"><div class="line"><span class="lineno">  124</span>                                                   {</div>
 <div class="line"><span class="lineno">  125</span>      <span class="keywordflow">if</span>( <a class="code hl_function" href="#a5a244791044e2d59736ff24339aed822">empty</a>() ) <span class="keywordflow">return</span>;</div>
-<div class="line"><span class="lineno">  126</span>      <span class="keyword">auto</span>&amp; <a class="code hl_variable" href="namespacehost__functions__tests__1.html#a8496a24b5236a2dc07bb4f2930d88342">idx</a> = queue.get&lt;by_trx_id&gt;();</div>
+<div class="line"><span class="lineno">  126</span>      <span class="keyword">auto</span>&amp; idx = queue.get&lt;by_trx_id&gt;();</div>
 <div class="line"><span class="lineno">  127</span>      <span class="keywordflow">for</span>( <span class="keyword">const</span> <span class="keyword">auto</span>&amp; receipt : bs-&gt;block-&gt;transactions ) {</div>
 <div class="line"><span class="lineno">  128</span>         <span class="keywordflow">if</span>( std::holds_alternative&lt;packed_transaction&gt;(receipt.trx) ) {</div>
 <div class="line"><span class="lineno">  129</span>            <span class="keyword">const</span> <span class="keyword">auto</span>&amp; pt = std::get&lt;packed_transaction&gt;(receipt.trx);</div>
-<div class="line"><span class="lineno">  130</span>            <span class="keyword">auto</span> itr = <a class="code hl_variable" href="namespacehost__functions__tests__1.html#a8496a24b5236a2dc07bb4f2930d88342">idx</a>.find( pt.id() );</div>
-<div class="line"><span class="lineno">  131</span>            <span class="keywordflow">if</span>( itr != <a class="code hl_variable" href="namespacehost__functions__tests__1.html#a8496a24b5236a2dc07bb4f2930d88342">idx</a>.end() ) {</div>
+<div class="line"><span class="lineno">  130</span>            <span class="keyword">auto</span> itr = idx.find( pt.id() );</div>
+<div class="line"><span class="lineno">  131</span>            <span class="keywordflow">if</span>( itr != idx.end() ) {</div>
 <div class="line"><span class="lineno">  132</span>               <span class="keywordflow">if</span>( itr-&gt;next ) {</div>
 <div class="line"><span class="lineno">  133</span>                  itr-&gt;next( std::static_pointer_cast&lt;fc::exception&gt;( std::make_shared&lt;tx_duplicate&gt;(</div>
 <div class="line"><span class="lineno">  134</span>                                <a class="code hl_define" href="log__message_8hpp.html#a4a4df4bb5cffbe07aadf7d29fd44c75e">FC_LOG_MESSAGE</a>( info, <span class="stringliteral">&quot;duplicate transaction ${id}&quot;</span>, (<span class="stringliteral">&quot;id&quot;</span>, itr-&gt;trx_meta-&gt;id())))));</div>
 <div class="line"><span class="lineno">  135</span>               }</div>
 <div class="line"><span class="lineno">  136</span>               removed( itr );</div>
-<div class="line"><span class="lineno">  137</span>               <a class="code hl_variable" href="namespacehost__functions__tests__1.html#a8496a24b5236a2dc07bb4f2930d88342">idx</a>.erase( itr );</div>
+<div class="line"><span class="lineno">  137</span>               idx.erase( itr );</div>
 <div class="line"><span class="lineno">  138</span>            }</div>
 <div class="line"><span class="lineno">  139</span>         }</div>
 <div class="line"><span class="lineno">  140</span>      }</div>
 <div class="line"><span class="lineno">  141</span>   }</div>
 <div class="ttc" id="aclasssysio_1_1chain_1_1unapplied__transaction__queue_html_a5a244791044e2d59736ff24339aed822"><div class="ttname"><a href="#a5a244791044e2d59736ff24339aed822">sysio::chain::unapplied_transaction_queue::empty</a></div><div class="ttdeci">bool empty() const</div><div class="ttdef"><b>Definition</b> <a href="unapplied__transaction__queue_8hpp_source.html#l00077">unapplied_transaction_queue.hpp:77</a></div></div>
-<div class="ttc" id="anamespacehost__functions__tests__1_html_a8496a24b5236a2dc07bb4f2930d88342"><div class="ttname"><a href="namespacehost__functions__tests__1.html#a8496a24b5236a2dc07bb4f2930d88342">host_functions_tests_1.idx</a></div><div class="ttdeci">int idx</div><div class="ttdef"><b>Definition</b> <a href="host__functions__tests__1_8py_source.html#l00021">host_functions_tests_1.py:21</a></div></div>
 </div><!-- fragment --><div class="dynheader">
 Here is the call graph for this function:</div>
 <div class="dyncontent">
@@ -731,48 +730,25 @@ Here is the caller graph for this function:</div>
 <div class="dyncontent">
 <div class="center"><img src="classsysio_1_1chain_1_1unapplied__transaction__queue_abb075082079145efb8165a652ca5858a_icgraph.png" border="0" usemap="#aclasssysio_1_1chain_1_1unapplied__transaction__queue_abb075082079145efb8165a652ca5858a_icgraph" alt=""/></div>
 <map name="aclasssysio_1_1chain_1_1unapplied__transaction__queue_abb075082079145efb8165a652ca5858a_icgraph" id="aclasssysio_1_1chain_1_1unapplied__transaction__queue_abb075082079145efb8165a652ca5858a_icgraph">
-<area shape="rect" title=" " alt="" coords="1235,279,1398,320"/>
-<area shape="poly" title=" " alt="" coords="1356,266,1342,260,1317,258,1293,260,1279,265,1274,270,1276,278,1271,279,1269,269,1276,260,1292,255,1317,253,1343,255,1358,261"/>
-<area shape="rect" href="classcpp_1_1tokenize_1_1_token.html#ad93a4059e9932fa2dea149510f0ef002" title=" " alt="" coords="1005,99,1144,140"/>
-<area shape="poly" title=" " alt="" coords="1293,268,1248,209,1218,179,1186,154,1143,135,1145,130,1188,149,1222,175,1252,205,1297,264"/>
-<area shape="rect" href="classcpp_1_1ast_1_1_node.html#aade2369ed75b8cd0b9e76752bf6ae7fb" title=" " alt="" coords="983,164,1166,190"/>
-<area shape="poly" title=" " alt="" coords="1270,273,1186,223,1113,193,1116,188,1188,218,1273,268"/>
-<area shape="rect" href="classpump_1_1_token.html#a808876dd5a7b1bf6c43a3855dc4a8868" title=" " alt="" coords="1009,257,1140,283"/>
-<area shape="poly" title=" " alt="" coords="1219,290,1140,281,1140,275,1220,285"/>
-<area shape="rect" href="classsysio_1_1chain_1_1unapplied__transaction__queue.html#ac15fce39af8a270bc242c4c09006daec" title=" " alt="" coords="963,307,1186,348"/>
-<area shape="poly" title=" " alt="" coords="1220,313,1186,317,1186,312,1219,308"/>
-<area shape="rect" href="classvalidate__reflection_1_1_empty_scope.html#a1fb4f76506790294268dc078986d7430" title=" " alt="" coords="990,372,1158,413"/>
-<area shape="poly" title=" " alt="" coords="1263,329,1188,362,1152,374,1150,369,1186,357,1260,324"/>
-<area shape="rect" href="classvalidate__reflection_1_1_reflections.html#a1e9c57ee99963e105d57f104baea9534" title=" " alt="" coords="962,437,1187,463"/>
-<area shape="poly" title=" " alt="" coords="1293,334,1248,383,1219,407,1188,427,1159,439,1157,434,1186,422,1216,403,1244,379,1289,330"/>
-<area shape="rect" href="classcpp_1_1ast_1_1_define.html#a8e51e0611e1a76c5874f6b39e27a6d6a" title=" " alt="" coords="740,5,893,31"/>
-<area shape="poly" title=" " alt="" coords="968,159,960,153,947,140,940,126,935,97,930,70,923,57,912,44,892,32,895,28,915,40,928,54,935,68,940,97,945,124,952,137,963,150,971,155"/>
-<area shape="rect" href="classcpp_1_1ast_1_1_expr.html#a47968bf1be367a77836f211ced014ec0" title=" " alt="" coords="746,55,887,80"/>
-<area shape="poly" title=" " alt="" coords="971,160,960,154,944,139,935,123,927,108,912,94,886,82,889,77,915,89,931,104,940,120,948,135,963,149,974,155"/>
-<area shape="rect" href="classcpp_1_1ast_1_1_goto.html#ad3bb8a557e3075d7b68c5b0449fb494c" title=" " alt="" coords="745,104,888,130"/>
-<area shape="poly" title=" " alt="" coords="998,163,961,154,872,133,874,128,962,149,999,157"/>
-<area shape="rect" href="classcpp_1_1ast_1_1_using.html#aa489ba90656b2c28290af718f644d2f4" title=" " alt="" coords="742,153,891,179"/>
-<area shape="poly" title=" " alt="" coords="967,175,892,172,892,167,968,170"/>
-<area shape="rect" href="classcpp_1_1ast_1_1_variable_declaration.html#aeafe1b55bcf3005d00951f0accb18def" title=" " alt="" coords="724,203,909,244"/>
-<area shape="poly" title=" " alt="" coords="985,196,910,209,909,204,984,190"/>
-<area shape="rect" href="classcpp_1_1ast_1_1_node.html#acceba1aa15a332dd139ba9587d439a51" title=" " alt="" coords="730,268,903,294"/>
-<area shape="poly" title=" " alt="" coords="1019,198,963,223,939,241,915,258,883,270,881,265,912,253,936,237,960,219,1017,193"/>
-<area shape="poly" title=" " alt="" coords="1117,245,1103,239,1074,236,1049,238,1035,243,1032,248,1038,255,1034,259,1026,249,1031,239,1047,233,1074,231,1104,233,1119,241"/>
-<area shape="rect" href="classsysio_1_1producer__plugin__impl.html#a708986322e03db824e4bad41ca213260" title=" " alt="" coords="719,318,914,358"/>
-<area shape="poly" title=" " alt="" coords="947,335,914,337,914,331,947,330"/>
-<area shape="rect" href="classsysio_1_1producer__plugin__impl.html#af3690d3cd99a828ada60fcf3decad39b" title=" " alt="" coords="730,382,903,438"/>
-<area shape="poly" title=" " alt="" coords="988,355,962,363,900,384,898,379,961,358,986,350"/>
-<area shape="rect" href="classsysio_1_1producer__plugin__impl.html#a7db63178eda240d671fc6ae4e46bf01e" title=" " alt="" coords="520,354,671,394"/>
-<area shape="poly" title=" " alt="" coords="704,359,672,364,671,359,704,354"/>
-<area shape="rect" href="classsysio_1_1producer__plugin__impl.html#ad8895b72aaf8928b54665684ffdb9405" title=" " alt="" coords="262,354,472,394"/>
-<area shape="poly" title=" " alt="" coords="505,377,473,377,473,372,505,372"/>
-<area shape="rect" href="classsysio_1_1producer__plugin__impl.html#a230c88a6ed7efbc3588a043fe4915bd9" title=" " alt="" coords="14,288,205,329"/>
-<area shape="poly" title=" " alt="" coords="269,352,192,332,193,327,270,347"/>
-<area shape="rect" href="classsysio_1_1producer__plugin__impl.html#a9ce89d0c80f40aeb7df69c5a49beff5a" title=" " alt="" coords="24,354,195,394"/>
-<area shape="poly" title=" " alt="" coords="246,377,196,377,196,372,246,372"/>
-<area shape="rect" href="classsysio_1_1producer__plugin__impl.html#ab57089953b20f4eac5adc247b73040ec" title=" " alt="" coords="5,419,214,460"/>
-<area shape="poly" title=" " alt="" coords="270,401,193,421,192,416,269,396"/>
-<area shape="poly" title=" " alt="" coords="715,396,671,389,672,384,716,391"/>
+<area shape="rect" title=" " alt="" coords="1232,71,1395,111"/>
+<area shape="poly" title=" " alt="" coords="1353,58,1338,52,1314,49,1291,51,1277,56,1271,62,1274,69,1268,71,1266,61,1274,52,1290,46,1314,44,1340,46,1355,53"/>
+<area shape="rect" href="classsysio_1_1chain_1_1unapplied__transaction__queue.html#ac15fce39af8a270bc242c4c09006daec" title=" " alt="" coords="962,71,1184,111"/>
+<area shape="poly" title=" " alt="" coords="1216,94,1184,94,1184,88,1216,88"/>
+<area shape="rect" href="classsysio_1_1producer__plugin__impl.html#a708986322e03db824e4bad41ca213260" title=" " alt="" coords="719,35,914,75"/>
+<area shape="poly" title=" " alt="" coords="946,76,914,71,914,66,947,71"/>
+<area shape="rect" href="classsysio_1_1producer__plugin__impl.html#af3690d3cd99a828ada60fcf3decad39b" title=" " alt="" coords="730,99,903,155"/>
+<area shape="poly" title=" " alt="" coords="947,111,903,118,903,112,946,106"/>
+<area shape="rect" href="classsysio_1_1producer__plugin__impl.html#a7db63178eda240d671fc6ae4e46bf01e" title=" " alt="" coords="520,71,671,111"/>
+<area shape="poly" title=" " alt="" coords="704,76,672,81,671,76,704,71"/>
+<area shape="rect" href="classsysio_1_1producer__plugin__impl.html#ad8895b72aaf8928b54665684ffdb9405" title=" " alt="" coords="262,71,472,111"/>
+<area shape="poly" title=" " alt="" coords="505,94,473,94,473,88,505,88"/>
+<area shape="rect" href="classsysio_1_1producer__plugin__impl.html#a230c88a6ed7efbc3588a043fe4915bd9" title=" " alt="" coords="14,5,205,46"/>
+<area shape="poly" title=" " alt="" coords="269,69,192,49,193,44,270,64"/>
+<area shape="rect" href="classsysio_1_1producer__plugin__impl.html#a9ce89d0c80f40aeb7df69c5a49beff5a" title=" " alt="" coords="24,71,195,111"/>
+<area shape="poly" title=" " alt="" coords="246,94,196,94,196,88,246,88"/>
+<area shape="rect" href="classsysio_1_1producer__plugin__impl.html#ab57089953b20f4eac5adc247b73040ec" title=" " alt="" coords="5,136,214,177"/>
+<area shape="poly" title=" " alt="" coords="270,118,193,138,192,133,269,113"/>
+<area shape="poly" title=" " alt="" coords="715,113,671,106,672,101,716,108"/>
 </map>
 </div>
 
@@ -1172,8 +1148,7 @@ Here is the caller graph for this function:</div>
 </div><div class="memdoc">
 
 <p class="definition">Definition at line <a class="el" href="unapplied__transaction__queue_8hpp_source.html#l00075">75</a> of file <a class="el" href="unapplied__transaction__queue_8hpp_source.html">unapplied_transaction_queue.hpp</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">   75</span>{ max_transaction_queue_size = <a class="code hl_variable" href="namespacedevelop_build.html#ade64cd34608f9442ef3049116a2da428">v</a>; }</div>
-<div class="ttc" id="anamespacedevelop_build_html_ade64cd34608f9442ef3049116a2da428"><div class="ttname"><a href="namespacedevelop_build.html#ade64cd34608f9442ef3049116a2da428">developBuild.v</a></div><div class="ttdeci">v</div><div class="ttdef"><b>Definition</b> <a href="develop_build_8py_source.html#l00006">developBuild.py:6</a></div></div>
+<div class="fragment"><div class="line"><span class="lineno">   75</span>{ max_transaction_queue_size = v; }</div>
 </div><!-- fragment -->
 </div>
 </div>

@@ -175,22 +175,22 @@ Functions</h2></td></tr>
 <div class="line"><span class="lineno">   47</span>   <span class="keyword">auto</span> parsed_args = bpo::command_line_parser(argc, <a class="code hl_variable" href="hello__driver_8cpp.html#af2efa898e9eed6fe6715279cb1ec35b0">argv</a>).options(cmdline_options).positional(pos_desc).allow_unregistered().run();</div>
 <div class="line"><span class="lineno">   48</span>   bpo::store(parsed_args, vm);</div>
 <div class="line"><span class="lineno">   49</span> </div>
-<div class="line"><span class="lineno">   50</span>   std::vector&lt;std::string&gt; <a class="code hl_variable" href="namespacebenchmark_compile.html#ad0ed96ae1454e4347ca61ac3887c379e">args</a> = bpo::collect_unrecognized(parsed_args.options, bpo::include_positional);</div>
+<div class="line"><span class="lineno">   50</span>   std::vector&lt;std::string&gt; args = bpo::collect_unrecognized(parsed_args.options, bpo::include_positional);</div>
 <div class="line"><span class="lineno">   51</span> </div>
 <div class="line"><span class="lineno">   52</span>   <span class="keyword">auto</span> show_help = [&amp;](std::ostream&amp; <a class="code hl_variable" href="environment_8hpp.html#a3951483d0b31c29ca95336206cd35238">os</a>) {</div>
-<div class="line"><span class="lineno">   53</span>      os &lt;&lt;</div>
+<div class="line"><span class="lineno">   53</span>      <a class="code hl_variable" href="environment_8hpp.html#a3951483d0b31c29ca95336206cd35238">os</a> &lt;&lt;</div>
 <div class="line"><span class="lineno">   54</span>         <span class="stringliteral">&quot;Usage: trace_api_util &lt;options&gt; command ...\n&quot;</span></div>
 <div class="line"><span class="lineno">   55</span>         <span class="stringliteral">&quot;\n&quot;</span></div>
 <div class="line"><span class="lineno">   56</span>         <span class="stringliteral">&quot;Commands:\n&quot;</span>;</div>
 <div class="line"><span class="lineno">   57</span> </div>
 <div class="line"><span class="lineno">   58</span>      <span class="keywordflow">for</span> (<span class="keyword">const</span> <span class="keyword">auto</span>&amp; e: command_map) {</div>
-<div class="line"><span class="lineno">   59</span>         os &lt;&lt; <span class="stringliteral">&quot;  &quot;</span> &lt;&lt; e.second-&gt;name &lt;&lt; <span class="stringliteral">&quot;              &quot;</span> &lt;&lt; e.second-&gt;slug &lt;&lt; <span class="stringliteral">&quot;\n&quot;</span>;</div>
+<div class="line"><span class="lineno">   59</span>         <a class="code hl_variable" href="environment_8hpp.html#a3951483d0b31c29ca95336206cd35238">os</a> &lt;&lt; <span class="stringliteral">&quot;  &quot;</span> &lt;&lt; e.second-&gt;name &lt;&lt; <span class="stringliteral">&quot;              &quot;</span> &lt;&lt; e.second-&gt;slug &lt;&lt; <span class="stringliteral">&quot;\n&quot;</span>;</div>
 <div class="line"><span class="lineno">   60</span>      }</div>
 <div class="line"><span class="lineno">   61</span> </div>
-<div class="line"><span class="lineno">   62</span>      os &lt;&lt; <span class="stringliteral">&quot;\n&quot;</span> &lt;&lt; vis_desc &lt;&lt; <span class="stringliteral">&quot;\n&quot;</span>;</div>
+<div class="line"><span class="lineno">   62</span>      <a class="code hl_variable" href="environment_8hpp.html#a3951483d0b31c29ca95336206cd35238">os</a> &lt;&lt; <span class="stringliteral">&quot;\n&quot;</span> &lt;&lt; vis_desc &lt;&lt; <span class="stringliteral">&quot;\n&quot;</span>;</div>
 <div class="line"><span class="lineno">   63</span>   };</div>
 <div class="line"><span class="lineno">   64</span> </div>
-<div class="line"><span class="lineno">   65</span>   <span class="keywordflow">if</span> (<a class="code hl_variable" href="namespacebenchmark_compile.html#ad0ed96ae1454e4347ca61ac3887c379e">args</a>.size() &lt; 1) {</div>
+<div class="line"><span class="lineno">   65</span>   <span class="keywordflow">if</span> (args.size() &lt; 1) {</div>
 <div class="line"><span class="lineno">   66</span>      <span class="keywordflow">if</span> (vm.count(<span class="stringliteral">&quot;help&quot;</span>) &gt; 0) {</div>
 <div class="line"><span class="lineno">   67</span>         show_help(std::cout);</div>
 <div class="line"><span class="lineno">   68</span>         <span class="keywordflow">return</span> 0;</div>
@@ -199,18 +199,17 @@ Functions</h2></td></tr>
 <div class="line"><span class="lineno">   71</span>      std::cerr &lt;&lt; <span class="stringliteral">&quot;Error: No command provided\n\n&quot;</span>;</div>
 <div class="line"><span class="lineno">   72</span>      show_help(std::cerr);</div>
 <div class="line"><span class="lineno">   73</span>      <span class="keywordflow">return</span> 1;</div>
-<div class="line"><span class="lineno">   74</span>   } <span class="keywordflow">else</span> <span class="keywordflow">if</span> (command_map.count(<a class="code hl_variable" href="namespacebenchmark_compile.html#ad0ed96ae1454e4347ca61ac3887c379e">args</a>.at(0)) == 0) {</div>
-<div class="line"><span class="lineno">   75</span>      std::cerr &lt;&lt; <span class="stringliteral">&quot;Error: unknown command \&quot;&quot;</span> &lt;&lt; <a class="code hl_variable" href="namespacebenchmark_compile.html#ad0ed96ae1454e4347ca61ac3887c379e">args</a>.at(0) &lt;&lt; <span class="stringliteral">&quot;\&quot;\n\n&quot;</span>;</div>
+<div class="line"><span class="lineno">   74</span>   } <span class="keywordflow">else</span> <span class="keywordflow">if</span> (command_map.count(args.at(0)) == 0) {</div>
+<div class="line"><span class="lineno">   75</span>      std::cerr &lt;&lt; <span class="stringliteral">&quot;Error: unknown command \&quot;&quot;</span> &lt;&lt; args.at(0) &lt;&lt; <span class="stringliteral">&quot;\&quot;\n\n&quot;</span>;</div>
 <div class="line"><span class="lineno">   76</span>      show_help(std::cerr);</div>
 <div class="line"><span class="lineno">   77</span>      <span class="keywordflow">return</span> 1;</div>
 <div class="line"><span class="lineno">   78</span>   }</div>
 <div class="line"><span class="lineno">   79</span> </div>
 <div class="line"><span class="lineno">   80</span>   <span class="comment">// trim the command name and pass the rest of the args to the defined command</span></div>
-<div class="line"><span class="lineno">   81</span>   <span class="keywordflow">return</span> command_map.at(<a class="code hl_variable" href="namespacebenchmark_compile.html#ad0ed96ae1454e4347ca61ac3887c379e">args</a>.at(0))-&gt;func(vm, std::vector&lt;std::string&gt;(<a class="code hl_variable" href="namespacebenchmark_compile.html#ad0ed96ae1454e4347ca61ac3887c379e">args</a>.begin() + 1, <a class="code hl_variable" href="namespacebenchmark_compile.html#ad0ed96ae1454e4347ca61ac3887c379e">args</a>.end()));</div>
+<div class="line"><span class="lineno">   81</span>   <span class="keywordflow">return</span> command_map.at(args.at(0))-&gt;func(vm, std::vector&lt;std::string&gt;(args.begin() + 1, args.end()));</div>
 <div class="line"><span class="lineno">   82</span>}</div>
 <div class="ttc" id="aenvironment_8hpp_html_a3951483d0b31c29ca95336206cd35238"><div class="ttname"><a href="environment_8hpp.html#a3951483d0b31c29ca95336206cd35238">os</a></div><div class="ttdeci">os_t os</div><div class="ttdef"><b>Definition</b> <a href="environment_8hpp_source.html#l00023">environment.hpp:23</a></div></div>
 <div class="ttc" id="ahello__driver_8cpp_html_af2efa898e9eed6fe6715279cb1ec35b0"><div class="ttname"><a href="hello__driver_8cpp.html#af2efa898e9eed6fe6715279cb1ec35b0">argv</a></div><div class="ttdeci">char ** argv</div><div class="ttdef"><b>Definition</b> <a href="hello__driver_8cpp_source.html#l00052">hello_driver.cpp:52</a></div></div>
-<div class="ttc" id="anamespacebenchmark_compile_html_ad0ed96ae1454e4347ca61ac3887c379e"><div class="ttname"><a href="namespacebenchmark_compile.html#ad0ed96ae1454e4347ca61ac3887c379e">benchmarkCompile.args</a></div><div class="ttdeci">args</div><div class="ttdef"><b>Definition</b> <a href="benchmark_compile_8py_source.html#l00122">benchmarkCompile.py:122</a></div></div>
 </div><!-- fragment -->
 </div>
 </div>

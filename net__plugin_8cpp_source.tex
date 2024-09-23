@@ -790,8 +790,8 @@
 \DoxyCodeLine{\Hypertarget{net__plugin_8cpp_source_l00904}00904\ \ \ \ \textcolor{keywordtype}{void}\ connection::update\_endpoints()\ \{}
 \DoxyCodeLine{\Hypertarget{net__plugin_8cpp_source_l00905}00905\ \ \ \ \ \ \ boost::system::error\_code\ ec;}
 \DoxyCodeLine{\Hypertarget{net__plugin_8cpp_source_l00906}00906\ \ \ \ \ \ \ boost::system::error\_code\ ec2;}
-\DoxyCodeLine{\Hypertarget{net__plugin_8cpp_source_l00907}00907\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ \mbox{\hyperlink{xbyak__mnemonic_8h_af6a3d3b3cf4994bee953cbff0003d939}{rep}}\ =\ socket-\/>remote\_endpoint(ec);}
-\DoxyCodeLine{\Hypertarget{net__plugin_8cpp_source_l00908}00908\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ lep\ =\ socket-\/>local\_endpoint(ec2);}
+\DoxyCodeLine{\Hypertarget{net__plugin_8cpp_source_l00907}00907\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ \mbox{\hyperlink{xbyak__mnemonic_8h_af6a3d3b3cf4994bee953cbff0003d939}{rep}}\ =\ \mbox{\hyperlink{classsysio_1_1connection_adb1c345e310c4bf64faa889c01440404}{socket}}-\/>remote\_endpoint(ec);}
+\DoxyCodeLine{\Hypertarget{net__plugin_8cpp_source_l00908}00908\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ lep\ =\ \mbox{\hyperlink{classsysio_1_1connection_adb1c345e310c4bf64faa889c01440404}{socket}}-\/>local\_endpoint(ec2);}
 \DoxyCodeLine{\Hypertarget{net__plugin_8cpp_source_l00909}00909\ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1connection_ac0e50a9bca0cca0c77ce7d1763832714}{log\_remote\_endpoint\_ip}}\ =\ ec\ ?\ unknown\ :\ \mbox{\hyperlink{xbyak__mnemonic_8h_af6a3d3b3cf4994bee953cbff0003d939}{rep}}.address().to\_string();}
 \DoxyCodeLine{\Hypertarget{net__plugin_8cpp_source_l00910}00910\ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1connection_a9d6df697090f0105fbcd82ee97f65712}{log\_remote\_endpoint\_port}}\ =\ ec\ ?\ unknown\ :\ std::to\_string(\mbox{\hyperlink{xbyak__mnemonic_8h_af6a3d3b3cf4994bee953cbff0003d939}{rep}}.port());}
 \DoxyCodeLine{\Hypertarget{net__plugin_8cpp_source_l00911}00911\ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1connection_abaffefd3dd270392c59a876c12f86bf2}{local\_endpoint\_ip}}\ =\ ec2\ ?\ unknown\ :\ lep.address().to\_string();}
@@ -843,7 +843,7 @@
 \DoxyCodeLine{\Hypertarget{net__plugin_8cpp_source_l00957}00957\ \ \ \ \ \ \ update\_endpoints();}
 \DoxyCodeLine{\Hypertarget{net__plugin_8cpp_source_l00958}00958\ \ \ \ \ \ \ boost::asio::ip::tcp::no\_delay\ nodelay(\ \textcolor{keyword}{true}\ );}
 \DoxyCodeLine{\Hypertarget{net__plugin_8cpp_source_l00959}00959\ \ \ \ \ \ \ boost::system::error\_code\ ec;}
-\DoxyCodeLine{\Hypertarget{net__plugin_8cpp_source_l00960}00960\ \ \ \ \ \ \ socket-\/>set\_option(\ nodelay,\ ec\ );}
+\DoxyCodeLine{\Hypertarget{net__plugin_8cpp_source_l00960}00960\ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1connection_adb1c345e310c4bf64faa889c01440404}{socket}}-\/>set\_option(\ nodelay,\ ec\ );}
 \DoxyCodeLine{\Hypertarget{net__plugin_8cpp_source_l00961}00961\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ ec\ )\ \{}
 \DoxyCodeLine{\Hypertarget{net__plugin_8cpp_source_l00962}00962\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{net__plugin_8cpp_a0237ff767d828f6a423a4728c65b11b8}{peer\_elog}}(\ \textcolor{keyword}{this},\ \textcolor{stringliteral}{"{}connection\ failed\ (set\_option):\ \$\{e1\}"{}},\ (\ \textcolor{stringliteral}{"{}e1"{}},\ ec.message()\ )\ );}
 \DoxyCodeLine{\Hypertarget{net__plugin_8cpp_source_l00963}00963\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1connection_a7fe7bb50b91bd69cdf56c7c09a868e29}{close}}();}
@@ -1105,7 +1105,7 @@
 \DoxyCodeLine{\Hypertarget{net__plugin_8cpp_source_l01219}01219\ }
 \DoxyCodeLine{\Hypertarget{net__plugin_8cpp_source_l01220}01220\ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1connection_a950c534737276c9d0a2724d9801d7def}{strand}}.post(\ [c\{std::move(c)\},\ bufs\{std::move(bufs)\}]()\ \{}
 \DoxyCodeLine{\Hypertarget{net__plugin_8cpp_source_l01221}01221\ \ \ \ \ \ \ \ \ \ boost::asio::async\_write(\ *c-\/>socket,\ bufs,}
-\DoxyCodeLine{\Hypertarget{net__plugin_8cpp_source_l01222}01222\ \ \ \ \ \ \ \ \ \ \ \ \ boost::asio::bind\_executor(\ c-\/>strand,\ [c,\ socket=c-\/>socket](\ boost::system::error\_code\ ec,\ std::size\_t\ w\ )\ \{}
+\DoxyCodeLine{\Hypertarget{net__plugin_8cpp_source_l01222}01222\ \ \ \ \ \ \ \ \ \ \ \ \ boost::asio::bind\_executor(\ c-\/>strand,\ [c,\ \mbox{\hyperlink{classsysio_1_1connection_adb1c345e310c4bf64faa889c01440404}{socket}}=c-\/>socket](\ boost::system::error\_code\ ec,\ std::size\_t\ w\ )\ \{}
 \DoxyCodeLine{\Hypertarget{net__plugin_8cpp_source_l01223}01223\ \ \ \ \ \ \ \ \ \ \ \ \ try\ \{}
 \DoxyCodeLine{\Hypertarget{net__plugin_8cpp_source_l01224}01224\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ c-\/>buffer\_queue.clear\_out\_queue();}
 \DoxyCodeLine{\Hypertarget{net__plugin_8cpp_source_l01225}01225\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ May\ have\ closed\ connection\ and\ cleared\ buffer\_queue}}
@@ -2227,10 +2227,10 @@
 \DoxyCodeLine{\Hypertarget{net__plugin_8cpp_source_l02344}02344\ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1connection_a2cb1b55074b31325f9845700fd7ede82}{connecting}}\ =\ \textcolor{keyword}{true};}
 \DoxyCodeLine{\Hypertarget{net__plugin_8cpp_source_l02345}02345\ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1connection_af241d498d210d4e238b73f7bcd1c45d1}{pending\_message\_buffer}}.\mbox{\hyperlink{classfc_1_1message__buffer_a49d9f621f19529a42cbfa0de7b9266dd}{reset}}();}
 \DoxyCodeLine{\Hypertarget{net__plugin_8cpp_source_l02346}02346\ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1connection_a8386b853edf1cbab18a09b8123cc525c}{buffer\_queue}}.\mbox{\hyperlink{classsysio_1_1queued__buffer_a6a5614c85ba08a707d94f8303b561940}{clear\_out\_queue}}();}
-\DoxyCodeLine{\Hypertarget{net__plugin_8cpp_source_l02347}02347\ \ \ \ \ \ \ boost::asio::async\_connect(\ *socket,\ endpoints,}
+\DoxyCodeLine{\Hypertarget{net__plugin_8cpp_source_l02347}02347\ \ \ \ \ \ \ boost::asio::async\_connect(\ *\mbox{\hyperlink{classsysio_1_1connection_adb1c345e310c4bf64faa889c01440404}{socket}},\ endpoints,}
 \DoxyCodeLine{\Hypertarget{net__plugin_8cpp_source_l02348}02348\ \ \ \ \ \ \ \ \ \ boost::asio::bind\_executor(\ \mbox{\hyperlink{classsysio_1_1connection_a950c534737276c9d0a2724d9801d7def}{strand}},}
-\DoxyCodeLine{\Hypertarget{net__plugin_8cpp_source_l02349}02349\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ [resolver,\ c\ =\ shared\_from\_this(),\ socket=socket](\ \textcolor{keyword}{const}\ boost::system::error\_code\&\ err,\ \textcolor{keyword}{const}\ tcp::endpoint\&\ endpoint\ )\ \{}
-\DoxyCodeLine{\Hypertarget{net__plugin_8cpp_source_l02350}02350\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ !err\ \&\&\ socket-\/>is\_open()\ \&\&\ socket\ ==\ c-\/>socket\ )\ \{}
+\DoxyCodeLine{\Hypertarget{net__plugin_8cpp_source_l02349}02349\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ [resolver,\ c\ =\ shared\_from\_this(),\ \mbox{\hyperlink{classsysio_1_1connection_adb1c345e310c4bf64faa889c01440404}{socket}}=\mbox{\hyperlink{classsysio_1_1connection_adb1c345e310c4bf64faa889c01440404}{socket}}](\ \textcolor{keyword}{const}\ boost::system::error\_code\&\ err,\ \textcolor{keyword}{const}\ tcp::endpoint\&\ endpoint\ )\ \{}
+\DoxyCodeLine{\Hypertarget{net__plugin_8cpp_source_l02350}02350\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ !err\ \&\&\ \mbox{\hyperlink{classsysio_1_1connection_adb1c345e310c4bf64faa889c01440404}{socket}}-\/>is\_open()\ \&\&\ \mbox{\hyperlink{classsysio_1_1connection_adb1c345e310c4bf64faa889c01440404}{socket}}\ ==\ c-\/>socket\ )\ \{}
 \DoxyCodeLine{\Hypertarget{net__plugin_8cpp_source_l02351}02351\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ c-\/>start\_session()\ )\ \{}
 \DoxyCodeLine{\Hypertarget{net__plugin_8cpp_source_l02352}02352\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ c-\/>send\_handshake();}
 \DoxyCodeLine{\Hypertarget{net__plugin_8cpp_source_l02353}02353\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
@@ -2323,7 +2323,7 @@
 \DoxyCodeLine{\Hypertarget{net__plugin_8cpp_source_l02440}02440\ \ \ \ \ \ \ \ \ \ \ \ \ std::size\_t\ socket\_read\_watermark\ =\ std::min<std::size\_t>(minimum\_read,\ max\_socket\_read\_watermark);}
 \DoxyCodeLine{\Hypertarget{net__plugin_8cpp_source_l02441}02441\ \ \ \ \ \ \ \ \ \ \ \ \ boost::asio::socket\_base::receive\_low\_watermark\ read\_watermark\_opt(socket\_read\_watermark);}
 \DoxyCodeLine{\Hypertarget{net__plugin_8cpp_source_l02442}02442\ \ \ \ \ \ \ \ \ \ \ \ \ boost::system::error\_code\ ec;}
-\DoxyCodeLine{\Hypertarget{net__plugin_8cpp_source_l02443}02443\ \ \ \ \ \ \ \ \ \ \ \ \ socket-\/>set\_option(\ read\_watermark\_opt,\ ec\ );}
+\DoxyCodeLine{\Hypertarget{net__plugin_8cpp_source_l02443}02443\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1connection_adb1c345e310c4bf64faa889c01440404}{socket}}-\/>set\_option(\ read\_watermark\_opt,\ ec\ );}
 \DoxyCodeLine{\Hypertarget{net__plugin_8cpp_source_l02444}02444\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ ec\ )\ \{}
 \DoxyCodeLine{\Hypertarget{net__plugin_8cpp_source_l02445}02445\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{net__plugin_8cpp_a0237ff767d828f6a423a4728c65b11b8}{peer\_elog}}(\ \textcolor{keyword}{this},\ \textcolor{stringliteral}{"{}unable\ to\ set\ read\ watermark:\ \$\{e1\}"{}},\ (\textcolor{stringliteral}{"{}e1"{}},\ ec.message())\ );}
 \DoxyCodeLine{\Hypertarget{net__plugin_8cpp_source_l02446}02446\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
@@ -2344,12 +2344,12 @@
 \DoxyCodeLine{\Hypertarget{net__plugin_8cpp_source_l02461}02461\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return};}
 \DoxyCodeLine{\Hypertarget{net__plugin_8cpp_source_l02462}02462\ \ \ \ \ \ \ \ \ \ \}}
 \DoxyCodeLine{\Hypertarget{net__plugin_8cpp_source_l02463}02463\ }
-\DoxyCodeLine{\Hypertarget{net__plugin_8cpp_source_l02464}02464\ \ \ \ \ \ \ \ \ \ boost::asio::async\_read(\ *socket,}
+\DoxyCodeLine{\Hypertarget{net__plugin_8cpp_source_l02464}02464\ \ \ \ \ \ \ \ \ \ boost::asio::async\_read(\ *\mbox{\hyperlink{classsysio_1_1connection_adb1c345e310c4bf64faa889c01440404}{socket}},}
 \DoxyCodeLine{\Hypertarget{net__plugin_8cpp_source_l02465}02465\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1connection_af241d498d210d4e238b73f7bcd1c45d1}{pending\_message\_buffer}}.\mbox{\hyperlink{classfc_1_1message__buffer_a7d14c84a452f14a0616f90cc3771efa9}{get\_buffer\_sequence\_for\_boost\_async\_read}}(),\ completion\_handler,}
 \DoxyCodeLine{\Hypertarget{net__plugin_8cpp_source_l02466}02466\ \ \ \ \ \ \ \ \ \ \ \ \ boost::asio::bind\_executor(\ \mbox{\hyperlink{classsysio_1_1connection_a950c534737276c9d0a2724d9801d7def}{strand}},}
-\DoxyCodeLine{\Hypertarget{net__plugin_8cpp_source_l02467}02467\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ [conn\ =\ shared\_from\_this(),\ socket=socket](\ boost::system::error\_code\ ec,\ std::size\_t\ bytes\_transferred\ )\ \{}
+\DoxyCodeLine{\Hypertarget{net__plugin_8cpp_source_l02467}02467\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ [conn\ =\ shared\_from\_this(),\ \mbox{\hyperlink{classsysio_1_1connection_adb1c345e310c4bf64faa889c01440404}{socket}}=\mbox{\hyperlink{classsysio_1_1connection_adb1c345e310c4bf64faa889c01440404}{socket}}](\ boost::system::error\_code\ ec,\ std::size\_t\ bytes\_transferred\ )\ \{}
 \DoxyCodeLine{\Hypertarget{net__plugin_8cpp_source_l02468}02468\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ may\ have\ closed\ connection\ and\ cleared\ pending\_message\_buffer}}
-\DoxyCodeLine{\Hypertarget{net__plugin_8cpp_source_l02469}02469\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ !conn-\/>socket\_is\_open()\ ||\ socket\ !=\ conn-\/>socket\ )\ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{\Hypertarget{net__plugin_8cpp_source_l02469}02469\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ !conn-\/>socket\_is\_open()\ ||\ \mbox{\hyperlink{classsysio_1_1connection_adb1c345e310c4bf64faa889c01440404}{socket}}\ !=\ conn-\/>socket\ )\ \textcolor{keywordflow}{return};}
 \DoxyCodeLine{\Hypertarget{net__plugin_8cpp_source_l02470}02470\ }
 \DoxyCodeLine{\Hypertarget{net__plugin_8cpp_source_l02471}02471\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{bool}\ close\_connection\ =\ \textcolor{keyword}{false};}
 \DoxyCodeLine{\Hypertarget{net__plugin_8cpp_source_l02472}02472\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{try}\ \{}

@@ -1220,7 +1220,7 @@ Here is the caller graph for this function:</div>
 <div class="fragment"><div class="line"><span class="lineno">  250</span>                                                                                                   {</div>
 <div class="line"><span class="lineno">  251</span>   set_program_options();</div>
 <div class="line"><span class="lineno">  252</span> </div>
-<div class="line"><span class="lineno">  253</span>   bpo::variables_map&amp; <a class="code hl_variable" href="namespacebenchmark_compile.html#acf738bbf3b8391aa78929ceeceb8a03b">options</a> = my-&gt;_options;</div>
+<div class="line"><span class="lineno">  253</span>   bpo::variables_map&amp; options = my-&gt;_options;</div>
 <div class="line"><span class="lineno">  254</span>   <span class="keywordflow">try</span> {</div>
 <div class="line"><span class="lineno">  255</span>      bpo::parsed_options parsed = bpo::command_line_parser(argc, <a class="code hl_variable" href="hello__driver_8cpp.html#af2efa898e9eed6fe6715279cb1ec35b0">argv</a>).options(my-&gt;_app_options).run();</div>
 <div class="line"><span class="lineno">  256</span>      bpo::store(parsed, options);</div>
@@ -1231,53 +1231,53 @@ Here is the caller graph for this function:</div>
 <div class="line"><span class="lineno">  261</span>      BOOST_THROW_EXCEPTION(std::runtime_error(<span class="stringliteral">&quot;Unknown option &#39;&quot;</span> + e.get_option_name() + <span class="stringliteral">&quot;&#39; passed as command line argument&quot;</span>));</div>
 <div class="line"><span class="lineno">  262</span>   }</div>
 <div class="line"><span class="lineno">  263</span> </div>
-<div class="line"><span class="lineno">  264</span>   <span class="keywordflow">if</span>( <a class="code hl_variable" href="namespacebenchmark_compile.html#acf738bbf3b8391aa78929ceeceb8a03b">options</a>.count( <span class="stringliteral">&quot;help&quot;</span> ) ) {</div>
+<div class="line"><span class="lineno">  264</span>   <span class="keywordflow">if</span>( options.count( <span class="stringliteral">&quot;help&quot;</span> ) ) {</div>
 <div class="line"><span class="lineno">  265</span>      cout &lt;&lt; my-&gt;_app_options &lt;&lt; std::endl;</div>
 <div class="line"><span class="lineno">  266</span>      <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
 <div class="line"><span class="lineno">  267</span>   }</div>
 <div class="line"><span class="lineno">  268</span> </div>
-<div class="line"><span class="lineno">  269</span>   <span class="keywordflow">if</span>( <a class="code hl_variable" href="namespacebenchmark_compile.html#acf738bbf3b8391aa78929ceeceb8a03b">options</a>.count( <span class="stringliteral">&quot;version&quot;</span> ) ) {</div>
+<div class="line"><span class="lineno">  269</span>   <span class="keywordflow">if</span>( options.count( <span class="stringliteral">&quot;version&quot;</span> ) ) {</div>
 <div class="line"><span class="lineno">  270</span>      cout &lt;&lt; <a class="code hl_function" href="#a780543c4d0330fe88b912a3fa914f953">version_string</a>() &lt;&lt; std::endl;</div>
 <div class="line"><span class="lineno">  271</span>      <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
 <div class="line"><span class="lineno">  272</span>   }</div>
 <div class="line"><span class="lineno">  273</span> </div>
-<div class="line"><span class="lineno">  274</span>   <span class="keywordflow">if</span>( <a class="code hl_variable" href="namespacebenchmark_compile.html#acf738bbf3b8391aa78929ceeceb8a03b">options</a>.count( <span class="stringliteral">&quot;full-version&quot;</span> ) ) {</div>
+<div class="line"><span class="lineno">  274</span>   <span class="keywordflow">if</span>( options.count( <span class="stringliteral">&quot;full-version&quot;</span> ) ) {</div>
 <div class="line"><span class="lineno">  275</span>      cout &lt;&lt; <a class="code hl_function" href="#ab53fa2d323d053e4e57adc832a9969bb">full_version_string</a>() &lt;&lt; std::endl;</div>
 <div class="line"><span class="lineno">  276</span>      <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
 <div class="line"><span class="lineno">  277</span>   }</div>
 <div class="line"><span class="lineno">  278</span> </div>
-<div class="line"><span class="lineno">  279</span>   <span class="keywordflow">if</span>( <a class="code hl_variable" href="namespacebenchmark_compile.html#acf738bbf3b8391aa78929ceeceb8a03b">options</a>.count( <span class="stringliteral">&quot;print-default-config&quot;</span> ) ) {</div>
+<div class="line"><span class="lineno">  279</span>   <span class="keywordflow">if</span>( options.count( <span class="stringliteral">&quot;print-default-config&quot;</span> ) ) {</div>
 <div class="line"><span class="lineno">  280</span>      print_default_config(cout);</div>
 <div class="line"><span class="lineno">  281</span>      <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
 <div class="line"><span class="lineno">  282</span>   }</div>
 <div class="line"><span class="lineno">  283</span> </div>
-<div class="line"><span class="lineno">  284</span>   <span class="keywordflow">if</span>( <a class="code hl_variable" href="namespacebenchmark_compile.html#acf738bbf3b8391aa78929ceeceb8a03b">options</a>.count( <span class="stringliteral">&quot;data-dir&quot;</span> ) ) {</div>
+<div class="line"><span class="lineno">  284</span>   <span class="keywordflow">if</span>( options.count( <span class="stringliteral">&quot;data-dir&quot;</span> ) ) {</div>
 <div class="line"><span class="lineno">  285</span>      <span class="comment">// Workaround for 10+ year old Boost defect</span></div>
 <div class="line"><span class="lineno">  286</span>      <span class="comment">// See https://svn.boost.org/trac10/ticket/8535</span></div>
 <div class="line"><span class="lineno">  287</span>      <span class="comment">// Should be .as&lt;bfs::path&gt;() but paths with escaped spaces break bpo e.g.</span></div>
 <div class="line"><span class="lineno">  288</span>      <span class="comment">// std::exception::what: the argument (&#39;/path/with/white\ space&#39;) for option &#39;--data-dir&#39; is invalid</span></div>
-<div class="line"><span class="lineno">  289</span>      <span class="keyword">auto</span> workaround = <a class="code hl_variable" href="namespacebenchmark_compile.html#acf738bbf3b8391aa78929ceeceb8a03b">options</a>[<span class="stringliteral">&quot;data-dir&quot;</span>].as&lt;std::string&gt;();</div>
+<div class="line"><span class="lineno">  289</span>      <span class="keyword">auto</span> workaround = options[<span class="stringliteral">&quot;data-dir&quot;</span>].as&lt;std::string&gt;();</div>
 <div class="line"><span class="lineno">  290</span>      bfs::path <a class="code hl_function" href="#a5dfd3cfb1124c57963fa17b3f4aabbe1">data_dir</a> = workaround;</div>
 <div class="line"><span class="lineno">  291</span>      <span class="keywordflow">if</span>( <a class="code hl_function" href="#a5dfd3cfb1124c57963fa17b3f4aabbe1">data_dir</a>.is_relative() )</div>
 <div class="line"><span class="lineno">  292</span>         <a class="code hl_function" href="#a5dfd3cfb1124c57963fa17b3f4aabbe1">data_dir</a> = bfs::current_path() / <a class="code hl_function" href="#a5dfd3cfb1124c57963fa17b3f4aabbe1">data_dir</a>;</div>
 <div class="line"><span class="lineno">  293</span>      my-&gt;_data_dir = <a class="code hl_function" href="#a5dfd3cfb1124c57963fa17b3f4aabbe1">data_dir</a>;</div>
 <div class="line"><span class="lineno">  294</span>   }</div>
 <div class="line"><span class="lineno">  295</span> </div>
-<div class="line"><span class="lineno">  296</span>   <span class="keywordflow">if</span>( <a class="code hl_variable" href="namespacebenchmark_compile.html#acf738bbf3b8391aa78929ceeceb8a03b">options</a>.count( <span class="stringliteral">&quot;config-dir&quot;</span> ) ) {</div>
-<div class="line"><span class="lineno">  297</span>      <span class="keyword">auto</span> workaround = <a class="code hl_variable" href="namespacebenchmark_compile.html#acf738bbf3b8391aa78929ceeceb8a03b">options</a>[<span class="stringliteral">&quot;config-dir&quot;</span>].as&lt;std::string&gt;();</div>
+<div class="line"><span class="lineno">  296</span>   <span class="keywordflow">if</span>( options.count( <span class="stringliteral">&quot;config-dir&quot;</span> ) ) {</div>
+<div class="line"><span class="lineno">  297</span>      <span class="keyword">auto</span> workaround = options[<span class="stringliteral">&quot;config-dir&quot;</span>].as&lt;std::string&gt;();</div>
 <div class="line"><span class="lineno">  298</span>      bfs::path <a class="code hl_function" href="#a9b2c99749c7209e218a3dbbe51cfdeac">config_dir</a> = workaround;</div>
 <div class="line"><span class="lineno">  299</span>      <span class="keywordflow">if</span>( <a class="code hl_function" href="#a9b2c99749c7209e218a3dbbe51cfdeac">config_dir</a>.is_relative() )</div>
 <div class="line"><span class="lineno">  300</span>         <a class="code hl_function" href="#a9b2c99749c7209e218a3dbbe51cfdeac">config_dir</a> = bfs::current_path() / <a class="code hl_function" href="#a9b2c99749c7209e218a3dbbe51cfdeac">config_dir</a>;</div>
 <div class="line"><span class="lineno">  301</span>      my-&gt;_config_dir = <a class="code hl_function" href="#a9b2c99749c7209e218a3dbbe51cfdeac">config_dir</a>;</div>
 <div class="line"><span class="lineno">  302</span>   }</div>
 <div class="line"><span class="lineno">  303</span> </div>
-<div class="line"><span class="lineno">  304</span>   <span class="keyword">auto</span> workaround = <a class="code hl_variable" href="namespacebenchmark_compile.html#acf738bbf3b8391aa78929ceeceb8a03b">options</a>[<span class="stringliteral">&quot;logconf&quot;</span>].as&lt;std::string&gt;();</div>
+<div class="line"><span class="lineno">  304</span>   <span class="keyword">auto</span> workaround = options[<span class="stringliteral">&quot;logconf&quot;</span>].as&lt;std::string&gt;();</div>
 <div class="line"><span class="lineno">  305</span>   bfs::path logconf = workaround;</div>
 <div class="line"><span class="lineno">  306</span>   <span class="keywordflow">if</span>( logconf.is_relative() )</div>
 <div class="line"><span class="lineno">  307</span>      logconf = my-&gt;_config_dir / logconf;</div>
 <div class="line"><span class="lineno">  308</span>   my-&gt;_logging_conf = logconf;</div>
 <div class="line"><span class="lineno">  309</span> </div>
-<div class="line"><span class="lineno">  310</span>   workaround = <a class="code hl_variable" href="namespacebenchmark_compile.html#acf738bbf3b8391aa78929ceeceb8a03b">options</a>[<span class="stringliteral">&quot;config&quot;</span>].as&lt;std::string&gt;();</div>
+<div class="line"><span class="lineno">  310</span>   workaround = options[<span class="stringliteral">&quot;config&quot;</span>].as&lt;std::string&gt;();</div>
 <div class="line"><span class="lineno">  311</span>   my-&gt;_config_file_name = workaround;</div>
 <div class="line"><span class="lineno">  312</span>   <span class="keywordflow">if</span>( my-&gt;_config_file_name.is_relative() )</div>
 <div class="line"><span class="lineno">  313</span>      my-&gt;_config_file_name = my-&gt;_config_dir / my-&gt;_config_file_name;</div>
@@ -1342,9 +1342,9 @@ Here is the caller graph for this function:</div>
 <div class="line"><span class="lineno">  372</span>      std::cerr &lt;&lt; <span class="stringliteral">&quot;         removing these items.&quot;</span> &lt;&lt; std::endl;</div>
 <div class="line"><span class="lineno">  373</span>   }</div>
 <div class="line"><span class="lineno">  374</span> </div>
-<div class="line"><span class="lineno">  375</span>   <span class="keywordflow">if</span>(<a class="code hl_variable" href="namespacebenchmark_compile.html#acf738bbf3b8391aa78929ceeceb8a03b">options</a>.count(<span class="stringliteral">&quot;plugin&quot;</span>) &gt; 0)</div>
+<div class="line"><span class="lineno">  375</span>   <span class="keywordflow">if</span>(options.count(<span class="stringliteral">&quot;plugin&quot;</span>) &gt; 0)</div>
 <div class="line"><span class="lineno">  376</span>   {</div>
-<div class="line"><span class="lineno">  377</span>      <span class="keyword">auto</span> plugins = <a class="code hl_variable" href="namespacebenchmark_compile.html#acf738bbf3b8391aa78929ceeceb8a03b">options</a>.at(<span class="stringliteral">&quot;plugin&quot;</span>).as&lt;std::vector&lt;std::string&gt;&gt;();</div>
+<div class="line"><span class="lineno">  377</span>      <span class="keyword">auto</span> plugins = options.at(<span class="stringliteral">&quot;plugin&quot;</span>).as&lt;std::vector&lt;std::string&gt;&gt;();</div>
 <div class="line"><span class="lineno">  378</span>      <span class="keywordflow">for</span>(<span class="keyword">auto</span>&amp; arg : plugins)</div>
 <div class="line"><span class="lineno">  379</span>      {</div>
 <div class="line"><span class="lineno">  380</span>         vector&lt;string&gt; names;</div>
@@ -1374,7 +1374,6 @@ Here is the caller graph for this function:</div>
 <div class="ttc" id="aclassappbase_1_1application_html_a9e37a08603d6b3b3cc06d662fc4100eb"><div class="ttname"><a href="#a9e37a08603d6b3b3cc06d662fc4100eb">appbase::application::get_plugin</a></div><div class="ttdeci">Plugin &amp; get_plugin() const</div><div class="ttdef"><b>Definition</b> <a href="application_8hpp_source.html#l00154">application.hpp:154</a></div></div>
 <div class="ttc" id="aclassappbase_1_1application_html_ab53fa2d323d053e4e57adc832a9969bb"><div class="ttname"><a href="#ab53fa2d323d053e4e57adc832a9969bb">appbase::application::full_version_string</a></div><div class="ttdeci">string full_version_string() const</div><div class="ttdoc">Get full version string; same as version_string() unless set differently.</div><div class="ttdef"><b>Definition</b> <a href="application_8cpp_source.html#l00114">application.cpp:114</a></div></div>
 <div class="ttc" id="aclassappbase_1_1application_html_ad76f20d019c93aec51c49c7b9c8cda18"><div class="ttname"><a href="#ad76f20d019c93aec51c49c7b9c8cda18">appbase::application::plugin</a></div><div class="ttdeci">friend class plugin</div><div class="ttdef"><b>Definition</b> <a href="application_8hpp_source.html#l00241">application.hpp:241</a></div></div>
-<div class="ttc" id="anamespacebenchmark_compile_html_acf738bbf3b8391aa78929ceeceb8a03b"><div class="ttname"><a href="namespacebenchmark_compile.html#acf738bbf3b8391aa78929ceeceb8a03b">benchmarkCompile.options</a></div><div class="ttdeci">list options</div><div class="ttdef"><b>Definition</b> <a href="benchmark_compile_8py_source.html#l00107">benchmarkCompile.py:107</a></div></div>
 </div><!-- fragment --><div class="dynheader">
 Here is the call graph for this function:</div>
 <div class="dyncontent">

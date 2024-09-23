@@ -2291,15 +2291,15 @@ template&lt;typename <a class="el" href="prettywritertest_8cpp.html#a6283df8c4e3
 <div class="line"><span class="lineno">  471</span>        <a class="code hl_variable" href="_x02-_disabled_macros_8cpp.html#ae28240b98d91d6eb7da702b770490f39">f</a> = <a class="code hl_variable" href="_x02-_disabled_macros_8cpp.html#ae28240b98d91d6eb7da702b770490f39">f</a>.inverse();</div>
 <div class="line"><span class="lineno">  472</span>    }</div>
 <div class="line"><span class="lineno">  473</span> </div>
-<div class="line"><span class="lineno">  474</span>    alt_bn128_ate_ell_coeffs c1 = prec_Q1.<a class="code hl_variable" href="structlibff_1_1alt__bn128__ate___g2__precomp.html#a093576e21dbfbab74253b847b1c0dce7">coeffs</a>[<a class="code hl_variable" href="namespacehost__functions__tests__1.html#a8496a24b5236a2dc07bb4f2930d88342">idx</a>];</div>
-<div class="line"><span class="lineno">  475</span>    alt_bn128_ate_ell_coeffs c2 = prec_Q2.<a class="code hl_variable" href="structlibff_1_1alt__bn128__ate___g2__precomp.html#a093576e21dbfbab74253b847b1c0dce7">coeffs</a>[<a class="code hl_variable" href="namespacehost__functions__tests__1.html#a8496a24b5236a2dc07bb4f2930d88342">idx</a>];</div>
-<div class="line"><span class="lineno">  476</span>    ++<a class="code hl_variable" href="namespacehost__functions__tests__1.html#a8496a24b5236a2dc07bb4f2930d88342">idx</a>;</div>
+<div class="line"><span class="lineno">  474</span>    alt_bn128_ate_ell_coeffs c1 = prec_Q1.<a class="code hl_variable" href="structlibff_1_1alt__bn128__ate___g2__precomp.html#a093576e21dbfbab74253b847b1c0dce7">coeffs</a>[idx];</div>
+<div class="line"><span class="lineno">  475</span>    alt_bn128_ate_ell_coeffs c2 = prec_Q2.<a class="code hl_variable" href="structlibff_1_1alt__bn128__ate___g2__precomp.html#a093576e21dbfbab74253b847b1c0dce7">coeffs</a>[idx];</div>
+<div class="line"><span class="lineno">  476</span>    ++idx;</div>
 <div class="line"><span class="lineno">  477</span>    <a class="code hl_variable" href="_x02-_disabled_macros_8cpp.html#ae28240b98d91d6eb7da702b770490f39">f</a> = <a class="code hl_variable" href="_x02-_disabled_macros_8cpp.html#ae28240b98d91d6eb7da702b770490f39">f</a>.mul_by_024(c1.ell_0, prec_P1.<a class="code hl_variable" href="structlibff_1_1alt__bn128__ate___g1__precomp.html#a5db2c840300e686e5d126b9f594b2ee5">PY</a> * c1.ell_VW, prec_P1.<a class="code hl_variable" href="structlibff_1_1alt__bn128__ate___g1__precomp.html#a81552b61b56535280e67730014522177">PX</a> * c1.ell_VV);</div>
 <div class="line"><span class="lineno">  478</span>    <a class="code hl_variable" href="_x02-_disabled_macros_8cpp.html#ae28240b98d91d6eb7da702b770490f39">f</a> = <a class="code hl_variable" href="_x02-_disabled_macros_8cpp.html#ae28240b98d91d6eb7da702b770490f39">f</a>.mul_by_024(c2.ell_0, prec_P2.<a class="code hl_variable" href="structlibff_1_1alt__bn128__ate___g1__precomp.html#a5db2c840300e686e5d126b9f594b2ee5">PY</a> * c2.ell_VW, prec_P2.<a class="code hl_variable" href="structlibff_1_1alt__bn128__ate___g1__precomp.html#a81552b61b56535280e67730014522177">PX</a> * c2.ell_VV);</div>
 <div class="line"><span class="lineno">  479</span> </div>
-<div class="line"><span class="lineno">  480</span>    c1 = prec_Q1.<a class="code hl_variable" href="structlibff_1_1alt__bn128__ate___g2__precomp.html#a093576e21dbfbab74253b847b1c0dce7">coeffs</a>[<a class="code hl_variable" href="namespacehost__functions__tests__1.html#a8496a24b5236a2dc07bb4f2930d88342">idx</a>];</div>
-<div class="line"><span class="lineno">  481</span>    c2 = prec_Q2.<a class="code hl_variable" href="structlibff_1_1alt__bn128__ate___g2__precomp.html#a093576e21dbfbab74253b847b1c0dce7">coeffs</a>[<a class="code hl_variable" href="namespacehost__functions__tests__1.html#a8496a24b5236a2dc07bb4f2930d88342">idx</a>];</div>
-<div class="line"><span class="lineno">  482</span>    ++<a class="code hl_variable" href="namespacehost__functions__tests__1.html#a8496a24b5236a2dc07bb4f2930d88342">idx</a>;</div>
+<div class="line"><span class="lineno">  480</span>    c1 = prec_Q1.<a class="code hl_variable" href="structlibff_1_1alt__bn128__ate___g2__precomp.html#a093576e21dbfbab74253b847b1c0dce7">coeffs</a>[idx];</div>
+<div class="line"><span class="lineno">  481</span>    c2 = prec_Q2.<a class="code hl_variable" href="structlibff_1_1alt__bn128__ate___g2__precomp.html#a093576e21dbfbab74253b847b1c0dce7">coeffs</a>[idx];</div>
+<div class="line"><span class="lineno">  482</span>    ++idx;</div>
 <div class="line"><span class="lineno">  483</span>    <a class="code hl_variable" href="_x02-_disabled_macros_8cpp.html#ae28240b98d91d6eb7da702b770490f39">f</a> = <a class="code hl_variable" href="_x02-_disabled_macros_8cpp.html#ae28240b98d91d6eb7da702b770490f39">f</a>.mul_by_024(c1.ell_0, prec_P1.<a class="code hl_variable" href="structlibff_1_1alt__bn128__ate___g1__precomp.html#a5db2c840300e686e5d126b9f594b2ee5">PY</a> * c1.ell_VW, prec_P1.<a class="code hl_variable" href="structlibff_1_1alt__bn128__ate___g1__precomp.html#a81552b61b56535280e67730014522177">PX</a> * c1.ell_VV);</div>
 <div class="line"><span class="lineno">  484</span>    <a class="code hl_variable" href="_x02-_disabled_macros_8cpp.html#ae28240b98d91d6eb7da702b770490f39">f</a> = <a class="code hl_variable" href="_x02-_disabled_macros_8cpp.html#ae28240b98d91d6eb7da702b770490f39">f</a>.mul_by_024(c2.ell_0, prec_P2.<a class="code hl_variable" href="structlibff_1_1alt__bn128__ate___g1__precomp.html#a5db2c840300e686e5d126b9f594b2ee5">PY</a> * c2.ell_VW, prec_P2.<a class="code hl_variable" href="structlibff_1_1alt__bn128__ate___g1__precomp.html#a81552b61b56535280e67730014522177">PX</a> * c2.ell_VV);</div>
 <div class="line"><span class="lineno">  485</span> </div>
@@ -2312,7 +2312,6 @@ template&lt;typename <a class="el" href="prettywritertest_8cpp.html#a6283df8c4e3
 <div class="ttc" id="aclasslibff_1_1bigint_html"><div class="ttname"><a href="classlibff_1_1bigint.html">libff::bigint</a></div><div class="ttdef"><b>Definition</b> <a href="libraries_2ff_2libff_2algebra_2fields_2bigint_8hpp_source.html#l00031">bigint.hpp:31</a></div></div>
 <div class="ttc" id="aclasslibff_1_1bigint_html_ab54f219b74b0482c0cc0a02252ae2a84"><div class="ttname"><a href="classlibff_1_1bigint.html#ab54f219b74b0482c0cc0a02252ae2a84">libff::bigint::test_bit</a></div><div class="ttdeci">bool test_bit(const std::size_t bitno) const</div></div>
 <div class="ttc" id="aclasslibff_1_1bigint_html_abdbea6b608ff15910d83bbaf8bd5a688"><div class="ttname"><a href="classlibff_1_1bigint.html#abdbea6b608ff15910d83bbaf8bd5a688">libff::bigint::max_bits</a></div><div class="ttdeci">size_t max_bits() const</div><div class="ttdef"><b>Definition</b> <a href="libraries_2ff_2libff_2algebra_2fields_2bigint_8hpp_source.html#l00048">bigint.hpp:48</a></div></div>
-<div class="ttc" id="anamespacehost__functions__tests__1_html_a8496a24b5236a2dc07bb4f2930d88342"><div class="ttname"><a href="namespacehost__functions__tests__1.html#a8496a24b5236a2dc07bb4f2930d88342">host_functions_tests_1.idx</a></div><div class="ttdeci">int idx</div><div class="ttdef"><b>Definition</b> <a href="host__functions__tests__1_8py_source.html#l00021">host_functions_tests_1.py:21</a></div></div>
 <div class="ttc" id="anamespacelibff_html_a64168e59c1ced7a22a49f7d819c02794"><div class="ttname"><a href="#a64168e59c1ced7a22a49f7d819c02794">libff::enter_block</a></div><div class="ttdeci">void enter_block(const std::string &amp;msg, const bool indent)</div><div class="ttdef"><b>Definition</b> <a href="profiling_8cpp_source.html#l00245">profiling.cpp:245</a></div></div>
 <div class="ttc" id="anamespacelibff_html_a6d27cea7791bbed99fc868a137aeda9d"><div class="ttname"><a href="#a6d27cea7791bbed99fc868a137aeda9d">libff::alt_bn128_ate_loop_count</a></div><div class="ttdeci">bigint&lt; alt_bn128_q_limbs &gt; alt_bn128_ate_loop_count</div><div class="ttdef"><b>Definition</b> <a href="alt__bn128__init_8cpp_source.html#l00025">alt_bn128_init.cpp:25</a></div></div>
 <div class="ttc" id="anamespacelibff_html_ac68d4feb3f7413e9e7de86e06fe6ef1f"><div class="ttname"><a href="#ac68d4feb3f7413e9e7de86e06fe6ef1f">libff::leave_block</a></div><div class="ttdeci">void leave_block(const std::string &amp;msg, const bool indent)</div><div class="ttdef"><b>Definition</b> <a href="profiling_8cpp_source.html#l00282">profiling.cpp:282</a></div></div>
@@ -2429,10 +2428,10 @@ Here is the caller graph for this function:</div>
 <div class="line"><span class="lineno">  409</span>        <a class="code hl_variable" href="_x02-_disabled_macros_8cpp.html#ae28240b98d91d6eb7da702b770490f39">f</a> = <a class="code hl_variable" href="_x02-_disabled_macros_8cpp.html#ae28240b98d91d6eb7da702b770490f39">f</a>.inverse();</div>
 <div class="line"><span class="lineno">  410</span>    }</div>
 <div class="line"><span class="lineno">  411</span> </div>
-<div class="line"><span class="lineno">  412</span>    c = prec_Q.<a class="code hl_variable" href="structlibff_1_1alt__bn128__ate___g2__precomp.html#a093576e21dbfbab74253b847b1c0dce7">coeffs</a>[<a class="code hl_variable" href="namespacehost__functions__tests__1.html#a8496a24b5236a2dc07bb4f2930d88342">idx</a>++];</div>
+<div class="line"><span class="lineno">  412</span>    c = prec_Q.<a class="code hl_variable" href="structlibff_1_1alt__bn128__ate___g2__precomp.html#a093576e21dbfbab74253b847b1c0dce7">coeffs</a>[idx++];</div>
 <div class="line"><span class="lineno">  413</span>    <a class="code hl_variable" href="_x02-_disabled_macros_8cpp.html#ae28240b98d91d6eb7da702b770490f39">f</a> = <a class="code hl_variable" href="_x02-_disabled_macros_8cpp.html#ae28240b98d91d6eb7da702b770490f39">f</a>.mul_by_024(c.<a class="code hl_variable" href="structlibff_1_1alt__bn128__ate__ell__coeffs.html#a68ba454273dff19747e9cba44cd2950f">ell_0</a>,prec_P.<a class="code hl_variable" href="structlibff_1_1alt__bn128__ate___g1__precomp.html#a5db2c840300e686e5d126b9f594b2ee5">PY</a> * c.<a class="code hl_variable" href="structlibff_1_1alt__bn128__ate__ell__coeffs.html#a78664903b1bc91fc0f899bff0ab23ad9">ell_VW</a>,prec_P.<a class="code hl_variable" href="structlibff_1_1alt__bn128__ate___g1__precomp.html#a81552b61b56535280e67730014522177">PX</a> * c.<a class="code hl_variable" href="structlibff_1_1alt__bn128__ate__ell__coeffs.html#a009aeadb6e8f89405692e0a78c47b571">ell_VV</a>);</div>
 <div class="line"><span class="lineno">  414</span> </div>
-<div class="line"><span class="lineno">  415</span>    c = prec_Q.<a class="code hl_variable" href="structlibff_1_1alt__bn128__ate___g2__precomp.html#a093576e21dbfbab74253b847b1c0dce7">coeffs</a>[<a class="code hl_variable" href="namespacehost__functions__tests__1.html#a8496a24b5236a2dc07bb4f2930d88342">idx</a>++];</div>
+<div class="line"><span class="lineno">  415</span>    c = prec_Q.<a class="code hl_variable" href="structlibff_1_1alt__bn128__ate___g2__precomp.html#a093576e21dbfbab74253b847b1c0dce7">coeffs</a>[idx++];</div>
 <div class="line"><span class="lineno">  416</span>    <a class="code hl_variable" href="_x02-_disabled_macros_8cpp.html#ae28240b98d91d6eb7da702b770490f39">f</a> = <a class="code hl_variable" href="_x02-_disabled_macros_8cpp.html#ae28240b98d91d6eb7da702b770490f39">f</a>.mul_by_024(c.<a class="code hl_variable" href="structlibff_1_1alt__bn128__ate__ell__coeffs.html#a68ba454273dff19747e9cba44cd2950f">ell_0</a>,prec_P.<a class="code hl_variable" href="structlibff_1_1alt__bn128__ate___g1__precomp.html#a5db2c840300e686e5d126b9f594b2ee5">PY</a> * c.<a class="code hl_variable" href="structlibff_1_1alt__bn128__ate__ell__coeffs.html#a78664903b1bc91fc0f899bff0ab23ad9">ell_VW</a>,prec_P.<a class="code hl_variable" href="structlibff_1_1alt__bn128__ate___g1__precomp.html#a81552b61b56535280e67730014522177">PX</a> * c.<a class="code hl_variable" href="structlibff_1_1alt__bn128__ate__ell__coeffs.html#a009aeadb6e8f89405692e0a78c47b571">ell_VV</a>);</div>
 <div class="line"><span class="lineno">  417</span> </div>
 <div class="line"><span class="lineno">  418</span>    <a class="code hl_function" href="#ac68d4feb3f7413e9e7de86e06fe6ef1f">leave_block</a>(<span class="stringliteral">&quot;Call to alt_bn128_ate_miller_loop&quot;</span>);</div>
@@ -9118,8 +9117,8 @@ Here is the call graph for this function:</div>
 <area shape="poly" title=" " alt="" coords="351,256,439,256,439,261,351,261"/>
 <area shape="rect" href="classmie_1_1_vsint_t.html#afb5d2b64ce04687f16c66f85b06eae5c" title=" " alt="" coords="441,295,553,320"/>
 <area shape="poly" title=" " alt="" coords="351,269,427,288,426,293,350,274"/>
-<area shape="rect" href="classmie_1_1_fp.html#af8679fcab0ee97ee5e8f201e396f6c78" title=" " alt="" coords="640,425,773,451"/>
-<area shape="poly" title=" " alt="" coords="352,269,378,281,394,294,403,306,412,319,426,331,464,350,495,360,529,368,570,381,660,416,658,421,568,386,527,373,494,365,462,355,424,335,408,322,399,310,390,297,376,286,350,274"/>
+<area shape="rect" href="classmie_1_1_fp.html#af8679fcab0ee97ee5e8f201e396f6c78" title=" " alt="" coords="640,443,773,468"/>
+<area shape="poly" title=" " alt="" coords="352,269,378,281,394,294,403,306,412,319,426,331,464,350,496,359,529,367,570,381,671,432,668,437,568,386,528,372,495,364,462,355,424,335,408,322,399,310,390,297,376,286,350,274"/>
 <area shape="rect" href="classmie_1_1_fp.html#af9c80c57f34c9fb31ba4c6e862b5b017" title=" " alt="" coords="441,396,553,422"/>
 <area shape="poly" title=" " alt="" coords="353,267,379,281,397,305,404,329,411,352,427,375,442,386,439,391,423,379,406,354,399,330,392,307,375,286,350,271"/>
 <area shape="rect" href="namespacemie.html#a1fbbd3566a6d17b92b0780b4f8aaa89f" title=" " alt="" coords="454,445,540,471"/>
@@ -9132,42 +9131,44 @@ Here is the call graph for this function:</div>
 <area shape="poly" title=" " alt="" coords="546,144,568,133,582,122,591,111,601,100,616,89,627,84,629,89,619,94,604,104,595,115,586,126,571,138,548,149"/>
 <area shape="rect" href="namespacebn_1_1util.html#ab00095c4a358927bf1a9ea90685bb335" title=" " alt="" coords="617,154,796,194"/>
 <area shape="poly" title=" " alt="" coords="570,162,602,164,601,169,569,167"/>
-<area shape="rect" href="structmie_1_1_vuint_t.html#a9343e5ca3019afd97e1d7a9f3bd5d6f8" title=" " alt="" coords="878,135,1007,160"/>
-<area shape="poly" title=" " alt="" coords="788,125,863,134,862,140,788,130"/>
-<area shape="rect" href="structmie_1_1_vuint_t.html#ae7af53ad3576a7d3c7d653062efd8a5c" title=" " alt="" coords="876,85,1008,111"/>
-<area shape="poly" title=" " alt="" coords="788,108,860,102,861,107,788,113"/>
-<area shape="rect" href="structmie_1_1_vuint_t.html#a5ebbc4896607410c747186c4f55d6b1b" title=" " alt="" coords="1089,160,1219,186"/>
-<area shape="poly" title=" " alt="" coords="1008,153,1074,161,1073,166,1007,158"/>
-<area shape="rect" href="structmie_1_1_vuint_t.html#a1be409ac9e110dc4b60234ce37cbf0c8" title=" " alt="" coords="1095,317,1213,343"/>
-<area shape="poly" title=" " alt="" coords="964,159,1043,221,1131,305,1128,308,1039,226,960,163"/>
-<area shape="rect" href="namespacebn_1_1util.html#ac9ed3fc4cd8a3692d51b6521a67515dd" title=" " alt="" coords="857,36,1028,62"/>
-<area shape="poly" title=" " alt="" coords="783,59,842,54,842,59,783,64"/>
+<area shape="rect" href="structmie_1_1_vuint_t.html#a9343e5ca3019afd97e1d7a9f3bd5d6f8" title=" " alt="" coords="878,117,1007,143"/>
+<area shape="poly" title=" " alt="" coords="788,119,862,123,862,128,788,124"/>
+<area shape="rect" href="structmie_1_1_vuint_t.html#ae7af53ad3576a7d3c7d653062efd8a5c" title=" " alt="" coords="876,68,1008,94"/>
+<area shape="poly" title=" " alt="" coords="788,102,860,91,861,96,788,107"/>
+<area shape="rect" href="structmie_1_1_vuint_t.html#a5ebbc4896607410c747186c4f55d6b1b" title=" " alt="" coords="1089,143,1219,168"/>
+<area shape="poly" title=" " alt="" coords="1008,135,1074,143,1073,149,1007,141"/>
+<area shape="rect" href="structmie_1_1_vuint_t.html#a1be409ac9e110dc4b60234ce37cbf0c8" title=" " alt="" coords="1095,305,1213,331"/>
+<area shape="poly" title=" " alt="" coords="964,141,1043,204,1132,292,1128,296,1039,208,960,146"/>
+<area shape="rect" href="namespacebn_1_1util.html#ac9ed3fc4cd8a3692d51b6521a67515dd" title=" " alt="" coords="857,19,1028,44"/>
+<area shape="poly" title=" " alt="" coords="782,53,841,44,842,49,783,59"/>
 <area shape="rect" href="classmie_1_1_fp.html#a3ec640185d307358357c22c7feed35f3" title=" " alt="" coords="661,219,752,244"/>
 <area shape="poly" title=" " alt="" coords="559,213,646,222,646,228,558,218"/>
-<area shape="poly" title=" " alt="" coords="752,223,1073,181,1074,186,752,228"/>
-<area shape="rect" href="structmie_1_1_vuint_t.html#a37838a763e8b608a0aeba236ec1313a7" title=" " alt="" coords="881,236,1004,262"/>
-<area shape="poly" title=" " alt="" coords="752,232,866,241,866,246,752,237"/>
-<area shape="poly" title=" " alt="" coords="773,432,899,417,970,404,1040,385,1081,368,1118,349,1120,354,1083,373,1042,390,972,409,900,422,774,437"/>
-<area shape="poly" title=" " alt="" coords="712,424,731,392,760,351,797,307,842,271,865,259,868,264,845,275,801,311,764,354,735,395,717,426"/>
-<area shape="rect" href="namespace_xbyak.html#ad60ea5f6215534109ed45a19f413a6f0" title=" " alt="" coords="888,285,996,311"/>
-<area shape="poly" title=" " alt="" coords="718,423,768,373,804,345,842,321,872,309,874,314,845,326,807,350,772,377,721,427"/>
-<area shape="rect" href="class_xbyak_1_1_code_array.html#ab8a548e2f4d28828fce62b0ab79e7551" title=" " alt="" coords="844,335,1041,376"/>
-<area shape="poly" title=" " alt="" coords="745,422,867,379,869,384,747,427"/>
-<area shape="rect" href="lib__test_8cpp.html#a02fd73d861ef2e4aabb38c0c9ff82947" title=" " alt="" coords="923,672,962,698"/>
-<area shape="poly" title=" " alt="" coords="716,450,763,535,800,587,845,635,877,656,909,671,907,676,874,661,842,639,796,591,758,537,712,453"/>
-<area shape="rect" href="class_xbyak_1_1_code_array.html#aeabe84fe014e9d4f4065608ec3c29e5a" title=" " alt="" coords="854,451,1030,476"/>
-<area shape="poly" title=" " alt="" coords="774,443,839,450,838,455,773,448"/>
-<area shape="rect" href="structmie_1_1_fp_1_1_dbl.html#a3f5c0f2e94bc7b5f0e6c1027e59ac290" title=" " alt="" coords="865,500,1020,526"/>
-<area shape="poly" title=" " alt="" coords="741,449,844,486,868,493,867,498,843,491,739,454"/>
-<area shape="rect" href="classmie_1_1_fp.html#aeb0819f69c38adb875b4ff9c497deddd" title=" " alt="" coords="879,549,1006,575"/>
-<area shape="poly" title=" " alt="" coords="723,449,775,492,808,516,845,536,865,544,863,549,843,541,806,520,771,496,720,453"/>
-<area shape="rect" href="classmie_1_1_zm_z.html#a2619580172130a9f7a085ff64bc1083f" title=" " alt="" coords="870,599,1015,624"/>
-<area shape="poly" title=" " alt="" coords="718,450,766,515,803,553,845,585,857,591,854,596,842,590,799,557,762,519,714,453"/>
-<area shape="poly" title=" " alt="" coords="921,681,904,670,901,658,915,648,942,645,966,648,981,654,985,664,977,674,973,670,979,663,977,657,965,653,942,651,916,654,906,660,908,667,924,677"/>
-<area shape="rect" href="struct_a.html#ae6a8af4c0a13366326d0f3784d46847b" title=" " alt="" coords="1126,647,1182,672"/>
-<area shape="poly" title=" " alt="" coords="962,680,1110,662,1111,667,962,685"/>
-<area shape="rect" href="lib_8h.html#a3275d706a60352411b10ffe9c266f0cd" title=" " alt="" coords="1122,696,1186,722"/>
-<area shape="poly" title=" " alt="" coords="962,684,1107,701,1107,706,962,690"/>
+<area shape="poly" title=" " alt="" coords="751,220,843,204,1073,165,1074,171,844,209,752,226"/>
+<area shape="rect" href="structmie_1_1_vuint_t.html#a37838a763e8b608a0aeba236ec1313a7" title=" " alt="" coords="881,268,1004,294"/>
+<area shape="poly" title=" " alt="" coords="753,238,867,262,866,268,752,244"/>
+<area shape="rect" href="classmie_1_1_fp.html#aad61a39ac267933278ea88ae87aa3357" title=" " alt="" coords="888,219,997,244"/>
+<area shape="poly" title=" " alt="" coords="752,229,872,229,872,234,752,234"/>
+<area shape="poly" title=" " alt="" coords="774,452,832,449,900,440,971,426,1040,402,1089,373,1128,340,1132,344,1092,377,1042,407,973,431,901,446,833,454,774,458"/>
+<area shape="poly" title=" " alt="" coords="714,441,762,374,799,335,842,303,865,292,867,297,845,307,803,339,766,378,718,444"/>
+<area shape="rect" href="namespace_xbyak.html#ad60ea5f6215534109ed45a19f413a6f0" title=" " alt="" coords="888,468,996,494"/>
+<area shape="poly" title=" " alt="" coords="774,460,873,471,873,476,773,465"/>
+<area shape="rect" href="class_xbyak_1_1_code_array.html#ab8a548e2f4d28828fce62b0ab79e7551" title=" " alt="" coords="844,518,1041,558"/>
+<area shape="poly" title=" " alt="" coords="743,466,845,504,863,510,861,515,843,509,741,471"/>
+<area shape="rect" href="lib__test_8cpp.html#a02fd73d861ef2e4aabb38c0c9ff82947" title=" " alt="" coords="923,607,962,632"/>
+<area shape="poly" title=" " alt="" coords="723,467,775,514,845,568,910,603,908,608,842,572,771,518,719,471"/>
+<area shape="rect" href="class_xbyak_1_1_code_array.html#aeabe84fe014e9d4f4065608ec3c29e5a" title=" " alt="" coords="854,656,1030,682"/>
+<area shape="poly" title=" " alt="" coords="716,468,733,503,761,551,798,601,821,623,845,643,852,647,849,651,842,647,817,627,794,604,756,554,728,506,711,470"/>
+<area shape="rect" href="structmie_1_1_fp_1_1_dbl.html#a3f5c0f2e94bc7b5f0e6c1027e59ac290" title=" " alt="" coords="865,705,1020,731"/>
+<area shape="poly" title=" " alt="" coords="714,468,728,512,754,573,793,637,817,667,845,692,853,697,850,701,842,696,813,670,788,641,749,575,723,514,709,470"/>
+<area shape="rect" href="classmie_1_1_fp.html#aeb0819f69c38adb875b4ff9c497deddd" title=" " alt="" coords="879,317,1006,343"/>
+<area shape="poly" title=" " alt="" coords="720,440,771,397,806,372,843,352,863,343,865,348,845,357,808,377,774,401,723,444"/>
+<area shape="rect" href="classmie_1_1_zm_z.html#a2619580172130a9f7a085ff64bc1083f" title=" " alt="" coords="870,367,1015,392"/>
+<area shape="poly" title=" " alt="" coords="748,440,885,395,887,400,750,445"/>
+<area shape="poly" title=" " alt="" coords="921,616,904,605,901,592,915,583,942,580,966,582,981,588,985,598,977,608,973,605,979,598,977,592,965,587,942,585,916,588,906,594,908,602,924,611"/>
+<area shape="rect" href="struct_a.html#ae6a8af4c0a13366326d0f3784d46847b" title=" " alt="" coords="1126,583,1182,608"/>
+<area shape="poly" title=" " alt="" coords="962,615,1110,598,1111,603,962,620"/>
+<area shape="rect" href="lib_8h.html#a3275d706a60352411b10ffe9c266f0cd" title=" " alt="" coords="1122,632,1186,658"/>
+<area shape="poly" title=" " alt="" coords="962,619,1107,637,1107,642,962,624"/>
 </map>
 </div>
 <div class="dynheader">

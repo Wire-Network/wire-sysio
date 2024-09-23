@@ -4,7 +4,8 @@
 {\ttfamily \#include $<$iostream$>$}\newline
 {\ttfamily \#include $<$iomanip$>$}\newline
 {\ttfamily \#include $<$cctype$>$}\newline
-Include dependency graph for addr2line.\+cpp\+:\nopagebreak
+Include dependency graph for addr2line.\+cpp\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -59,7 +60,8 @@ Definition at line \mbox{\hyperlink{addr2line_8cpp_source_l00029}{29}} of file \
 \DoxyCodeLine{00043\ \}}
 
 \end{DoxyCode}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -83,7 +85,7 @@ Definition at line \mbox{\hyperlink{addr2line_8cpp_source_l00053}{53}} of file \
 \DoxyCodeLine{00055\ \ \ \ \textcolor{keywordtype}{bool}\ print\_functions\ =\ \textcolor{keyword}{false};}
 \DoxyCodeLine{00056\ \ \ \ \textcolor{keywordtype}{bool}\ pretty\ =\ \textcolor{keyword}{false};}
 \DoxyCodeLine{00057\ \ \ \ std::vector<std::string>\ addresses;}
-\DoxyCodeLine{00058\ \ \ \ std::string\ \mbox{\hyperlink{namespaceembed_clara_a1e1bd594f85f58f5dca6c41c0ac720fb}{filename}}\ =\ \textcolor{stringliteral}{"{}a.out"{}};}
+\DoxyCodeLine{00058\ \ \ \ std::string\ filename\ =\ \textcolor{stringliteral}{"{}a.out"{}};}
 \DoxyCodeLine{00059\ \ \ \ \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int}\ i\ =\ 1;\ i\ <\ argc;\ ++i)\ \{}
 \DoxyCodeLine{00060\ \ \ \ \ \ \ std::string\ arg\ =\ \mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}}[i];}
 \DoxyCodeLine{00061\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(arg\ ==\ \textcolor{stringliteral}{"{}-\/h"{}}\ ||\ arg\ ==\ \textcolor{stringliteral}{"{}-\/-\/help"{}})\ \{}
@@ -95,13 +97,13 @@ Definition at line \mbox{\hyperlink{addr2line_8cpp_source_l00053}{53}} of file \
 \DoxyCodeLine{00067\ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Ignore\ requests\ to\ demangle}}
 \DoxyCodeLine{00068\ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}(arg\ ==\ \textcolor{stringliteral}{"{}-\/e"{}})\ \{}
 \DoxyCodeLine{00069\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(++i\ <\ argc)\ \{}
-\DoxyCodeLine{00070\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespaceembed_clara_a1e1bd594f85f58f5dca6c41c0ac720fb}{filename}}\ =\ \mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}}[i];}
+\DoxyCodeLine{00070\ \ \ \ \ \ \ \ \ \ \ \ \ filename\ =\ \mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}}[i];}
 \DoxyCodeLine{00071\ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
 \DoxyCodeLine{00072\ \ \ \ \ \ \ \ \ \ \ \ \ std::cerr\ <<\ \textcolor{stringliteral}{"{}Missing\ argument\ to\ -\/e"{}}\ <<\ std::endl;}
 \DoxyCodeLine{00073\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ 2;}
 \DoxyCodeLine{00074\ \ \ \ \ \ \ \ \ \ \}}
 \DoxyCodeLine{00075\ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}(\mbox{\hyperlink{addr2line_8cpp_af098af211275a41a03419345d18a8a59}{starts\_with}}(arg,\ \textcolor{stringliteral}{"{}-\/-\/exe="{}}))\ \{}
-\DoxyCodeLine{00076\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespaceembed_clara_a1e1bd594f85f58f5dca6c41c0ac720fb}{filename}}\ =\ arg.substr(6);}
+\DoxyCodeLine{00076\ \ \ \ \ \ \ \ \ \ filename\ =\ arg.substr(6);}
 \DoxyCodeLine{00077\ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}(arg\ ==\ \textcolor{stringliteral}{"{}-\/f"{}}\ ||\ arg\ ==\ \textcolor{stringliteral}{"{}-\/-\/functions"{}})\ \{}
 \DoxyCodeLine{00078\ \ \ \ \ \ \ \ \ \ print\_functions\ =\ \textcolor{keyword}{true};}
 \DoxyCodeLine{00079\ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}(arg\ ==\ \textcolor{stringliteral}{"{}-\/s"{}}\ ||\ arg\ ==\ \textcolor{stringliteral}{"{}-\/-\/basenames"{}})\ \{}
@@ -124,8 +126,8 @@ Definition at line \mbox{\hyperlink{addr2line_8cpp_source_l00053}{53}} of file \
 \DoxyCodeLine{00096\ \ \ \ \textcolor{keyword}{auto}\ code\ =\ \mbox{\hyperlink{fuzz__parser_8cpp_ab6d9537f94c320b20d681495d7f93099}{read\_wasm}}(filename);}
 \DoxyCodeLine{00097\ \ \ \ \mbox{\hyperlink{structnm__debug__info}{nm\_debug\_info}}\ info;}
 \DoxyCodeLine{00098\ \ \ \ \textcolor{keyword}{module}\ mod;}
-\DoxyCodeLine{00099\ \ \ \ \mbox{\hyperlink{classsysio_1_1vm_1_1binary__parser}{binary\_parser<null\_writer,\ nm\_options,\ nm\_debug\_info>}}\ \mbox{\hyperlink{namespaceupload_af9e508d19dc2dd9cdb7c642dde0bdd21}{parser}}(mod.allocator);}
-\DoxyCodeLine{00100\ \ \ \ \mbox{\hyperlink{namespaceupload_af9e508d19dc2dd9cdb7c642dde0bdd21}{parser}}.parse\_module(code,\ mod,\ info);}
+\DoxyCodeLine{00099\ \ \ \ \mbox{\hyperlink{classsysio_1_1vm_1_1binary__parser}{binary\_parser<null\_writer,\ nm\_options,\ nm\_debug\_info>}}\ parser(mod.allocator);}
+\DoxyCodeLine{00100\ \ \ \ parser.parse\_module(code,\ mod,\ info);}
 \DoxyCodeLine{00101\ \ \ \ \{}
 \DoxyCodeLine{00102\ \ \ \ \ \ \ \textcolor{keywordflow}{for}(std::size\_t\ i\ =\ 0;\ i\ <\ info.function\_offsets.size();\ ++i)\ \{}
 \DoxyCodeLine{00103\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\mbox{\hyperlink{classsysio_1_1vm_1_1managed__vector}{guarded\_vector<uint8\_t>}}*\ \mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}}\ =\ \mbox{\hyperlink{addr2line_8cpp_a0c79579de6b0e6b2ab9145d9ae03da59}{find\_export\_name}}(mod,\ i\ +\ mod.get\_imported\_functions\_size()))\ \{}
@@ -162,11 +164,12 @@ Definition at line \mbox{\hyperlink{addr2line_8cpp_source_l00053}{53}} of file \
 \DoxyCodeLine{00134\ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
-\includegraphics[width=246pt]{addr2line_8cpp_a217dbf8b442f20279ea00b898af96f52_cgraph}
+\includegraphics[width=276pt]{addr2line_8cpp_a217dbf8b442f20279ea00b898af96f52_cgraph}
 \end{center}
 \end{figure}
 \Hypertarget{addr2line_8cpp_af098af211275a41a03419345d18a8a59}\index{addr2line.cpp@{addr2line.cpp}!starts\_with@{starts\_with}}
@@ -186,7 +189,8 @@ Definition at line \mbox{\hyperlink{addr2line_8cpp_source_l00049}{49}} of file \
 \DoxyCodeLine{00051\ \}}
 
 \end{DoxyCode}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode

@@ -522,8 +522,8 @@
 \DoxyCodeLine{\Hypertarget{util__pkcs11_8c_source_l00518}00518\ \textcolor{keyword}{static}\ \textcolor{keywordtype}{void}\ get\_label\_attribute(\mbox{\hyperlink{structyh__object__descriptor}{yh\_object\_descriptor}}\ *\textcolor{keywordtype}{object},\ \mbox{\hyperlink{pkcs11_8h_a88e8d2cf99e26f3b3f86a0a698b0ab64}{CK\_VOID\_PTR}}\ \mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}},}
 \DoxyCodeLine{\Hypertarget{util__pkcs11_8c_source_l00519}00519\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{pkcs11_8h_a2c6426aaa1ca6dd1f48a01b8490482fa}{CK\_ULONG\_PTR}}\ length)\ \{}
 \DoxyCodeLine{\Hypertarget{util__pkcs11_8c_source_l00520}00520\ }
-\DoxyCodeLine{\Hypertarget{util__pkcs11_8c_source_l00521}00521\ \ \ *length\ =\ strlen(object-\/>label);}
-\DoxyCodeLine{\Hypertarget{util__pkcs11_8c_source_l00522}00522\ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_ae785d5badbf1f08b491af31f32a135a1}{memcpy}}(\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}},\ object-\/>label,\ *length);}
+\DoxyCodeLine{\Hypertarget{util__pkcs11_8c_source_l00521}00521\ \ \ *length\ =\ strlen(\mbox{\hyperlink{yubihsm__pkcs11_8c_a85d991d90970121ba1480cd98d93aab9}{object}}-\/>\mbox{\hyperlink{structyh__object__descriptor_ab63cc80a958a1debc4ac0ee255810fa5}{label}});}
+\DoxyCodeLine{\Hypertarget{util__pkcs11_8c_source_l00522}00522\ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_ae785d5badbf1f08b491af31f32a135a1}{memcpy}}(\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}},\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a85d991d90970121ba1480cd98d93aab9}{object}}-\/>\mbox{\hyperlink{structyh__object__descriptor_ab63cc80a958a1debc4ac0ee255810fa5}{label}},\ *length);}
 \DoxyCodeLine{\Hypertarget{util__pkcs11_8c_source_l00523}00523\ \ \ \textcolor{comment}{//\ NOTE(adma):\ we\ have\ seen\ some\ weird\ behvior\ with\ different}}
 \DoxyCodeLine{\Hypertarget{util__pkcs11_8c_source_l00524}00524\ \ \ \textcolor{comment}{//\ PKCS\#11\ tools.\ We\ decided\ not\ to\ add\ '\(\backslash\)0'\ for\ now.\ This\ *seems*}}
 \DoxyCodeLine{\Hypertarget{util__pkcs11_8c_source_l00525}00525\ \ \ \textcolor{comment}{//\ to\ be\ a\ good\ solution\ ...}}
@@ -532,7 +532,7 @@
 \DoxyCodeLine{\Hypertarget{util__pkcs11_8c_source_l00528}00528\ \textcolor{keyword}{static}\ \textcolor{keywordtype}{void}\ get\_id\_attribute(\mbox{\hyperlink{structyh__object__descriptor}{yh\_object\_descriptor}}\ *\textcolor{keywordtype}{object},\ \mbox{\hyperlink{pkcs11_8h_a88e8d2cf99e26f3b3f86a0a698b0ab64}{CK\_VOID\_PTR}}\ \mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}},}
 \DoxyCodeLine{\Hypertarget{util__pkcs11_8c_source_l00529}00529\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{pkcs11_8h_a2c6426aaa1ca6dd1f48a01b8490482fa}{CK\_ULONG\_PTR}}\ length)\ \{}
 \DoxyCodeLine{\Hypertarget{util__pkcs11_8c_source_l00530}00530\ \ \ \mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\_t}}\ *ptr\ =\ \mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}};}
-\DoxyCodeLine{\Hypertarget{util__pkcs11_8c_source_l00531}00531\ \ \ *ptr\ =\ ntohs(object-\/>id);}
+\DoxyCodeLine{\Hypertarget{util__pkcs11_8c_source_l00531}00531\ \ \ *ptr\ =\ ntohs(\mbox{\hyperlink{yubihsm__pkcs11_8c_a85d991d90970121ba1480cd98d93aab9}{object}}-\/>\mbox{\hyperlink{structyh__object__descriptor_a8683d3f22f1e8ba56e3caea8ed8504ec}{id}});}
 \DoxyCodeLine{\Hypertarget{util__pkcs11_8c_source_l00532}00532\ \ \ *length\ =\ \textcolor{keyword}{sizeof}(\mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\_t}});}
 \DoxyCodeLine{\Hypertarget{util__pkcs11_8c_source_l00533}00533\ \}}
 \DoxyCodeLine{\Hypertarget{util__pkcs11_8c_source_l00534}00534\ }
@@ -542,9 +542,9 @@
 \DoxyCodeLine{\Hypertarget{util__pkcs11_8c_source_l00538}00538\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{yubihsm_8h_a2fe39512cb4df34b270a67dbb8e13583}{yh\_object\_type}}\ *type)\ \{}
 \DoxyCodeLine{\Hypertarget{util__pkcs11_8c_source_l00539}00539\ }
 \DoxyCodeLine{\Hypertarget{util__pkcs11_8c_source_l00540}00540\ \ \ \textcolor{keywordflow}{if}\ ((type\ ==\ NULL\ \&\&}
-\DoxyCodeLine{\Hypertarget{util__pkcs11_8c_source_l00541}00541\ \ \ \ \ \ \ \ \mbox{\hyperlink{yubihsm_8c_aba384949362ccaf19cbeae3bb046489c}{yh\_check\_capability}}(\&object-\/>capabilities,\ capability)\ ==\ val)\ ||}
-\DoxyCodeLine{\Hypertarget{util__pkcs11_8c_source_l00542}00542\ \ \ \ \ \ \ (type\ !=\ NULL\ \&\&\ *type\ ==\ object-\/>type\ \&\&}
-\DoxyCodeLine{\Hypertarget{util__pkcs11_8c_source_l00543}00543\ \ \ \ \ \ \ \ \mbox{\hyperlink{yubihsm_8c_aba384949362ccaf19cbeae3bb046489c}{yh\_check\_capability}}(\&object-\/>capabilities,\ capability)\ ==\ val))\ \{}
+\DoxyCodeLine{\Hypertarget{util__pkcs11_8c_source_l00541}00541\ \ \ \ \ \ \ \ \mbox{\hyperlink{yubihsm_8c_aba384949362ccaf19cbeae3bb046489c}{yh\_check\_capability}}(\&\mbox{\hyperlink{yubihsm__pkcs11_8c_a85d991d90970121ba1480cd98d93aab9}{object}}-\/>\mbox{\hyperlink{structyh__object__descriptor_a94fcb9bbe5ffacadafc207c166f6239f}{capabilities}},\ capability)\ ==\ val)\ ||}
+\DoxyCodeLine{\Hypertarget{util__pkcs11_8c_source_l00542}00542\ \ \ \ \ \ \ (type\ !=\ NULL\ \&\&\ *type\ ==\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a85d991d90970121ba1480cd98d93aab9}{object}}-\/>\mbox{\hyperlink{structyh__object__descriptor_ab8c1b3cc5b859e3c89eb228fa0763165}{type}}\ \&\&}
+\DoxyCodeLine{\Hypertarget{util__pkcs11_8c_source_l00543}00543\ \ \ \ \ \ \ \ \mbox{\hyperlink{yubihsm_8c_aba384949362ccaf19cbeae3bb046489c}{yh\_check\_capability}}(\&\mbox{\hyperlink{yubihsm__pkcs11_8c_a85d991d90970121ba1480cd98d93aab9}{object}}-\/>\mbox{\hyperlink{structyh__object__descriptor_a94fcb9bbe5ffacadafc207c166f6239f}{capabilities}},\ capability)\ ==\ val))\ \{}
 \DoxyCodeLine{\Hypertarget{util__pkcs11_8c_source_l00544}00544\ }
 \DoxyCodeLine{\Hypertarget{util__pkcs11_8c_source_l00545}00545\ \ \ \ \ *((\mbox{\hyperlink{pkcs11_8h_a9dc289e62be691f41a9c6b875789b1f2}{CK\_BBOOL}}\ *)\ \mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}})\ =\ \mbox{\hyperlink{pkcs11_8h_a76edf786ed8cccb1b3d2cf9e9f0800cd}{CK\_TRUE}};}
 \DoxyCodeLine{\Hypertarget{util__pkcs11_8c_source_l00546}00546\ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
@@ -558,13 +558,13 @@
 \DoxyCodeLine{\Hypertarget{util__pkcs11_8c_source_l00554}00554\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{pkcs11_8h_a88e8d2cf99e26f3b3f86a0a698b0ab64}{CK\_VOID\_PTR}}\ \mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}},\ \mbox{\hyperlink{pkcs11_8h_a2c6426aaa1ca6dd1f48a01b8490482fa}{CK\_ULONG\_PTR}}\ length,}
 \DoxyCodeLine{\Hypertarget{util__pkcs11_8c_source_l00555}00555\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structyh__session}{yh\_session}}\ *\mbox{\hyperlink{ecdh__derive__test_8c_a0a2c7706d971796d7dc84fee36d6c84f}{session}})\ \{}
 \DoxyCodeLine{\Hypertarget{util__pkcs11_8c_source_l00556}00556\ }
-\DoxyCodeLine{\Hypertarget{util__pkcs11_8c_source_l00557}00557\ \ \ \textcolor{keywordflow}{if}\ (object-\/>type\ !=\ \mbox{\hyperlink{yubihsm_8h_a2fe39512cb4df34b270a67dbb8e13583a5d37b7418d50b420621e6a6eb2700de4}{YH\_OPAQUE}})\ \{}
+\DoxyCodeLine{\Hypertarget{util__pkcs11_8c_source_l00557}00557\ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{yubihsm__pkcs11_8c_a85d991d90970121ba1480cd98d93aab9}{object}}-\/>\mbox{\hyperlink{structyh__object__descriptor_ab8c1b3cc5b859e3c89eb228fa0763165}{type}}\ !=\ \mbox{\hyperlink{yubihsm_8h_a2fe39512cb4df34b270a67dbb8e13583a5d37b7418d50b420621e6a6eb2700de4}{YH\_OPAQUE}})\ \{}
 \DoxyCodeLine{\Hypertarget{util__pkcs11_8c_source_l00558}00558\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{pkcs11_8h_a91150ecacbaa624fcc7d861f1b54f57c}{CKR\_FUNCTION\_FAILED}};}
 \DoxyCodeLine{\Hypertarget{util__pkcs11_8c_source_l00559}00559\ \ \ \}}
 \DoxyCodeLine{\Hypertarget{util__pkcs11_8c_source_l00560}00560\ }
 \DoxyCodeLine{\Hypertarget{util__pkcs11_8c_source_l00561}00561\ \ \ \textcolor{keywordflow}{switch}\ (type)\ \{}
 \DoxyCodeLine{\Hypertarget{util__pkcs11_8c_source_l00562}00562\ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{pkcs11_8h_af867d3ae9286fe0f8cab4995bb6af337}{CKA\_CLASS}}:}
-\DoxyCodeLine{\Hypertarget{util__pkcs11_8c_source_l00563}00563\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (object-\/>algorithm\ ==\ \mbox{\hyperlink{yubihsm_8h_a498937b5a72accbb0ef21bb1dcdd55caa590b0ef9be4ed65e87e26c985bb7f350}{YH\_ALGO\_OPAQUE\_X509\_CERTIFICATE}})\ \{}
+\DoxyCodeLine{\Hypertarget{util__pkcs11_8c_source_l00563}00563\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{yubihsm__pkcs11_8c_a85d991d90970121ba1480cd98d93aab9}{object}}-\/>\mbox{\hyperlink{structyh__object__descriptor_a485734f824121a0901c151d814ab7226}{algorithm}}\ ==\ \mbox{\hyperlink{yubihsm_8h_a498937b5a72accbb0ef21bb1dcdd55caa590b0ef9be4ed65e87e26c985bb7f350}{YH\_ALGO\_OPAQUE\_X509\_CERTIFICATE}})\ \{}
 \DoxyCodeLine{\Hypertarget{util__pkcs11_8c_source_l00564}00564\ \ \ \ \ \ \ \ \ *((CK\_OBJECT\_CLASS\ *)\ \mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}})\ =\ \mbox{\hyperlink{pkcs11_8h_a457c8513d35d53d7a2abe79f28c17a92}{CKO\_CERTIFICATE}};}
 \DoxyCodeLine{\Hypertarget{util__pkcs11_8c_source_l00565}00565\ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
 \DoxyCodeLine{\Hypertarget{util__pkcs11_8c_source_l00566}00566\ \ \ \ \ \ \ \ \ *((CK\_OBJECT\_CLASS\ *)\ \mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}})\ =\ \mbox{\hyperlink{pkcs11_8h_a89ba66a1939998c058c049964ac0a24a}{CKO\_DATA}};}
@@ -609,7 +609,7 @@
 \DoxyCodeLine{\Hypertarget{util__pkcs11_8c_source_l00605}00605\ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
 \DoxyCodeLine{\Hypertarget{util__pkcs11_8c_source_l00606}00606\ }
 \DoxyCodeLine{\Hypertarget{util__pkcs11_8c_source_l00607}00607\ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{pkcs11_8h_a799f3b28e5c856ef4229d12257818841}{CKA\_VALUE}}:}
-\DoxyCodeLine{\Hypertarget{util__pkcs11_8c_source_l00608}00608\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{yubihsm_8c_a56e060e71fb8baa0531b3a20848abf37}{yh\_util\_get\_opaque}}(\mbox{\hyperlink{ecdh__derive__test_8c_a0a2c7706d971796d7dc84fee36d6c84f}{session}},\ object-\/>id,\ \mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}},\ (\textcolor{keywordtype}{size\_t}\ *)\ length)\ !=}
+\DoxyCodeLine{\Hypertarget{util__pkcs11_8c_source_l00608}00608\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{yubihsm_8c_a56e060e71fb8baa0531b3a20848abf37}{yh\_util\_get\_opaque}}(\mbox{\hyperlink{ecdh__derive__test_8c_a0a2c7706d971796d7dc84fee36d6c84f}{session}},\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a85d991d90970121ba1480cd98d93aab9}{object}}-\/>\mbox{\hyperlink{structyh__object__descriptor_a8683d3f22f1e8ba56e3caea8ed8504ec}{id}},\ \mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}},\ (\textcolor{keywordtype}{size\_t}\ *)\ length)\ !=}
 \DoxyCodeLine{\Hypertarget{util__pkcs11_8c_source_l00609}00609\ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{yubihsm_8h_ae4f602d2343d01b1727dfd633169d366a405155512dc2284dc210ed15be1d0815}{YHR\_SUCCESS}})\ \{}
 \DoxyCodeLine{\Hypertarget{util__pkcs11_8c_source_l00610}00610\ \ \ \ \ \ \ \ \ *length\ =\ \mbox{\hyperlink{pkcs11_8h_a76782288a47c99c6e6ff3dc667f0e3ef}{CK\_UNAVAILABLE\_INFORMATION}};}
 \DoxyCodeLine{\Hypertarget{util__pkcs11_8c_source_l00611}00611\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{pkcs11_8h_a0afbefc1a4ce05ba5faea1778eb602ca}{CKR\_ATTRIBUTE\_TYPE\_INVALID}};}
@@ -617,7 +617,7 @@
 \DoxyCodeLine{\Hypertarget{util__pkcs11_8c_source_l00613}00613\ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
 \DoxyCodeLine{\Hypertarget{util__pkcs11_8c_source_l00614}00614\ }
 \DoxyCodeLine{\Hypertarget{util__pkcs11_8c_source_l00615}00615\ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{pkcs11_8h_ac7d2a83448425bf632b01520ab49ef38}{CKA\_CERTIFICATE\_TYPE}}:}
-\DoxyCodeLine{\Hypertarget{util__pkcs11_8c_source_l00616}00616\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (object-\/>algorithm\ ==\ \mbox{\hyperlink{yubihsm_8h_a498937b5a72accbb0ef21bb1dcdd55caa590b0ef9be4ed65e87e26c985bb7f350}{YH\_ALGO\_OPAQUE\_X509\_CERTIFICATE}})\ \{}
+\DoxyCodeLine{\Hypertarget{util__pkcs11_8c_source_l00616}00616\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{yubihsm__pkcs11_8c_a85d991d90970121ba1480cd98d93aab9}{object}}-\/>\mbox{\hyperlink{structyh__object__descriptor_a485734f824121a0901c151d814ab7226}{algorithm}}\ ==\ \mbox{\hyperlink{yubihsm_8h_a498937b5a72accbb0ef21bb1dcdd55caa590b0ef9be4ed65e87e26c985bb7f350}{YH\_ALGO\_OPAQUE\_X509\_CERTIFICATE}})\ \{}
 \DoxyCodeLine{\Hypertarget{util__pkcs11_8c_source_l00617}00617\ \ \ \ \ \ \ \ \ *((CK\_CERTIFICATE\_TYPE\ *)\ \mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}})\ =\ \mbox{\hyperlink{pkcs11_8h_a224cf68f2f62fbf662f5f04bd8e1fcf8}{CKC\_X\_509}};}
 \DoxyCodeLine{\Hypertarget{util__pkcs11_8c_source_l00618}00618\ \ \ \ \ \ \ \ \ *length\ =\ \textcolor{keyword}{sizeof}(CK\_CERTIFICATE\_TYPE);}
 \DoxyCodeLine{\Hypertarget{util__pkcs11_8c_source_l00619}00619\ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
@@ -666,8 +666,8 @@
 \DoxyCodeLine{\Hypertarget{util__pkcs11_8c_source_l00662}00662\ \ \ \ \ \ \ \textcolor{comment}{//\ NOTE(adma):\ Key\ Objects\ attributes}}
 \DoxyCodeLine{\Hypertarget{util__pkcs11_8c_source_l00663}00663\ }
 \DoxyCodeLine{\Hypertarget{util__pkcs11_8c_source_l00664}00664\ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{pkcs11_8h_aa438b88cbcb8a921288eeefba5613274}{CKA\_KEY\_TYPE}}:}
-\DoxyCodeLine{\Hypertarget{util__pkcs11_8c_source_l00665}00665\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (object-\/>type\ ==\ \mbox{\hyperlink{yubihsm_8h_a2fe39512cb4df34b270a67dbb8e13583a16f0118db1dac3d0732e7d66630e1dba}{YH\_WRAP\_KEY}})\ \{}
-\DoxyCodeLine{\Hypertarget{util__pkcs11_8c_source_l00666}00666\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{switch}\ (object-\/>algorithm)\ \{}
+\DoxyCodeLine{\Hypertarget{util__pkcs11_8c_source_l00665}00665\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{yubihsm__pkcs11_8c_a85d991d90970121ba1480cd98d93aab9}{object}}-\/>\mbox{\hyperlink{structyh__object__descriptor_ab8c1b3cc5b859e3c89eb228fa0763165}{type}}\ ==\ \mbox{\hyperlink{yubihsm_8h_a2fe39512cb4df34b270a67dbb8e13583a16f0118db1dac3d0732e7d66630e1dba}{YH\_WRAP\_KEY}})\ \{}
+\DoxyCodeLine{\Hypertarget{util__pkcs11_8c_source_l00666}00666\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{switch}\ (\mbox{\hyperlink{yubihsm__pkcs11_8c_a85d991d90970121ba1480cd98d93aab9}{object}}-\/>\mbox{\hyperlink{structyh__object__descriptor_a485734f824121a0901c151d814ab7226}{algorithm}})\ \{}
 \DoxyCodeLine{\Hypertarget{util__pkcs11_8c_source_l00667}00667\ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{yubihsm_8h_a498937b5a72accbb0ef21bb1dcdd55caae22b228e457c9bdccb5a93d81730b1b1}{YH\_ALGO\_AES128\_CCM\_WRAP}}:}
 \DoxyCodeLine{\Hypertarget{util__pkcs11_8c_source_l00668}00668\ \ \ \ \ \ \ \ \ \ \ \ \ *((CK\_KEY\_TYPE\ *)\ \mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}})\ =\ \mbox{\hyperlink{pkcs11y_8h_a36836c45477aa90c29f687876a41adfa}{CKK\_YUBICO\_AES128\_CCM\_WRAP}};}
 \DoxyCodeLine{\Hypertarget{util__pkcs11_8c_source_l00669}00669\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
@@ -683,8 +683,8 @@
 \DoxyCodeLine{\Hypertarget{util__pkcs11_8c_source_l00679}00679\ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{default}:}
 \DoxyCodeLine{\Hypertarget{util__pkcs11_8c_source_l00680}00680\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{pkcs11_8h_a91150ecacbaa624fcc7d861f1b54f57c}{CKR\_FUNCTION\_FAILED}};}
 \DoxyCodeLine{\Hypertarget{util__pkcs11_8c_source_l00681}00681\ \ \ \ \ \ \ \ \ \}}
-\DoxyCodeLine{\Hypertarget{util__pkcs11_8c_source_l00682}00682\ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}\ (object-\/>type\ ==\ \mbox{\hyperlink{yubihsm_8h_a2fe39512cb4df34b270a67dbb8e13583a708d85f80fc33743ac26a7c3e43464a9}{YH\_HMAC\_KEY}})\ \{}
-\DoxyCodeLine{\Hypertarget{util__pkcs11_8c_source_l00683}00683\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{switch}\ (object-\/>algorithm)\ \{}
+\DoxyCodeLine{\Hypertarget{util__pkcs11_8c_source_l00682}00682\ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{yubihsm__pkcs11_8c_a85d991d90970121ba1480cd98d93aab9}{object}}-\/>\mbox{\hyperlink{structyh__object__descriptor_ab8c1b3cc5b859e3c89eb228fa0763165}{type}}\ ==\ \mbox{\hyperlink{yubihsm_8h_a2fe39512cb4df34b270a67dbb8e13583a708d85f80fc33743ac26a7c3e43464a9}{YH\_HMAC\_KEY}})\ \{}
+\DoxyCodeLine{\Hypertarget{util__pkcs11_8c_source_l00683}00683\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{switch}\ (\mbox{\hyperlink{yubihsm__pkcs11_8c_a85d991d90970121ba1480cd98d93aab9}{object}}-\/>\mbox{\hyperlink{structyh__object__descriptor_a485734f824121a0901c151d814ab7226}{algorithm}})\ \{}
 \DoxyCodeLine{\Hypertarget{util__pkcs11_8c_source_l00684}00684\ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{yubihsm_8h_a498937b5a72accbb0ef21bb1dcdd55caa942e65c8cd0034eebe9a20c2297c7b06}{YH\_ALGO\_HMAC\_SHA1}}:}
 \DoxyCodeLine{\Hypertarget{util__pkcs11_8c_source_l00685}00685\ \ \ \ \ \ \ \ \ \ \ \ \ *((CK\_KEY\_TYPE\ *)\ \mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}})\ =\ \mbox{\hyperlink{pkcs11_8h_aec5006f9a0e144d9b43af3a1f1e4a38f}{CKK\_SHA\_1\_HMAC}};}
 \DoxyCodeLine{\Hypertarget{util__pkcs11_8c_source_l00686}00686\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
@@ -723,7 +723,7 @@
 \DoxyCodeLine{\Hypertarget{util__pkcs11_8c_source_l00719}00719\ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
 \DoxyCodeLine{\Hypertarget{util__pkcs11_8c_source_l00720}00720\ }
 \DoxyCodeLine{\Hypertarget{util__pkcs11_8c_source_l00721}00721\ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{pkcs11_8h_a7f7089933d976e82f882eda6efcf7e66}{CKA\_LOCAL}}:}
-\DoxyCodeLine{\Hypertarget{util__pkcs11_8c_source_l00722}00722\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (object-\/>origin\ ==\ \mbox{\hyperlink{yubihsm_8h_a1b233ade526e2b1a6313e2e2d892bd88}{YH\_ORIGIN\_GENERATED}})\ \{}
+\DoxyCodeLine{\Hypertarget{util__pkcs11_8c_source_l00722}00722\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{yubihsm__pkcs11_8c_a85d991d90970121ba1480cd98d93aab9}{object}}-\/>\mbox{\hyperlink{structyh__object__descriptor_ab4e9be8940ce12a69b6b2389137aa768}{origin}}\ ==\ \mbox{\hyperlink{yubihsm_8h_a1b233ade526e2b1a6313e2e2d892bd88}{YH\_ORIGIN\_GENERATED}})\ \{}
 \DoxyCodeLine{\Hypertarget{util__pkcs11_8c_source_l00723}00723\ \ \ \ \ \ \ \ \ *((\mbox{\hyperlink{pkcs11_8h_a9dc289e62be691f41a9c6b875789b1f2}{CK\_BBOOL}}\ *)\ \mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}})\ =\ \mbox{\hyperlink{pkcs11_8h_a76edf786ed8cccb1b3d2cf9e9f0800cd}{CK\_TRUE}};}
 \DoxyCodeLine{\Hypertarget{util__pkcs11_8c_source_l00724}00724\ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
 \DoxyCodeLine{\Hypertarget{util__pkcs11_8c_source_l00725}00725\ \ \ \ \ \ \ \ \ *((\mbox{\hyperlink{pkcs11_8h_a9dc289e62be691f41a9c6b875789b1f2}{CK\_BBOOL}}\ *)\ \mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}})\ =\ \mbox{\hyperlink{pkcs11_8h_a1df8841072c48f0b511ccad3bbb25812}{CK\_FALSE}};}
@@ -840,8 +840,8 @@
 \DoxyCodeLine{\Hypertarget{util__pkcs11_8c_source_l00836}00836\ \ \ \ \ \ \ \textcolor{comment}{//\ NOTE(adma):\ Key\ Objects\ attributes}}
 \DoxyCodeLine{\Hypertarget{util__pkcs11_8c_source_l00837}00837\ }
 \DoxyCodeLine{\Hypertarget{util__pkcs11_8c_source_l00838}00838\ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{pkcs11_8h_aa438b88cbcb8a921288eeefba5613274}{CKA\_KEY\_TYPE}}:}
-\DoxyCodeLine{\Hypertarget{util__pkcs11_8c_source_l00839}00839\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (object-\/>type\ ==\ \mbox{\hyperlink{yubihsm_8h_a2fe39512cb4df34b270a67dbb8e13583ab71424e16384319d6e6a12f9a3d8ceae}{YH\_ASYMMETRIC\_KEY}})\ \{}
-\DoxyCodeLine{\Hypertarget{util__pkcs11_8c_source_l00840}00840\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{yubihsm_8c_a0a67155f2a7970ecb52e4f6aac6bbe84}{yh\_is\_rsa}}(object-\/>algorithm))\ \{}
+\DoxyCodeLine{\Hypertarget{util__pkcs11_8c_source_l00839}00839\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{yubihsm__pkcs11_8c_a85d991d90970121ba1480cd98d93aab9}{object}}-\/>\mbox{\hyperlink{structyh__object__descriptor_ab8c1b3cc5b859e3c89eb228fa0763165}{type}}\ ==\ \mbox{\hyperlink{yubihsm_8h_a2fe39512cb4df34b270a67dbb8e13583ab71424e16384319d6e6a12f9a3d8ceae}{YH\_ASYMMETRIC\_KEY}})\ \{}
+\DoxyCodeLine{\Hypertarget{util__pkcs11_8c_source_l00840}00840\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{yubihsm_8c_a0a67155f2a7970ecb52e4f6aac6bbe84}{yh\_is\_rsa}}(\mbox{\hyperlink{yubihsm__pkcs11_8c_a85d991d90970121ba1480cd98d93aab9}{object}}-\/>\mbox{\hyperlink{structyh__object__descriptor_a485734f824121a0901c151d814ab7226}{algorithm}}))\ \{}
 \DoxyCodeLine{\Hypertarget{util__pkcs11_8c_source_l00841}00841\ \ \ \ \ \ \ \ \ \ \ *((CK\_KEY\_TYPE\ *)\ \mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}})\ =\ \mbox{\hyperlink{pkcs11_8h_a354731675f1ecc116e220b58b32636a1}{CKK\_RSA}};}
 \DoxyCodeLine{\Hypertarget{util__pkcs11_8c_source_l00842}00842\ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
 \DoxyCodeLine{\Hypertarget{util__pkcs11_8c_source_l00843}00843\ \ \ \ \ \ \ \ \ \ \ *((CK\_KEY\_TYPE\ *)\ \mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}})\ =\ \mbox{\hyperlink{pkcs11_8h_ae95493c017b9901d9d1c96354119eadb}{CKK\_EC}};}
@@ -861,9 +861,9 @@
 \DoxyCodeLine{\Hypertarget{util__pkcs11_8c_source_l00857}00857\ \ \ \ \ \ \ \textcolor{comment}{//\ case\ CKA\_END\_DATE:}}
 \DoxyCodeLine{\Hypertarget{util__pkcs11_8c_source_l00858}00858\ }
 \DoxyCodeLine{\Hypertarget{util__pkcs11_8c_source_l00859}00859\ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{pkcs11_8h_ab65b14615d388fc862c82a8d1e163f84}{CKA\_DERIVE}}:}
-\DoxyCodeLine{\Hypertarget{util__pkcs11_8c_source_l00860}00860\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (object-\/>type\ ==\ \mbox{\hyperlink{yubihsm_8h_a2fe39512cb4df34b270a67dbb8e13583ab71424e16384319d6e6a12f9a3d8ceae}{YH\_ASYMMETRIC\_KEY}}\ \&\&}
-\DoxyCodeLine{\Hypertarget{util__pkcs11_8c_source_l00861}00861\ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{yubihsm_8c_a0a67155f2a7970ecb52e4f6aac6bbe84}{yh\_is\_rsa}}(object-\/>algorithm)\ ==\ \textcolor{keyword}{false}\ \&\&}
-\DoxyCodeLine{\Hypertarget{util__pkcs11_8c_source_l00862}00862\ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{yubihsm_8c_aba384949362ccaf19cbeae3bb046489c}{yh\_check\_capability}}(\&object-\/>capabilities,\ \textcolor{stringliteral}{"{}derive-\/ecdh"{}})\ ==\ \textcolor{keyword}{true})\ \{}
+\DoxyCodeLine{\Hypertarget{util__pkcs11_8c_source_l00860}00860\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{yubihsm__pkcs11_8c_a85d991d90970121ba1480cd98d93aab9}{object}}-\/>\mbox{\hyperlink{structyh__object__descriptor_ab8c1b3cc5b859e3c89eb228fa0763165}{type}}\ ==\ \mbox{\hyperlink{yubihsm_8h_a2fe39512cb4df34b270a67dbb8e13583ab71424e16384319d6e6a12f9a3d8ceae}{YH\_ASYMMETRIC\_KEY}}\ \&\&}
+\DoxyCodeLine{\Hypertarget{util__pkcs11_8c_source_l00861}00861\ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{yubihsm_8c_a0a67155f2a7970ecb52e4f6aac6bbe84}{yh\_is\_rsa}}(\mbox{\hyperlink{yubihsm__pkcs11_8c_a85d991d90970121ba1480cd98d93aab9}{object}}-\/>\mbox{\hyperlink{structyh__object__descriptor_a485734f824121a0901c151d814ab7226}{algorithm}})\ ==\ \textcolor{keyword}{false}\ \&\&}
+\DoxyCodeLine{\Hypertarget{util__pkcs11_8c_source_l00862}00862\ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{yubihsm_8c_aba384949362ccaf19cbeae3bb046489c}{yh\_check\_capability}}(\&\mbox{\hyperlink{yubihsm__pkcs11_8c_a85d991d90970121ba1480cd98d93aab9}{object}}-\/>\mbox{\hyperlink{structyh__object__descriptor_a94fcb9bbe5ffacadafc207c166f6239f}{capabilities}},\ \textcolor{stringliteral}{"{}derive-\/ecdh"{}})\ ==\ \textcolor{keyword}{true})\ \{}
 \DoxyCodeLine{\Hypertarget{util__pkcs11_8c_source_l00863}00863\ }
 \DoxyCodeLine{\Hypertarget{util__pkcs11_8c_source_l00864}00864\ \ \ \ \ \ \ \ \ *((\mbox{\hyperlink{pkcs11_8h_a9dc289e62be691f41a9c6b875789b1f2}{CK\_BBOOL}}\ *)\ \mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}})\ =\ \mbox{\hyperlink{pkcs11_8h_a76edf786ed8cccb1b3d2cf9e9f0800cd}{CK\_TRUE}};}
 \DoxyCodeLine{\Hypertarget{util__pkcs11_8c_source_l00865}00865\ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
@@ -873,7 +873,7 @@
 \DoxyCodeLine{\Hypertarget{util__pkcs11_8c_source_l00869}00869\ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
 \DoxyCodeLine{\Hypertarget{util__pkcs11_8c_source_l00870}00870\ }
 \DoxyCodeLine{\Hypertarget{util__pkcs11_8c_source_l00871}00871\ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{pkcs11_8h_a7f7089933d976e82f882eda6efcf7e66}{CKA\_LOCAL}}:}
-\DoxyCodeLine{\Hypertarget{util__pkcs11_8c_source_l00872}00872\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (object-\/>origin\ ==\ \mbox{\hyperlink{yubihsm_8h_a1b233ade526e2b1a6313e2e2d892bd88}{YH\_ORIGIN\_GENERATED}})\ \{}
+\DoxyCodeLine{\Hypertarget{util__pkcs11_8c_source_l00872}00872\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{yubihsm__pkcs11_8c_a85d991d90970121ba1480cd98d93aab9}{object}}-\/>\mbox{\hyperlink{structyh__object__descriptor_ab4e9be8940ce12a69b6b2389137aa768}{origin}}\ ==\ \mbox{\hyperlink{yubihsm_8h_a1b233ade526e2b1a6313e2e2d892bd88}{YH\_ORIGIN\_GENERATED}})\ \{}
 \DoxyCodeLine{\Hypertarget{util__pkcs11_8c_source_l00873}00873\ \ \ \ \ \ \ \ \ *((\mbox{\hyperlink{pkcs11_8h_a9dc289e62be691f41a9c6b875789b1f2}{CK\_BBOOL}}\ *)\ \mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}})\ =\ \mbox{\hyperlink{pkcs11_8h_a76edf786ed8cccb1b3d2cf9e9f0800cd}{CK\_TRUE}};}
 \DoxyCodeLine{\Hypertarget{util__pkcs11_8c_source_l00874}00874\ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
 \DoxyCodeLine{\Hypertarget{util__pkcs11_8c_source_l00875}00875\ \ \ \ \ \ \ \ \ *((\mbox{\hyperlink{pkcs11_8h_a9dc289e62be691f41a9c6b875789b1f2}{CK\_BBOOL}}\ *)\ \mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}})\ =\ \mbox{\hyperlink{pkcs11_8h_a1df8841072c48f0b511ccad3bbb25812}{CK\_FALSE}};}
@@ -899,7 +899,7 @@
 \DoxyCodeLine{\Hypertarget{util__pkcs11_8c_source_l00895}00895\ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
 \DoxyCodeLine{\Hypertarget{util__pkcs11_8c_source_l00896}00896\ }
 \DoxyCodeLine{\Hypertarget{util__pkcs11_8c_source_l00897}00897\ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{pkcs11_8h_aa26224c75961163975e3de4347940401}{CKA\_DECRYPT}}:}
-\DoxyCodeLine{\Hypertarget{util__pkcs11_8c_source_l00898}00898\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (object-\/>type\ ==\ \mbox{\hyperlink{yubihsm_8h_a2fe39512cb4df34b270a67dbb8e13583ab71424e16384319d6e6a12f9a3d8ceae}{YH\_ASYMMETRIC\_KEY}}\ \&\&\ \mbox{\hyperlink{yubihsm_8c_a0a67155f2a7970ecb52e4f6aac6bbe84}{yh\_is\_rsa}}(object-\/>algorithm))\ \{}
+\DoxyCodeLine{\Hypertarget{util__pkcs11_8c_source_l00898}00898\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{yubihsm__pkcs11_8c_a85d991d90970121ba1480cd98d93aab9}{object}}-\/>\mbox{\hyperlink{structyh__object__descriptor_ab8c1b3cc5b859e3c89eb228fa0763165}{type}}\ ==\ \mbox{\hyperlink{yubihsm_8h_a2fe39512cb4df34b270a67dbb8e13583ab71424e16384319d6e6a12f9a3d8ceae}{YH\_ASYMMETRIC\_KEY}}\ \&\&\ \mbox{\hyperlink{yubihsm_8c_a0a67155f2a7970ecb52e4f6aac6bbe84}{yh\_is\_rsa}}(\mbox{\hyperlink{yubihsm__pkcs11_8c_a85d991d90970121ba1480cd98d93aab9}{object}}-\/>\mbox{\hyperlink{structyh__object__descriptor_a485734f824121a0901c151d814ab7226}{algorithm}}))\ \{}
 \DoxyCodeLine{\Hypertarget{util__pkcs11_8c_source_l00899}00899\ \ \ \ \ \ \ \ \ get\_capability\_attribute(\textcolor{keywordtype}{object},\ \textcolor{stringliteral}{"{}decrypt-\/pkcs,decrypt-\/oaep"{}},\ \textcolor{keyword}{true},}
 \DoxyCodeLine{\Hypertarget{util__pkcs11_8c_source_l00900}00900\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}},\ length,\ NULL);}
 \DoxyCodeLine{\Hypertarget{util__pkcs11_8c_source_l00901}00901\ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
@@ -909,12 +909,12 @@
 \DoxyCodeLine{\Hypertarget{util__pkcs11_8c_source_l00905}00905\ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
 \DoxyCodeLine{\Hypertarget{util__pkcs11_8c_source_l00906}00906\ }
 \DoxyCodeLine{\Hypertarget{util__pkcs11_8c_source_l00907}00907\ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{pkcs11_8h_a6ffd14ad7386d9aa7178e841a964a87e}{CKA\_SIGN}}:}
-\DoxyCodeLine{\Hypertarget{util__pkcs11_8c_source_l00908}00908\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (object-\/>type\ ==\ \mbox{\hyperlink{yubihsm_8h_a2fe39512cb4df34b270a67dbb8e13583ab71424e16384319d6e6a12f9a3d8ceae}{YH\_ASYMMETRIC\_KEY}}\ \&\&}
-\DoxyCodeLine{\Hypertarget{util__pkcs11_8c_source_l00909}00909\ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{yubihsm_8c_a0a67155f2a7970ecb52e4f6aac6bbe84}{yh\_is\_rsa}}(object-\/>algorithm)\ ==\ \textcolor{keyword}{true})\ \{}
+\DoxyCodeLine{\Hypertarget{util__pkcs11_8c_source_l00908}00908\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{yubihsm__pkcs11_8c_a85d991d90970121ba1480cd98d93aab9}{object}}-\/>\mbox{\hyperlink{structyh__object__descriptor_ab8c1b3cc5b859e3c89eb228fa0763165}{type}}\ ==\ \mbox{\hyperlink{yubihsm_8h_a2fe39512cb4df34b270a67dbb8e13583ab71424e16384319d6e6a12f9a3d8ceae}{YH\_ASYMMETRIC\_KEY}}\ \&\&}
+\DoxyCodeLine{\Hypertarget{util__pkcs11_8c_source_l00909}00909\ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{yubihsm_8c_a0a67155f2a7970ecb52e4f6aac6bbe84}{yh\_is\_rsa}}(\mbox{\hyperlink{yubihsm__pkcs11_8c_a85d991d90970121ba1480cd98d93aab9}{object}}-\/>\mbox{\hyperlink{structyh__object__descriptor_a485734f824121a0901c151d814ab7226}{algorithm}})\ ==\ \textcolor{keyword}{true})\ \{}
 \DoxyCodeLine{\Hypertarget{util__pkcs11_8c_source_l00910}00910\ \ \ \ \ \ \ \ \ get\_capability\_attribute(\textcolor{keywordtype}{object},\ \textcolor{stringliteral}{"{}sign-\/pkcs,sign-\/pss"{}},\ \textcolor{keyword}{true},\ \mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}},}
 \DoxyCodeLine{\Hypertarget{util__pkcs11_8c_source_l00911}00911\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ length,\ NULL);}
-\DoxyCodeLine{\Hypertarget{util__pkcs11_8c_source_l00912}00912\ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}\ (object-\/>type\ ==\ \mbox{\hyperlink{yubihsm_8h_a2fe39512cb4df34b270a67dbb8e13583ab71424e16384319d6e6a12f9a3d8ceae}{YH\_ASYMMETRIC\_KEY}}\ \&\&}
-\DoxyCodeLine{\Hypertarget{util__pkcs11_8c_source_l00913}00913\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{yubihsm_8c_a3032a8f45bfad36ed6157b0158dd7921}{yh\_is\_ec}}(object-\/>algorithm)\ ==\ \textcolor{keyword}{true})\ \{}
+\DoxyCodeLine{\Hypertarget{util__pkcs11_8c_source_l00912}00912\ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{yubihsm__pkcs11_8c_a85d991d90970121ba1480cd98d93aab9}{object}}-\/>\mbox{\hyperlink{structyh__object__descriptor_ab8c1b3cc5b859e3c89eb228fa0763165}{type}}\ ==\ \mbox{\hyperlink{yubihsm_8h_a2fe39512cb4df34b270a67dbb8e13583ab71424e16384319d6e6a12f9a3d8ceae}{YH\_ASYMMETRIC\_KEY}}\ \&\&}
+\DoxyCodeLine{\Hypertarget{util__pkcs11_8c_source_l00913}00913\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{yubihsm_8c_a3032a8f45bfad36ed6157b0158dd7921}{yh\_is\_ec}}(\mbox{\hyperlink{yubihsm__pkcs11_8c_a85d991d90970121ba1480cd98d93aab9}{object}}-\/>\mbox{\hyperlink{structyh__object__descriptor_a485734f824121a0901c151d814ab7226}{algorithm}})\ ==\ \textcolor{keyword}{true})\ \{}
 \DoxyCodeLine{\Hypertarget{util__pkcs11_8c_source_l00914}00914\ \ \ \ \ \ \ \ \ get\_capability\_attribute(\textcolor{keywordtype}{object},\ \textcolor{stringliteral}{"{}sign-\/ecdsa"{}},\ \textcolor{keyword}{true},\ \mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}},\ length,}
 \DoxyCodeLine{\Hypertarget{util__pkcs11_8c_source_l00915}00915\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ NULL);}
 \DoxyCodeLine{\Hypertarget{util__pkcs11_8c_source_l00916}00916\ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
@@ -948,7 +948,7 @@
 \DoxyCodeLine{\Hypertarget{util__pkcs11_8c_source_l00944}00944\ }
 \DoxyCodeLine{\Hypertarget{util__pkcs11_8c_source_l00945}00945\ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{pkcs11_8h_af4e399d748bfe19cf956386179e0c3da}{CKA\_EC\_PARAMS}}:\ \{}
 \DoxyCodeLine{\Hypertarget{util__pkcs11_8c_source_l00946}00946\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\ *oid;}
-\DoxyCodeLine{\Hypertarget{util__pkcs11_8c_source_l00947}00947\ \ \ \ \ \ \ \textcolor{keywordflow}{switch}\ (object-\/>algorithm)\ \{}
+\DoxyCodeLine{\Hypertarget{util__pkcs11_8c_source_l00947}00947\ \ \ \ \ \ \ \textcolor{keywordflow}{switch}\ (\mbox{\hyperlink{yubihsm__pkcs11_8c_a85d991d90970121ba1480cd98d93aab9}{object}}-\/>\mbox{\hyperlink{structyh__object__descriptor_a485734f824121a0901c151d814ab7226}{algorithm}})\ \{}
 \DoxyCodeLine{\Hypertarget{util__pkcs11_8c_source_l00948}00948\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{yubihsm_8h_a498937b5a72accbb0ef21bb1dcdd55caaedcbc07d82b18ca5c21eb3379a6cc010}{YH\_ALGO\_EC\_P224}}:}
 \DoxyCodeLine{\Hypertarget{util__pkcs11_8c_source_l00949}00949\ \ \ \ \ \ \ \ \ \ \ oid\ =\ oid\_secp224r1;}
 \DoxyCodeLine{\Hypertarget{util__pkcs11_8c_source_l00950}00950\ \ \ \ \ \ \ \ \ \ \ *length\ =\ \textcolor{keyword}{sizeof}(oid\_secp224r1);}
@@ -988,14 +988,14 @@
 \DoxyCodeLine{\Hypertarget{util__pkcs11_8c_source_l00984}00984\ \ \ \ \ \}\ \textcolor{keywordflow}{break};}
 \DoxyCodeLine{\Hypertarget{util__pkcs11_8c_source_l00985}00985\ }
 \DoxyCodeLine{\Hypertarget{util__pkcs11_8c_source_l00986}00986\ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{pkcs11_8h_a505044b8a4656ed27cf95f5f43c2c0c0}{CKA\_MODULUS}}:\ \{}
-\DoxyCodeLine{\Hypertarget{util__pkcs11_8c_source_l00987}00987\ \ \ \ \ \ \ \textcolor{keywordflow}{switch}\ (object-\/>algorithm)\ \{}
+\DoxyCodeLine{\Hypertarget{util__pkcs11_8c_source_l00987}00987\ \ \ \ \ \ \ \textcolor{keywordflow}{switch}\ (\mbox{\hyperlink{yubihsm__pkcs11_8c_a85d991d90970121ba1480cd98d93aab9}{object}}-\/>\mbox{\hyperlink{structyh__object__descriptor_a485734f824121a0901c151d814ab7226}{algorithm}})\ \{}
 \DoxyCodeLine{\Hypertarget{util__pkcs11_8c_source_l00988}00988\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{yubihsm_8h_a498937b5a72accbb0ef21bb1dcdd55caaafe94e6a770edb51c6db84f77d98d2c6}{YH\_ALGO\_RSA\_2048}}:}
 \DoxyCodeLine{\Hypertarget{util__pkcs11_8c_source_l00989}00989\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{yubihsm_8h_a498937b5a72accbb0ef21bb1dcdd55caafd3fbd9ed86caf267ccc77cb24d44426}{YH\_ALGO\_RSA\_3072}}:}
 \DoxyCodeLine{\Hypertarget{util__pkcs11_8c_source_l00990}00990\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{yubihsm_8h_a498937b5a72accbb0ef21bb1dcdd55caae5963322a0a0f43a1b74faa78e3a7329}{YH\_ALGO\_RSA\_4096}}:\ \{}
 \DoxyCodeLine{\Hypertarget{util__pkcs11_8c_source_l00991}00991\ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\ resp[2048];}
 \DoxyCodeLine{\Hypertarget{util__pkcs11_8c_source_l00992}00992\ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{size\_t}\ resp\_len\ =\ \textcolor{keyword}{sizeof}(resp);}
 \DoxyCodeLine{\Hypertarget{util__pkcs11_8c_source_l00993}00993\ }
-\DoxyCodeLine{\Hypertarget{util__pkcs11_8c_source_l00994}00994\ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{yubihsm_8c_aa7b8b42156c4bdaf41d8b9758a2fd73f}{yh\_util\_get\_public\_key}}(\mbox{\hyperlink{ecdh__derive__test_8c_a0a2c7706d971796d7dc84fee36d6c84f}{session}},\ object-\/>id,\ resp,\ \&resp\_len,}
+\DoxyCodeLine{\Hypertarget{util__pkcs11_8c_source_l00994}00994\ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{yubihsm_8c_aa7b8b42156c4bdaf41d8b9758a2fd73f}{yh\_util\_get\_public\_key}}(\mbox{\hyperlink{ecdh__derive__test_8c_a0a2c7706d971796d7dc84fee36d6c84f}{session}},\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a85d991d90970121ba1480cd98d93aab9}{object}}-\/>\mbox{\hyperlink{structyh__object__descriptor_a8683d3f22f1e8ba56e3caea8ed8504ec}{id}},\ resp,\ \&resp\_len,}
 \DoxyCodeLine{\Hypertarget{util__pkcs11_8c_source_l00995}00995\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ NULL)\ !=\ \mbox{\hyperlink{yubihsm_8h_ae4f602d2343d01b1727dfd633169d366a405155512dc2284dc210ed15be1d0815}{YHR\_SUCCESS}})\ \{}
 \DoxyCodeLine{\Hypertarget{util__pkcs11_8c_source_l00996}00996\ \ \ \ \ \ \ \ \ \ \ \ \ *length\ =\ \mbox{\hyperlink{pkcs11_8h_a76782288a47c99c6e6ff3dc667f0e3ef}{CK\_UNAVAILABLE\_INFORMATION}};}
 \DoxyCodeLine{\Hypertarget{util__pkcs11_8c_source_l00997}00997\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{pkcs11_8h_a0afbefc1a4ce05ba5faea1778eb602ca}{CKR\_ATTRIBUTE\_TYPE\_INVALID}};}
@@ -1014,7 +1014,7 @@
 \DoxyCodeLine{\Hypertarget{util__pkcs11_8c_source_l01010}01010\ \ \ \ \ \}}
 \DoxyCodeLine{\Hypertarget{util__pkcs11_8c_source_l01011}01011\ }
 \DoxyCodeLine{\Hypertarget{util__pkcs11_8c_source_l01012}01012\ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{pkcs11_8h_a3560a0897e67ea3584c5e5d6b49997a9}{CKA\_PUBLIC\_EXPONENT}}:}
-\DoxyCodeLine{\Hypertarget{util__pkcs11_8c_source_l01013}01013\ \ \ \ \ \ \ \textcolor{keywordflow}{switch}\ (object-\/>algorithm)\ \{}
+\DoxyCodeLine{\Hypertarget{util__pkcs11_8c_source_l01013}01013\ \ \ \ \ \ \ \textcolor{keywordflow}{switch}\ (\mbox{\hyperlink{yubihsm__pkcs11_8c_a85d991d90970121ba1480cd98d93aab9}{object}}-\/>\mbox{\hyperlink{structyh__object__descriptor_a485734f824121a0901c151d814ab7226}{algorithm}})\ \{}
 \DoxyCodeLine{\Hypertarget{util__pkcs11_8c_source_l01014}01014\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{yubihsm_8h_a498937b5a72accbb0ef21bb1dcdd55caaafe94e6a770edb51c6db84f77d98d2c6}{YH\_ALGO\_RSA\_2048}}:}
 \DoxyCodeLine{\Hypertarget{util__pkcs11_8c_source_l01015}01015\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{yubihsm_8h_a498937b5a72accbb0ef21bb1dcdd55caafd3fbd9ed86caf267ccc77cb24d44426}{YH\_ALGO\_RSA\_3072}}:}
 \DoxyCodeLine{\Hypertarget{util__pkcs11_8c_source_l01016}01016\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{yubihsm_8h_a498937b5a72accbb0ef21bb1dcdd55caae5963322a0a0f43a1b74faa78e3a7329}{YH\_ALGO\_RSA\_4096}}:\ \{}
@@ -1191,8 +1191,8 @@
 \DoxyCodeLine{\Hypertarget{util__pkcs11_8c_source_l01187}01187\ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
 \DoxyCodeLine{\Hypertarget{util__pkcs11_8c_source_l01188}01188\ }
 \DoxyCodeLine{\Hypertarget{util__pkcs11_8c_source_l01189}01189\ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{pkcs11_8h_ad427016a08d7b8f0d8fe910b907e9b44}{CKA\_ENCRYPT}}:}
-\DoxyCodeLine{\Hypertarget{util__pkcs11_8c_source_l01190}01190\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (object-\/>type\ ==\ (0x80\ |\ \mbox{\hyperlink{yubihsm_8h_a2fe39512cb4df34b270a67dbb8e13583ab71424e16384319d6e6a12f9a3d8ceae}{YH\_ASYMMETRIC\_KEY}})\ \&\&}
-\DoxyCodeLine{\Hypertarget{util__pkcs11_8c_source_l01191}01191\ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{yubihsm_8c_a0a67155f2a7970ecb52e4f6aac6bbe84}{yh\_is\_rsa}}(object-\/>algorithm))\ \{}
+\DoxyCodeLine{\Hypertarget{util__pkcs11_8c_source_l01190}01190\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{yubihsm__pkcs11_8c_a85d991d90970121ba1480cd98d93aab9}{object}}-\/>\mbox{\hyperlink{structyh__object__descriptor_ab8c1b3cc5b859e3c89eb228fa0763165}{type}}\ ==\ (0x80\ |\ \mbox{\hyperlink{yubihsm_8h_a2fe39512cb4df34b270a67dbb8e13583ab71424e16384319d6e6a12f9a3d8ceae}{YH\_ASYMMETRIC\_KEY}})\ \&\&}
+\DoxyCodeLine{\Hypertarget{util__pkcs11_8c_source_l01191}01191\ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{yubihsm_8c_a0a67155f2a7970ecb52e4f6aac6bbe84}{yh\_is\_rsa}}(\mbox{\hyperlink{yubihsm__pkcs11_8c_a85d991d90970121ba1480cd98d93aab9}{object}}-\/>\mbox{\hyperlink{structyh__object__descriptor_a485734f824121a0901c151d814ab7226}{algorithm}}))\ \{}
 \DoxyCodeLine{\Hypertarget{util__pkcs11_8c_source_l01192}01192\ \ \ \ \ \ \ \ \ get\_capability\_attribute(\textcolor{keywordtype}{object},\ \textcolor{stringliteral}{"{}decrypt-\/pkcs,decrypt-\/oaep"{}},\ \textcolor{keyword}{true},}
 \DoxyCodeLine{\Hypertarget{util__pkcs11_8c_source_l01193}01193\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}},\ length,\ NULL);}
 \DoxyCodeLine{\Hypertarget{util__pkcs11_8c_source_l01194}01194\ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
@@ -1202,12 +1202,12 @@
 \DoxyCodeLine{\Hypertarget{util__pkcs11_8c_source_l01198}01198\ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
 \DoxyCodeLine{\Hypertarget{util__pkcs11_8c_source_l01199}01199\ }
 \DoxyCodeLine{\Hypertarget{util__pkcs11_8c_source_l01200}01200\ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{pkcs11_8h_a84c89cd9def639cb4a58145063b7bd42}{CKA\_VERIFY}}:}
-\DoxyCodeLine{\Hypertarget{util__pkcs11_8c_source_l01201}01201\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (object-\/>type\ ==\ (0x80\ |\ \mbox{\hyperlink{yubihsm_8h_a2fe39512cb4df34b270a67dbb8e13583ab71424e16384319d6e6a12f9a3d8ceae}{YH\_ASYMMETRIC\_KEY}})\ \&\&}
-\DoxyCodeLine{\Hypertarget{util__pkcs11_8c_source_l01202}01202\ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{yubihsm_8c_a0a67155f2a7970ecb52e4f6aac6bbe84}{yh\_is\_rsa}}(object-\/>algorithm)\ ==\ \textcolor{keyword}{true})\ \{}
+\DoxyCodeLine{\Hypertarget{util__pkcs11_8c_source_l01201}01201\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{yubihsm__pkcs11_8c_a85d991d90970121ba1480cd98d93aab9}{object}}-\/>\mbox{\hyperlink{structyh__object__descriptor_ab8c1b3cc5b859e3c89eb228fa0763165}{type}}\ ==\ (0x80\ |\ \mbox{\hyperlink{yubihsm_8h_a2fe39512cb4df34b270a67dbb8e13583ab71424e16384319d6e6a12f9a3d8ceae}{YH\_ASYMMETRIC\_KEY}})\ \&\&}
+\DoxyCodeLine{\Hypertarget{util__pkcs11_8c_source_l01202}01202\ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{yubihsm_8c_a0a67155f2a7970ecb52e4f6aac6bbe84}{yh\_is\_rsa}}(\mbox{\hyperlink{yubihsm__pkcs11_8c_a85d991d90970121ba1480cd98d93aab9}{object}}-\/>\mbox{\hyperlink{structyh__object__descriptor_a485734f824121a0901c151d814ab7226}{algorithm}})\ ==\ \textcolor{keyword}{true})\ \{}
 \DoxyCodeLine{\Hypertarget{util__pkcs11_8c_source_l01203}01203\ \ \ \ \ \ \ \ \ get\_capability\_attribute(\textcolor{keywordtype}{object},\ \textcolor{stringliteral}{"{}sign-\/pkcs,sign-\/pss"{}},\ \textcolor{keyword}{true},\ \mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}},}
 \DoxyCodeLine{\Hypertarget{util__pkcs11_8c_source_l01204}01204\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ length,\ NULL);}
-\DoxyCodeLine{\Hypertarget{util__pkcs11_8c_source_l01205}01205\ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}\ (object-\/>type\ ==\ (0x80\ |\ \mbox{\hyperlink{yubihsm_8h_a2fe39512cb4df34b270a67dbb8e13583ab71424e16384319d6e6a12f9a3d8ceae}{YH\_ASYMMETRIC\_KEY}})\ \&\&}
-\DoxyCodeLine{\Hypertarget{util__pkcs11_8c_source_l01206}01206\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{yubihsm_8c_a3032a8f45bfad36ed6157b0158dd7921}{yh\_is\_ec}}(object-\/>algorithm)\ ==\ \textcolor{keyword}{true})\ \{}
+\DoxyCodeLine{\Hypertarget{util__pkcs11_8c_source_l01205}01205\ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{yubihsm__pkcs11_8c_a85d991d90970121ba1480cd98d93aab9}{object}}-\/>\mbox{\hyperlink{structyh__object__descriptor_ab8c1b3cc5b859e3c89eb228fa0763165}{type}}\ ==\ (0x80\ |\ \mbox{\hyperlink{yubihsm_8h_a2fe39512cb4df34b270a67dbb8e13583ab71424e16384319d6e6a12f9a3d8ceae}{YH\_ASYMMETRIC\_KEY}})\ \&\&}
+\DoxyCodeLine{\Hypertarget{util__pkcs11_8c_source_l01206}01206\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{yubihsm_8c_a3032a8f45bfad36ed6157b0158dd7921}{yh\_is\_ec}}(\mbox{\hyperlink{yubihsm__pkcs11_8c_a85d991d90970121ba1480cd98d93aab9}{object}}-\/>\mbox{\hyperlink{structyh__object__descriptor_a485734f824121a0901c151d814ab7226}{algorithm}})\ ==\ \textcolor{keyword}{true})\ \{}
 \DoxyCodeLine{\Hypertarget{util__pkcs11_8c_source_l01207}01207\ \ \ \ \ \ \ \ \ get\_capability\_attribute(\textcolor{keywordtype}{object},\ \textcolor{stringliteral}{"{}sign-\/ecdsa"{}},\ \textcolor{keyword}{true},\ \mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}},\ length,}
 \DoxyCodeLine{\Hypertarget{util__pkcs11_8c_source_l01208}01208\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ NULL);}
 \DoxyCodeLine{\Hypertarget{util__pkcs11_8c_source_l01209}01209\ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
@@ -1223,8 +1223,8 @@
 \DoxyCodeLine{\Hypertarget{util__pkcs11_8c_source_l01219}01219\ \ \ \ \ \ \ \textcolor{comment}{//\ NOTE(adma):\ Key\ Objects\ attributes}}
 \DoxyCodeLine{\Hypertarget{util__pkcs11_8c_source_l01220}01220\ }
 \DoxyCodeLine{\Hypertarget{util__pkcs11_8c_source_l01221}01221\ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{pkcs11_8h_aa438b88cbcb8a921288eeefba5613274}{CKA\_KEY\_TYPE}}:}
-\DoxyCodeLine{\Hypertarget{util__pkcs11_8c_source_l01222}01222\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (object-\/>type\ ==\ (0x80\ |\ \mbox{\hyperlink{yubihsm_8h_a2fe39512cb4df34b270a67dbb8e13583ab71424e16384319d6e6a12f9a3d8ceae}{YH\_ASYMMETRIC\_KEY}}))\ \{}
-\DoxyCodeLine{\Hypertarget{util__pkcs11_8c_source_l01223}01223\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{switch}\ (object-\/>algorithm)\ \{}
+\DoxyCodeLine{\Hypertarget{util__pkcs11_8c_source_l01222}01222\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{yubihsm__pkcs11_8c_a85d991d90970121ba1480cd98d93aab9}{object}}-\/>\mbox{\hyperlink{structyh__object__descriptor_ab8c1b3cc5b859e3c89eb228fa0763165}{type}}\ ==\ (0x80\ |\ \mbox{\hyperlink{yubihsm_8h_a2fe39512cb4df34b270a67dbb8e13583ab71424e16384319d6e6a12f9a3d8ceae}{YH\_ASYMMETRIC\_KEY}}))\ \{}
+\DoxyCodeLine{\Hypertarget{util__pkcs11_8c_source_l01223}01223\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{switch}\ (\mbox{\hyperlink{yubihsm__pkcs11_8c_a85d991d90970121ba1480cd98d93aab9}{object}}-\/>\mbox{\hyperlink{structyh__object__descriptor_a485734f824121a0901c151d814ab7226}{algorithm}})\ \{}
 \DoxyCodeLine{\Hypertarget{util__pkcs11_8c_source_l01224}01224\ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{yubihsm_8h_a498937b5a72accbb0ef21bb1dcdd55caaafe94e6a770edb51c6db84f77d98d2c6}{YH\_ALGO\_RSA\_2048}}:}
 \DoxyCodeLine{\Hypertarget{util__pkcs11_8c_source_l01225}01225\ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{yubihsm_8h_a498937b5a72accbb0ef21bb1dcdd55caafd3fbd9ed86caf267ccc77cb24d44426}{YH\_ALGO\_RSA\_3072}}:}
 \DoxyCodeLine{\Hypertarget{util__pkcs11_8c_source_l01226}01226\ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{yubihsm_8h_a498937b5a72accbb0ef21bb1dcdd55caae5963322a0a0f43a1b74faa78e3a7329}{YH\_ALGO\_RSA\_4096}}:}
@@ -1247,8 +1247,8 @@
 \DoxyCodeLine{\Hypertarget{util__pkcs11_8c_source_l01243}01243\ \ \ \ \ \ \ \ \ \}}
 \DoxyCodeLine{\Hypertarget{util__pkcs11_8c_source_l01244}01244\ }
 \DoxyCodeLine{\Hypertarget{util__pkcs11_8c_source_l01245}01245\ \ \ \ \ \ \ \ \ *length\ =\ \textcolor{keyword}{sizeof}(CK\_KEY\_TYPE);}
-\DoxyCodeLine{\Hypertarget{util__pkcs11_8c_source_l01246}01246\ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}\ (object-\/>type\ ==\ \mbox{\hyperlink{yubihsm_8h_a2fe39512cb4df34b270a67dbb8e13583a708d85f80fc33743ac26a7c3e43464a9}{YH\_HMAC\_KEY}})\ \{}
-\DoxyCodeLine{\Hypertarget{util__pkcs11_8c_source_l01247}01247\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{switch}\ (object-\/>algorithm)\ \{}
+\DoxyCodeLine{\Hypertarget{util__pkcs11_8c_source_l01246}01246\ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{yubihsm__pkcs11_8c_a85d991d90970121ba1480cd98d93aab9}{object}}-\/>\mbox{\hyperlink{structyh__object__descriptor_ab8c1b3cc5b859e3c89eb228fa0763165}{type}}\ ==\ \mbox{\hyperlink{yubihsm_8h_a2fe39512cb4df34b270a67dbb8e13583a708d85f80fc33743ac26a7c3e43464a9}{YH\_HMAC\_KEY}})\ \{}
+\DoxyCodeLine{\Hypertarget{util__pkcs11_8c_source_l01247}01247\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{switch}\ (\mbox{\hyperlink{yubihsm__pkcs11_8c_a85d991d90970121ba1480cd98d93aab9}{object}}-\/>\mbox{\hyperlink{structyh__object__descriptor_a485734f824121a0901c151d814ab7226}{algorithm}})\ \{}
 \DoxyCodeLine{\Hypertarget{util__pkcs11_8c_source_l01248}01248\ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{yubihsm_8h_a498937b5a72accbb0ef21bb1dcdd55caa942e65c8cd0034eebe9a20c2297c7b06}{YH\_ALGO\_HMAC\_SHA1}}:}
 \DoxyCodeLine{\Hypertarget{util__pkcs11_8c_source_l01249}01249\ \ \ \ \ \ \ \ \ \ \ \ \ *((CK\_KEY\_TYPE\ *)\ \mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}})\ =\ \mbox{\hyperlink{pkcs11_8h_aec5006f9a0e144d9b43af3a1f1e4a38f}{CKK\_SHA\_1\_HMAC}};}
 \DoxyCodeLine{\Hypertarget{util__pkcs11_8c_source_l01250}01250\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
@@ -1282,7 +1282,7 @@
 \DoxyCodeLine{\Hypertarget{util__pkcs11_8c_source_l01278}01278\ \ \ \ \ \ \ \textcolor{comment}{//\ case\ CKA\_END\_DATE:}}
 \DoxyCodeLine{\Hypertarget{util__pkcs11_8c_source_l01279}01279\ }
 \DoxyCodeLine{\Hypertarget{util__pkcs11_8c_source_l01280}01280\ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{pkcs11_8h_a7f7089933d976e82f882eda6efcf7e66}{CKA\_LOCAL}}:}
-\DoxyCodeLine{\Hypertarget{util__pkcs11_8c_source_l01281}01281\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (object-\/>origin\ ==\ \mbox{\hyperlink{yubihsm_8h_a1b233ade526e2b1a6313e2e2d892bd88}{YH\_ORIGIN\_GENERATED}})\ \{}
+\DoxyCodeLine{\Hypertarget{util__pkcs11_8c_source_l01281}01281\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{yubihsm__pkcs11_8c_a85d991d90970121ba1480cd98d93aab9}{object}}-\/>\mbox{\hyperlink{structyh__object__descriptor_ab4e9be8940ce12a69b6b2389137aa768}{origin}}\ ==\ \mbox{\hyperlink{yubihsm_8h_a1b233ade526e2b1a6313e2e2d892bd88}{YH\_ORIGIN\_GENERATED}})\ \{}
 \DoxyCodeLine{\Hypertarget{util__pkcs11_8c_source_l01282}01282\ \ \ \ \ \ \ \ \ *((\mbox{\hyperlink{pkcs11_8h_a9dc289e62be691f41a9c6b875789b1f2}{CK\_BBOOL}}\ *)\ \mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}})\ =\ \mbox{\hyperlink{pkcs11_8h_a76edf786ed8cccb1b3d2cf9e9f0800cd}{CK\_TRUE}};}
 \DoxyCodeLine{\Hypertarget{util__pkcs11_8c_source_l01283}01283\ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
 \DoxyCodeLine{\Hypertarget{util__pkcs11_8c_source_l01284}01284\ \ \ \ \ \ \ \ \ *((\mbox{\hyperlink{pkcs11_8h_a9dc289e62be691f41a9c6b875789b1f2}{CK\_BBOOL}}\ *)\ \mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}})\ =\ \mbox{\hyperlink{pkcs11_8h_a1df8841072c48f0b511ccad3bbb25812}{CK\_FALSE}};}
@@ -1303,7 +1303,7 @@
 \DoxyCodeLine{\Hypertarget{util__pkcs11_8c_source_l01299}01299\ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
 \DoxyCodeLine{\Hypertarget{util__pkcs11_8c_source_l01300}01300\ }
 \DoxyCodeLine{\Hypertarget{util__pkcs11_8c_source_l01301}01301\ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{pkcs11_8h_ace277af7e7da877d65a25411a22a6b39}{CKA\_MODULUS\_BITS}}:}
-\DoxyCodeLine{\Hypertarget{util__pkcs11_8c_source_l01302}01302\ \ \ \ \ \ \ \textcolor{keywordflow}{switch}\ (object-\/>algorithm)\ \{}
+\DoxyCodeLine{\Hypertarget{util__pkcs11_8c_source_l01302}01302\ \ \ \ \ \ \ \textcolor{keywordflow}{switch}\ (\mbox{\hyperlink{yubihsm__pkcs11_8c_a85d991d90970121ba1480cd98d93aab9}{object}}-\/>\mbox{\hyperlink{structyh__object__descriptor_a485734f824121a0901c151d814ab7226}{algorithm}})\ \{}
 \DoxyCodeLine{\Hypertarget{util__pkcs11_8c_source_l01303}01303\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{yubihsm_8h_a498937b5a72accbb0ef21bb1dcdd55caaafe94e6a770edb51c6db84f77d98d2c6}{YH\_ALGO\_RSA\_2048}}:}
 \DoxyCodeLine{\Hypertarget{util__pkcs11_8c_source_l01304}01304\ \ \ \ \ \ \ \ \ \ \ *((\mbox{\hyperlink{pkcs11_8h_a35181858a3b7a0a81f49d180d8f446ef}{CK\_ULONG}}\ *)\ \mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}})\ =\ 2048;}
 \DoxyCodeLine{\Hypertarget{util__pkcs11_8c_source_l01305}01305\ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
@@ -1324,7 +1324,7 @@
 \DoxyCodeLine{\Hypertarget{util__pkcs11_8c_source_l01320}01320\ }
 \DoxyCodeLine{\Hypertarget{util__pkcs11_8c_source_l01321}01321\ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{pkcs11_8h_af4e399d748bfe19cf956386179e0c3da}{CKA\_EC\_PARAMS}}:\ \{}
 \DoxyCodeLine{\Hypertarget{util__pkcs11_8c_source_l01322}01322\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\ *oid;}
-\DoxyCodeLine{\Hypertarget{util__pkcs11_8c_source_l01323}01323\ \ \ \ \ \ \ \textcolor{keywordflow}{switch}\ (object-\/>algorithm)\ \{}
+\DoxyCodeLine{\Hypertarget{util__pkcs11_8c_source_l01323}01323\ \ \ \ \ \ \ \textcolor{keywordflow}{switch}\ (\mbox{\hyperlink{yubihsm__pkcs11_8c_a85d991d90970121ba1480cd98d93aab9}{object}}-\/>\mbox{\hyperlink{structyh__object__descriptor_a485734f824121a0901c151d814ab7226}{algorithm}})\ \{}
 \DoxyCodeLine{\Hypertarget{util__pkcs11_8c_source_l01324}01324\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{yubihsm_8h_a498937b5a72accbb0ef21bb1dcdd55caaedcbc07d82b18ca5c21eb3379a6cc010}{YH\_ALGO\_EC\_P224}}:}
 \DoxyCodeLine{\Hypertarget{util__pkcs11_8c_source_l01325}01325\ \ \ \ \ \ \ \ \ \ \ oid\ =\ oid\_secp224r1;}
 \DoxyCodeLine{\Hypertarget{util__pkcs11_8c_source_l01326}01326\ \ \ \ \ \ \ \ \ \ \ *length\ =\ \textcolor{keyword}{sizeof}(oid\_secp224r1);}
@@ -1368,7 +1368,7 @@
 \DoxyCodeLine{\Hypertarget{util__pkcs11_8c_source_l01364}01364\ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\ resp[2048];}
 \DoxyCodeLine{\Hypertarget{util__pkcs11_8c_source_l01365}01365\ \ \ \ \ \ \ \textcolor{keywordtype}{size\_t}\ resplen\ =\ \textcolor{keyword}{sizeof}(resp);}
 \DoxyCodeLine{\Hypertarget{util__pkcs11_8c_source_l01366}01366\ }
-\DoxyCodeLine{\Hypertarget{util__pkcs11_8c_source_l01367}01367\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{yubihsm_8c_aa7b8b42156c4bdaf41d8b9758a2fd73f}{yh\_util\_get\_public\_key}}(\mbox{\hyperlink{ecdh__derive__test_8c_a0a2c7706d971796d7dc84fee36d6c84f}{session}},\ object-\/>id,\ resp,\ \&resplen,\ NULL)\ ==}
+\DoxyCodeLine{\Hypertarget{util__pkcs11_8c_source_l01367}01367\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{yubihsm_8c_aa7b8b42156c4bdaf41d8b9758a2fd73f}{yh\_util\_get\_public\_key}}(\mbox{\hyperlink{ecdh__derive__test_8c_a0a2c7706d971796d7dc84fee36d6c84f}{session}},\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a85d991d90970121ba1480cd98d93aab9}{object}}-\/>\mbox{\hyperlink{structyh__object__descriptor_a8683d3f22f1e8ba56e3caea8ed8504ec}{id}},\ resp,\ \&resplen,\ NULL)\ ==}
 \DoxyCodeLine{\Hypertarget{util__pkcs11_8c_source_l01368}01368\ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{yubihsm_8h_ae4f602d2343d01b1727dfd633169d366a405155512dc2284dc210ed15be1d0815}{YHR\_SUCCESS}})\ \{}
 \DoxyCodeLine{\Hypertarget{util__pkcs11_8c_source_l01369}01369\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\ *\mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}\ =\ \mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}};}
 \DoxyCodeLine{\Hypertarget{util__pkcs11_8c_source_l01370}01370\ \ \ \ \ \ \ \ \ *\mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}++\ =\ 0x04;}
@@ -1388,14 +1388,14 @@
 \DoxyCodeLine{\Hypertarget{util__pkcs11_8c_source_l01384}01384\ \ \ \ \ \}}
 \DoxyCodeLine{\Hypertarget{util__pkcs11_8c_source_l01385}01385\ }
 \DoxyCodeLine{\Hypertarget{util__pkcs11_8c_source_l01386}01386\ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{pkcs11_8h_a505044b8a4656ed27cf95f5f43c2c0c0}{CKA\_MODULUS}}:\ \{}
-\DoxyCodeLine{\Hypertarget{util__pkcs11_8c_source_l01387}01387\ \ \ \ \ \ \ \textcolor{keywordflow}{switch}\ (object-\/>algorithm)\ \{}
+\DoxyCodeLine{\Hypertarget{util__pkcs11_8c_source_l01387}01387\ \ \ \ \ \ \ \textcolor{keywordflow}{switch}\ (\mbox{\hyperlink{yubihsm__pkcs11_8c_a85d991d90970121ba1480cd98d93aab9}{object}}-\/>\mbox{\hyperlink{structyh__object__descriptor_a485734f824121a0901c151d814ab7226}{algorithm}})\ \{}
 \DoxyCodeLine{\Hypertarget{util__pkcs11_8c_source_l01388}01388\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{yubihsm_8h_a498937b5a72accbb0ef21bb1dcdd55caaafe94e6a770edb51c6db84f77d98d2c6}{YH\_ALGO\_RSA\_2048}}:}
 \DoxyCodeLine{\Hypertarget{util__pkcs11_8c_source_l01389}01389\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{yubihsm_8h_a498937b5a72accbb0ef21bb1dcdd55caafd3fbd9ed86caf267ccc77cb24d44426}{YH\_ALGO\_RSA\_3072}}:}
 \DoxyCodeLine{\Hypertarget{util__pkcs11_8c_source_l01390}01390\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{yubihsm_8h_a498937b5a72accbb0ef21bb1dcdd55caae5963322a0a0f43a1b74faa78e3a7329}{YH\_ALGO\_RSA\_4096}}:\ \{}
 \DoxyCodeLine{\Hypertarget{util__pkcs11_8c_source_l01391}01391\ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\ resp[2048];}
 \DoxyCodeLine{\Hypertarget{util__pkcs11_8c_source_l01392}01392\ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{size\_t}\ resp\_len\ =\ \textcolor{keyword}{sizeof}(resp);}
 \DoxyCodeLine{\Hypertarget{util__pkcs11_8c_source_l01393}01393\ }
-\DoxyCodeLine{\Hypertarget{util__pkcs11_8c_source_l01394}01394\ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{yubihsm_8c_aa7b8b42156c4bdaf41d8b9758a2fd73f}{yh\_util\_get\_public\_key}}(\mbox{\hyperlink{ecdh__derive__test_8c_a0a2c7706d971796d7dc84fee36d6c84f}{session}},\ object-\/>id,\ resp,\ \&resp\_len,}
+\DoxyCodeLine{\Hypertarget{util__pkcs11_8c_source_l01394}01394\ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{yubihsm_8c_aa7b8b42156c4bdaf41d8b9758a2fd73f}{yh\_util\_get\_public\_key}}(\mbox{\hyperlink{ecdh__derive__test_8c_a0a2c7706d971796d7dc84fee36d6c84f}{session}},\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a85d991d90970121ba1480cd98d93aab9}{object}}-\/>\mbox{\hyperlink{structyh__object__descriptor_a8683d3f22f1e8ba56e3caea8ed8504ec}{id}},\ resp,\ \&resp\_len,}
 \DoxyCodeLine{\Hypertarget{util__pkcs11_8c_source_l01395}01395\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ NULL)\ !=\ \mbox{\hyperlink{yubihsm_8h_ae4f602d2343d01b1727dfd633169d366a405155512dc2284dc210ed15be1d0815}{YHR\_SUCCESS}})\ \{}
 \DoxyCodeLine{\Hypertarget{util__pkcs11_8c_source_l01396}01396\ \ \ \ \ \ \ \ \ \ \ \ \ *length\ =\ \mbox{\hyperlink{pkcs11_8h_a76782288a47c99c6e6ff3dc667f0e3ef}{CK\_UNAVAILABLE\_INFORMATION}};}
 \DoxyCodeLine{\Hypertarget{util__pkcs11_8c_source_l01397}01397\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{pkcs11_8h_a0afbefc1a4ce05ba5faea1778eb602ca}{CKR\_ATTRIBUTE\_TYPE\_INVALID}};}
@@ -1414,7 +1414,7 @@
 \DoxyCodeLine{\Hypertarget{util__pkcs11_8c_source_l01410}01410\ \ \ \ \ \}}
 \DoxyCodeLine{\Hypertarget{util__pkcs11_8c_source_l01411}01411\ }
 \DoxyCodeLine{\Hypertarget{util__pkcs11_8c_source_l01412}01412\ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{pkcs11_8h_a3560a0897e67ea3584c5e5d6b49997a9}{CKA\_PUBLIC\_EXPONENT}}:}
-\DoxyCodeLine{\Hypertarget{util__pkcs11_8c_source_l01413}01413\ \ \ \ \ \ \ \textcolor{keywordflow}{switch}\ (object-\/>algorithm)\ \{}
+\DoxyCodeLine{\Hypertarget{util__pkcs11_8c_source_l01413}01413\ \ \ \ \ \ \ \textcolor{keywordflow}{switch}\ (\mbox{\hyperlink{yubihsm__pkcs11_8c_a85d991d90970121ba1480cd98d93aab9}{object}}-\/>\mbox{\hyperlink{structyh__object__descriptor_a485734f824121a0901c151d814ab7226}{algorithm}})\ \{}
 \DoxyCodeLine{\Hypertarget{util__pkcs11_8c_source_l01414}01414\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{yubihsm_8h_a498937b5a72accbb0ef21bb1dcdd55caaafe94e6a770edb51c6db84f77d98d2c6}{YH\_ALGO\_RSA\_2048}}:}
 \DoxyCodeLine{\Hypertarget{util__pkcs11_8c_source_l01415}01415\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{yubihsm_8h_a498937b5a72accbb0ef21bb1dcdd55caafd3fbd9ed86caf267ccc77cb24d44426}{YH\_ALGO\_RSA\_3072}}:}
 \DoxyCodeLine{\Hypertarget{util__pkcs11_8c_source_l01416}01416\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{yubihsm_8h_a498937b5a72accbb0ef21bb1dcdd55caae5963322a0a0f43a1b74faa78e3a7329}{YH\_ALGO\_RSA\_4096}}:\ \{}
@@ -1438,7 +1438,7 @@
 \DoxyCodeLine{\Hypertarget{util__pkcs11_8c_source_l01434}01434\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{pkcs11_8h_a91150ecacbaa624fcc7d861f1b54f57c}{CKR\_FUNCTION\_FAILED}};}
 \DoxyCodeLine{\Hypertarget{util__pkcs11_8c_source_l01435}01435\ \ \ \ \ \ \ \}}
 \DoxyCodeLine{\Hypertarget{util__pkcs11_8c_source_l01436}01436\ }
-\DoxyCodeLine{\Hypertarget{util__pkcs11_8c_source_l01437}01437\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (load\_public\_key(\mbox{\hyperlink{ecdh__derive__test_8c_a0a2c7706d971796d7dc84fee36d6c84f}{session}},\ object-\/>id,\ pkey)\ ==\ \textcolor{keyword}{false})\ \{}
+\DoxyCodeLine{\Hypertarget{util__pkcs11_8c_source_l01437}01437\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (load\_public\_key(\mbox{\hyperlink{ecdh__derive__test_8c_a0a2c7706d971796d7dc84fee36d6c84f}{session}},\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a85d991d90970121ba1480cd98d93aab9}{object}}-\/>\mbox{\hyperlink{structyh__object__descriptor_a8683d3f22f1e8ba56e3caea8ed8504ec}{id}},\ pkey)\ ==\ \textcolor{keyword}{false})\ \{}
 \DoxyCodeLine{\Hypertarget{util__pkcs11_8c_source_l01438}01438\ \ \ \ \ \ \ \ \ EVP\_PKEY\_free(pkey);}
 \DoxyCodeLine{\Hypertarget{util__pkcs11_8c_source_l01439}01439\ \ \ \ \ \ \ \ \ *length\ =\ \mbox{\hyperlink{pkcs11_8h_a76782288a47c99c6e6ff3dc667f0e3ef}{CK\_UNAVAILABLE\_INFORMATION}};}
 \DoxyCodeLine{\Hypertarget{util__pkcs11_8c_source_l01440}01440\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{pkcs11_8h_a0afbefc1a4ce05ba5faea1778eb602ca}{CKR\_ATTRIBUTE\_TYPE\_INVALID}};}
@@ -1471,7 +1471,7 @@
 \DoxyCodeLine{\Hypertarget{util__pkcs11_8c_source_l01467}01467\ \ \ \ \ ptr\ =\ \mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}};}
 \DoxyCodeLine{\Hypertarget{util__pkcs11_8c_source_l01468}01468\ \ \ \}}
 \DoxyCodeLine{\Hypertarget{util__pkcs11_8c_source_l01469}01469\ }
-\DoxyCodeLine{\Hypertarget{util__pkcs11_8c_source_l01470}01470\ \ \ \textcolor{keywordflow}{switch}\ (object-\/>type)\ \{}
+\DoxyCodeLine{\Hypertarget{util__pkcs11_8c_source_l01470}01470\ \ \ \textcolor{keywordflow}{switch}\ (\mbox{\hyperlink{yubihsm__pkcs11_8c_a85d991d90970121ba1480cd98d93aab9}{object}}-\/>\mbox{\hyperlink{structyh__object__descriptor_ab8c1b3cc5b859e3c89eb228fa0763165}{type}})\ \{}
 \DoxyCodeLine{\Hypertarget{util__pkcs11_8c_source_l01471}01471\ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{yubihsm_8h_a2fe39512cb4df34b270a67dbb8e13583a5d37b7418d50b420621e6a6eb2700de4}{YH\_OPAQUE}}:}
 \DoxyCodeLine{\Hypertarget{util__pkcs11_8c_source_l01472}01472\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ get\_attribute\_opaque(type,\ \textcolor{keywordtype}{object},\ ptr,\ length,\ \mbox{\hyperlink{ecdh__derive__test_8c_a0a2c7706d971796d7dc84fee36d6c84f}{session}});}
 \DoxyCodeLine{\Hypertarget{util__pkcs11_8c_source_l01473}01473\ }
@@ -1629,10 +1629,10 @@
 \DoxyCodeLine{\Hypertarget{util__pkcs11_8c_source_l01625}01625\ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_adc4bd59a60361844aa0e852efa210105}{memset}}(\textcolor{keywordtype}{object},\ 0,\ \textcolor{keyword}{sizeof}(\mbox{\hyperlink{structyubihsm__pkcs11__object__desc}{yubihsm\_pkcs11\_object\_desc}}));}
 \DoxyCodeLine{\Hypertarget{util__pkcs11_8c_source_l01626}01626\ \ \ \}}
 \DoxyCodeLine{\Hypertarget{util__pkcs11_8c_source_l01627}01627\ }
-\DoxyCodeLine{\Hypertarget{util__pkcs11_8c_source_l01628}01628\ \ \ \textcolor{keywordflow}{if}\ (!object-\/>filled)\ \{}
+\DoxyCodeLine{\Hypertarget{util__pkcs11_8c_source_l01628}01628\ \ \ \textcolor{keywordflow}{if}\ (!\mbox{\hyperlink{yubihsm__pkcs11_8c_a85d991d90970121ba1480cd98d93aab9}{object}}-\/>filled)\ \{}
 \DoxyCodeLine{\Hypertarget{util__pkcs11_8c_source_l01629}01629\ \ \ \ \ \mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\_t}}\ real\_type\ =}
 \DoxyCodeLine{\Hypertarget{util__pkcs11_8c_source_l01630}01630\ \ \ \ \ \ \ type\ \&\ \string~0x80;\ \textcolor{comment}{//\ NOTE(adma):\ public\ key\ are\ not\ real\ objects}}
-\DoxyCodeLine{\Hypertarget{util__pkcs11_8c_source_l01631}01631\ \ \ \ \ \mbox{\hyperlink{yubihsm_8h_ae4f602d2343d01b1727dfd633169d366}{yh\_rc}}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a97917e1d5a9fa5e8b7a4495dc9234ac7}{rc}}\ =\ \mbox{\hyperlink{yubihsm_8c_a7b5f1f0c1cbca11fbe21e7e4e6b29a1b}{yh\_util\_get\_object\_info}}(\mbox{\hyperlink{ecdh__derive__test_8c_a0a2c7706d971796d7dc84fee36d6c84f}{session}},\ \textcolor{keywordtype}{id},\ real\_type,\ \&object-\/>object);}
+\DoxyCodeLine{\Hypertarget{util__pkcs11_8c_source_l01631}01631\ \ \ \ \ \mbox{\hyperlink{yubihsm_8h_ae4f602d2343d01b1727dfd633169d366}{yh\_rc}}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a97917e1d5a9fa5e8b7a4495dc9234ac7}{rc}}\ =\ \mbox{\hyperlink{yubihsm_8c_a7b5f1f0c1cbca11fbe21e7e4e6b29a1b}{yh\_util\_get\_object\_info}}(\mbox{\hyperlink{ecdh__derive__test_8c_a0a2c7706d971796d7dc84fee36d6c84f}{session}},\ \textcolor{keywordtype}{id},\ real\_type,\ \&\mbox{\hyperlink{yubihsm__pkcs11_8c_a85d991d90970121ba1480cd98d93aab9}{object}}-\/>object);}
 \DoxyCodeLine{\Hypertarget{util__pkcs11_8c_source_l01632}01632\ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{yubihsm__pkcs11_8c_a97917e1d5a9fa5e8b7a4495dc9234ac7}{rc}}\ !=\ \mbox{\hyperlink{yubihsm_8h_ae4f602d2343d01b1727dfd633169d366a405155512dc2284dc210ed15be1d0815}{YHR\_SUCCESS}})\ \{}
 \DoxyCodeLine{\Hypertarget{util__pkcs11_8c_source_l01633}01633\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ NULL;}
 \DoxyCodeLine{\Hypertarget{util__pkcs11_8c_source_l01634}01634\ \ \ \ \ \}}
@@ -1642,7 +1642,7 @@
 \DoxyCodeLine{\Hypertarget{util__pkcs11_8c_source_l01638}01638\ }
 \DoxyCodeLine{\Hypertarget{util__pkcs11_8c_source_l01639}01639\ \ \ \textcolor{keywordtype}{object}-\/>\mbox{\hyperlink{structyubihsm__pkcs11__object__desc_a6029acaef1678d77702d2c51fb75540a}{object}}.\mbox{\hyperlink{structyh__object__descriptor_ab8c1b3cc5b859e3c89eb228fa0763165}{type}}\ =\ \mbox{\hyperlink{yubihsm_8h_a1d127017fb298b889f4ba24752d08b8e}{type}};}
 \DoxyCodeLine{\Hypertarget{util__pkcs11_8c_source_l01640}01640\ }
-\DoxyCodeLine{\Hypertarget{util__pkcs11_8c_source_l01641}01641\ \ \ gettimeofday(\&object-\/>tv,\ NULL);}
+\DoxyCodeLine{\Hypertarget{util__pkcs11_8c_source_l01641}01641\ \ \ gettimeofday(\&\mbox{\hyperlink{yubihsm__pkcs11_8c_a85d991d90970121ba1480cd98d93aab9}{object}}-\/>tv,\ NULL);}
 \DoxyCodeLine{\Hypertarget{util__pkcs11_8c_source_l01642}01642\ }
 \DoxyCodeLine{\Hypertarget{util__pkcs11_8c_source_l01643}01643\ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a85d991d90970121ba1480cd98d93aab9}{object}};}
 \DoxyCodeLine{\Hypertarget{util__pkcs11_8c_source_l01644}01644\ \}}
@@ -3096,7 +3096,7 @@
 \DoxyCodeLine{\Hypertarget{util__pkcs11_8c_source_l03092}03092\ }
 \DoxyCodeLine{\Hypertarget{util__pkcs11_8c_source_l03093}03093\ \textcolor{keyword}{static}\ CK\_RV\ parse\_ecparams(\mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\ *ecparams,\ \mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\_t}}\ ecparams\_len,}
 \DoxyCodeLine{\Hypertarget{util__pkcs11_8c_source_l03094}03094\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{yubihsm_8h_a498937b5a72accbb0ef21bb1dcdd55ca}{yh\_algorithm}}\ *\mbox{\hyperlink{yubihsm_8h_a67bb26eddc39413f8e94c98aedbbd391}{algorithm}},\ \mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\_t}}\ *\mbox{\hyperlink{yubihsm__pkcs11_8c_a8b142e2a51f6b9b8760f9132119673b6}{key\_len}})\ \{}
-\DoxyCodeLine{\Hypertarget{util__pkcs11_8c_source_l03095}03095\ \ \ EC\_GROUP\ *\mbox{\hyperlink{namespaceupload_a9d33d66de17175dced88ffe95f079226}{group}}\ =\ EC\_GROUP\_new(EC\_GFp\_simple\_method());}
+\DoxyCodeLine{\Hypertarget{util__pkcs11_8c_source_l03095}03095\ \ \ EC\_GROUP\ *group\ =\ EC\_GROUP\_new(EC\_GFp\_simple\_method());}
 \DoxyCodeLine{\Hypertarget{util__pkcs11_8c_source_l03096}03096\ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\ *param\_ptr\ =\ ecparams;}
 \DoxyCodeLine{\Hypertarget{util__pkcs11_8c_source_l03097}03097\ \ \ \textcolor{keywordtype}{int}\ curve\ =\ 0;}
 \DoxyCodeLine{\Hypertarget{util__pkcs11_8c_source_l03098}03098\ \ \ \textcolor{keywordflow}{if}\ (group\ ==\ NULL)\ \{}

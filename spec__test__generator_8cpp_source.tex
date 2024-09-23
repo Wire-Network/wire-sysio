@@ -208,16 +208,16 @@
 \DoxyCodeLine{\Hypertarget{spec__test__generator_8cpp_source_l00204}00204\ \ \ \ \textcolor{keywordtype}{bool}\ \ \ \ \ \ \ \ \mbox{\hyperlink{classpicojson_1_1value_ab158ecb69f714bbc2741fd5f99ba9b25}{contains}}(\textcolor{keyword}{const}\ std::string\&\ key)\ \textcolor{keyword}{const};}
 \DoxyCodeLine{\Hypertarget{spec__test__generator_8cpp_source_l00205}00205\ \ \ \ std::string\ \mbox{\hyperlink{classpicojson_1_1value_a005099b2865752cf31b7ced33bd85f59}{to\_str}}()\ \textcolor{keyword}{const};}
 \DoxyCodeLine{\Hypertarget{spec__test__generator_8cpp_source_l00206}00206\ \ \ \ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ Iter>}
-\DoxyCodeLine{\Hypertarget{spec__test__generator_8cpp_source_l00207}00207\ \ \ \ \textcolor{keywordtype}{void}\ \ \ \ \ \ \ \ \mbox{\hyperlink{classpicojson_1_1value_a23664084ed4a8ecbfda901484de34bbc}{serialize}}(Iter\ os,\ \textcolor{keywordtype}{bool}\ prettify\ =\ \textcolor{keyword}{false})\ \textcolor{keyword}{const};}
+\DoxyCodeLine{\Hypertarget{spec__test__generator_8cpp_source_l00207}00207\ \ \ \ \textcolor{keywordtype}{void}\ \ \ \ \ \ \ \ \mbox{\hyperlink{classpicojson_1_1value_a23664084ed4a8ecbfda901484de34bbc}{serialize}}(Iter\ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}},\ \textcolor{keywordtype}{bool}\ prettify\ =\ \textcolor{keyword}{false})\ \textcolor{keyword}{const};}
 \DoxyCodeLine{\Hypertarget{spec__test__generator_8cpp_source_l00208}00208\ \ \ \ std::string\ \mbox{\hyperlink{classpicojson_1_1value_a23664084ed4a8ecbfda901484de34bbc}{serialize}}(\textcolor{keywordtype}{bool}\ prettify\ =\ \textcolor{keyword}{false})\ \textcolor{keyword}{const};}
 \DoxyCodeLine{\Hypertarget{spec__test__generator_8cpp_source_l00209}00209\ }
 \DoxyCodeLine{\Hypertarget{spec__test__generator_8cpp_source_l00210}00210\ \ \textcolor{keyword}{private}:}
 \DoxyCodeLine{\Hypertarget{spec__test__generator_8cpp_source_l00211}00211\ \ \ \ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ T>}
 \DoxyCodeLine{\Hypertarget{spec__test__generator_8cpp_source_l00212}00212\ \ \ \ \mbox{\hyperlink{classpicojson_1_1value_a445f8d1b335e7bcad6abd6c310b44c75}{value}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}*);\ \textcolor{comment}{//\ intentionally\ defined\ to\ block\ implicit\ conversion\ of\ pointer\ to\ bool}}
 \DoxyCodeLine{\Hypertarget{spec__test__generator_8cpp_source_l00213}00213\ \ \ \ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ Iter>}
-\DoxyCodeLine{\Hypertarget{spec__test__generator_8cpp_source_l00214}00214\ \ \ \ \textcolor{keyword}{static}\ \textcolor{keywordtype}{void}\ \_indent(Iter\ os,\ \textcolor{keywordtype}{int}\ indent);}
+\DoxyCodeLine{\Hypertarget{spec__test__generator_8cpp_source_l00214}00214\ \ \ \ \textcolor{keyword}{static}\ \textcolor{keywordtype}{void}\ \_indent(Iter\ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}},\ \textcolor{keywordtype}{int}\ indent);}
 \DoxyCodeLine{\Hypertarget{spec__test__generator_8cpp_source_l00215}00215\ \ \ \ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ Iter>}
-\DoxyCodeLine{\Hypertarget{spec__test__generator_8cpp_source_l00216}00216\ \ \ \ \textcolor{keywordtype}{void}\ \ \ \ \ \ \ \ \_serialize(Iter\ os,\ \textcolor{keywordtype}{int}\ indent)\ \textcolor{keyword}{const};}
+\DoxyCodeLine{\Hypertarget{spec__test__generator_8cpp_source_l00216}00216\ \ \ \ \textcolor{keywordtype}{void}\ \ \ \ \ \ \ \ \_serialize(Iter\ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}},\ \textcolor{keywordtype}{int}\ indent)\ \textcolor{keyword}{const};}
 \DoxyCodeLine{\Hypertarget{spec__test__generator_8cpp_source_l00217}00217\ \ \ \ std::string\ \_serialize(\textcolor{keywordtype}{int}\ indent)\ \textcolor{keyword}{const};}
 \DoxyCodeLine{\Hypertarget{spec__test__generator_8cpp_source_l00218}00218\ \ \ \ \textcolor{keywordtype}{void}\ \ \ \ \ \ \ \ clear();}
 \DoxyCodeLine{\Hypertarget{spec__test__generator_8cpp_source_l00219}00219\ \};}
@@ -1111,8 +1111,8 @@
 \DoxyCodeLine{\Hypertarget{spec__test__generator_8cpp_source_l01107}01107\ \ \ \ \textcolor{keywordflow}{return}\ is;}
 \DoxyCodeLine{\Hypertarget{spec__test__generator_8cpp_source_l01108}01108\ \}}
 \DoxyCodeLine{\Hypertarget{spec__test__generator_8cpp_source_l01109}01109\ }
-\DoxyCodeLine{\Hypertarget{spec__test__generator_8cpp_source_l01110}\mbox{\hyperlink{spec__test__generator_8cpp_aff57d8c4a4e6df0306c7014e51e9a36f}{01110}}\ \textcolor{keyword}{inline}\ std::ostream\&\ \mbox{\hyperlink{namespacestd_aa723876b3fe465de1898817742c90b93}{operator<<}}(std::ostream\&\ os,\ \textcolor{keyword}{const}\ \mbox{\hyperlink{classpicojson_1_1value}{picojson::value}}\&\ x)\ \{}
-\DoxyCodeLine{\Hypertarget{spec__test__generator_8cpp_source_l01111}01111\ \ \ \ x.\mbox{\hyperlink{classpicojson_1_1value_a23664084ed4a8ecbfda901484de34bbc}{serialize}}(std::ostream\_iterator<char>(os));}
+\DoxyCodeLine{\Hypertarget{spec__test__generator_8cpp_source_l01110}\mbox{\hyperlink{spec__test__generator_8cpp_aff57d8c4a4e6df0306c7014e51e9a36f}{01110}}\ \textcolor{keyword}{inline}\ std::ostream\&\ \mbox{\hyperlink{namespacestd_aa723876b3fe465de1898817742c90b93}{operator<<}}(std::ostream\&\ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}},\ \textcolor{keyword}{const}\ \mbox{\hyperlink{classpicojson_1_1value}{picojson::value}}\&\ x)\ \{}
+\DoxyCodeLine{\Hypertarget{spec__test__generator_8cpp_source_l01111}01111\ \ \ \ x.\mbox{\hyperlink{classpicojson_1_1value_a23664084ed4a8ecbfda901484de34bbc}{serialize}}(std::ostream\_iterator<char>(\mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}));}
 \DoxyCodeLine{\Hypertarget{spec__test__generator_8cpp_source_l01112}01112\ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}};}
 \DoxyCodeLine{\Hypertarget{spec__test__generator_8cpp_source_l01113}01113\ \}}
 \DoxyCodeLine{\Hypertarget{spec__test__generator_8cpp_source_l01114}01114\ \textcolor{preprocessor}{\#\ \ \ ifdef\ \_MSC\_VER}}
@@ -1371,7 +1371,7 @@
 \DoxyCodeLine{\Hypertarget{spec__test__generator_8cpp_source_l01367}01367\ \ \ \ \textcolor{keywordtype}{string}\ test\_suite\_name;}
 \DoxyCodeLine{\Hypertarget{spec__test__generator_8cpp_source_l01368}01368\ }
 \DoxyCodeLine{\Hypertarget{spec__test__generator_8cpp_source_l01369}01369\ \ \ \ map<string,\ vector<picojson::object>>\ test\_mappings;}
-\DoxyCodeLine{\Hypertarget{spec__test__generator_8cpp_source_l01370}01370\ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{classpicojson_1_1value_afaff3eacfcaa3816a1c3c05191c6a378}{picojson::value::object}}\&\ \ \ \ \ \ \ \ obj\ =\ v.get<\mbox{\hyperlink{namespacepicojson_a3e769a5e2dbffd9a9309e1dc2d67975b}{picojson::object}}>();}
+\DoxyCodeLine{\Hypertarget{spec__test__generator_8cpp_source_l01370}01370\ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{classpicojson_1_1value_afaff3eacfcaa3816a1c3c05191c6a378}{picojson::value::object}}\&\ \ \ \ \ \ \ \ obj\ =\ v.\mbox{\hyperlink{classpicojson_1_1value_a13bd312245da5d28a8ae13b3df3d7301}{get}}<\mbox{\hyperlink{namespacepicojson_a3e769a5e2dbffd9a9309e1dc2d67975b}{picojson::object}}>();}
 \DoxyCodeLine{\Hypertarget{spec__test__generator_8cpp_source_l01371}01371\ \ \ \ \textcolor{keywordflow}{for}\ (picojson::value::object::const\_iterator\ i\ =\ obj.begin();\ i\ !=\ obj.end();\ i++)}
 \DoxyCodeLine{\Hypertarget{spec__test__generator_8cpp_source_l01372}01372\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (i-\/>first\ ==\ \textcolor{stringliteral}{"{}commands"{}})\ \{}
 \DoxyCodeLine{\Hypertarget{spec__test__generator_8cpp_source_l01373}01373\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ o\ :\ i-\/>second.get<\mbox{\hyperlink{namespacepicojson_ac1e72166adfe3d96dc58cddc7ebd536a}{picojson::array}}>())\ \{}

@@ -1,13 +1,13 @@
 <map id="CLI::detail::valid_later_char" name="CLI::detail::valid_later_char">
-<area shape="rect" id="Node000001" title="Verify following characters of an option." alt="" coords="670,2919,787,2959"/>
-<area shape="rect" id="Node000002" href="$namespace_c_l_i_1_1detail.html#a4274628d24f9e3fbc719284f1db263b8" title="Verify an option name." alt="" coords="506,2919,622,2959"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="654,2942,623,2942,623,2936,654,2936"/>
+<area shape="rect" id="Node000001" title="Verify following characters of an option." alt="" coords="670,1824,787,1865"/>
+<area shape="rect" id="Node000002" href="$namespace_c_l_i_1_1detail.html#a4274628d24f9e3fbc719284f1db263b8" title="Verify an option name." alt="" coords="506,1824,622,1865"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="654,1847,623,1847,623,1842,654,1842"/>
 <area shape="rect" id="Node000003" href="$class_c_l_i_1_1_app.html#a8b461d2233ec4121259011b5ed24b336" title="Add a subcommand. Inherits INHERITABLE and OptionDefaults, and help flag." alt="" coords="271,1445,458,1470"/>
-<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="555,2904,365,1471,370,1470,561,2903"/>
-<area shape="rect" id="Node000047" href="$class_c_l_i_1_1_app.html#ad5d02ee857879c6abd007c8293a1151a" title="Set an alias for the app." alt="" coords="310,2926,418,2952"/>
-<area shape="poly" id="edge47_Node000002_Node000047" title=" " alt="" coords="491,2942,419,2942,419,2936,491,2936"/>
-<area shape="rect" id="Node000050" href="$namespace_c_l_i_1_1detail.html#a2f845e274b0701ae700150328804badf" title="Get a vector of short names, one of long names, and a single name." alt="" coords="288,2976,441,3001"/>
-<area shape="poly" id="edge50_Node000002_Node000050" title=" " alt="" coords="492,2960,420,2977,419,2972,490,2954"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="543,1811,370,1472,375,1470,548,1809"/>
+<area shape="rect" id="Node000047" href="$class_c_l_i_1_1_app.html#ad5d02ee857879c6abd007c8293a1151a" title="Set an alias for the app." alt="" coords="310,1832,418,1857"/>
+<area shape="poly" id="edge47_Node000002_Node000047" title=" " alt="" coords="491,1847,419,1847,419,1842,491,1842"/>
+<area shape="rect" id="Node000048" href="$namespace_c_l_i_1_1detail.html#a2f845e274b0701ae700150328804badf" title="Get a vector of short names, one of long names, and a single name." alt="" coords="288,2556,441,2581"/>
+<area shape="poly" id="edge48_Node000002_Node000048" title=" " alt="" coords="556,1881,372,2556,367,2554,551,1879"/>
 <area shape="poly" id="edge4_Node000003_Node000003" title=" " alt="" coords="399,1432,387,1426,364,1423,343,1425,332,1430,330,1436,335,1443,331,1446,324,1436,328,1426,342,1420,364,1418,389,1421,401,1428"/>
 <area shape="rect" id="Node000004" href="$class_c_l_i_1_1_app.html#a5e114076a7cfa20a5895e9f6e8fd7dd5" title="creates an option group as part of the given app" alt="" coords="42,5,186,46"/>
 <area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="359,1430,347,1152,321,715,302,492,279,294,252,142,237,92,221,61,205,47,185,37,188,33,208,42,225,57,241,90,257,141,284,293,307,491,326,715,353,1152,365,1430"/>
@@ -68,35 +68,33 @@
 <area shape="rect" id="Node000032" href="$structrentnet__subcommand.html#af44e949826393fed2ab0e0dda3c78b2b" title=" " alt="" coords="37,1861,191,1902"/>
 <area shape="poly" id="edge32_Node000003_Node000032" title=" " alt="" coords="364,1487,355,1559,332,1657,314,1709,291,1760,261,1808,224,1850,193,1870,190,1865,221,1846,257,1805,286,1758,309,1707,327,1655,349,1558,359,1486"/>
 <area shape="rect" id="Node000033" href="$structrexexec__subcommand.html#ae01c272a46ec790ca302c0c9a3c0da2b" title=" " alt="" coords="34,1927,194,1967"/>
-<area shape="poly" id="edge33_Node000003_Node000033" title=" " alt="" coords="366,1486,360,1569,353,1624,340,1684,323,1746,298,1808,266,1865,224,1916,196,1935,193,1930,221,1912,261,1862,293,1805,318,1745,335,1683,347,1624,355,1569,360,1486"/>
+<area shape="poly" id="edge33_Node000003_Node000033" title=" " alt="" coords="359,1487,295,1724,256,1848,239,1891,225,1916,196,1935,193,1930,221,1912,234,1889,251,1846,290,1723,353,1485"/>
 <area shape="rect" id="Node000034" href="$structsellram__subcommand.html#a9b98e3bf09fcf2f35466274f7ae099ac" title=" " alt="" coords="36,1992,192,2033"/>
-<area shape="poly" id="edge34_Node000003_Node000034" title=" " alt="" coords="362,1486,344,1594,314,1742,296,1817,274,1886,250,1942,225,1981,210,1993,194,2001,191,1997,207,1988,221,1977,246,1940,269,1884,290,1816,309,1741,339,1593,356,1485"/>
+<area shape="poly" id="edge34_Node000003_Node000034" title=" " alt="" coords="358,1486,285,1769,246,1914,225,1980,210,1993,194,2001,191,1997,207,1988,220,1978,241,1912,280,1768,353,1485"/>
 <area shape="rect" id="Node000035" href="$structsellrex__subcommand.html#aecf86f109f12f61f6297c5c6b8cbd519" title=" " alt="" coords="38,2057,190,2098"/>
-<area shape="poly" id="edge35_Node000003_Node000035" title=" " alt="" coords="363,1486,347,1606,319,1774,300,1859,278,1937,253,2002,225,2046,209,2059,192,2068,189,2063,206,2054,221,2043,248,1999,273,1936,295,1858,314,1773,342,1606,357,1486"/>
+<area shape="poly" id="edge35_Node000003_Node000035" title=" " alt="" coords="358,1486,273,1820,267,1854,266,1886,266,1941,265,1966,259,1992,246,2018,225,2046,209,2059,192,2068,189,2063,206,2054,221,2042,241,2016,253,1990,259,1966,261,1941,260,1886,262,1854,268,1818,353,1485"/>
 <area shape="rect" id="Node000036" href="$structset__account__permission__subcommand.html#a2da47985a64e4a5c68e17ef4df9f8126" title=" " alt="" coords="21,2122,207,2178"/>
-<area shape="poly" id="edge36_Node000003_Node000036" title=" " alt="" coords="363,1487,349,1618,322,1805,303,1900,280,1988,255,2061,240,2089,225,2111,209,2125,205,2121,221,2108,236,2087,250,2059,275,1987,298,1899,316,1804,344,1618,358,1486"/>
+<area shape="poly" id="edge36_Node000003_Node000036" title=" " alt="" coords="358,1486,319,1628,273,1819,267,1864,266,1904,270,1974,270,2007,264,2040,250,2075,225,2111,209,2126,206,2122,221,2108,245,2072,259,2039,265,2007,265,1975,261,1904,262,1864,268,1819,314,1627,353,1485"/>
 <area shape="rect" id="Node000037" href="$structset__action__permission__subcommand.html#a21e2eff93402582965baf60440fb85b0" title=" " alt="" coords="26,2202,202,2258"/>
-<area shape="poly" id="edge37_Node000003_Node000037" title=" " alt="" coords="364,1486,352,1632,326,1843,308,1951,285,2051,257,2134,242,2166,225,2191,204,2209,201,2205,221,2188,237,2164,253,2132,280,2050,303,1950,321,1842,347,1632,359,1486"/>
+<area shape="poly" id="edge37_Node000003_Node000037" title=" " alt="" coords="357,1486,318,1628,273,1819,266,1902,263,2011,252,2116,241,2159,225,2191,204,2209,201,2205,221,2188,236,2157,247,2115,258,2010,261,1902,268,1819,313,1627,352,1484"/>
 <area shape="rect" id="Node000038" href="$structunapprove__producer__subcommand.html#ac184906416dda7600bbcd5163e0a3071" title=" " alt="" coords="27,2282,201,2338"/>
-<area shape="poly" id="edge38_Node000003_Node000038" title=" " alt="" coords="364,1487,355,1646,331,1881,313,2002,289,2114,260,2207,243,2243,225,2271,203,2289,200,2285,221,2268,239,2241,255,2205,284,2113,307,2001,326,1880,349,1646,359,1486"/>
+<area shape="poly" id="edge38_Node000003_Node000038" title=" " alt="" coords="357,1486,317,1628,293,1723,273,1819,269,1864,267,1920,266,2052,263,2118,256,2180,244,2232,225,2271,203,2290,200,2286,221,2268,239,2231,251,2179,258,2118,260,2052,262,1920,263,1863,268,1819,288,1721,312,1626,352,1484"/>
 <area shape="rect" id="Node000039" href="$structundelegate__bandwidth__subcommand.html#a536b6238ada347a9d2754c096e45556a" title=" " alt="" coords="25,2362,203,2418"/>
-<area shape="poly" id="edge39_Node000003_Node000039" title=" " alt="" coords="365,1486,357,1660,336,1918,318,2053,294,2177,263,2280,245,2320,225,2351,205,2369,201,2365,221,2348,240,2318,258,2278,289,2176,312,2052,330,1918,352,1659,360,1486"/>
+<area shape="poly" id="edge39_Node000003_Node000039" title=" " alt="" coords="357,1486,316,1628,293,1722,273,1819,268,1872,267,1938,269,2093,267,2171,260,2244,247,2305,237,2331,225,2351,205,2369,202,2365,221,2348,232,2328,242,2304,255,2243,261,2171,263,2093,262,1938,263,1871,268,1819,288,1721,311,1626,352,1484"/>
 <area shape="rect" id="Node000040" href="$structunregister__producer__subcommand.html#a9ebc05d6e9ea36f11f6366d18cb2e5b4" title=" " alt="" coords="28,2442,200,2498"/>
-<area shape="poly" id="edge40_Node000003_Node000040" title=" " alt="" coords="365,1486,360,1673,352,1808,340,1955,323,2103,298,2239,283,2300,266,2353,247,2397,225,2431,202,2451,198,2447,221,2428,242,2395,261,2351,278,2298,293,2238,317,2102,335,1955,347,1808,354,1673,360,1486"/>
+<area shape="poly" id="edge40_Node000003_Node000040" title=" " alt="" coords="357,1486,316,1628,293,1722,273,1819,268,1879,268,1956,272,2134,271,2224,264,2308,250,2378,239,2408,225,2431,202,2451,198,2447,221,2428,234,2405,245,2377,259,2307,265,2224,266,2134,263,1956,263,1879,268,1819,287,1721,311,1626,352,1484"/>
 <area shape="rect" id="Node000041" href="$structunregproxy__subcommand.html#a377c1391b9536c1371dd13426e99d25d" title=" " alt="" coords="25,2521,203,2562"/>
-<area shape="poly" id="edge41_Node000003_Node000041" title=" " alt="" coords="366,1486,363,1687,358,1834,347,1995,330,2156,305,2304,289,2369,270,2427,249,2475,225,2511,206,2527,202,2523,221,2508,244,2472,265,2425,284,2368,300,2303,325,2155,342,1994,352,1834,358,1687,361,1486"/>
+<area shape="poly" id="edge41_Node000003_Node000041" title=" " alt="" coords="357,1486,316,1628,292,1722,273,1819,267,1951,263,2170,251,2387,241,2466,233,2494,225,2511,205,2528,202,2524,221,2508,228,2492,235,2465,246,2387,257,2170,262,1950,268,1819,287,1721,310,1626,352,1484"/>
 <area shape="rect" id="Node000042" href="$structunstaketorex__subcommand.html#a7497d59f269a1c944562ec4b05b41a07" title=" " alt="" coords="19,2587,209,2627"/>
-<area shape="poly" id="edge42_Node000003_Node000042" title=" " alt="" coords="366,1486,365,1698,360,1854,350,2025,333,2196,308,2354,292,2424,273,2485,250,2536,225,2575,211,2588,207,2584,221,2572,246,2534,268,2483,287,2422,303,2353,328,2195,345,2024,355,1854,360,1698,361,1486"/>
+<area shape="poly" id="edge42_Node000003_Node000042" title=" " alt="" coords="357,1486,315,1628,292,1722,273,1819,268,1963,264,2203,260,2328,253,2440,242,2526,234,2556,225,2575,211,2588,207,2584,221,2572,229,2554,236,2525,248,2439,255,2328,259,2203,262,1963,268,1819,287,1721,310,1626,352,1484"/>
 <area shape="rect" id="Node000043" href="$structupdaterex__subcommand.html#ad329f8b1ceacebe9e11073cee0554453" title=" " alt="" coords="28,2652,200,2693"/>
-<area shape="poly" id="edge43_Node000003_Node000043" title=" " alt="" coords="364,1486,349,1726,320,2092,300,2279,278,2445,253,2571,239,2614,225,2641,202,2659,198,2655,221,2637,234,2612,248,2569,273,2444,295,2279,314,2092,344,1725,359,1486"/>
+<area shape="poly" id="edge43_Node000003_Node000043" title=" " alt="" coords="357,1486,315,1628,292,1722,273,1819,270,1877,268,1975,265,2236,262,2372,255,2493,243,2587,235,2620,225,2641,202,2659,199,2655,221,2637,230,2618,238,2586,249,2493,256,2372,260,2236,262,1975,264,1877,268,1819,287,1721,310,1626,352,1484"/>
 <area shape="rect" id="Node000044" href="$structvote__producer__proxy__subcommand.html#aa7e9f190f70f0452fdd02b40d6b3fe16" title=" " alt="" coords="16,2716,212,2772"/>
-<area shape="poly" id="edge44_Node000003_Node000044" title=" " alt="" coords="364,1486,350,1737,321,2124,301,2322,279,2497,253,2631,239,2677,225,2706,213,2718,209,2714,221,2703,234,2675,248,2630,273,2496,296,2321,315,2123,344,1736,359,1486"/>
+<area shape="poly" id="edge44_Node000003_Node000044" title=" " alt="" coords="357,1486,315,1628,292,1722,273,1819,269,1882,268,1987,266,2268,262,2415,255,2546,244,2648,235,2683,225,2706,214,2718,210,2714,220,2703,230,2682,238,2647,250,2546,257,2415,260,2268,262,1987,264,1882,268,1819,287,1721,310,1626,351,1484"/>
 <area shape="rect" id="Node000045" href="$structvote__producers__subcommand.html#a0eef881cfd270a15c3e2f6be6def9c36" title=" " alt="" coords="12,2796,216,2837"/>
-<area shape="poly" id="edge45_Node000003_Node000045" title=" " alt="" coords="365,1486,352,1752,324,2165,305,2376,282,2564,256,2707,241,2756,225,2786,213,2797,209,2793,221,2783,236,2754,250,2706,277,2563,300,2376,319,2165,346,1751,359,1486"/>
+<area shape="poly" id="edge45_Node000003_Node000045" title=" " alt="" coords="357,1486,315,1628,292,1722,273,1819,269,1888,268,2003,268,2310,265,2470,259,2613,246,2723,236,2762,225,2786,213,2798,209,2794,221,2783,231,2760,240,2722,253,2613,260,2470,263,2310,263,2003,264,1887,268,1819,286,1721,310,1626,351,1484"/>
 <area shape="rect" id="Node000046" href="$structwithdraw__subcommand.html#a01107075444e5c11a70c76e5a66d46e5" title=" " alt="" coords="31,2861,197,2902"/>
-<area shape="poly" id="edge46_Node000003_Node000046" title=" " alt="" coords="365,1486,353,1763,326,2197,307,2419,284,2616,257,2767,241,2818,225,2850,199,2870,196,2866,221,2847,236,2816,251,2765,279,2615,302,2419,321,2197,347,1763,359,1486"/>
-<area shape="rect" id="Node000048" href="$classcpp_1_1ast_1_1_typedef.html#ac461b1e6209716f39cc06baa5d726f56" title=" " alt="" coords="33,2926,195,2952"/>
-<area shape="poly" id="edge48_Node000047_Node000048" title=" " alt="" coords="295,2942,195,2942,195,2936,295,2936"/>
-<area shape="rect" id="Node000049" href="$classcpp_1_1ast_1_1_typedef.html#ad94253075cea5a5110bf5e9b8fe0ee61" title=" " alt="" coords="29,2976,199,3001"/>
-<area shape="poly" id="edge49_Node000047_Node000049" title=" " alt="" coords="295,2955,184,2977,182,2972,294,2950"/>
+<area shape="poly" id="edge46_Node000003_Node000046" title=" " alt="" coords="357,1486,315,1628,292,1722,273,1819,269,1892,269,2015,269,2342,267,2513,260,2665,247,2783,237,2824,225,2850,199,2870,196,2866,221,2847,232,2822,242,2782,255,2665,262,2513,264,2342,263,2015,264,1892,268,1819,286,1721,310,1626,351,1484"/>
+<area shape="rect" id="Node000049" href="$class_c_l_i_1_1_option.html#a35e90f0fc810ccca676f7fa39bf4cc27" title="Making an option by hand is not defined, it must be made by the App class." alt="" coords="47,2926,181,2952"/>
+<area shape="poly" id="edge49_Node000048_Node000049" title=" " alt="" coords="363,2597,352,2663,328,2749,310,2795,287,2839,259,2880,224,2916,204,2928,182,2936,180,2931,202,2924,221,2912,255,2877,283,2836,305,2792,323,2747,347,2662,358,2596"/>
 </map>

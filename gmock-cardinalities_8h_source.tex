@@ -76,7 +76,7 @@
 \DoxyCodeLine{\Hypertarget{gmock-cardinalities_8h_source_l00072}\mbox{\hyperlink{classtesting_1_1_cardinality_interface_a42508cff9627de2e6f9c1ec33a7d8bf2}{00072}}\ \ \ \textcolor{keyword}{virtual}\ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{classtesting_1_1_cardinality_interface_a42508cff9627de2e6f9c1ec33a7d8bf2}{IsSaturatedByCallCount}}(\textcolor{keywordtype}{int}\ call\_count)\ \textcolor{keyword}{const}\ =\ 0;}
 \DoxyCodeLine{\Hypertarget{gmock-cardinalities_8h_source_l00073}00073\ }
 \DoxyCodeLine{\Hypertarget{gmock-cardinalities_8h_source_l00074}00074\ \ \ \textcolor{comment}{//\ Describes\ self\ to\ an\ ostream.}}
-\DoxyCodeLine{\Hypertarget{gmock-cardinalities_8h_source_l00075}\mbox{\hyperlink{classtesting_1_1_cardinality_interface_a8a93e3bbf24d14fe21186802ecef0929}{00075}}\ \ \ \textcolor{keyword}{virtual}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classtesting_1_1_cardinality_interface_a8a93e3bbf24d14fe21186802ecef0929}{DescribeTo}}(::std::ostream*\ os)\ \textcolor{keyword}{const}\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{gmock-cardinalities_8h_source_l00075}\mbox{\hyperlink{classtesting_1_1_cardinality_interface_a8a93e3bbf24d14fe21186802ecef0929}{00075}}\ \ \ \textcolor{keyword}{virtual}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classtesting_1_1_cardinality_interface_a8a93e3bbf24d14fe21186802ecef0929}{DescribeTo}}(::std::ostream*\ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}})\ \textcolor{keyword}{const}\ =\ 0;}
 \DoxyCodeLine{\Hypertarget{gmock-cardinalities_8h_source_l00076}00076\ \};}
 \DoxyCodeLine{\Hypertarget{gmock-cardinalities_8h_source_l00077}00077\ }
 \DoxyCodeLine{\Hypertarget{gmock-cardinalities_8h_source_l00078}00078\ \textcolor{comment}{//\ A\ Cardinality\ is\ a\ copyable\ and\ IMMUTABLE\ (except\ by\ assignment)}}
@@ -116,11 +116,11 @@
 \DoxyCodeLine{\Hypertarget{gmock-cardinalities_8h_source_l00112}00112\ \ \ \}}
 \DoxyCodeLine{\Hypertarget{gmock-cardinalities_8h_source_l00113}00113\ }
 \DoxyCodeLine{\Hypertarget{gmock-cardinalities_8h_source_l00114}00114\ \ \ \textcolor{comment}{//\ Describes\ self\ to\ an\ ostream}}
-\DoxyCodeLine{\Hypertarget{gmock-cardinalities_8h_source_l00115}\mbox{\hyperlink{classtesting_1_1_cardinality_a2955f4b65022c422f56e79b767c4fa71}{00115}}\ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classtesting_1_1_cardinality_a2955f4b65022c422f56e79b767c4fa71}{DescribeTo}}(::std::ostream*\ os)\textcolor{keyword}{\ const\ }\{\ impl\_-\/>DescribeTo(os);\ \}}
+\DoxyCodeLine{\Hypertarget{gmock-cardinalities_8h_source_l00115}\mbox{\hyperlink{classtesting_1_1_cardinality_a2955f4b65022c422f56e79b767c4fa71}{00115}}\ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classtesting_1_1_cardinality_a2955f4b65022c422f56e79b767c4fa71}{DescribeTo}}(::std::ostream*\ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}})\textcolor{keyword}{\ const\ }\{\ impl\_-\/>DescribeTo(\mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}});\ \}}
 \DoxyCodeLine{\Hypertarget{gmock-cardinalities_8h_source_l00116}00116\ }
 \DoxyCodeLine{\Hypertarget{gmock-cardinalities_8h_source_l00117}00117\ \ \ \textcolor{comment}{//\ Describes\ the\ given\ actual\ call\ count\ to\ an\ ostream.}}
 \DoxyCodeLine{\Hypertarget{gmock-cardinalities_8h_source_l00118}00118\ \ \ \textcolor{keyword}{static}\ \textcolor{keywordtype}{void}\ DescribeActualCallCountTo(\textcolor{keywordtype}{int}\ actual\_call\_count,}
-\DoxyCodeLine{\Hypertarget{gmock-cardinalities_8h_source_l00119}00119\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ::std::ostream*\ os);}
+\DoxyCodeLine{\Hypertarget{gmock-cardinalities_8h_source_l00119}00119\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ::std::ostream*\ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}});}
 \DoxyCodeLine{\Hypertarget{gmock-cardinalities_8h_source_l00120}00120\ }
 \DoxyCodeLine{\Hypertarget{gmock-cardinalities_8h_source_l00121}00121\ \ \textcolor{keyword}{private}:}
 \DoxyCodeLine{\Hypertarget{gmock-cardinalities_8h_source_l00122}00122\ \ \ \mbox{\hyperlink{classtesting_1_1internal_1_1linked__ptr}{internal::linked\_ptr<const\ CardinalityInterface>}}\ impl\_;}

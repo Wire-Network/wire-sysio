@@ -1,3 +1,5 @@
 <map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
-<area shape="rect" id="Node000000" href="$structstd_1_1tr1_1_1gtest__internal_1_1_tuple_element_3_01true_00_015_00_01_g_t_e_s_t__10___t_u_p_l_e___07_t_08_01_4.html" title=" " alt="" coords="5,5,181,61"/>
+<area shape="rect" id="Node000000" title=" " alt="" coords="5,13,138,38"/>
+<area shape="rect" id="Node000001" href="$structtesting_1_1gmock__matchers__test_1_1_functor.html" title=" " alt="" coords="186,5,354,46"/>
+<area shape="poly" id="edge579_Node000000_Node000001" title=" " alt="" coords="153,23,185,23,185,28,153,28"/>
 </map>

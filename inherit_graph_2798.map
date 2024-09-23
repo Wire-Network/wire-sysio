@@ -1,9 +1,13 @@
 <map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
-<area shape="rect" id="Node000000" href="$struct_w_a_s_t_1_1_action.html" title=" " alt="" coords="5,55,108,80"/>
-<area shape="rect" id="Node000001" href="$struct_w_a_s_t_1_1_get_action.html" title=" " alt="" coords="166,5,290,31"/>
-<area shape="poly" id="edge1009_Node000000_Node000001" title=" " alt="" coords="118,47,180,29,181,34,119,52"/>
-<area shape="rect" id="Node000002" href="$struct_w_a_s_t_1_1_invoke_action.html" title=" " alt="" coords="157,55,298,80"/>
-<area shape="poly" id="edge1010_Node000000_Node000002" title=" " alt="" coords="123,65,157,65,157,70,123,70"/>
-<area shape="rect" id="Node000003" href="$struct_w_a_s_t_1_1_module_action.html" title=" " alt="" coords="156,104,300,130"/>
-<area shape="poly" id="edge1011_Node000000_Node000003" title=" " alt="" coords="119,83,181,101,180,106,118,88"/>
+<area shape="rect" id="Node000000" href="$structwebsocketpp_1_1config_1_1core_1_1transport__config.html" title=" " alt="" coords="5,91,161,132"/>
+<area shape="rect" id="Node000001" href="$structwebsocketpp_1_1config_1_1asio_1_1transport__config.html" title=" " alt="" coords="209,55,363,96"/>
+<area shape="poly" id="edge971_Node000000_Node000001" title=" " alt="" coords="176,92,208,87,209,92,177,98"/>
+<area shape="rect" id="Node000005" href="$structwebsocketpp_1_1config_1_1asio__tls_1_1transport__config.html" title=" " alt="" coords="215,120,356,175"/>
+<area shape="poly" id="edge975_Node000000_Node000005" title=" " alt="" coords="177,125,215,132,214,138,176,131"/>
+<area shape="rect" id="Node000002" href="$structconfig_1_1transport__config.html" title=" " alt="" coords="412,5,569,31"/>
+<area shape="poly" id="edge972_Node000001_Node000002" title=" " alt="" coords="374,48,441,29,442,34,375,53"/>
+<area shape="rect" id="Node000003" href="$structconfig__tls_1_1transport__config.html" title=" " alt="" coords="422,55,558,96"/>
+<area shape="poly" id="edge973_Node000001_Node000003" title=" " alt="" coords="378,73,422,73,422,78,378,78"/>
+<area shape="rect" id="Node000004" href="$structtestee__config_1_1transport__config.html" title=" " alt="" coords="411,120,569,161"/>
+<area shape="poly" id="edge974_Node000001_Node000004" title=" " alt="" coords="367,98,425,117,423,122,365,104"/>
 </map>

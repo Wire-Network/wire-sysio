@@ -2,7 +2,8 @@
 \hypertarget{recovery_2tests__exhaustive__impl_8h}{}\label{recovery_2tests__exhaustive__impl_8h}\index{libraries/fc/secp256k1/secp256k1/src/modules/recovery/tests\_exhaustive\_impl.h@{libraries/fc/secp256k1/secp256k1/src/modules/recovery/tests\_exhaustive\_impl.h}}
 {\ttfamily \#include "{}src/modules/recovery/main\+\_\+impl.\+h"{}}\newline
 {\ttfamily \#include "{}../../../include/secp256k1\+\_\+recovery.\+h"{}}\newline
-Include dependency graph for tests\+\_\+exhaustive\+\_\+impl.\+h\+:\nopagebreak
+Include dependency graph for tests\+\_\+exhaustive\+\_\+impl.\+h\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -70,7 +71,7 @@ Definition at line \mbox{\hyperlink{recovery_2tests__exhaustive__impl_8h_source_
 \DoxyCodeLine{00049\ \textcolor{comment}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ *\ floor(R.x\ /\ group\_order),\ but\ only\ one\ bit\ is\ used\ as\ that\ is\ sufficient}}
 \DoxyCodeLine{00050\ \textcolor{comment}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ *\ in\ the\ real\ group.\ */}}
 \DoxyCodeLine{00051\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ expected\_recid\ =\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a49aa97067a36875627e1380c3fb3833d}{overflow}}\ ?\ 2\ :\ 0;}
-\DoxyCodeLine{00052\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ r\_dot\_y\_normalized\ =\ \mbox{\hyperlink{namespaceupload_a9d33d66de17175dced88ffe95f079226}{group}}[k].y;}
+\DoxyCodeLine{00052\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ r\_dot\_y\_normalized\ =\ group[k].\mbox{\hyperlink{structsecp256k1__ge_a604295983a1f4aa6e8b5b0f1e46f9ee0}{y}};}
 \DoxyCodeLine{00053\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ secp256k1\_fe\_normalize(\&r\_dot\_y\_normalized);}
 \DoxyCodeLine{00054\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{/*\ Also\ the\ recovery\ id\ is\ flipped\ depending\ if\ we\ hit\ the\ low-\/s\ branch\ */}}
 \DoxyCodeLine{00055\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ ((k\ *\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}})\ \%\ \mbox{\hyperlink{tests__exhaustive_8c_aef79eeed489f1f87f86dbbef6f0cb41b}{EXHAUSTIVE\_TEST\_ORDER}}\ ==\ (i\ +\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}\ *\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a538d097420e725c4dad63c3caa9e55bd}{j}})\ \%\ \mbox{\hyperlink{tests__exhaustive_8c_aef79eeed489f1f87f86dbbef6f0cb41b}{EXHAUSTIVE\_TEST\_ORDER}})\ \{}
@@ -101,7 +102,8 @@ Definition at line \mbox{\hyperlink{recovery_2tests__exhaustive__impl_8h_source_
 \DoxyCodeLine{00080\ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -183,7 +185,8 @@ Definition at line \mbox{\hyperlink{recovery_2tests__exhaustive__impl_8h_source_
 \DoxyCodeLine{00142\ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode

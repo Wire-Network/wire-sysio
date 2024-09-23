@@ -5,7 +5,8 @@
 {\ttfamily \#include "{}rapidjson/filereadstream.\+h"{}}\newline
 {\ttfamily \#include "{}rapidjson/filewritestream.\+h"{}}\newline
 {\ttfamily \#include "{}rapidjson/error/en.\+h"{}}\newline
-Include dependency graph for pretty.\+cpp\+:\nopagebreak
+Include dependency graph for pretty.\+cpp\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -41,7 +42,7 @@ Definition at line \mbox{\hyperlink{pretty_8cpp_source_l00012}{12}} of file \mbo
 \DoxyCodeLine{00018\ \ \ \ \ \textcolor{comment}{//\ Prepare\ writer\ and\ output\ stream.}}
 \DoxyCodeLine{00019\ \ \ \ \ \textcolor{keywordtype}{char}\ writeBuffer[65536];}
 \DoxyCodeLine{00020\ \ \ \ \ \mbox{\hyperlink{class_file_write_stream}{FileWriteStream}}\ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}(stdout,\ writeBuffer,\ \textcolor{keyword}{sizeof}(writeBuffer));}
-\DoxyCodeLine{00021\ \ \ \ \ \mbox{\hyperlink{class_pretty_writer}{PrettyWriter<FileWriteStream>}}\ writer(os);}
+\DoxyCodeLine{00021\ \ \ \ \ \mbox{\hyperlink{class_pretty_writer}{PrettyWriter<FileWriteStream>}}\ writer(\mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}});}
 \DoxyCodeLine{00022\ }
 \DoxyCodeLine{00023\ \ \ \ \ \textcolor{comment}{//\ JSON\ reader\ parse\ from\ the\ input\ stream\ and\ let\ writer\ generate\ the\ output.}}
 \DoxyCodeLine{00024\ \ \ \ \ \textcolor{keywordflow}{if}\ (!reader.\mbox{\hyperlink{class_generic_reader_a0c450620d14ff1824e58bb7bd9b42099}{Parse}}<\mbox{\hyperlink{reader_8h_ab7be7dabe6ffcba60fad441505583450a9b3baa16346575d2dc072b23a88e1928}{kParseValidateEncodingFlag}}>(is,\ writer))\ \{}
@@ -53,7 +54,8 @@ Definition at line \mbox{\hyperlink{pretty_8cpp_source_l00012}{12}} of file \mbo
 \DoxyCodeLine{00030\ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode

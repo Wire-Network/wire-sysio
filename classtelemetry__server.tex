@@ -93,7 +93,8 @@ Definition at line \mbox{\hyperlink{telemetry__server_8cpp_source_l00036}{36}} o
 \DoxyCodeLine{00051\ \ \ \ \ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -120,7 +121,8 @@ Definition at line \mbox{\hyperlink{telemetry__server_8cpp_source_l00160}{160}} 
 \DoxyCodeLine{00162\ \ \ \ \ \}}
 
 \end{DoxyCode}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -144,22 +146,22 @@ Definition at line \mbox{\hyperlink{telemetry__server_8cpp_source_l00109}{109}} 
 \DoxyCodeLine{00111\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classwebsocketpp_1_1server_abb895563dddafdc1426997d245cbd7cb}{server::connection\_ptr}}\ con\ =\ m\_endpoint.\mbox{\hyperlink{classwebsocketpp_1_1endpoint_a0fe4457427d4124abe7ca022ba7afbb4}{get\_con\_from\_hdl}}(hdl);}
 \DoxyCodeLine{00112\ \ \ \ \ }
 \DoxyCodeLine{00113\ \ \ \ \ \ \ \ \ std::ifstream\ file;}
-\DoxyCodeLine{00114\ \ \ \ \ \ \ \ \ std::string\ \mbox{\hyperlink{namespaceembed_clara_a1e1bd594f85f58f5dca6c41c0ac720fb}{filename}}\ =\ con-\/>get\_resource();}
+\DoxyCodeLine{00114\ \ \ \ \ \ \ \ \ std::string\ filename\ =\ con-\/>get\_resource();}
 \DoxyCodeLine{00115\ \ \ \ \ \ \ \ \ std::string\ response;}
 \DoxyCodeLine{00116\ \ \ \ \ }
 \DoxyCodeLine{00117\ \ \ \ \ \ \ \ \ m\_endpoint.\mbox{\hyperlink{classwebsocketpp_1_1endpoint_a1d9163813aa02ed32100f443b4ddbd8e}{get\_alog}}().write(\mbox{\hyperlink{structwebsocketpp_1_1log_1_1alevel_aaf67c94a68502c49308489ff01d8d0a8}{websocketpp::log::alevel::app}},}
 \DoxyCodeLine{00118\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}http\ request1:\ "{}}+filename);}
 \DoxyCodeLine{00119\ \ \ \ \ }
 \DoxyCodeLine{00120\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (filename\ ==\ \textcolor{stringliteral}{"{}/"{}})\ \{}
-\DoxyCodeLine{00121\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespaceembed_clara_a1e1bd594f85f58f5dca6c41c0ac720fb}{filename}}\ =\ m\_docroot+\textcolor{stringliteral}{"{}index.html"{}};}
+\DoxyCodeLine{00121\ \ \ \ \ \ \ \ \ \ \ \ \ filename\ =\ m\_docroot+\textcolor{stringliteral}{"{}index.html"{}};}
 \DoxyCodeLine{00122\ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
-\DoxyCodeLine{00123\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespaceembed_clara_a1e1bd594f85f58f5dca6c41c0ac720fb}{filename}}\ =\ m\_docroot+\mbox{\hyperlink{namespaceembed_clara_a1e1bd594f85f58f5dca6c41c0ac720fb}{filename}}.substr(1);}
+\DoxyCodeLine{00123\ \ \ \ \ \ \ \ \ \ \ \ \ filename\ =\ m\_docroot+filename.substr(1);}
 \DoxyCodeLine{00124\ \ \ \ \ \ \ \ \ \}}
 \DoxyCodeLine{00125\ \ \ \ \ \ \ \ \ }
 \DoxyCodeLine{00126\ \ \ \ \ \ \ \ \ m\_endpoint.\mbox{\hyperlink{classwebsocketpp_1_1endpoint_a1d9163813aa02ed32100f443b4ddbd8e}{get\_alog}}().write(\mbox{\hyperlink{structwebsocketpp_1_1log_1_1alevel_aaf67c94a68502c49308489ff01d8d0a8}{websocketpp::log::alevel::app}},}
 \DoxyCodeLine{00127\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}http\ request2:\ "{}}+filename);}
 \DoxyCodeLine{00128\ \ \ \ \ }
-\DoxyCodeLine{00129\ \ \ \ \ \ \ \ \ file.open(\mbox{\hyperlink{namespaceembed_clara_a1e1bd594f85f58f5dca6c41c0ac720fb}{filename}}.c\_str(),\ std::ios::in);}
+\DoxyCodeLine{00129\ \ \ \ \ \ \ \ \ file.open(filename.c\_str(),\ std::ios::in);}
 \DoxyCodeLine{00130\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!file)\ \{}
 \DoxyCodeLine{00131\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ 404\ error}}
 \DoxyCodeLine{00132\ \ \ \ \ \ \ \ \ \ \ \ \ std::stringstream\ \mbox{\hyperlink{namespace_xbyak_1_1util_a67cd5471fb751b186b53fdab6da7d3f7}{ss}};}
@@ -167,7 +169,7 @@ Definition at line \mbox{\hyperlink{telemetry__server_8cpp_source_l00109}{109}} 
 \DoxyCodeLine{00134\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_xbyak_1_1util_a67cd5471fb751b186b53fdab6da7d3f7}{ss}}\ <<\ \textcolor{stringliteral}{"{}<!doctype\ html><html><head>"{}}}
 \DoxyCodeLine{00135\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ <<\ \textcolor{stringliteral}{"{}<title>Error\ 404\ (Resource\ not\ found)</title><body>"{}}}
 \DoxyCodeLine{00136\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ <<\ \textcolor{stringliteral}{"{}<h1>Error\ 404</h1>"{}}}
-\DoxyCodeLine{00137\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ <<\ \textcolor{stringliteral}{"{}<p>The\ requested\ URL\ "{}}\ <<\ \mbox{\hyperlink{namespaceembed_clara_a1e1bd594f85f58f5dca6c41c0ac720fb}{filename}}\ <<\ \textcolor{stringliteral}{"{}\ was\ not\ found\ on\ this\ server.</p>"{}}}
+\DoxyCodeLine{00137\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ <<\ \textcolor{stringliteral}{"{}<p>The\ requested\ URL\ "{}}\ <<\ filename\ <<\ \textcolor{stringliteral}{"{}\ was\ not\ found\ on\ this\ server.</p>"{}}}
 \DoxyCodeLine{00138\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ <<\ \textcolor{stringliteral}{"{}</body></head></html>"{}};}
 \DoxyCodeLine{00139\ \ \ \ \ \ \ \ \ }
 \DoxyCodeLine{00140\ \ \ \ \ \ \ \ \ \ \ \ \ con-\/>set\_body(\mbox{\hyperlink{namespace_xbyak_1_1util_a67cd5471fb751b186b53fdab6da7d3f7}{ss}}.str());}
@@ -187,14 +189,16 @@ Definition at line \mbox{\hyperlink{telemetry__server_8cpp_source_l00109}{109}} 
 \DoxyCodeLine{00154\ \ \ \ \ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
 \includegraphics[width=350pt]{classtelemetry__server_abab5c8572db5f87e745b862e59867bc8_cgraph}
 \end{center}
 \end{figure}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -218,7 +222,8 @@ Definition at line \mbox{\hyperlink{telemetry__server_8cpp_source_l00156}{156}} 
 \DoxyCodeLine{00158\ \ \ \ \ \}}
 
 \end{DoxyCode}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -259,14 +264,16 @@ Definition at line \mbox{\hyperlink{telemetry__server_8cpp_source_l00088}{88}} o
 \DoxyCodeLine{00107\ \ \ \ \ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
 \includegraphics[width=338pt]{classtelemetry__server_acc29e40bd4262e42b3d16e4fcd79ec22_cgraph}
 \end{center}
 \end{figure}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -310,14 +317,16 @@ Definition at line \mbox{\hyperlink{telemetry__server_8cpp_source_l00053}{53}} o
 \DoxyCodeLine{00075\ \ \ \ \ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
 \includegraphics[width=350pt]{classtelemetry__server_a8c09eba40e8993079859e9f1974254ab_cgraph}
 \end{center}
 \end{figure}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -348,14 +357,16 @@ Definition at line \mbox{\hyperlink{telemetry__server_8cpp_source_l00077}{77}} o
 \DoxyCodeLine{00086\ \ \ \ \ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
 \includegraphics[width=350pt]{classtelemetry__server_a2a510e3a3c91c123f37d95d7b7d140ea_cgraph}
 \end{center}
 \end{figure}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode

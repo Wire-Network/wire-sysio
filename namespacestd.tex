@@ -53,9 +53,9 @@ std\+::ostream \& \mbox{\hyperlink{namespacestd_a26c08359ed9bed0577d855906d09f40
 \item 
 template$<$$>$ void \mbox{\hyperlink{namespacestd_abb7e41c7063536ff6eeee4bb5f66de6c}{swap}} (\mbox{\hyperlink{classpicojson_1_1value}{picojson\+::value}} \&x, \mbox{\hyperlink{classpicojson_1_1value}{picojson\+::value}} \&y)
 \item 
-ostream \& \mbox{\hyperlink{namespacestd_a063aefacc028fad5b24cc605b807d978}{operator$<$$<$}} (ostream \&os, const pair$<$ string, string $>$ \&entry)
+ostream \& \mbox{\hyperlink{namespacestd_a063aefacc028fad5b24cc605b807d978}{operator$<$$<$}} (ostream \&\mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}, const pair$<$ string, string $>$ \&entry)
 \item 
-{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} , size\+\_\+t S$>$ }\\std\+::ostream \& \mbox{\hyperlink{namespacestd_a1e05ee53dd61c7e8a09ac2ec6dd412dd}{operator$<$$<$}} (std\+::ostream \&os, const std\+::array$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}, \mbox{\hyperlink{struct_s}{S}} $>$ \&\mbox{\hyperlink{classfc_1_1array}{array}})
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} , size\+\_\+t S$>$ }\\std\+::ostream \& \mbox{\hyperlink{namespacestd_a1e05ee53dd61c7e8a09ac2ec6dd412dd}{operator$<$$<$}} (std\+::ostream \&\mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}, const std\+::array$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}, \mbox{\hyperlink{struct_s}{S}} $>$ \&\mbox{\hyperlink{classfc_1_1array}{array}})
 \end{DoxyCompactItemize}
 
 
@@ -73,7 +73,7 @@ Definition at line \mbox{\hyperlink{test__common_8hpp_source_l00280}{280}} of fi
 
 \begin{DoxyCode}{0}
 \DoxyCodeLine{00280\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
-\DoxyCodeLine{00281\ \ \ \ \ \ \ os\ <<\ entry.first\ +\ \textcolor{stringliteral}{"{}="{}}\ +\ entry.second;}
+\DoxyCodeLine{00281\ \ \ \ \ \ \ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}\ <<\ entry.first\ +\ \textcolor{stringliteral}{"{}="{}}\ +\ entry.second;}
 \DoxyCodeLine{00282\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}};}
 \DoxyCodeLine{00283\ \ \ \ \}}
 
@@ -220,14 +220,16 @@ Definition at line \mbox{\hyperlink{spec__test__generator_8cpp_source_l01094}{10
 \DoxyCodeLine{01096\ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
 \includegraphics[width=285pt]{namespacestd_abb7e41c7063536ff6eeee4bb5f66de6c_cgraph}
 \end{center}
 \end{figure}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode

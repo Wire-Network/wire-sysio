@@ -2,7 +2,8 @@
 \hypertarget{class_schema}{}\label{class_schema}\index{Schema@{Schema}}
 
 
-Inheritance diagram for Schema\+:\nopagebreak
+Inheritance diagram for Schema\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -11,7 +12,8 @@ Inheritance diagram for Schema\+:\nopagebreak
 \end{figure}
 
 
-Collaboration diagram for Schema\+:\nopagebreak
+Collaboration diagram for Schema\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -145,7 +147,7 @@ Definition at line \mbox{\hyperlink{perftest_2schematest_8cpp_source_l00056}{56}
 \DoxyCodeLine{00091\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_memory_pool_allocator}{MemoryPoolAllocator<>}}\ jsonAllocator(jsonBuffer,\ \textcolor{keyword}{sizeof}(jsonBuffer));}
 \DoxyCodeLine{00092\ }
 \DoxyCodeLine{00093\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{size\_t}\ i\ =\ 0;\ i\ <\ \mbox{\hyperlink{perftest_2schematest_8cpp_a25f003de16c08a4888b69f619d70f427}{ARRAY\_SIZE}}(filenames);\ i++)\ \{}
-\DoxyCodeLine{00094\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{char}\ \mbox{\hyperlink{namespaceembed_clara_a1e1bd594f85f58f5dca6c41c0ac720fb}{filename}}[FILENAME\_MAX];}
+\DoxyCodeLine{00094\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{char}\ filename[FILENAME\_MAX];}
 \DoxyCodeLine{00095\ \ \ \ \ \ \ \ \ \ \ \ \ sprintf(filename,\ \textcolor{stringliteral}{"{}jsonschema/tests/draft4/\%s"{}},\ filenames[i]);}
 \DoxyCodeLine{00096\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{char}*\ json\ =\ ReadFile(filename,\ jsonAllocator);}
 \DoxyCodeLine{00097\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!json)\ \{}
@@ -183,7 +185,8 @@ Definition at line \mbox{\hyperlink{perftest_2schematest_8cpp_source_l00056}{56}
 \DoxyCodeLine{00129\ \ \ \ \ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode

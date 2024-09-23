@@ -1,14 +1,16 @@
 \doxysection{libraries/fc/include/fc/crypto/keccak256.hpp File Reference}
 \hypertarget{keccak256_8hpp}{}\label{keccak256_8hpp}\index{libraries/fc/include/fc/crypto/keccak256.hpp@{libraries/fc/include/fc/crypto/keccak256.hpp}}
 {\ttfamily \#include $<$cstdint$>$}\newline
-Include dependency graph for keccak256.\+hpp\+:\nopagebreak
+Include dependency graph for keccak256.\+hpp\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
 \includegraphics[width=206pt]{keccak256_8hpp__incl}
 \end{center}
 \end{figure}
-This graph shows which files directly or indirectly include this file\+:\nopagebreak
+This graph shows which files directly or indirectly include this file\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -129,14 +131,16 @@ Definition at line \mbox{\hyperlink{keccak256_8cpp_source_l00220}{220}} of file 
 \DoxyCodeLine{00238\ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
 \includegraphics[width=238pt]{keccak256_8hpp_ab3d065f3af63d47a27d94d60a38422b5_cgraph}
 \end{center}
 \end{figure}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -162,7 +166,8 @@ Definition at line \mbox{\hyperlink{keccak256_8cpp_source_l00075}{75}} of file \
 \DoxyCodeLine{00079\ \}}
 
 \end{DoxyCode}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -193,14 +198,14 @@ Definition at line \mbox{\hyperlink{keccak256_8cpp_source_l00175}{175}} of file 
 
 \begin{DoxyCode}{0}
 \DoxyCodeLine{00176\ \{}
-\DoxyCodeLine{00177\ \ \ \ \ \mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\_t}}\ \mbox{\hyperlink{namespacehost__functions__tests__1_a8496a24b5236a2dc07bb4f2930d88342}{idx}}\ =\ (\mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\_t}})ctx-\/>\mbox{\hyperlink{struct_s_h_a3___c_t_x_a206aeef34e8cabe7390884ef5c131999}{rest}};}
+\DoxyCodeLine{00177\ \ \ \ \ \mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\_t}}\ idx\ =\ (\mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\_t}})ctx-\/>\mbox{\hyperlink{struct_s_h_a3___c_t_x_a206aeef34e8cabe7390884ef5c131999}{rest}};}
 \DoxyCodeLine{00178\ }
 \DoxyCodeLine{00179\ \ \ \ \ \textcolor{comment}{//if\ (ctx-\/>rest\ \&\ SHA3\_FINALIZED)\ return;\ /*\ too\ late\ for\ additional\ input\ */}}
 \DoxyCodeLine{00180\ \ \ \ \ ctx-\/>\mbox{\hyperlink{struct_s_h_a3___c_t_x_a206aeef34e8cabe7390884ef5c131999}{rest}}\ =\ (unsigned)((ctx-\/>\mbox{\hyperlink{struct_s_h_a3___c_t_x_a206aeef34e8cabe7390884ef5c131999}{rest}}\ +\ size)\ \%\ \mbox{\hyperlink{keccak256_8cpp_ad51ded0bbd705f02f73fc60c0b721ced}{BLOCK\_SIZE}});}
 \DoxyCodeLine{00181\ }
 \DoxyCodeLine{00182\ \ \ \ \ \textcolor{comment}{/*\ fill\ partial\ block\ */}}
 \DoxyCodeLine{00183\ \ \ \ \ \textcolor{keywordflow}{if}\ (idx)\ \{}
-\DoxyCodeLine{00184\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\_t}}\ left\ =\ \mbox{\hyperlink{keccak256_8cpp_ad51ded0bbd705f02f73fc60c0b721ced}{BLOCK\_SIZE}}\ -\/\ \mbox{\hyperlink{namespacehost__functions__tests__1_a8496a24b5236a2dc07bb4f2930d88342}{idx}};}
+\DoxyCodeLine{00184\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\_t}}\ left\ =\ \mbox{\hyperlink{keccak256_8cpp_ad51ded0bbd705f02f73fc60c0b721ced}{BLOCK\_SIZE}}\ -\/\ idx;}
 \DoxyCodeLine{00185\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_ae785d5badbf1f08b491af31f32a135a1}{memcpy}}((\textcolor{keywordtype}{char}*)ctx-\/>\mbox{\hyperlink{struct_s_h_a3___c_t_x_a37957cb14d1f29d6e3c8b86c13baf86c}{message}}\ +\ idx,\ msg,\ (size\ <\ left\ ?\ size\ :\ left));}
 \DoxyCodeLine{00186\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (size\ <\ left)\ \textcolor{keywordflow}{return};}
 \DoxyCodeLine{00187\ }
@@ -231,14 +236,16 @@ Definition at line \mbox{\hyperlink{keccak256_8cpp_source_l00175}{175}} of file 
 \DoxyCodeLine{00212\ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
 \includegraphics[width=252pt]{keccak256_8hpp_a3a3c3f80dd9847bffcaa8e638aefef12_cgraph}
 \end{center}
 \end{figure}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode

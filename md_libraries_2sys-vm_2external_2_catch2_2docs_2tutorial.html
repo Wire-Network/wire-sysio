@@ -200,20 +200,19 @@ $(function(){initNavTree('md_libraries_2sys-vm_2external_2_catch2_2docs_2tutoria
 <div class="line">        <a class="code hl_define" href="include_2catch_8hpp.html#ad57835ba8f1bb419a865ada6bd011a85">REQUIRE</a>( v.capacity() &gt;= 5 );</div>
 <div class="line">    }</div>
 <div class="line">    <a class="code hl_define" href="include_2catch_8hpp.html#ad512fd95a78b95770b9759823f8fbc21">SECTION</a>( <span class="stringliteral">&quot;reserving bigger changes capacity but not size&quot;</span> ) {</div>
-<div class="line">        <a class="code hl_variable" href="namespacedevelop_build.html#ade64cd34608f9442ef3049116a2da428">v</a>.reserve( 10 );</div>
+<div class="line">        v.reserve( 10 );</div>
 <div class="line"> </div>
-<div class="line">        <a class="code hl_define" href="include_2catch_8hpp.html#ad57835ba8f1bb419a865ada6bd011a85">REQUIRE</a>( <a class="code hl_variable" href="namespacedevelop_build.html#ade64cd34608f9442ef3049116a2da428">v</a>.size() == 5 );</div>
-<div class="line">        <a class="code hl_define" href="include_2catch_8hpp.html#ad57835ba8f1bb419a865ada6bd011a85">REQUIRE</a>( <a class="code hl_variable" href="namespacedevelop_build.html#ade64cd34608f9442ef3049116a2da428">v</a>.capacity() &gt;= 10 );</div>
+<div class="line">        <a class="code hl_define" href="include_2catch_8hpp.html#ad57835ba8f1bb419a865ada6bd011a85">REQUIRE</a>( v.size() == 5 );</div>
+<div class="line">        <a class="code hl_define" href="include_2catch_8hpp.html#ad57835ba8f1bb419a865ada6bd011a85">REQUIRE</a>( v.capacity() &gt;= 10 );</div>
 <div class="line">    }</div>
 <div class="line">    <a class="code hl_define" href="include_2catch_8hpp.html#ad512fd95a78b95770b9759823f8fbc21">SECTION</a>( <span class="stringliteral">&quot;reserving smaller does not change size or capacity&quot;</span> ) {</div>
-<div class="line">        <a class="code hl_variable" href="namespacedevelop_build.html#ade64cd34608f9442ef3049116a2da428">v</a>.reserve( 0 );</div>
+<div class="line">        v.reserve( 0 );</div>
 <div class="line"> </div>
-<div class="line">        <a class="code hl_define" href="include_2catch_8hpp.html#ad57835ba8f1bb419a865ada6bd011a85">REQUIRE</a>( <a class="code hl_variable" href="namespacedevelop_build.html#ade64cd34608f9442ef3049116a2da428">v</a>.size() == 5 );</div>
-<div class="line">        <a class="code hl_define" href="include_2catch_8hpp.html#ad57835ba8f1bb419a865ada6bd011a85">REQUIRE</a>( <a class="code hl_variable" href="namespacedevelop_build.html#ade64cd34608f9442ef3049116a2da428">v</a>.capacity() &gt;= 5 );</div>
+<div class="line">        <a class="code hl_define" href="include_2catch_8hpp.html#ad57835ba8f1bb419a865ada6bd011a85">REQUIRE</a>( v.size() == 5 );</div>
+<div class="line">        <a class="code hl_define" href="include_2catch_8hpp.html#ad57835ba8f1bb419a865ada6bd011a85">REQUIRE</a>( v.capacity() &gt;= 5 );</div>
 <div class="line">    }</div>
 <div class="line">}</div>
 <div class="ttc" id="ainclude_2catch_8hpp_html_ad512fd95a78b95770b9759823f8fbc21"><div class="ttname"><a href="include_2catch_8hpp.html#ad512fd95a78b95770b9759823f8fbc21">SECTION</a></div><div class="ttdeci">#define SECTION(...)</div><div class="ttdef"><b>Definition</b> <a href="include_2catch_8hpp_source.html#l00226">catch.hpp:226</a></div></div>
-<div class="ttc" id="anamespacedevelop_build_html_ade64cd34608f9442ef3049116a2da428"><div class="ttname"><a href="namespacedevelop_build.html#ade64cd34608f9442ef3049116a2da428">developBuild.v</a></div><div class="ttdeci">v</div><div class="ttdef"><b>Definition</b> <a href="develop_build_8py_source.html#l00006">developBuild.py:6</a></div></div>
 </div><!-- fragment --><p>For each <code>SECTION</code> the <code>TEST_CASE</code> is executed from the start - so as we enter each section we know that size is 5 and capacity is at least 5. We enforced those requirements with the <code>REQUIRE</code>s at the top level so we can be confident in them. This works because the <code>SECTION</code> macro contains an if statement that calls back into <a class="el" href="namespace_catch.html">Catch</a> to see if the section should be executed. One leaf section is executed on each run through a <code>TEST_CASE</code>. The other sections are skipped. Next time through the next section is executed, and so on until no new sections are encountered.</p>
 <p>So far so good - this is already an improvement on the setup/teardown approach because now we see our setup code inline and use the stack.</p>
 <p>The power of sections really shows, however, when we need to execute a sequence of checked operations. Continuing the vector example, we might want to verify that attempting to reserve a capacity smaller than the current capacity of the vector changes nothing. We can do that, naturally, like so:</p>
@@ -252,27 +251,27 @@ $(function(){initNavTree('md_libraries_2sys-vm_2external_2_catch2_2docs_2tutoria
 <div class="line">            }</div>
 <div class="line">        }</div>
 <div class="line">        <a class="code hl_define" href="include_2catch_8hpp.html#ab09e9b8186233f676ce6a23aebe89d6e">WHEN</a>( <span class="stringliteral">&quot;the size is reduced&quot;</span> ) {</div>
-<div class="line">            <a class="code hl_variable" href="namespacedevelop_build.html#ade64cd34608f9442ef3049116a2da428">v</a>.resize( 0 );</div>
+<div class="line">            v.resize( 0 );</div>
 <div class="line"> </div>
 <div class="line">            <a class="code hl_define" href="include_2catch_8hpp.html#a27987092139727fd7a471b5f74dc62de">THEN</a>( <span class="stringliteral">&quot;the size changes but not capacity&quot;</span> ) {</div>
-<div class="line">                <a class="code hl_define" href="include_2catch_8hpp.html#ad57835ba8f1bb419a865ada6bd011a85">REQUIRE</a>( <a class="code hl_variable" href="namespacedevelop_build.html#ade64cd34608f9442ef3049116a2da428">v</a>.size() == 0 );</div>
-<div class="line">                <a class="code hl_define" href="include_2catch_8hpp.html#ad57835ba8f1bb419a865ada6bd011a85">REQUIRE</a>( <a class="code hl_variable" href="namespacedevelop_build.html#ade64cd34608f9442ef3049116a2da428">v</a>.capacity() &gt;= 5 );</div>
+<div class="line">                <a class="code hl_define" href="include_2catch_8hpp.html#ad57835ba8f1bb419a865ada6bd011a85">REQUIRE</a>( v.size() == 0 );</div>
+<div class="line">                <a class="code hl_define" href="include_2catch_8hpp.html#ad57835ba8f1bb419a865ada6bd011a85">REQUIRE</a>( v.capacity() &gt;= 5 );</div>
 <div class="line">            }</div>
 <div class="line">        }</div>
 <div class="line">        <a class="code hl_define" href="include_2catch_8hpp.html#ab09e9b8186233f676ce6a23aebe89d6e">WHEN</a>( <span class="stringliteral">&quot;more capacity is reserved&quot;</span> ) {</div>
-<div class="line">            <a class="code hl_variable" href="namespacedevelop_build.html#ade64cd34608f9442ef3049116a2da428">v</a>.reserve( 10 );</div>
+<div class="line">            v.reserve( 10 );</div>
 <div class="line"> </div>
 <div class="line">            <a class="code hl_define" href="include_2catch_8hpp.html#a27987092139727fd7a471b5f74dc62de">THEN</a>( <span class="stringliteral">&quot;the capacity changes but not the size&quot;</span> ) {</div>
-<div class="line">                <a class="code hl_define" href="include_2catch_8hpp.html#ad57835ba8f1bb419a865ada6bd011a85">REQUIRE</a>( <a class="code hl_variable" href="namespacedevelop_build.html#ade64cd34608f9442ef3049116a2da428">v</a>.size() == 5 );</div>
-<div class="line">                <a class="code hl_define" href="include_2catch_8hpp.html#ad57835ba8f1bb419a865ada6bd011a85">REQUIRE</a>( <a class="code hl_variable" href="namespacedevelop_build.html#ade64cd34608f9442ef3049116a2da428">v</a>.capacity() &gt;= 10 );</div>
+<div class="line">                <a class="code hl_define" href="include_2catch_8hpp.html#ad57835ba8f1bb419a865ada6bd011a85">REQUIRE</a>( v.size() == 5 );</div>
+<div class="line">                <a class="code hl_define" href="include_2catch_8hpp.html#ad57835ba8f1bb419a865ada6bd011a85">REQUIRE</a>( v.capacity() &gt;= 10 );</div>
 <div class="line">            }</div>
 <div class="line">        }</div>
 <div class="line">        <a class="code hl_define" href="include_2catch_8hpp.html#ab09e9b8186233f676ce6a23aebe89d6e">WHEN</a>( <span class="stringliteral">&quot;less capacity is reserved&quot;</span> ) {</div>
-<div class="line">            <a class="code hl_variable" href="namespacedevelop_build.html#ade64cd34608f9442ef3049116a2da428">v</a>.reserve( 0 );</div>
+<div class="line">            v.reserve( 0 );</div>
 <div class="line"> </div>
 <div class="line">            <a class="code hl_define" href="include_2catch_8hpp.html#a27987092139727fd7a471b5f74dc62de">THEN</a>( <span class="stringliteral">&quot;neither size nor capacity are changed&quot;</span> ) {</div>
-<div class="line">                <a class="code hl_define" href="include_2catch_8hpp.html#ad57835ba8f1bb419a865ada6bd011a85">REQUIRE</a>( <a class="code hl_variable" href="namespacedevelop_build.html#ade64cd34608f9442ef3049116a2da428">v</a>.size() == 5 );</div>
-<div class="line">                <a class="code hl_define" href="include_2catch_8hpp.html#ad57835ba8f1bb419a865ada6bd011a85">REQUIRE</a>( <a class="code hl_variable" href="namespacedevelop_build.html#ade64cd34608f9442ef3049116a2da428">v</a>.capacity() &gt;= 5 );</div>
+<div class="line">                <a class="code hl_define" href="include_2catch_8hpp.html#ad57835ba8f1bb419a865ada6bd011a85">REQUIRE</a>( v.size() == 5 );</div>
+<div class="line">                <a class="code hl_define" href="include_2catch_8hpp.html#ad57835ba8f1bb419a865ada6bd011a85">REQUIRE</a>( v.capacity() &gt;= 5 );</div>
 <div class="line">            }</div>
 <div class="line">        }</div>
 <div class="line">    }</div>

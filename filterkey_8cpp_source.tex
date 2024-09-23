@@ -123,7 +123,7 @@
 \DoxyCodeLine{\Hypertarget{filterkey_8cpp_source_l00119}00119\ \ \ \ \ \textcolor{comment}{//\ Prepare\ JSON\ writer\ and\ output\ stream.}}
 \DoxyCodeLine{\Hypertarget{filterkey_8cpp_source_l00120}00120\ \ \ \ \ \textcolor{keywordtype}{char}\ writeBuffer[65536];}
 \DoxyCodeLine{\Hypertarget{filterkey_8cpp_source_l00121}00121\ \ \ \ \ \mbox{\hyperlink{class_file_write_stream}{FileWriteStream}}\ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}(stdout,\ writeBuffer,\ \textcolor{keyword}{sizeof}(writeBuffer));}
-\DoxyCodeLine{\Hypertarget{filterkey_8cpp_source_l00122}00122\ \ \ \ \ \mbox{\hyperlink{class_writer}{Writer<FileWriteStream>}}\ writer(os);}
+\DoxyCodeLine{\Hypertarget{filterkey_8cpp_source_l00122}00122\ \ \ \ \ \mbox{\hyperlink{class_writer}{Writer<FileWriteStream>}}\ writer(\mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}});}
 \DoxyCodeLine{\Hypertarget{filterkey_8cpp_source_l00123}00123\ }
 \DoxyCodeLine{\Hypertarget{filterkey_8cpp_source_l00124}00124\ \ \ \ \ \textcolor{comment}{//\ Prepare\ Filter}}
 \DoxyCodeLine{\Hypertarget{filterkey_8cpp_source_l00125}00125\ \ \ \ \ \mbox{\hyperlink{class_filter_key_handler}{FilterKeyHandler<Writer<FileWriteStream>}}\ >\ filter(writer,\ \mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}}[1],\ \textcolor{keyword}{static\_cast<}\mbox{\hyperlink{rapidjson_8h_a5ed6e6e67250fadbd041127e6386dcb5}{SizeType}}\textcolor{keyword}{>}(strlen(\mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}}[1])));}

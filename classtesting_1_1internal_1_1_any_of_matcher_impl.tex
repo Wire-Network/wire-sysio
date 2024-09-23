@@ -6,7 +6,8 @@
 
 
 
-Inheritance diagram for testing\+::internal\+::Any\+Of\+Matcher\+Impl\texorpdfstring{$<$}{<} T \texorpdfstring{$>$}{>}\+:\nopagebreak
+Inheritance diagram for testing\+::internal\+::Any\+Of\+Matcher\+Impl\texorpdfstring{$<$}{<} T \texorpdfstring{$>$}{>}\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -15,7 +16,8 @@ Inheritance diagram for testing\+::internal\+::Any\+Of\+Matcher\+Impl\texorpdfst
 \end{figure}
 
 
-Collaboration diagram for testing\+::internal\+::Any\+Of\+Matcher\+Impl\texorpdfstring{$<$}{<} T \texorpdfstring{$>$}{>}\+:\nopagebreak
+Collaboration diagram for testing\+::internal\+::Any\+Of\+Matcher\+Impl\texorpdfstring{$<$}{<} T \texorpdfstring{$>$}{>}\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -27,9 +29,9 @@ Collaboration diagram for testing\+::internal\+::Any\+Of\+Matcher\+Impl\texorpdf
 \item 
 \mbox{\hyperlink{classtesting_1_1internal_1_1_any_of_matcher_impl_a089425de8a7af17f69f80eb974d59c22}{Any\+Of\+Matcher\+Impl}} (std\+::vector$<$ \mbox{\hyperlink{classtesting_1_1_matcher}{Matcher}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ $>$ matchers)
 \item 
-virtual void \mbox{\hyperlink{classtesting_1_1internal_1_1_any_of_matcher_impl_a4a0eff72492620542b1fabc453c107c9}{Describe\+To}} (\+::std\+::ostream \texorpdfstring{$\ast$}{*}os) const
+virtual void \mbox{\hyperlink{classtesting_1_1internal_1_1_any_of_matcher_impl_a4a0eff72492620542b1fabc453c107c9}{Describe\+To}} (\+::std\+::ostream \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}) const
 \item 
-virtual void \mbox{\hyperlink{classtesting_1_1internal_1_1_any_of_matcher_impl_aa3fbb0271c7d8a3f3888618f30fc773a}{Describe\+Negation\+To}} (\+::std\+::ostream \texorpdfstring{$\ast$}{*}os) const
+virtual void \mbox{\hyperlink{classtesting_1_1internal_1_1_any_of_matcher_impl_aa3fbb0271c7d8a3f3888618f30fc773a}{Describe\+Negation\+To}} (\+::std\+::ostream \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}) const
 \item 
 virtual bool \mbox{\hyperlink{classtesting_1_1internal_1_1_any_of_matcher_impl_aa1b4ccba617cffe6bd1c18b0af22178b}{Match\+And\+Explain}} (\mbox{\hyperlink{gtest-port_8h_a9f91fcd24cae0b48fdaeb19102dac525}{GTEST\+\_\+\+REFERENCE\+\_\+\+TO\+\_\+\+CONST\+\_\+}}(\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}) x, \mbox{\hyperlink{classtesting_1_1_match_result_listener}{Match\+Result\+Listener}} \texorpdfstring{$\ast$}{*}listener) const
 \end{DoxyCompactItemize}
@@ -92,12 +94,12 @@ Definition at line \mbox{\hyperlink{gmock-matchers_8h_source_l01872}{1872}} of f
 
 \begin{DoxyCode}{0}
 \DoxyCodeLine{01872\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
-\DoxyCodeLine{01873\ \ \ \ \ *os\ <<\ \textcolor{stringliteral}{"{}("{}};}
+\DoxyCodeLine{01873\ \ \ \ \ *\mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}\ <<\ \textcolor{stringliteral}{"{}("{}};}
 \DoxyCodeLine{01874\ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{size\_t}\ i\ =\ 0;\ i\ <\ matchers\_.size();\ ++i)\ \{}
-\DoxyCodeLine{01875\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (i\ !=\ 0)\ *os\ <<\ \textcolor{stringliteral}{"{})\ and\ ("{}};}
-\DoxyCodeLine{01876\ \ \ \ \ \ \ matchers\_[i].DescribeNegationTo(os);}
+\DoxyCodeLine{01875\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (i\ !=\ 0)\ *\mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}\ <<\ \textcolor{stringliteral}{"{})\ and\ ("{}};}
+\DoxyCodeLine{01876\ \ \ \ \ \ \ matchers\_[i].DescribeNegationTo(\mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}});}
 \DoxyCodeLine{01877\ \ \ \ \ \}}
-\DoxyCodeLine{01878\ \ \ \ \ *os\ <<\ \textcolor{stringliteral}{"{})"{}};}
+\DoxyCodeLine{01878\ \ \ \ \ *\mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}\ <<\ \textcolor{stringliteral}{"{})"{}};}
 \DoxyCodeLine{01879\ \ \ \}}
 
 \end{DoxyCode}
@@ -119,12 +121,12 @@ Definition at line \mbox{\hyperlink{gmock-matchers_8h_source_l01863}{1863}} of f
 
 \begin{DoxyCode}{0}
 \DoxyCodeLine{01863\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
-\DoxyCodeLine{01864\ \ \ \ \ *os\ <<\ \textcolor{stringliteral}{"{}("{}};}
+\DoxyCodeLine{01864\ \ \ \ \ *\mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}\ <<\ \textcolor{stringliteral}{"{}("{}};}
 \DoxyCodeLine{01865\ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{size\_t}\ i\ =\ 0;\ i\ <\ matchers\_.size();\ ++i)\ \{}
-\DoxyCodeLine{01866\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (i\ !=\ 0)\ *os\ <<\ \textcolor{stringliteral}{"{})\ or\ ("{}};}
-\DoxyCodeLine{01867\ \ \ \ \ \ \ matchers\_[i].DescribeTo(os);}
+\DoxyCodeLine{01866\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (i\ !=\ 0)\ *\mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}\ <<\ \textcolor{stringliteral}{"{})\ or\ ("{}};}
+\DoxyCodeLine{01867\ \ \ \ \ \ \ matchers\_[i].DescribeTo(\mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}});}
 \DoxyCodeLine{01868\ \ \ \ \ \}}
-\DoxyCodeLine{01869\ \ \ \ \ *os\ <<\ \textcolor{stringliteral}{"{})"{}};}
+\DoxyCodeLine{01869\ \ \ \ \ *\mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}\ <<\ \textcolor{stringliteral}{"{})"{}};}
 \DoxyCodeLine{01870\ \ \ \}}
 
 \end{DoxyCode}
@@ -170,14 +172,16 @@ Definition at line \mbox{\hyperlink{gmock-matchers_8h_source_l01881}{1881}} of f
 \DoxyCodeLine{01908\ \ \ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
 \includegraphics[width=350pt]{classtesting_1_1internal_1_1_any_of_matcher_impl_aa1b4ccba617cffe6bd1c18b0af22178b_cgraph}
 \end{center}
 \end{figure}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode

@@ -88,14 +88,15 @@ Definition at line \mbox{\hyperlink{log__message_8cpp_source_l00045}{45}} of fil
 \DoxyCodeLine{00048\ \ \ \ \{}
 \DoxyCodeLine{00049\ \ \ \ \ \ \ my-\/>level\ \ \ \ \ \ \ =\ ll;}
 \DoxyCodeLine{00050\ \ \ \ \ \ \ my-\/>file\ \ \ \ \ \ \ \ =\ \mbox{\hyperlink{classfc_1_1path}{fc::path}}(file).\mbox{\hyperlink{classfc_1_1path_a1e6beb6e05c3f6d6f699c1c448c4b1d6}{filename}}().\mbox{\hyperlink{classfc_1_1path_ab1eae2062df4ea01435348ec52fb3784}{generic\_string}}();\ \textcolor{comment}{//\ TODO\ truncate\ filename}}
-\DoxyCodeLine{00051\ \ \ \ \ \ \ my-\/>line\ \ \ \ \ \ \ \ =\ \mbox{\hyperlink{namespacevalidate__reflection_a54d4e98ade8417b88a7e3859a693630a}{line}};}
+\DoxyCodeLine{00051\ \ \ \ \ \ \ my-\/>line\ \ \ \ \ \ \ \ =\ line;}
 \DoxyCodeLine{00052\ \ \ \ \ \ \ my-\/>method\ \ \ \ \ \ =\ \mbox{\hyperlink{namespacewebsocketpp_1_1http_1_1parser_1_1state_a12f378e0c6dbf373781e7988ee4a0853a808f25179e5ccace33050c0f65571dee}{method}};}
 \DoxyCodeLine{00053\ \ \ \ \ \ \ my-\/>timestamp\ \ \ =\ \mbox{\hyperlink{classfc_1_1time__point_aa164ff1268a16d4b32afcff181f6100e}{time\_point::now}}();}
 \DoxyCodeLine{00054\ \ \ \ \ \ \ my-\/>thread\_name\ =\ \mbox{\hyperlink{namespacefc_a6b490790e2e4297225ecaee475b64ccb}{fc::get\_thread\_name}}();}
 \DoxyCodeLine{00055\ \ \ \ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -131,7 +132,7 @@ Definition at line \mbox{\hyperlink{log__message_8cpp_source_l00057}{57}} of fil
 \begin{DoxyCode}{0}
 \DoxyCodeLine{00058\ \ \ \ :my(\ std::make\_shared<detail::log\_context\_impl>()\ )}
 \DoxyCodeLine{00059\ \ \ \ \{}
-\DoxyCodeLine{00060\ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ obj\ =\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.get\_object();}
+\DoxyCodeLine{00060\ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ obj\ =\ v.get\_object();}
 \DoxyCodeLine{00061\ \ \ \ \ \ \ \ my-\/>level\ \ \ \ \ \ \ \ =\ obj[\textcolor{stringliteral}{"{}level"{}}].as<log\_level>();}
 \DoxyCodeLine{00062\ \ \ \ \ \ \ \ my-\/>file\ \ \ \ \ \ \ \ \ =\ obj[\textcolor{stringliteral}{"{}file"{}}].as\_string();}
 \DoxyCodeLine{00063\ \ \ \ \ \ \ \ my-\/>line\ \ \ \ \ \ \ \ \ =\ obj[\textcolor{stringliteral}{"{}line"{}}].as\_uint64();}
@@ -146,6 +147,14 @@ Definition at line \mbox{\hyperlink{log__message_8cpp_source_l00057}{57}} of fil
 \DoxyCodeLine{00072\ \ \ \ \}}
 
 \end{DoxyCode}
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classfc_1_1log__context_a4dd50551f679b724c87f9ea129b6afe3_cgraph}
+\end{center}
+\end{figure}
 
 
 \doxysubsection{Member Function Documentation}
@@ -168,7 +177,8 @@ Definition at line \mbox{\hyperlink{log__message_8cpp_source_l00080}{80}} of fil
 \DoxyCodeLine{00085\ \ \ \ \}}
 
 \end{DoxyCode}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -250,7 +260,8 @@ Definition at line \mbox{\hyperlink{log__message_8cpp_source_l00175}{175}} of fi
 \DoxyCodeLine{00175\ \{\ \textcolor{keywordflow}{return}\ my-\/>level;\ \ \ \}}
 
 \end{DoxyCode}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -335,7 +346,8 @@ Definition at line \mbox{\hyperlink{log__message_8cpp_source_l00074}{74}} of fil
 \DoxyCodeLine{00078\ \ \ \ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode

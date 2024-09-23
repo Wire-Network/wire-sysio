@@ -240,17 +240,21 @@ Here is the call graph for this function:</div>
 <div class="dyncontent">
 <div class="center"><img src="classfc_1_1http__client_a93331c2706ae276fad2daee42cafac58_cgraph.png" border="0" usemap="#aclassfc_1_1http__client_a93331c2706ae276fad2daee42cafac58_cgraph" alt=""/></div>
 <map name="aclassfc_1_1http__client_a93331c2706ae276fad2daee42cafac58_cgraph" id="aclassfc_1_1http__client_a93331c2706ae276fad2daee42cafac58_cgraph">
-<area shape="rect" title=" " alt="" coords="5,31,174,56"/>
-<area shape="rect" href="classfc_1_1http__client.html#a17c7f208e97d47e1b8e17f9f07c9821d" title=" " alt="" coords="222,5,390,31"/>
-<area shape="poly" title=" " alt="" coords="174,31,206,27,206,32,174,36"/>
-<area shape="rect" href="namespacefc.html#adea61f2343de94d0fbcb920a32332ad9" title=" " alt="" coords="257,55,354,80"/>
-<area shape="poly" title=" " alt="" coords="174,50,242,58,242,63,174,55"/>
-<area shape="rect" href="structsysio_1_1chain_1_1shared__public__key.html#a328e4a70940629953f9087100c46b207" title=" " alt="" coords="438,47,586,88"/>
-<area shape="poly" title=" " alt="" coords="355,65,422,65,422,70,355,70"/>
-<area shape="rect" href="classfc_1_1crypto_1_1public__key.html#ada5158a385e0d407268feb4790ba8646" title=" " alt="" coords="634,47,753,88"/>
-<area shape="poly" title=" " alt="" coords="587,65,619,65,619,70,587,70"/>
-<area shape="rect" href="classfc_1_1crypto_1_1public__key.html#aa96a2da856cbba914572aa8629c06c09" title=" " alt="" coords="801,47,919,88"/>
-<area shape="poly" title=" " alt="" coords="753,65,785,65,785,70,753,70"/>
+<area shape="rect" title=" " alt="" coords="5,84,174,110"/>
+<area shape="rect" href="classfc_1_1http__client.html#a17c7f208e97d47e1b8e17f9f07c9821d" title=" " alt="" coords="222,55,390,80"/>
+<area shape="poly" title=" " alt="" coords="174,83,206,78,206,84,174,88"/>
+<area shape="rect" href="namespacefc.html#adea61f2343de94d0fbcb920a32332ad9" title=" " alt="" coords="257,108,354,134"/>
+<area shape="poly" title=" " alt="" coords="174,104,242,111,242,116,174,109"/>
+<area shape="rect" href="classfc_1_1url.html#a195a2322d4ed37d3a6a8be6e5144473c" title=" " alt="" coords="468,5,556,31"/>
+<area shape="poly" title=" " alt="" coords="362,51,453,29,454,35,363,57"/>
+<area shape="rect" href="classfc_1_1url.html#a5133c026182f0f10a9bf13ac81483565" title=" " alt="" coords="466,55,558,80"/>
+<area shape="poly" title=" " alt="" coords="391,65,451,65,451,70,391,70"/>
+<area shape="rect" href="structsysio_1_1chain_1_1shared__public__key.html#a328e4a70940629953f9087100c46b207" title=" " alt="" coords="438,104,586,145"/>
+<area shape="poly" title=" " alt="" coords="355,119,422,120,422,126,355,124"/>
+<area shape="rect" href="classfc_1_1crypto_1_1public__key.html#ada5158a385e0d407268feb4790ba8646" title=" " alt="" coords="634,104,753,145"/>
+<area shape="poly" title=" " alt="" coords="587,122,619,122,619,128,587,128"/>
+<area shape="rect" href="classfc_1_1crypto_1_1public__key.html#aa96a2da856cbba914572aa8629c06c09" title=" " alt="" coords="801,104,919,145"/>
+<area shape="poly" title=" " alt="" coords="753,122,785,122,785,128,753,128"/>
 </map>
 </div>
 
@@ -282,13 +286,24 @@ Here is the call graph for this function:</div>
 
 <p class="definition">Definition at line <a class="el" href="http__client_8cpp_source.html#l00435">435</a> of file <a class="el" href="http__client_8cpp_source.html">http_client.cpp</a>.</p>
 <div class="fragment"><div class="line"><span class="lineno">  435</span>                                                                                                    {</div>
-<div class="line"><span class="lineno">  436</span>   <span class="keywordflow">if</span>(<a class="code hl_variable" href="namespaceupload.html#a770d9c7b49b1fede80de6078d5e49af7">dest</a>.proto() == <span class="stringliteral">&quot;unix&quot;</span>)</div>
-<div class="line"><span class="lineno">  437</span>      <span class="keywordflow">return</span> _my-&gt;post_sync(_my-&gt;get_unix_url(*<a class="code hl_variable" href="namespaceupload.html#a770d9c7b49b1fede80de6078d5e49af7">dest</a>.host()), payload, deadline);</div>
+<div class="line"><span class="lineno">  436</span>   <span class="keywordflow">if</span>(dest.proto() == <span class="stringliteral">&quot;unix&quot;</span>)</div>
+<div class="line"><span class="lineno">  437</span>      <span class="keywordflow">return</span> _my-&gt;post_sync(_my-&gt;get_unix_url(*dest.host()), payload, deadline);</div>
 <div class="line"><span class="lineno">  438</span>   <span class="keywordflow">else</span></div>
 <div class="line"><span class="lineno">  439</span>      <span class="keywordflow">return</span> _my-&gt;post_sync(dest, payload, deadline);</div>
 <div class="line"><span class="lineno">  440</span>}</div>
-<div class="ttc" id="anamespaceupload_html_a770d9c7b49b1fede80de6078d5e49af7"><div class="ttname"><a href="namespaceupload.html#a770d9c7b49b1fede80de6078d5e49af7">upload.dest</a></div><div class="ttdeci">dest</div><div class="ttdef"><b>Definition</b> <a href="googlemock_2scripts_2upload_8py_source.html#l00394">upload.py:394</a></div></div>
 </div><!-- fragment --><div class="dynheader">
+Here is the call graph for this function:</div>
+<div class="dyncontent">
+<div class="center"><img src="classfc_1_1http__client_a17c7f208e97d47e1b8e17f9f07c9821d_cgraph.png" border="0" usemap="#aclassfc_1_1http__client_a17c7f208e97d47e1b8e17f9f07c9821d_cgraph" alt=""/></div>
+<map name="aclassfc_1_1http__client_a17c7f208e97d47e1b8e17f9f07c9821d_cgraph" id="aclassfc_1_1http__client_a17c7f208e97d47e1b8e17f9f07c9821d_cgraph">
+<area shape="rect" title=" " alt="" coords="5,31,174,56"/>
+<area shape="rect" href="classfc_1_1url.html#a195a2322d4ed37d3a6a8be6e5144473c" title=" " alt="" coords="224,5,311,31"/>
+<area shape="poly" title=" " alt="" coords="174,29,208,24,209,29,175,34"/>
+<area shape="rect" href="classfc_1_1url.html#a5133c026182f0f10a9bf13ac81483565" title=" " alt="" coords="222,55,313,80"/>
+<area shape="poly" title=" " alt="" coords="175,52,207,57,206,62,174,58"/>
+</map>
+</div>
+<div class="dynheader">
 Here is the caller graph for this function:</div>
 <div class="dyncontent">
 <div class="center"><img src="classfc_1_1http__client_a17c7f208e97d47e1b8e17f9f07c9821d_icgraph.png" border="0" usemap="#aclassfc_1_1http__client_a17c7f208e97d47e1b8e17f9f07c9821d_icgraph" alt=""/></div>

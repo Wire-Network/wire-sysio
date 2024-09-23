@@ -6,7 +6,8 @@
 {\ttfamily \#include $<$xbyak/xbyak.\+h$>$}\newline
 {\ttfamily \#include $<$cybozu/inttype.\+hpp$>$}\newline
 {\ttfamily \#include $<$cybozu/test.\+hpp$>$}\newline
-Include dependency graph for misc.\+cpp\+:\nopagebreak
+Include dependency graph for misc.\+cpp\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -61,7 +62,8 @@ Definition at line \mbox{\hyperlink{misc_8cpp_source_l00085}{85}} of file \mbox{
 \DoxyCodeLine{00105\ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -107,7 +109,7 @@ Definition at line \mbox{\hyperlink{misc_8cpp_source_l00035}{35}} of file \mbox{
 \DoxyCodeLine{00038\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_code_a3605683bd8fd54691437ff05ba4431b9}{Code}}()}
 \DoxyCodeLine{00039\ \ \ \ \ \ \ \ \ \{}
 \DoxyCodeLine{00040\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{struct\ }\{}
-\DoxyCodeLine{00041\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}};}
+\DoxyCodeLine{00041\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ v;}
 \DoxyCodeLine{00042\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{yubihsm_8h_a276ec4ea44aa77416c732159c90a37b9}{bit}};}
 \DoxyCodeLine{00043\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{bool}\ error;}
 \DoxyCodeLine{00044\ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \mbox{\hyperlink{cvt__test_8cpp_af73a49a9258b274934a51f5b17b0d1be}{tbl}}[]\ =\ \{}
@@ -139,7 +141,7 @@ Definition at line \mbox{\hyperlink{misc_8cpp_source_l00035}{35}} of file \mbox{
 \DoxyCodeLine{00070\ \ \ \ \ \ \ \ \ \ \ \ \ \};}
 \DoxyCodeLine{00071\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{size\_t}\ i\ =\ 0;\ i\ <\ \mbox{\hyperlink{ate-pairing_2include_2cybozu_2inttype_8hpp_a9590a04f10a3cc6e777de8bef7ae030c}{CYBOZU\_NUM\_OF\_ARRAY}}(\mbox{\hyperlink{cvt__test_8cpp_af73a49a9258b274934a51f5b17b0d1be}{tbl}});\ i++)\ \{}
 \DoxyCodeLine{00072\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{yubihsm_8h_a276ec4ea44aa77416c732159c90a37b9}{bit}}\ =\ \mbox{\hyperlink{cvt__test_8cpp_af73a49a9258b274934a51f5b17b0d1be}{tbl}}[i].bit;}
-\DoxyCodeLine{00073\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}\ =\ \mbox{\hyperlink{cvt__test_8cpp_af73a49a9258b274934a51f5b17b0d1be}{tbl}}[i].v;}
+\DoxyCodeLine{00073\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ v\ =\ \mbox{\hyperlink{cvt__test_8cpp_af73a49a9258b274934a51f5b17b0d1be}{tbl}}[i].v;}
 \DoxyCodeLine{00074\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{class_xbyak_1_1_address_frame}{Xbyak::AddressFrame}}\&\ af\ =\ \mbox{\hyperlink{yubihsm_8h_a276ec4ea44aa77416c732159c90a37b9}{bit}}\ ==\ 8\ ?\ \mbox{\hyperlink{class_xbyak_1_1_code_generator_a7e3fe82f1b67f9653a2471996fba76b5}{byte}}\ :\ \mbox{\hyperlink{yubihsm_8h_a276ec4ea44aa77416c732159c90a37b9}{bit}}\ ==\ 16\ ?\ \mbox{\hyperlink{class_xbyak_1_1_code_generator_abbd7c6a65ecfd27ebb7ee63287f1f78d}{word}}\ :\ \mbox{\hyperlink{yubihsm_8h_a276ec4ea44aa77416c732159c90a37b9}{bit}}\ ==\ 32\ ?\ \mbox{\hyperlink{class_xbyak_1_1_code_generator_a68d1af2ea4ad9321a2fe814392280a48}{dword}}\ :\ \mbox{\hyperlink{class_xbyak_1_1_code_generator_aadb87e9f28e254cc9f5b49ca106b1ce8}{qword}};}
 \DoxyCodeLine{00075\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{cvt__test_8cpp_af73a49a9258b274934a51f5b17b0d1be}{tbl}}[i].error)\ \{}
 \DoxyCodeLine{00076\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{ate-pairing_2include_2cybozu_2test_8hpp_a55d417cd6a01e7709f468f27f1de0309}{CYBOZU\_TEST\_EXCEPTION}}(\mbox{\hyperlink{class_xbyak_1_1_code_generator_ac01f285f4da251eb2fa144d5c49c9e3e}{mov}}(af[\mbox{\hyperlink{class_xbyak_1_1_code_generator_a682bca64626bf98c33660e1e245392d1}{eax}}],\ v),\ \mbox{\hyperlink{class_xbyak_1_1_error}{Xbyak::Error}});}
@@ -152,7 +154,8 @@ Definition at line \mbox{\hyperlink{misc_8cpp_source_l00035}{35}} of file \mbox{
 \DoxyCodeLine{00083\ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -186,7 +189,8 @@ Definition at line \mbox{\hyperlink{misc_8cpp_source_l00010}{10}} of file \mbox{
 \DoxyCodeLine{00023\ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode

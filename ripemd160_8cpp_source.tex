@@ -110,7 +110,7 @@
 \DoxyCodeLine{\Hypertarget{ripemd160_8cpp_source_l00106}00106\ \ \ \}}
 \DoxyCodeLine{\Hypertarget{ripemd160_8cpp_source_l00107}\mbox{\hyperlink{namespacefc_a519e5f82e87b49399ce419fccfb7b1ab}{00107}}\ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespacefc_accef08adf4ee05c36ccc550d8101b08f}{from\_variant}}(\ \textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1variant}{variant}}\&\ v,\ \mbox{\hyperlink{classfc_1_1ripemd160}{ripemd160}}\&\ bi\ )}
 \DoxyCodeLine{\Hypertarget{ripemd160_8cpp_source_l00108}00108\ \ \ \{}
-\DoxyCodeLine{\Hypertarget{ripemd160_8cpp_source_l00109}00109\ \ \ \ \ std::vector<char>\ ve\ =\ v.as<\ std::vector<char>\ >();}
+\DoxyCodeLine{\Hypertarget{ripemd160_8cpp_source_l00109}00109\ \ \ \ \ std::vector<char>\ ve\ =\ v.\mbox{\hyperlink{classfc_1_1variant_a82edd1f33199355d3a1f19bbb92909cc}{as}}<\ std::vector<char>\ >();}
 \DoxyCodeLine{\Hypertarget{ripemd160_8cpp_source_l00110}00110\ \ \ \ \ \textcolor{keywordflow}{if}(\ ve.size()\ )}
 \DoxyCodeLine{\Hypertarget{ripemd160_8cpp_source_l00111}00111\ \ \ \ \ \{}
 \DoxyCodeLine{\Hypertarget{ripemd160_8cpp_source_l00112}00112\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_ae785d5badbf1f08b491af31f32a135a1}{memcpy}}(\&bi,\ ve.\mbox{\hyperlink{classfc_1_1ripemd160_a774d4a3de0048d37778673674b2fd586}{data}}(),\ \mbox{\hyperlink{namespacefc_aa3ea11c18de71ec23b19c3cc571fb8ff}{fc::min<size\_t>}}(ve.size(),\textcolor{keyword}{sizeof}(bi))\ );}

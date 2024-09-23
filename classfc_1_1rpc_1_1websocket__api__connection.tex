@@ -6,7 +6,8 @@
 
 
 
-Inheritance diagram for fc\+::rpc\+::websocket\+\_\+api\+\_\+connection\+:\nopagebreak
+Inheritance diagram for fc\+::rpc\+::websocket\+\_\+api\+\_\+connection\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -15,7 +16,8 @@ Inheritance diagram for fc\+::rpc\+::websocket\+\_\+api\+\_\+connection\+:\nopag
 \end{figure}
 
 
-Collaboration diagram for fc\+::rpc\+::websocket\+\_\+api\+\_\+connection\+:\nopagebreak
+Collaboration diagram for fc\+::rpc\+::websocket\+\_\+api\+\_\+connection\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -100,7 +102,7 @@ Definition at line \mbox{\hyperlink{websocket__api_8cpp_source_l00010}{10}} of f
 \DoxyCodeLine{00012\ \{}
 \DoxyCodeLine{00013\ \ \ \ \mbox{\hyperlink{classfc_1_1rpc_1_1websocket__api__connection_a05bbf1dfec628036d64033dd230af9b5}{\_rpc\_state}}.add\_method(\ \textcolor{stringliteral}{"{}call"{}},\ [\textcolor{keyword}{this}](\ \textcolor{keyword}{const}\ \mbox{\hyperlink{namespacefc_a9148361f6aaa3d739990a75ac557fe59}{variants}}\&\ args\ )\ -\/>\ variant}
 \DoxyCodeLine{00014\ \ \ \ \{}
-\DoxyCodeLine{00015\ \ \ \ \ \ \ \mbox{\hyperlink{exception_8hpp_abed525eeff3ae581be7e4e2fcd3b7bf4}{FC\_ASSERT}}(\ \mbox{\hyperlink{namespacebenchmark_compile_ad0ed96ae1454e4347ca61ac3887c379e}{args}}.size()\ ==\ 3\ \&\&\ args[2].is\_array()\ );}
+\DoxyCodeLine{00015\ \ \ \ \ \ \ \mbox{\hyperlink{exception_8hpp_abed525eeff3ae581be7e4e2fcd3b7bf4}{FC\_ASSERT}}(\ args.size()\ ==\ 3\ \&\&\ args[2].is\_array()\ );}
 \DoxyCodeLine{00016\ \ \ \ \ \ \ \mbox{\hyperlink{namespacefc_a18e9e0bd9c0a52896425ae1172bc4e2b}{api\_id\_type}}\ api\_id;}
 \DoxyCodeLine{00017\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ args[0].is\_string()\ )}
 \DoxyCodeLine{00018\ \ \ \ \ \ \ \{}
@@ -110,7 +112,7 @@ Definition at line \mbox{\hyperlink{websocket__api_8cpp_source_l00010}{10}} of f
 \DoxyCodeLine{00022\ \ \ \ \ \ \ \ \ \ api\_id\ =\ subresult.as\_uint64();}
 \DoxyCodeLine{00023\ \ \ \ \ \ \ \}}
 \DoxyCodeLine{00024\ \ \ \ \ \ \ \textcolor{keywordflow}{else}}
-\DoxyCodeLine{00025\ \ \ \ \ \ \ \ \ \ api\_id\ =\ \mbox{\hyperlink{namespacebenchmark_compile_ad0ed96ae1454e4347ca61ac3887c379e}{args}}[0].as\_uint64();}
+\DoxyCodeLine{00025\ \ \ \ \ \ \ \ \ \ api\_id\ =\ args[0].as\_uint64();}
 \DoxyCodeLine{00026\ }
 \DoxyCodeLine{00027\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ this-\/>\mbox{\hyperlink{classfc_1_1api__connection_aee1166b3d1f739ffd7759cf02b2e7efa}{receive\_call}}(}
 \DoxyCodeLine{00028\ \ \ \ \ \ \ \ \ \ api\_id,}
@@ -120,14 +122,14 @@ Definition at line \mbox{\hyperlink{websocket__api_8cpp_source_l00010}{10}} of f
 \DoxyCodeLine{00032\ }
 \DoxyCodeLine{00033\ \ \ \ \mbox{\hyperlink{classfc_1_1rpc_1_1websocket__api__connection_a05bbf1dfec628036d64033dd230af9b5}{\_rpc\_state}}.add\_method(\ \textcolor{stringliteral}{"{}notice"{}},\ [\textcolor{keyword}{this}](\ \textcolor{keyword}{const}\ \mbox{\hyperlink{namespacefc_a9148361f6aaa3d739990a75ac557fe59}{variants}}\&\ args\ )\ -\/>\ variant}
 \DoxyCodeLine{00034\ \ \ \ \{}
-\DoxyCodeLine{00035\ \ \ \ \ \ \ \mbox{\hyperlink{exception_8hpp_abed525eeff3ae581be7e4e2fcd3b7bf4}{FC\_ASSERT}}(\ \mbox{\hyperlink{namespacebenchmark_compile_ad0ed96ae1454e4347ca61ac3887c379e}{args}}.size()\ ==\ 2\ \&\&\ args[1].is\_array()\ );}
+\DoxyCodeLine{00035\ \ \ \ \ \ \ \mbox{\hyperlink{exception_8hpp_abed525eeff3ae581be7e4e2fcd3b7bf4}{FC\_ASSERT}}(\ args.size()\ ==\ 2\ \&\&\ args[1].is\_array()\ );}
 \DoxyCodeLine{00036\ \ \ \ \ \ \ this-\/>\mbox{\hyperlink{classfc_1_1api__connection_ad5bd634f7e967ca90ccc8fd4c3e9fac8}{receive\_notice}}(\ args[0].as\_uint64(),\ args[1].get\_array()\ );}
 \DoxyCodeLine{00037\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ variant();}
 \DoxyCodeLine{00038\ \ \ \ \}\ );}
 \DoxyCodeLine{00039\ }
 \DoxyCodeLine{00040\ \ \ \ \mbox{\hyperlink{classfc_1_1rpc_1_1websocket__api__connection_a05bbf1dfec628036d64033dd230af9b5}{\_rpc\_state}}.add\_method(\ \textcolor{stringliteral}{"{}callback"{}},\ [\textcolor{keyword}{this}](\ \textcolor{keyword}{const}\ \mbox{\hyperlink{namespacefc_a9148361f6aaa3d739990a75ac557fe59}{variants}}\&\ args\ )\ -\/>\ variant}
 \DoxyCodeLine{00041\ \ \ \ \{}
-\DoxyCodeLine{00042\ \ \ \ \ \ \ \mbox{\hyperlink{exception_8hpp_abed525eeff3ae581be7e4e2fcd3b7bf4}{FC\_ASSERT}}(\ \mbox{\hyperlink{namespacebenchmark_compile_ad0ed96ae1454e4347ca61ac3887c379e}{args}}.size()\ ==\ 2\ \&\&\ args[1].is\_array()\ );}
+\DoxyCodeLine{00042\ \ \ \ \ \ \ \mbox{\hyperlink{exception_8hpp_abed525eeff3ae581be7e4e2fcd3b7bf4}{FC\_ASSERT}}(\ args.size()\ ==\ 2\ \&\&\ args[1].is\_array()\ );}
 \DoxyCodeLine{00043\ \ \ \ \ \ \ this-\/>\mbox{\hyperlink{classfc_1_1api__connection_a16bc734461e2954bf42d2f97be137eb8}{receive\_callback}}(\ args[0].as\_uint64(),\ args[1].get\_array()\ );}
 \DoxyCodeLine{00044\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ variant();}
 \DoxyCodeLine{00045\ \ \ \ \}\ );}
@@ -143,7 +145,8 @@ Definition at line \mbox{\hyperlink{websocket__api_8cpp_source_l00010}{10}} of f
 \DoxyCodeLine{00055\ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -272,14 +275,16 @@ Definition at line \mbox{\hyperlink{websocket__api_8cpp_source_l00084}{84}} of f
 \DoxyCodeLine{00175\ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
 \includegraphics[width=350pt]{classfc_1_1rpc_1_1websocket__api__connection_a1fce181c4cd79f53a796311293201518_cgraph}
 \end{center}
 \end{figure}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -309,7 +314,8 @@ Definition at line \mbox{\hyperlink{websocket__api_8cpp_source_l00057}{57}} of f
 \DoxyCodeLine{00065\ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -339,7 +345,8 @@ Definition at line \mbox{\hyperlink{websocket__api_8cpp_source_l00067}{67}} of f
 \DoxyCodeLine{00074\ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -368,7 +375,8 @@ Definition at line \mbox{\hyperlink{websocket__api_8cpp_source_l00076}{76}} of f
 \DoxyCodeLine{00082\ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode

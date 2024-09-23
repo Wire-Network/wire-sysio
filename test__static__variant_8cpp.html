@@ -330,14 +330,13 @@ Functions</h2></td></tr>
 <p class="definition">Definition at line <a class="el" href="test__static__variant_8cpp_source.html#l00037">37</a> of file <a class="el" href="test__static__variant_8cpp_source.html">test_static_variant.cpp</a>.</p>
 <div class="fragment"><div class="line"><span class="lineno">   38</span>   {</div>
 <div class="line"><span class="lineno">   39</span>      <span class="keyword">using </span>variant_type = std::variant&lt;int32_t, bool, std::string&gt;;</div>
-<div class="line"><span class="lineno">   40</span>      <span class="keyword">auto</span> <a class="code hl_variable" href="namespacedevelop_build.html#ade64cd34608f9442ef3049116a2da428">v</a> = variant_type{};</div>
+<div class="line"><span class="lineno">   40</span>      <span class="keyword">auto</span> v = variant_type{};</div>
 <div class="line"><span class="lineno">   41</span> </div>
 <div class="line"><span class="lineno">   42</span>      BOOST_CHECK_EXCEPTION(<a class="code hl_function" href="namespacefc.html#afc8acfd464a85f8a41ec497039c22934">fc::from_index</a>(v, 3), fc::assert_exception, [](<span class="keyword">const</span> <span class="keyword">auto</span>&amp; e) { <span class="keywordflow">return</span> e.code() == <a class="code hl_enumvalue" href="namespacefc.html#ab52b42f18c442a260897c74c66c3d35ca0609f726018df8d223cd932c85d31b6c">fc::assert_exception_code</a>; });</div>
 <div class="line"><span class="lineno">   43</span> </div>
 <div class="line"><span class="lineno">   44</span>      <a class="code hl_function" href="namespacefc.html#afc8acfd464a85f8a41ec497039c22934">fc::from_index</a>(v, 2);</div>
 <div class="line"><span class="lineno">   45</span>      BOOST_REQUIRE(std::string{} == std::get&lt;std::string&gt;(v));</div>
 <div class="line"><span class="lineno">   46</span>   }</div>
-<div class="ttc" id="anamespacedevelop_build_html_ade64cd34608f9442ef3049116a2da428"><div class="ttname"><a href="namespacedevelop_build.html#ade64cd34608f9442ef3049116a2da428">developBuild.v</a></div><div class="ttdeci">v</div><div class="ttdef"><b>Definition</b> <a href="develop_build_8py_source.html#l00006">developBuild.py:6</a></div></div>
 <div class="ttc" id="anamespacefc_html_ab52b42f18c442a260897c74c66c3d35ca0609f726018df8d223cd932c85d31b6c"><div class="ttname"><a href="namespacefc.html#ab52b42f18c442a260897c74c66c3d35ca0609f726018df8d223cd932c85d31b6c">fc::assert_exception_code</a></div><div class="ttdeci">@ assert_exception_code</div><div class="ttdef"><b>Definition</b> <a href="exception_8hpp_source.html#l00030">exception.hpp:30</a></div></div>
 <div class="ttc" id="anamespacefc_html_afc8acfd464a85f8a41ec497039c22934"><div class="ttname"><a href="namespacefc.html#afc8acfd464a85f8a41ec497039c22934">fc::from_index</a></div><div class="ttdeci">void from_index(variant &amp;v, int index)</div><div class="ttdef"><b>Definition</b> <a href="static__variant_8hpp_source.html#l00015">static_variant.hpp:15</a></div></div>
 </div><!-- fragment --><div class="dynheader">

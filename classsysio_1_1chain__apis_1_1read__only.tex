@@ -319,7 +319,8 @@ Definition at line \mbox{\hyperlink{chain__plugin_8cpp_source_l02601}{2601}} of 
 \DoxyCodeLine{02620\ \}\ \mbox{\hyperlink{exception_8hpp_af3731d6e3beb140d9e652adf7a18113b}{FC\_RETHROW\_EXCEPTIONS}}(\ warn,\ \textcolor{stringliteral}{"{}code:\ \$\{code\},\ action:\ \$\{action\},\ args:\ \$\{args\}"{}},}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -350,14 +351,16 @@ Definition at line \mbox{\hyperlink{chain__plugin_8hpp_source_l00453}{453}} of f
 \DoxyCodeLine{00456\ \ \ \ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
 \includegraphics[width=350pt]{classsysio_1_1chain__apis_1_1read__only_a0dcb14319331c9229b8652e5cc85c60a_cgraph}
 \end{center}
 \end{figure}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -397,7 +400,8 @@ Definition at line \mbox{\hyperlink{chain__plugin_8cpp_source_l02348}{2348}} of 
 \DoxyCodeLine{02360\ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -508,9 +512,9 @@ Definition at line \mbox{\hyperlink{chain__plugin_8cpp_source_l02429}{2429}} of 
 \DoxyCodeLine{02519\ }
 \DoxyCodeLine{02520\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}*\ t\_id\ =\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a107648633008a7f2d872b4b3d98c2f96}{d}}.find<chain::table\_id\_object,\ chain::by\_code\_scope\_table>(boost::make\_tuple(\ token\_code,\ \mbox{\hyperlink{test__account__query__db_8cpp_aedc91aab307c8fb7ad822c3e16a6dd73}{params}}.account\_name,\ \textcolor{stringliteral}{"{}accounts"{}}\_n\ ));}
 \DoxyCodeLine{02521\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ t\_id\ !=\ \textcolor{keyword}{nullptr}\ )\ \{}
-\DoxyCodeLine{02522\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\ \&\mbox{\hyperlink{namespacehost__functions__tests__1_a8496a24b5236a2dc07bb4f2930d88342}{idx}}\ =\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a107648633008a7f2d872b4b3d98c2f96}{d}}.get\_index<\mbox{\hyperlink{namespacesysio_1_1chain_aac1a2c1330fcb6c8002d59d4d1de5858}{key\_value\_index}},\ by\_scope\_primary>();}
-\DoxyCodeLine{02523\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ it\ =\ \mbox{\hyperlink{namespacehost__functions__tests__1_a8496a24b5236a2dc07bb4f2930d88342}{idx}}.find(boost::make\_tuple(\ t\_id-\/>id,\ core\_symbol.to\_symbol\_code()\ ));}
-\DoxyCodeLine{02524\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ it\ !=\ \mbox{\hyperlink{namespacehost__functions__tests__1_a8496a24b5236a2dc07bb4f2930d88342}{idx}}.end()\ \&\&\ it-\/>value.size()\ >=\ \textcolor{keyword}{sizeof}(asset)\ )\ \{}
+\DoxyCodeLine{02522\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\ \&idx\ =\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a107648633008a7f2d872b4b3d98c2f96}{d}}.get\_index<\mbox{\hyperlink{namespacesysio_1_1chain_aac1a2c1330fcb6c8002d59d4d1de5858}{key\_value\_index}},\ by\_scope\_primary>();}
+\DoxyCodeLine{02523\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ it\ =\ idx.find(boost::make\_tuple(\ t\_id-\/>id,\ core\_symbol.to\_symbol\_code()\ ));}
+\DoxyCodeLine{02524\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ it\ !=\ idx.end()\ \&\&\ it-\/>value.size()\ >=\ \textcolor{keyword}{sizeof}(asset)\ )\ \{}
 \DoxyCodeLine{02525\ \ \ \ \ \ \ \ \ \ \ \ \ asset\ bal;}
 \DoxyCodeLine{02526\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1datastream}{fc::datastream<const\ char\ *>}}\ \mbox{\hyperlink{namespace_xbyak_1_1util_a4b2aef26182d21706896022467868f7c}{ds}}(it-\/>value.data(),\ it-\/>value.size());}
 \DoxyCodeLine{02527\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacefc_1_1raw_a0b442d98ceb22dd5a6ae84745e43ffab}{fc::raw::unpack}}(ds,\ bal);}
@@ -523,9 +527,9 @@ Definition at line \mbox{\hyperlink{chain__plugin_8cpp_source_l02429}{2429}} of 
 \DoxyCodeLine{02534\ }
 \DoxyCodeLine{02535\ \ \ \ \ \ \ t\_id\ =\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a107648633008a7f2d872b4b3d98c2f96}{d}}.find<chain::table\_id\_object,\ chain::by\_code\_scope\_table>(boost::make\_tuple(\ config::system\_account\_name,\ \mbox{\hyperlink{test__account__query__db_8cpp_aedc91aab307c8fb7ad822c3e16a6dd73}{params}}.account\_name,\ \textcolor{stringliteral}{"{}userres"{}}\_n\ ));}
 \DoxyCodeLine{02536\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (t\_id\ !=\ \textcolor{keyword}{nullptr})\ \{}
-\DoxyCodeLine{02537\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\ \&\mbox{\hyperlink{namespacehost__functions__tests__1_a8496a24b5236a2dc07bb4f2930d88342}{idx}}\ =\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a107648633008a7f2d872b4b3d98c2f96}{d}}.get\_index<\mbox{\hyperlink{namespacesysio_1_1chain_aac1a2c1330fcb6c8002d59d4d1de5858}{key\_value\_index}},\ by\_scope\_primary>();}
-\DoxyCodeLine{02538\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ it\ =\ \mbox{\hyperlink{namespacehost__functions__tests__1_a8496a24b5236a2dc07bb4f2930d88342}{idx}}.find(boost::make\_tuple(\ t\_id-\/>id,\ \mbox{\hyperlink{test__account__query__db_8cpp_aedc91aab307c8fb7ad822c3e16a6dd73}{params}}.account\_name.to\_uint64\_t()\ ));}
-\DoxyCodeLine{02539\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\ it\ !=\ \mbox{\hyperlink{namespacehost__functions__tests__1_a8496a24b5236a2dc07bb4f2930d88342}{idx}}.end()\ )\ \{}
+\DoxyCodeLine{02537\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\ \&idx\ =\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a107648633008a7f2d872b4b3d98c2f96}{d}}.get\_index<\mbox{\hyperlink{namespacesysio_1_1chain_aac1a2c1330fcb6c8002d59d4d1de5858}{key\_value\_index}},\ by\_scope\_primary>();}
+\DoxyCodeLine{02538\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ it\ =\ idx.find(boost::make\_tuple(\ t\_id-\/>id,\ \mbox{\hyperlink{test__account__query__db_8cpp_aedc91aab307c8fb7ad822c3e16a6dd73}{params}}.account\_name.to\_uint64\_t()\ ));}
+\DoxyCodeLine{02539\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\ it\ !=\ idx.end()\ )\ \{}
 \DoxyCodeLine{02540\ \ \ \ \ \ \ \ \ \ \ \ \ vector<char>\ data;}
 \DoxyCodeLine{02541\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1chain__apis_1_1read__only_a0dcb14319331c9229b8652e5cc85c60a}{copy\_inline\_row}}(*it,\ data);}
 \DoxyCodeLine{02542\ \ \ \ \ \ \ \ \ \ \ \ \ result.total\_resources\ =\ abis.binary\_to\_variant(\ \textcolor{stringliteral}{"{}user\_resources"{}},\ data,\ \mbox{\hyperlink{structsysio_1_1chain_1_1abi__serializer_a2dc34bf706557f0c83d61b3791299c98}{abi\_serializer::create\_yield\_function}}(\ abi\_serializer\_max\_time\ ),\ shorten\_abi\_errors\ );}
@@ -534,9 +538,9 @@ Definition at line \mbox{\hyperlink{chain__plugin_8cpp_source_l02429}{2429}} of 
 \DoxyCodeLine{02545\ }
 \DoxyCodeLine{02546\ \ \ \ \ \ \ t\_id\ =\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a107648633008a7f2d872b4b3d98c2f96}{d}}.find<chain::table\_id\_object,\ chain::by\_code\_scope\_table>(boost::make\_tuple(\ config::system\_account\_name,\ \mbox{\hyperlink{test__account__query__db_8cpp_aedc91aab307c8fb7ad822c3e16a6dd73}{params}}.account\_name,\ \textcolor{stringliteral}{"{}delband"{}}\_n\ ));}
 \DoxyCodeLine{02547\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (t\_id\ !=\ \textcolor{keyword}{nullptr})\ \{}
-\DoxyCodeLine{02548\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\ \&\mbox{\hyperlink{namespacehost__functions__tests__1_a8496a24b5236a2dc07bb4f2930d88342}{idx}}\ =\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a107648633008a7f2d872b4b3d98c2f96}{d}}.get\_index<\mbox{\hyperlink{namespacesysio_1_1chain_aac1a2c1330fcb6c8002d59d4d1de5858}{key\_value\_index}},\ by\_scope\_primary>();}
-\DoxyCodeLine{02549\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ it\ =\ \mbox{\hyperlink{namespacehost__functions__tests__1_a8496a24b5236a2dc07bb4f2930d88342}{idx}}.find(boost::make\_tuple(\ t\_id-\/>id,\ \mbox{\hyperlink{test__account__query__db_8cpp_aedc91aab307c8fb7ad822c3e16a6dd73}{params}}.account\_name.to\_uint64\_t()\ ));}
-\DoxyCodeLine{02550\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\ it\ !=\ \mbox{\hyperlink{namespacehost__functions__tests__1_a8496a24b5236a2dc07bb4f2930d88342}{idx}}.end()\ )\ \{}
+\DoxyCodeLine{02548\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\ \&idx\ =\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a107648633008a7f2d872b4b3d98c2f96}{d}}.get\_index<\mbox{\hyperlink{namespacesysio_1_1chain_aac1a2c1330fcb6c8002d59d4d1de5858}{key\_value\_index}},\ by\_scope\_primary>();}
+\DoxyCodeLine{02549\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ it\ =\ idx.find(boost::make\_tuple(\ t\_id-\/>id,\ \mbox{\hyperlink{test__account__query__db_8cpp_aedc91aab307c8fb7ad822c3e16a6dd73}{params}}.account\_name.to\_uint64\_t()\ ));}
+\DoxyCodeLine{02550\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\ it\ !=\ idx.end()\ )\ \{}
 \DoxyCodeLine{02551\ \ \ \ \ \ \ \ \ \ \ \ \ vector<char>\ data;}
 \DoxyCodeLine{02552\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1chain__apis_1_1read__only_a0dcb14319331c9229b8652e5cc85c60a}{copy\_inline\_row}}(*it,\ data);}
 \DoxyCodeLine{02553\ \ \ \ \ \ \ \ \ \ \ \ \ result.self\_delegated\_bandwidth\ =\ abis.binary\_to\_variant(\ \textcolor{stringliteral}{"{}delegated\_bandwidth"{}},\ data,\ \mbox{\hyperlink{structsysio_1_1chain_1_1abi__serializer_a2dc34bf706557f0c83d61b3791299c98}{abi\_serializer::create\_yield\_function}}(\ abi\_serializer\_max\_time\ ),\ shorten\_abi\_errors\ );}
@@ -545,9 +549,9 @@ Definition at line \mbox{\hyperlink{chain__plugin_8cpp_source_l02429}{2429}} of 
 \DoxyCodeLine{02556\ }
 \DoxyCodeLine{02557\ \ \ \ \ \ \ t\_id\ =\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a107648633008a7f2d872b4b3d98c2f96}{d}}.find<chain::table\_id\_object,\ chain::by\_code\_scope\_table>(boost::make\_tuple(\ config::system\_account\_name,\ \mbox{\hyperlink{test__account__query__db_8cpp_aedc91aab307c8fb7ad822c3e16a6dd73}{params}}.account\_name,\ \textcolor{stringliteral}{"{}refunds"{}}\_n\ ));}
 \DoxyCodeLine{02558\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (t\_id\ !=\ \textcolor{keyword}{nullptr})\ \{}
-\DoxyCodeLine{02559\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\ \&\mbox{\hyperlink{namespacehost__functions__tests__1_a8496a24b5236a2dc07bb4f2930d88342}{idx}}\ =\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a107648633008a7f2d872b4b3d98c2f96}{d}}.get\_index<\mbox{\hyperlink{namespacesysio_1_1chain_aac1a2c1330fcb6c8002d59d4d1de5858}{key\_value\_index}},\ by\_scope\_primary>();}
-\DoxyCodeLine{02560\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ it\ =\ \mbox{\hyperlink{namespacehost__functions__tests__1_a8496a24b5236a2dc07bb4f2930d88342}{idx}}.find(boost::make\_tuple(\ t\_id-\/>id,\ \mbox{\hyperlink{test__account__query__db_8cpp_aedc91aab307c8fb7ad822c3e16a6dd73}{params}}.account\_name.to\_uint64\_t()\ ));}
-\DoxyCodeLine{02561\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\ it\ !=\ \mbox{\hyperlink{namespacehost__functions__tests__1_a8496a24b5236a2dc07bb4f2930d88342}{idx}}.end()\ )\ \{}
+\DoxyCodeLine{02559\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\ \&idx\ =\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a107648633008a7f2d872b4b3d98c2f96}{d}}.get\_index<\mbox{\hyperlink{namespacesysio_1_1chain_aac1a2c1330fcb6c8002d59d4d1de5858}{key\_value\_index}},\ by\_scope\_primary>();}
+\DoxyCodeLine{02560\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ it\ =\ idx.find(boost::make\_tuple(\ t\_id-\/>id,\ \mbox{\hyperlink{test__account__query__db_8cpp_aedc91aab307c8fb7ad822c3e16a6dd73}{params}}.account\_name.to\_uint64\_t()\ ));}
+\DoxyCodeLine{02561\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\ it\ !=\ idx.end()\ )\ \{}
 \DoxyCodeLine{02562\ \ \ \ \ \ \ \ \ \ \ \ \ vector<char>\ data;}
 \DoxyCodeLine{02563\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1chain__apis_1_1read__only_a0dcb14319331c9229b8652e5cc85c60a}{copy\_inline\_row}}(*it,\ data);}
 \DoxyCodeLine{02564\ \ \ \ \ \ \ \ \ \ \ \ \ result.refund\_request\ =\ abis.binary\_to\_variant(\ \textcolor{stringliteral}{"{}refund\_request"{}},\ data,\ \mbox{\hyperlink{structsysio_1_1chain_1_1abi__serializer_a2dc34bf706557f0c83d61b3791299c98}{abi\_serializer::create\_yield\_function}}(\ abi\_serializer\_max\_time\ ),\ shorten\_abi\_errors\ );}
@@ -556,9 +560,9 @@ Definition at line \mbox{\hyperlink{chain__plugin_8cpp_source_l02429}{2429}} of 
 \DoxyCodeLine{02567\ }
 \DoxyCodeLine{02568\ \ \ \ \ \ \ t\_id\ =\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a107648633008a7f2d872b4b3d98c2f96}{d}}.find<chain::table\_id\_object,\ chain::by\_code\_scope\_table>(boost::make\_tuple(\ config::system\_account\_name,\ config::system\_account\_name,\ \textcolor{stringliteral}{"{}voters"{}}\_n\ ));}
 \DoxyCodeLine{02569\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (t\_id\ !=\ \textcolor{keyword}{nullptr})\ \{}
-\DoxyCodeLine{02570\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\ \&\mbox{\hyperlink{namespacehost__functions__tests__1_a8496a24b5236a2dc07bb4f2930d88342}{idx}}\ =\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a107648633008a7f2d872b4b3d98c2f96}{d}}.get\_index<\mbox{\hyperlink{namespacesysio_1_1chain_aac1a2c1330fcb6c8002d59d4d1de5858}{key\_value\_index}},\ by\_scope\_primary>();}
-\DoxyCodeLine{02571\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ it\ =\ \mbox{\hyperlink{namespacehost__functions__tests__1_a8496a24b5236a2dc07bb4f2930d88342}{idx}}.find(boost::make\_tuple(\ t\_id-\/>id,\ \mbox{\hyperlink{test__account__query__db_8cpp_aedc91aab307c8fb7ad822c3e16a6dd73}{params}}.account\_name.to\_uint64\_t()\ ));}
-\DoxyCodeLine{02572\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\ it\ !=\ \mbox{\hyperlink{namespacehost__functions__tests__1_a8496a24b5236a2dc07bb4f2930d88342}{idx}}.end()\ )\ \{}
+\DoxyCodeLine{02570\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\ \&idx\ =\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a107648633008a7f2d872b4b3d98c2f96}{d}}.get\_index<\mbox{\hyperlink{namespacesysio_1_1chain_aac1a2c1330fcb6c8002d59d4d1de5858}{key\_value\_index}},\ by\_scope\_primary>();}
+\DoxyCodeLine{02571\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ it\ =\ idx.find(boost::make\_tuple(\ t\_id-\/>id,\ \mbox{\hyperlink{test__account__query__db_8cpp_aedc91aab307c8fb7ad822c3e16a6dd73}{params}}.account\_name.to\_uint64\_t()\ ));}
+\DoxyCodeLine{02572\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\ it\ !=\ idx.end()\ )\ \{}
 \DoxyCodeLine{02573\ \ \ \ \ \ \ \ \ \ \ \ \ vector<char>\ data;}
 \DoxyCodeLine{02574\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1chain__apis_1_1read__only_a0dcb14319331c9229b8652e5cc85c60a}{copy\_inline\_row}}(*it,\ data);}
 \DoxyCodeLine{02575\ \ \ \ \ \ \ \ \ \ \ \ \ result.voter\_info\ =\ abis.binary\_to\_variant(\ \textcolor{stringliteral}{"{}voter\_info"{}},\ data,\ \mbox{\hyperlink{structsysio_1_1chain_1_1abi__serializer_a2dc34bf706557f0c83d61b3791299c98}{abi\_serializer::create\_yield\_function}}(\ abi\_serializer\_max\_time\ ),\ shorten\_abi\_errors\ );}
@@ -567,9 +571,9 @@ Definition at line \mbox{\hyperlink{chain__plugin_8cpp_source_l02429}{2429}} of 
 \DoxyCodeLine{02578\ }
 \DoxyCodeLine{02579\ \ \ \ \ \ \ t\_id\ =\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a107648633008a7f2d872b4b3d98c2f96}{d}}.find<chain::table\_id\_object,\ chain::by\_code\_scope\_table>(boost::make\_tuple(\ config::system\_account\_name,\ config::system\_account\_name,\ \textcolor{stringliteral}{"{}rexbal"{}}\_n\ ));}
 \DoxyCodeLine{02580\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (t\_id\ !=\ \textcolor{keyword}{nullptr})\ \{}
-\DoxyCodeLine{02581\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\ \&\mbox{\hyperlink{namespacehost__functions__tests__1_a8496a24b5236a2dc07bb4f2930d88342}{idx}}\ =\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a107648633008a7f2d872b4b3d98c2f96}{d}}.get\_index<\mbox{\hyperlink{namespacesysio_1_1chain_aac1a2c1330fcb6c8002d59d4d1de5858}{key\_value\_index}},\ by\_scope\_primary>();}
-\DoxyCodeLine{02582\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ it\ =\ \mbox{\hyperlink{namespacehost__functions__tests__1_a8496a24b5236a2dc07bb4f2930d88342}{idx}}.find(boost::make\_tuple(\ t\_id-\/>id,\ \mbox{\hyperlink{test__account__query__db_8cpp_aedc91aab307c8fb7ad822c3e16a6dd73}{params}}.account\_name.to\_uint64\_t()\ ));}
-\DoxyCodeLine{02583\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ it\ !=\ \mbox{\hyperlink{namespacehost__functions__tests__1_a8496a24b5236a2dc07bb4f2930d88342}{idx}}.end()\ )\ \{}
+\DoxyCodeLine{02581\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\ \&idx\ =\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a107648633008a7f2d872b4b3d98c2f96}{d}}.get\_index<\mbox{\hyperlink{namespacesysio_1_1chain_aac1a2c1330fcb6c8002d59d4d1de5858}{key\_value\_index}},\ by\_scope\_primary>();}
+\DoxyCodeLine{02582\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ it\ =\ idx.find(boost::make\_tuple(\ t\_id-\/>id,\ \mbox{\hyperlink{test__account__query__db_8cpp_aedc91aab307c8fb7ad822c3e16a6dd73}{params}}.account\_name.to\_uint64\_t()\ ));}
+\DoxyCodeLine{02583\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ it\ !=\ idx.end()\ )\ \{}
 \DoxyCodeLine{02584\ \ \ \ \ \ \ \ \ \ \ \ \ vector<char>\ data;}
 \DoxyCodeLine{02585\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1chain__apis_1_1read__only_a0dcb14319331c9229b8652e5cc85c60a}{copy\_inline\_row}}(*it,\ data);}
 \DoxyCodeLine{02586\ \ \ \ \ \ \ \ \ \ \ \ \ result.rex\_info\ =\ abis.binary\_to\_variant(\ \textcolor{stringliteral}{"{}rex\_balance"{}},\ data,\ \mbox{\hyperlink{structsysio_1_1chain_1_1abi__serializer_a2dc34bf706557f0c83d61b3791299c98}{abi\_serializer::create\_yield\_function}}(\ abi\_serializer\_max\_time\ ),\ shorten\_abi\_errors\ );}
@@ -580,7 +584,8 @@ Definition at line \mbox{\hyperlink{chain__plugin_8cpp_source_l02429}{2429}} of 
 \DoxyCodeLine{02591\ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -673,7 +678,8 @@ Definition at line \mbox{\hyperlink{chain__plugin_8cpp_source_l01472}{1472}} of 
 \DoxyCodeLine{01537\ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -729,7 +735,8 @@ Definition at line \mbox{\hyperlink{chain__plugin_8cpp_source_l02041}{2041}} of 
 \DoxyCodeLine{02075\ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -772,7 +779,8 @@ Definition at line \mbox{\hyperlink{chain__plugin_8cpp_source_l02106}{2106}} of 
 \DoxyCodeLine{02127\ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -821,7 +829,8 @@ Definition at line \mbox{\hyperlink{chain__plugin_8cpp_source_l02077}{2077}} of 
 \DoxyCodeLine{02104\ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -864,7 +873,8 @@ Definition at line \mbox{\hyperlink{chain__plugin_8cpp_source_l02362}{2362}} of 
 \DoxyCodeLine{02383\ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -935,7 +945,8 @@ Definition at line \mbox{\hyperlink{chain__plugin_8cpp_source_l01797}{1797}} of 
 \DoxyCodeLine{01821\ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -980,7 +991,8 @@ Definition at line \mbox{\hyperlink{chain__plugin_8cpp_source_l01823}{1823}} of 
 \DoxyCodeLine{01846\ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -1029,7 +1041,8 @@ Definition at line \mbox{\hyperlink{chain__plugin_8cpp_source_l01416}{1416}} of 
 \DoxyCodeLine{01443\ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -1060,7 +1073,8 @@ Definition at line \mbox{\hyperlink{chain__plugin_8cpp_source_l01937}{1937}} of 
 \DoxyCodeLine{01946\ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -1153,7 +1167,8 @@ Definition at line \mbox{\hyperlink{chain__plugin_8cpp_source_l01864}{1864}} of 
 \DoxyCodeLine{01935\ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -1189,7 +1204,8 @@ Definition at line \mbox{\hyperlink{chain__plugin_8cpp_source_l02413}{2413}} of 
 \DoxyCodeLine{02427\ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -1316,7 +1332,8 @@ Definition at line \mbox{\hyperlink{chain__plugin_8cpp_source_l01969}{1969}} of 
 \DoxyCodeLine{02039\ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -1339,7 +1356,7 @@ Definition at line \mbox{\hyperlink{chain__plugin_8cpp_source_l01749}{1749}} of 
 \DoxyCodeLine{01750\ \ \ \ read\_only::get\_table\_by\_scope\_result\ result;}
 \DoxyCodeLine{01751\ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a107648633008a7f2d872b4b3d98c2f96}{d}}\ =\ db.\mbox{\hyperlink{classsysio_1_1chain_1_1controller_a0c79d00dae8c0d90efc18f4d091b2391}{db}}();}
 \DoxyCodeLine{01752\ }
-\DoxyCodeLine{01753\ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ \mbox{\hyperlink{namespacehost__functions__tests__1_a8496a24b5236a2dc07bb4f2930d88342}{idx}}\ =\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a107648633008a7f2d872b4b3d98c2f96}{d}}.get\_index<\mbox{\hyperlink{namespacesysio_1_1chain_aacd8d660fd83146e0a5d6a9cb7b19a29}{chain::table\_id\_multi\_index}},\ chain::by\_code\_scope\_table>();}
+\DoxyCodeLine{01753\ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ idx\ =\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a107648633008a7f2d872b4b3d98c2f96}{d}}.get\_index<\mbox{\hyperlink{namespacesysio_1_1chain_aacd8d660fd83146e0a5d6a9cb7b19a29}{chain::table\_id\_multi\_index}},\ chain::by\_code\_scope\_table>();}
 \DoxyCodeLine{01754\ \ \ \ \textcolor{keyword}{auto}\ lower\_bound\_lookup\_tuple\ =\ std::make\_tuple(\ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}.code,\ \mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}(std::numeric\_limits<uint64\_t>::lowest()),\ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}.table\ );}
 \DoxyCodeLine{01755\ \ \ \ \textcolor{keyword}{auto}\ upper\_bound\_lookup\_tuple\ =\ std::make\_tuple(\ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}.code,\ \mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}(std::numeric\_limits<uint64\_t>::max()),}
 \DoxyCodeLine{01756\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (\mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}.table.empty()\ ?\ \mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}(std::numeric\_limits<uint64\_t>::max())\ :\ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}.table)\ );}
@@ -1372,8 +1389,8 @@ Definition at line \mbox{\hyperlink{chain__plugin_8cpp_source_l01749}{1749}} of 
 \DoxyCodeLine{01783\ \ \ \ \ \ \ \}}
 \DoxyCodeLine{01784\ \ \ \ \};}
 \DoxyCodeLine{01785\ }
-\DoxyCodeLine{01786\ \ \ \ \textcolor{keyword}{auto}\ lower\ =\ \mbox{\hyperlink{namespacehost__functions__tests__1_a8496a24b5236a2dc07bb4f2930d88342}{idx}}.lower\_bound(\ lower\_bound\_lookup\_tuple\ );}
-\DoxyCodeLine{01787\ \ \ \ \textcolor{keyword}{auto}\ upper\ =\ \mbox{\hyperlink{namespacehost__functions__tests__1_a8496a24b5236a2dc07bb4f2930d88342}{idx}}.upper\_bound(\ upper\_bound\_lookup\_tuple\ );}
+\DoxyCodeLine{01786\ \ \ \ \textcolor{keyword}{auto}\ lower\ =\ idx.lower\_bound(\ lower\_bound\_lookup\_tuple\ );}
+\DoxyCodeLine{01787\ \ \ \ \textcolor{keyword}{auto}\ upper\ =\ idx.upper\_bound(\ upper\_bound\_lookup\_tuple\ );}
 \DoxyCodeLine{01788\ \ \ \ \textcolor{keywordflow}{if}(\ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}.reverse\ \&\&\ *\mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}.reverse\ )\ \{}
 \DoxyCodeLine{01789\ \ \ \ \ \ \ walk\_table\_range(\ boost::make\_reverse\_iterator(upper),\ boost::make\_reverse\_iterator(lower)\ );}
 \DoxyCodeLine{01790\ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
@@ -1384,7 +1401,8 @@ Definition at line \mbox{\hyperlink{chain__plugin_8cpp_source_l01749}{1749}} of 
 \DoxyCodeLine{01795\ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -1449,14 +1467,16 @@ Definition at line \mbox{\hyperlink{chain__plugin_8cpp_source_l01539}{1539}} of 
 \DoxyCodeLine{01582\ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
 \includegraphics[width=290pt]{classsysio_1_1chain__apis_1_1read__only_afeb449a0b86410f3e2e4d18ccfc7f463_cgraph}
 \end{center}
 \end{figure}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -1491,12 +1511,12 @@ Definition at line \mbox{\hyperlink{chain__plugin_8cpp_source_l01682}{1682}} of 
 \DoxyCodeLine{01695\ }
 \DoxyCodeLine{01696\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}.key\_type\ ==\ \mbox{\hyperlink{namespacesysio_1_1chain__apis_a76dbd5fabc41f219dd5d05678c75ac6a}{chain\_apis::i64}}\ ||\ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}.key\_type\ ==\ \textcolor{stringliteral}{"{}name"{}})\ \{}
 \DoxyCodeLine{01697\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classsysio_1_1chain__apis_1_1read__only_a12edb6f951732f73cb6b2b1c549a442d}{get\_table\_rows\_by\_seckey<index64\_index,\ uint64\_t>}}(\mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}},\ abi,\ [](\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ v)-\/>\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ \{}
-\DoxyCodeLine{01698\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}};}
+\DoxyCodeLine{01698\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ v;}
 \DoxyCodeLine{01699\ \ \ \ \ \ \ \ \ \ \});}
 \DoxyCodeLine{01700\ \ \ \ \ \ \ \}}
 \DoxyCodeLine{01701\ \ \ \ \ \ \ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}.key\_type\ ==\ \mbox{\hyperlink{namespacesysio_1_1chain__apis_aae3060a772fefcb696b08e348643d70e}{chain\_apis::i128}})\ \{}
 \DoxyCodeLine{01702\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classsysio_1_1chain__apis_1_1read__only_a12edb6f951732f73cb6b2b1c549a442d}{get\_table\_rows\_by\_seckey<index128\_index,\ uint128\_t>}}(\mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}},\ abi,\ [](\mbox{\hyperlink{namespacesysio_1_1chain_1_1config_a376f631fcb770bd4b2e8349a33e52f8a}{uint128\_t}}\ v)-\/>\mbox{\hyperlink{namespacesysio_1_1chain_1_1config_a376f631fcb770bd4b2e8349a33e52f8a}{uint128\_t}}\ \{}
-\DoxyCodeLine{01703\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}};}
+\DoxyCodeLine{01703\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ v;}
 \DoxyCodeLine{01704\ \ \ \ \ \ \ \ \ \ \});}
 \DoxyCodeLine{01705\ \ \ \ \ \ \ \}}
 \DoxyCodeLine{01706\ \ \ \ \ \ \ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}.key\_type\ ==\ \mbox{\hyperlink{namespacesysio_1_1chain__apis_a14def9e0f14e5d29b1f88384b1dd4815}{chain\_apis::i256}})\ \{}
@@ -1543,7 +1563,8 @@ Definition at line \mbox{\hyperlink{chain__plugin_8cpp_source_l01682}{1682}} of 
 \DoxyCodeLine{01747\ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -1654,7 +1675,8 @@ Definition at line \mbox{\hyperlink{chain__plugin_8hpp_source_l00480}{480}} of f
 \DoxyCodeLine{00568\ \ \ \ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -1684,7 +1706,7 @@ Definition at line \mbox{\hyperlink{chain__plugin_8hpp_source_l00571}{571}} of f
 \DoxyCodeLine{00578\ \ \ \ \ \ \ abis.set\_abi(abi,\ \mbox{\hyperlink{structsysio_1_1chain_1_1abi__serializer_a2dc34bf706557f0c83d61b3791299c98}{abi\_serializer::create\_yield\_function}}(\ abi\_serializer\_max\_time\ ));}
 \DoxyCodeLine{00579\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}*\ t\_id\ =\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a107648633008a7f2d872b4b3d98c2f96}{d}}.find<chain::table\_id\_object,\ chain::by\_code\_scope\_table>(boost::make\_tuple(\mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}.code,\ \mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}(scope),\ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}.table));}
 \DoxyCodeLine{00580\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ t\_id\ !=\ \textcolor{keyword}{nullptr}\ )\ \{}
-\DoxyCodeLine{00581\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ \mbox{\hyperlink{namespacehost__functions__tests__1_a8496a24b5236a2dc07bb4f2930d88342}{idx}}\ =\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a107648633008a7f2d872b4b3d98c2f96}{d}}.get\_index<IndexType,\ chain::by\_scope\_primary>();}
+\DoxyCodeLine{00581\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ idx\ =\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a107648633008a7f2d872b4b3d98c2f96}{d}}.get\_index<IndexType,\ chain::by\_scope\_primary>();}
 \DoxyCodeLine{00582\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ lower\_bound\_lookup\_tuple\ =\ std::make\_tuple(\ t\_id-\/>id,\ std::numeric\_limits<uint64\_t>::lowest()\ );}
 \DoxyCodeLine{00583\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ upper\_bound\_lookup\_tuple\ =\ std::make\_tuple(\ t\_id-\/>id,\ std::numeric\_limits<uint64\_t>::max()\ );}
 \DoxyCodeLine{00584\ }
@@ -1737,8 +1759,8 @@ Definition at line \mbox{\hyperlink{chain__plugin_8hpp_source_l00571}{571}} of f
 \DoxyCodeLine{00631\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
 \DoxyCodeLine{00632\ \ \ \ \ \ \ \ \ \ \};}
 \DoxyCodeLine{00633\ }
-\DoxyCodeLine{00634\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ lower\ =\ \mbox{\hyperlink{namespacehost__functions__tests__1_a8496a24b5236a2dc07bb4f2930d88342}{idx}}.lower\_bound(\ lower\_bound\_lookup\_tuple\ );}
-\DoxyCodeLine{00635\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ upper\ =\ \mbox{\hyperlink{namespacehost__functions__tests__1_a8496a24b5236a2dc07bb4f2930d88342}{idx}}.upper\_bound(\ upper\_bound\_lookup\_tuple\ );}
+\DoxyCodeLine{00634\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ lower\ =\ idx.lower\_bound(\ lower\_bound\_lookup\_tuple\ );}
+\DoxyCodeLine{00635\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ upper\ =\ idx.upper\_bound(\ upper\_bound\_lookup\_tuple\ );}
 \DoxyCodeLine{00636\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}.reverse\ \&\&\ *\mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}.reverse\ )\ \{}
 \DoxyCodeLine{00637\ \ \ \ \ \ \ \ \ \ \ \ \ walk\_table\_row\_range(\ boost::make\_reverse\_iterator(upper),\ boost::make\_reverse\_iterator(lower)\ );}
 \DoxyCodeLine{00638\ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
@@ -1749,7 +1771,8 @@ Definition at line \mbox{\hyperlink{chain__plugin_8hpp_source_l00571}{571}} of f
 \DoxyCodeLine{00643\ \ \ \ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -1848,10 +1871,10 @@ Definition at line \mbox{\hyperlink{chain__plugin_8hpp_source_l00459}{459}} of f
 \DoxyCodeLine{00461\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a107648633008a7f2d872b4b3d98c2f96}{d}}\ =\ db.\mbox{\hyperlink{classsysio_1_1chain_1_1controller_a0c79d00dae8c0d90efc18f4d091b2391}{db}}();}
 \DoxyCodeLine{00462\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}*\ t\_id\ =\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a107648633008a7f2d872b4b3d98c2f96}{d}}.find<chain::table\_id\_object,\ chain::by\_code\_scope\_table>(boost::make\_tuple(code,\ scope,\ table));}
 \DoxyCodeLine{00463\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (t\_id\ !=\ \textcolor{keyword}{nullptr})\ \{}
-\DoxyCodeLine{00464\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\ \&\mbox{\hyperlink{namespacehost__functions__tests__1_a8496a24b5236a2dc07bb4f2930d88342}{idx}}\ =\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a107648633008a7f2d872b4b3d98c2f96}{d}}.get\_index<\mbox{\hyperlink{namespacesysio_1_1chain_aac1a2c1330fcb6c8002d59d4d1de5858}{chain::key\_value\_index}},\ chain::by\_scope\_primary>();}
+\DoxyCodeLine{00464\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\ \&idx\ =\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a107648633008a7f2d872b4b3d98c2f96}{d}}.get\_index<\mbox{\hyperlink{namespacesysio_1_1chain_aac1a2c1330fcb6c8002d59d4d1de5858}{chain::key\_value\_index}},\ chain::by\_scope\_primary>();}
 \DoxyCodeLine{00465\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{decltype}(t\_id-\/>id)\ next\_tid(t\_id-\/>id.\_id\ +\ 1);}
-\DoxyCodeLine{00466\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ lower\ =\ \mbox{\hyperlink{namespacehost__functions__tests__1_a8496a24b5236a2dc07bb4f2930d88342}{idx}}.lower\_bound(boost::make\_tuple(t\_id-\/>id));}
-\DoxyCodeLine{00467\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ upper\ =\ \mbox{\hyperlink{namespacehost__functions__tests__1_a8496a24b5236a2dc07bb4f2930d88342}{idx}}.lower\_bound(boost::make\_tuple(next\_tid));}
+\DoxyCodeLine{00466\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ lower\ =\ idx.lower\_bound(boost::make\_tuple(t\_id-\/>id));}
+\DoxyCodeLine{00467\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ upper\ =\ idx.lower\_bound(boost::make\_tuple(next\_tid));}
 \DoxyCodeLine{00468\ }
 \DoxyCodeLine{00469\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keyword}{auto}\ itr\ =\ lower;\ itr\ !=\ upper;\ ++itr)\ \{}
 \DoxyCodeLine{00470\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!\mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}}(*itr))\ \{}
@@ -1862,14 +1885,16 @@ Definition at line \mbox{\hyperlink{chain__plugin_8hpp_source_l00459}{459}} of f
 \DoxyCodeLine{00475\ \ \ \ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
 \includegraphics[width=350pt]{classsysio_1_1chain__apis_1_1read__only_a05fc54d19d5cc028478d766ca45cbe5c_cgraph}
 \end{center}
 \end{figure}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode

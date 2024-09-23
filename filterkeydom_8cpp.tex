@@ -6,7 +6,8 @@
 {\ttfamily \#include "{}rapidjson/filewritestream.\+h"{}}\newline
 {\ttfamily \#include "{}rapidjson/error/en.\+h"{}}\newline
 {\ttfamily \#include $<$stack$>$}\newline
-Include dependency graph for filterkeydom.\+cpp\+:\nopagebreak
+Include dependency graph for filterkeydom.\+cpp\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -65,7 +66,7 @@ Definition at line \mbox{\hyperlink{filterkeydom_8cpp_source_l00140}{140}} of fi
 \DoxyCodeLine{00162\ \ \ \ \ \textcolor{comment}{//\ Prepare\ JSON\ writer\ and\ output\ stream.}}
 \DoxyCodeLine{00163\ \ \ \ \ \textcolor{keywordtype}{char}\ writeBuffer[65536];}
 \DoxyCodeLine{00164\ \ \ \ \ \mbox{\hyperlink{class_file_write_stream}{FileWriteStream}}\ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}(stdout,\ writeBuffer,\ \textcolor{keyword}{sizeof}(writeBuffer));}
-\DoxyCodeLine{00165\ \ \ \ \ \mbox{\hyperlink{class_writer}{Writer<FileWriteStream>}}\ writer(os);}
+\DoxyCodeLine{00165\ \ \ \ \ \mbox{\hyperlink{class_writer}{Writer<FileWriteStream>}}\ writer(\mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}});}
 \DoxyCodeLine{00166\ }
 \DoxyCodeLine{00167\ \ \ \ \ \textcolor{comment}{//\ Write\ the\ document\ to\ standard\ output}}
 \DoxyCodeLine{00168\ \ \ \ \ document.Accept(writer);}
@@ -73,7 +74,8 @@ Definition at line \mbox{\hyperlink{filterkeydom_8cpp_source_l00140}{140}} of fi
 \DoxyCodeLine{00170\ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode

@@ -1,6 +1,10 @@
 <map id="fc::from_variant" name="fc::from_variant">
-<area shape="rect" id="Node000001" title=" " alt="" coords="5,29,118,55"/>
-<area shape="rect" id="Node000002" href="$namespacefc.html#accef08adf4ee05c36ccc550d8101b08f" title=" " alt="" coords="166,29,278,55"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="118,40,150,40,150,45,118,45"/>
-<area shape="poly" id="edge2_Node000002_Node000002" title=" " alt="" coords="194,30,189,21,192,11,204,5,222,3,241,5,252,12,249,16,240,10,222,8,205,10,196,15,195,20,199,28"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,55,118,80"/>
+<area shape="rect" id="Node000002" href="$namespacefc.html#accef08adf4ee05c36ccc550d8101b08f" title=" " alt="" coords="182,29,294,55"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="118,57,166,50,166,55,119,62"/>
+<area shape="rect" id="Node000003" href="$classfc_1_1variant.html#a2ca9f4d2feb8c9743da4128b18bfa886" title=" " alt="" coords="166,79,310,104"/>
+<area shape="poly" id="edge3_Node000001_Node000003" title=" " alt="" coords="119,73,150,77,150,82,118,78"/>
+<area shape="poly" id="edge2_Node000002_Node000002" title=" " alt="" coords="208,30,202,21,206,11,218,5,238,3,259,5,270,12,268,16,258,10,238,8,219,10,210,15,208,20,212,28"/>
+<area shape="rect" id="Node000004" href="$classfc_1_1variant.html#afaae1df286ff97c83301eda21dbd51ea" title=" " alt="" coords="358,79,495,104"/>
+<area shape="poly" id="edge4_Node000003_Node000004" title=" " alt="" coords="311,89,342,89,342,94,311,94"/>
 </map>

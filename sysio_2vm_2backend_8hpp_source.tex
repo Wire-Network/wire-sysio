@@ -33,7 +33,7 @@
 \DoxyCodeLine{\Hypertarget{sysio_2vm_2backend_8hpp_source_l00029}00029\ \ \ \ \ \ \ \textcolor{keyword}{template}<\textcolor{keyword}{typename}\ Host>}
 \DoxyCodeLine{\Hypertarget{sysio_2vm_2backend_8hpp_source_l00030}00030\ \ \ \ \ \ \ \textcolor{keyword}{using\ }\mbox{\hyperlink{structcontext}{context}}\ =\ jit\_execution\_context<Host>;}
 \DoxyCodeLine{\Hypertarget{sysio_2vm_2backend_8hpp_source_l00031}00031\ \ \ \ \ \ \ \textcolor{keyword}{template}<\textcolor{keyword}{typename}\ Host,\ \textcolor{keyword}{typename}\ Options,\ \textcolor{keyword}{typename}\ DebugInfo>}
-\DoxyCodeLine{\Hypertarget{sysio_2vm_2backend_8hpp_source_l00032}00032\ \ \ \ \ \ \ \textcolor{keyword}{using\ }\mbox{\hyperlink{namespaceupload_af9e508d19dc2dd9cdb7c642dde0bdd21}{parser}}\ =\ binary\_parser<machine\_code\_writer<jit\_execution\_context<Host>>,\ Options,\ DebugInfo>;}
+\DoxyCodeLine{\Hypertarget{sysio_2vm_2backend_8hpp_source_l00032}00032\ \ \ \ \ \ \ \textcolor{keyword}{using\ }parser\ =\ binary\_parser<machine\_code\_writer<jit\_execution\_context<Host>>,\ Options,\ DebugInfo>;}
 \DoxyCodeLine{\Hypertarget{sysio_2vm_2backend_8hpp_source_l00033}00033\ \ \ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{constexpr}\ \textcolor{keywordtype}{bool}\ is\_jit\ =\ \textcolor{keyword}{true};}
 \DoxyCodeLine{\Hypertarget{sysio_2vm_2backend_8hpp_source_l00034}00034\ \ \ \ \};}
 \DoxyCodeLine{\Hypertarget{sysio_2vm_2backend_8hpp_source_l00035}00035\ }
@@ -41,7 +41,7 @@
 \DoxyCodeLine{\Hypertarget{sysio_2vm_2backend_8hpp_source_l00037}00037\ \ \ \ \ \ \ \textcolor{keyword}{template}<\textcolor{keyword}{typename}\ Host>}
 \DoxyCodeLine{\Hypertarget{sysio_2vm_2backend_8hpp_source_l00038}00038\ \ \ \ \ \ \ \textcolor{keyword}{using\ }\mbox{\hyperlink{structcontext}{context}}\ =\ jit\_execution\_context<Host,\ true>;}
 \DoxyCodeLine{\Hypertarget{sysio_2vm_2backend_8hpp_source_l00039}00039\ \ \ \ \ \ \ \textcolor{keyword}{template}<\textcolor{keyword}{typename}\ Host,\ \textcolor{keyword}{typename}\ Options,\ \textcolor{keyword}{typename}\ DebugInfo>}
-\DoxyCodeLine{\Hypertarget{sysio_2vm_2backend_8hpp_source_l00040}00040\ \ \ \ \ \ \ \textcolor{keyword}{using\ }\mbox{\hyperlink{namespaceupload_af9e508d19dc2dd9cdb7c642dde0bdd21}{parser}}\ =\ binary\_parser<machine\_code\_writer<context<Host>>,\ Options,\ DebugInfo>;}
+\DoxyCodeLine{\Hypertarget{sysio_2vm_2backend_8hpp_source_l00040}00040\ \ \ \ \ \ \ \textcolor{keyword}{using\ }parser\ =\ binary\_parser<machine\_code\_writer<context<Host>>,\ Options,\ DebugInfo>;}
 \DoxyCodeLine{\Hypertarget{sysio_2vm_2backend_8hpp_source_l00041}00041\ \ \ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{constexpr}\ \textcolor{keywordtype}{bool}\ is\_jit\ =\ \textcolor{keyword}{true};}
 \DoxyCodeLine{\Hypertarget{sysio_2vm_2backend_8hpp_source_l00042}00042\ \ \ \ \};}
 \DoxyCodeLine{\Hypertarget{sysio_2vm_2backend_8hpp_source_l00043}00043\ \textcolor{preprocessor}{\#endif}}

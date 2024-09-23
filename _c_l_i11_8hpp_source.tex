@@ -3913,7 +3913,7 @@
 \DoxyCodeLine{\Hypertarget{_c_l_i11_8hpp_source_l04524}04524\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ err\_msg;}
 \DoxyCodeLine{\Hypertarget{_c_l_i11_8hpp_source_l04525}04525\ \ \ \ \ \ \ \ \ \}}
 \DoxyCodeLine{\Hypertarget{_c_l_i11_8hpp_source_l04526}04526\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}(\textcolor{keyword}{const}\ \textcolor{keyword}{auto}\ \&vali\ :\ \mbox{\hyperlink{class_c_l_i_1_1_option_ad406b8299fb243f0caa52a35863c82b7}{validators\_}})\ \{}
-\DoxyCodeLine{\Hypertarget{_c_l_i11_8hpp_source_l04527}04527\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}\ =\ vali.get\_application\_index();}
+\DoxyCodeLine{\Hypertarget{_c_l_i11_8hpp_source_l04527}04527\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ v\ =\ vali.get\_application\_index();}
 \DoxyCodeLine{\Hypertarget{_c_l_i11_8hpp_source_l04528}04528\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(v\ ==\ -\/1\ ||\ v\ ==\ index)\ \{}
 \DoxyCodeLine{\Hypertarget{_c_l_i11_8hpp_source_l04529}04529\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{try}\ \{}
 \DoxyCodeLine{\Hypertarget{_c_l_i11_8hpp_source_l04530}04530\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ err\_msg\ =\ vali(result);}
@@ -5227,7 +5227,7 @@
 \DoxyCodeLine{\Hypertarget{_c_l_i11_8hpp_source_l06096}06096\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ std::end(options));}
 \DoxyCodeLine{\Hypertarget{_c_l_i11_8hpp_source_l06097}06097\ \ \ \ \ \ \ \ \ \}}
 \DoxyCodeLine{\Hypertarget{_c_l_i11_8hpp_source_l06098}06098\ }
-\DoxyCodeLine{\Hypertarget{_c_l_i11_8hpp_source_l06099}06099\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespacebenchmark_compile_acf738bbf3b8391aa78929ceeceb8a03b}{options}};}
+\DoxyCodeLine{\Hypertarget{_c_l_i11_8hpp_source_l06099}06099\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ options;}
 \DoxyCodeLine{\Hypertarget{_c_l_i11_8hpp_source_l06100}06100\ \ \ \ \ \}}
 \DoxyCodeLine{\Hypertarget{_c_l_i11_8hpp_source_l06101}06101\ }
 \DoxyCodeLine{\Hypertarget{_c_l_i11_8hpp_source_l06103}\mbox{\hyperlink{class_c_l_i_1_1_app_aef371986f217c7082123a36fac202448}{06103}}\ \ \ \ \ std::vector<Option\ *>\ \mbox{\hyperlink{class_c_l_i_1_1_app_aef371986f217c7082123a36fac202448}{get\_options}}(\textcolor{keyword}{const}\ std::function<\textcolor{keywordtype}{bool}(\mbox{\hyperlink{class_c_l_i_1_1_option}{Option}}\ *)>\ filter\ =\ \{\})\ \{}
@@ -5242,7 +5242,7 @@
 \DoxyCodeLine{\Hypertarget{_c_l_i11_8hpp_source_l06112}06112\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ std::end(options));}
 \DoxyCodeLine{\Hypertarget{_c_l_i11_8hpp_source_l06113}06113\ \ \ \ \ \ \ \ \ \}}
 \DoxyCodeLine{\Hypertarget{_c_l_i11_8hpp_source_l06114}06114\ }
-\DoxyCodeLine{\Hypertarget{_c_l_i11_8hpp_source_l06115}06115\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespacebenchmark_compile_acf738bbf3b8391aa78929ceeceb8a03b}{options}};}
+\DoxyCodeLine{\Hypertarget{_c_l_i11_8hpp_source_l06115}06115\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ options;}
 \DoxyCodeLine{\Hypertarget{_c_l_i11_8hpp_source_l06116}06116\ \ \ \ \ \}}
 \DoxyCodeLine{\Hypertarget{_c_l_i11_8hpp_source_l06117}06117\ }
 \DoxyCodeLine{\Hypertarget{_c_l_i11_8hpp_source_l06119}\mbox{\hyperlink{class_c_l_i_1_1_app_a5125f786c409fe0bbba684fe99f2c5fe}{06119}}\ \ \ \ \ \mbox{\hyperlink{class_c_l_i_1_1_option}{Option}}\ *\mbox{\hyperlink{class_c_l_i_1_1_app_a5125f786c409fe0bbba684fe99f2c5fe}{get\_option\_no\_throw}}(std::string\ option\_name)\ \textcolor{keyword}{noexcept}\ \{}
@@ -6739,23 +6739,23 @@
 \DoxyCodeLine{\Hypertarget{_c_l_i11_8hpp_source_l07732}07732\ \ \ \ \ \ \ \ \ \}}
 \DoxyCodeLine{\Hypertarget{_c_l_i11_8hpp_source_l07733}07733\ }
 \DoxyCodeLine{\Hypertarget{_c_l_i11_8hpp_source_l07734}07734\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(parents.size()\ >\ 1)\ \{}
-\DoxyCodeLine{\Hypertarget{_c_l_i11_8hpp_source_l07735}07735\ \ \ \ \ \ \ \ \ \ \ \ \ std::size\_t\ \mbox{\hyperlink{namespacecommon}{common}}\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{_c_l_i11_8hpp_source_l07735}07735\ \ \ \ \ \ \ \ \ \ \ \ \ std::size\_t\ common\ =\ 0;}
 \DoxyCodeLine{\Hypertarget{_c_l_i11_8hpp_source_l07736}07736\ \ \ \ \ \ \ \ \ \ \ \ \ std::size\_t\ mpair\ =\ (std::min)(output.back().parents.size(),\ parents.size()\ -\/\ 1);}
 \DoxyCodeLine{\Hypertarget{_c_l_i11_8hpp_source_l07737}07737\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}(std::size\_t\ ii\ =\ 0;\ ii\ <\ mpair;\ ++ii)\ \{}
 \DoxyCodeLine{\Hypertarget{_c_l_i11_8hpp_source_l07738}07738\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(output.back().parents[ii]\ !=\ parents[ii])\ \{}
 \DoxyCodeLine{\Hypertarget{_c_l_i11_8hpp_source_l07739}07739\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
 \DoxyCodeLine{\Hypertarget{_c_l_i11_8hpp_source_l07740}07740\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
-\DoxyCodeLine{\Hypertarget{_c_l_i11_8hpp_source_l07741}07741\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ++\mbox{\hyperlink{namespacecommon}{common}};}
+\DoxyCodeLine{\Hypertarget{_c_l_i11_8hpp_source_l07741}07741\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ++common;}
 \DoxyCodeLine{\Hypertarget{_c_l_i11_8hpp_source_l07742}07742\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
-\DoxyCodeLine{\Hypertarget{_c_l_i11_8hpp_source_l07743}07743\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\mbox{\hyperlink{namespacecommon}{common}}\ ==\ mpair)\ \{}
+\DoxyCodeLine{\Hypertarget{_c_l_i11_8hpp_source_l07743}07743\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(common\ ==\ mpair)\ \{}
 \DoxyCodeLine{\Hypertarget{_c_l_i11_8hpp_source_l07744}07744\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ output.pop\_back();}
 \DoxyCodeLine{\Hypertarget{_c_l_i11_8hpp_source_l07745}07745\ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
-\DoxyCodeLine{\Hypertarget{_c_l_i11_8hpp_source_l07746}07746\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{while}(output.back().parents.size()\ >\ \mbox{\hyperlink{namespacecommon}{common}}\ +\ 1)\ \{}
+\DoxyCodeLine{\Hypertarget{_c_l_i11_8hpp_source_l07746}07746\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{while}(output.back().parents.size()\ >\ common\ +\ 1)\ \{}
 \DoxyCodeLine{\Hypertarget{_c_l_i11_8hpp_source_l07747}07747\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ output.push\_back(output.back());}
 \DoxyCodeLine{\Hypertarget{_c_l_i11_8hpp_source_l07748}07748\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ output.back().parents.pop\_back();}
 \DoxyCodeLine{\Hypertarget{_c_l_i11_8hpp_source_l07749}07749\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
 \DoxyCodeLine{\Hypertarget{_c_l_i11_8hpp_source_l07750}07750\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
-\DoxyCodeLine{\Hypertarget{_c_l_i11_8hpp_source_l07751}07751\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}(std::size\_t\ ii\ =\ \mbox{\hyperlink{namespacecommon}{common}};\ ii\ <\ parents.size()\ -\/\ 1;\ ++ii)\ \{}
+\DoxyCodeLine{\Hypertarget{_c_l_i11_8hpp_source_l07751}07751\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}(std::size\_t\ ii\ =\ common;\ ii\ <\ parents.size()\ -\/\ 1;\ ++ii)\ \{}
 \DoxyCodeLine{\Hypertarget{_c_l_i11_8hpp_source_l07752}07752\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ output.emplace\_back();}
 \DoxyCodeLine{\Hypertarget{_c_l_i11_8hpp_source_l07753}07753\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ output.back().parents.assign(parents.begin(),\ parents.begin()\ +\ \textcolor{keyword}{static\_cast<}std::ptrdiff\_t\textcolor{keyword}{>}(ii)\ +\ 1);}
 \DoxyCodeLine{\Hypertarget{_c_l_i11_8hpp_source_l07754}07754\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ output.back().name\ =\ \textcolor{stringliteral}{"{}++"{}};}

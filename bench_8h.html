@@ -554,7 +554,7 @@ Here is the caller graph for this function:</div>
 <div class="line"><span class="lineno">   90</span>            setup(data);</div>
 <div class="line"><span class="lineno">   91</span>        }</div>
 <div class="line"><span class="lineno">   92</span>        begin = gettime_i64();</div>
-<div class="line"><span class="lineno">   93</span>        <a class="code hl_function" href="namespacebenchmark_compile.html#ad29a9c658be0bfc9585b6e6eedd783c4">benchmark</a>(data, iter);</div>
+<div class="line"><span class="lineno">   93</span>        benchmark(data, iter);</div>
 <div class="line"><span class="lineno">   94</span>        total = gettime_i64() - begin;</div>
 <div class="line"><span class="lineno">   95</span>        <span class="keywordflow">if</span> (teardown != NULL) {</div>
 <div class="line"><span class="lineno">   96</span>            teardown(data, iter);</div>
@@ -579,7 +579,6 @@ Here is the caller graph for this function:</div>
 <div class="ttc" id="abench_8h_html_a75b5cae79d48e5e21e3b9dee987531c3"><div class="ttname"><a href="#a75b5cae79d48e5e21e3b9dee987531c3">print_number</a></div><div class="ttdeci">void print_number(const int64_t x)</div><div class="ttdef"><b>Definition</b> <a href="bench_8h_source.html#l00025">bench.h:25</a></div></div>
 <div class="ttc" id="acatch__reporter__console_8cpp_html_a9b45b3e13bd9167aab02e17e08916231"><div class="ttname"><a href="catch__reporter__console_8cpp.html#a9b45b3e13bd9167aab02e17e08916231">name</a></div><div class="ttdeci">std::string name</div><div class="ttdef"><b>Definition</b> <a href="catch__reporter__console_8cpp_source.html#l00186">catch_reporter_console.cpp:186</a></div></div>
 <div class="ttc" id="agmock__stress__test_8cc_html_afd9db40e3361ae09188795e8cbe19752"><div class="ttname"><a href="gmock__stress__test_8cc.html#afd9db40e3361ae09188795e8cbe19752">count</a></div><div class="ttdeci">int * count</div><div class="ttdef"><b>Definition</b> <a href="gmock__stress__test_8cc_source.html#l00177">gmock_stress_test.cc:177</a></div></div>
-<div class="ttc" id="anamespacebenchmark_compile_html_ad29a9c658be0bfc9585b6e6eedd783c4"><div class="ttname"><a href="namespacebenchmark_compile.html#ad29a9c658be0bfc9585b6e6eedd783c4">benchmarkCompile.benchmark</a></div><div class="ttdeci">benchmark(func)</div><div class="ttdef"><b>Definition</b> <a href="benchmark_compile_8py_source.html#l00075">benchmarkCompile.py:75</a></div></div>
 <div class="ttc" id="anamespacefc_html_aa3ea11c18de71ec23b19c3cc571fb8ff"><div class="ttname"><a href="namespacefc.html#aa3ea11c18de71ec23b19c3cc571fb8ff">fc::min</a></div><div class="ttdeci">const T &amp; min(const T &amp;a, const T &amp;b)</div><div class="ttdef"><b>Definition</b> <a href="utility_8hpp_source.html#l00140">utility.hpp:140</a></div></div>
 <div class="ttc" id="astdint_8h_html_ad0d744f05898e32d01f73f8af3cd2071"><div class="ttname"><a href="stdint_8h.html#ad0d744f05898e32d01f73f8af3cd2071">INT64_MAX</a></div><div class="ttdeci">#define INT64_MAX</div><div class="ttdef"><b>Definition</b> <a href="stdint_8h_source.html#l00185">stdint.h:185</a></div></div>
 </div><!-- fragment --><div class="dynheader">

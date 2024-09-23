@@ -1,14 +1,16 @@
 \doxysection{plugins/wallet\+\_\+plugin/include/sysio/wallet\+\_\+plugin/macos\+\_\+user\+\_\+auth.h File Reference}
 \hypertarget{macos__user__auth_8h}{}\label{macos__user__auth_8h}\index{plugins/wallet\_plugin/include/sysio/wallet\_plugin/macos\_user\_auth.h@{plugins/wallet\_plugin/include/sysio/wallet\_plugin/macos\_user\_auth.h}}
 {\ttfamily \#include $<$Core\+Foundation/\+Core\+Foundation.\+h$>$}\newline
-Include dependency graph for macos\+\_\+user\+\_\+auth.\+h\+:\nopagebreak
+Include dependency graph for macos\+\_\+user\+\_\+auth.\+h\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
 \includegraphics[width=245pt]{macos__user__auth_8h__incl}
 \end{center}
 \end{figure}
-This graph shows which files directly or indirectly include this file\+:\nopagebreak
+This graph shows which files directly or indirectly include this file\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -29,24 +31,8 @@ void \mbox{\hyperlink{macos__user__auth_8h_af17e895352b722eb1a08dd36478bce9f}{ma
 {\footnotesize\ttfamily \label{macos__user__auth_8h_af17e895352b722eb1a08dd36478bce9f} 
 void macos\+\_\+user\+\_\+auth (\begin{DoxyParamCaption}\item[{void(\texorpdfstring{$\ast$}{*}}]{cb~}{)(int, void \texorpdfstring{$\ast$}{*}), }\item[{void \texorpdfstring{$\ast$}{*}}]{cb\+\_\+userdata}{, }\item[{CFString\+Ref}]{message}{}\end{DoxyParamCaption})}
 
-
-
-Definition at line \mbox{\hyperlink{macos__user__auth_8m_source_l00003}{3}} of file \mbox{\hyperlink{macos__user__auth_8m_source}{macos\+\_\+user\+\_\+auth.\+m}}.
-
-
-\begin{DoxyCode}{0}
-\DoxyCodeLine{00003\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
-\DoxyCodeLine{00004\ \ \ \ \textcolor{keyword}{static}\ LAContext*\ ctx;}
-\DoxyCodeLine{00005\ \ \ \ \textcolor{keywordflow}{if}(ctx)}
-\DoxyCodeLine{00006\ \ \ \ \ \ \ [ctx\ dealloc];}
-\DoxyCodeLine{00007\ \ \ \ ctx\ =\ [[LAContext\ alloc]\ \mbox{\hyperlink{lib_8h_a02fd73d861ef2e4aabb38c0c9ff82947}{init}}];}
-\DoxyCodeLine{00008\ \ \ \ [ctx\ evaluatePolicy:kLAPolicyDeviceOwnerAuthentication\ localizedReason:(NSString*)message\ reply:\string^(BOOL\ \mbox{\hyperlink{namespacesysio_1_1chain_1_1webassembly_a72ffd6653260a2dedcc4b55e39e10973a4e09c20e9a85794807a130e8283e8769}{success}},\ NSError*\ error)\ \{}
-\DoxyCodeLine{00009\ \ \ \ \ \ \ \ \ cb(success,\ cb\_userdata);}
-\DoxyCodeLine{00010\ \ \ \ \ \}];}
-\DoxyCodeLine{00011\ \}}
-
-\end{DoxyCode}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode

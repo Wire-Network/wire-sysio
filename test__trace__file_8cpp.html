@@ -383,30 +383,30 @@ Functions</h2></td></tr>
 <div class="line"><span class="lineno">  615</span> </div>
 <div class="line"><span class="lineno">  616</span>      <span class="comment">// verify it cleans up when there is just an index file, just a trace file, or when both are there</span></div>
 <div class="line"><span class="lineno">  617</span>      <span class="comment">// verify it cleans up all slices that need to be cleaned</span></div>
-<div class="line"><span class="lineno">  618</span>      std::set&lt;bfs::path&gt; <a class="code hl_variable" href="namespaceapprove.html#ac74141eb5bed2ad90470ab44a35d0a4f">files</a>;</div>
+<div class="line"><span class="lineno">  618</span>      std::set&lt;bfs::path&gt; files;</div>
 <div class="line"><span class="lineno">  619</span>      BOOST_REQUIRE(!sd.find_or_create_index_slice(0, open_state::read, file));</div>
-<div class="line"><span class="lineno">  620</span>      <a class="code hl_variable" href="namespaceapprove.html#ac74141eb5bed2ad90470ab44a35d0a4f">files</a>.insert(file.get_file_path().filename());</div>
+<div class="line"><span class="lineno">  620</span>      files.insert(file.get_file_path().filename());</div>
 <div class="line"><span class="lineno">  621</span>      <a class="code hl_function" href="#ac49ab2cf53f615a1a84cdef0579d6fb8">verify_directory_contents</a>(tempdir.<a class="code hl_function" href="classfc_1_1temp__file__base.html#a7ef88f2ed75bf87d276a80ce9283c55e">path</a>(), files);</div>
 <div class="line"><span class="lineno">  622</span>      BOOST_REQUIRE(!sd.find_or_create_trace_slice(0, open_state::read, file));</div>
-<div class="line"><span class="lineno">  623</span>      <a class="code hl_variable" href="namespaceapprove.html#ac74141eb5bed2ad90470ab44a35d0a4f">files</a>.insert(file.get_file_path().filename());</div>
+<div class="line"><span class="lineno">  623</span>      files.insert(file.get_file_path().filename());</div>
 <div class="line"><span class="lineno">  624</span>      BOOST_REQUIRE(!sd.find_or_create_index_slice(1, open_state::read, file));</div>
-<div class="line"><span class="lineno">  625</span>      <a class="code hl_variable" href="namespaceapprove.html#ac74141eb5bed2ad90470ab44a35d0a4f">files</a>.insert(file.get_file_path().filename());</div>
+<div class="line"><span class="lineno">  625</span>      files.insert(file.get_file_path().filename());</div>
 <div class="line"><span class="lineno">  626</span>      BOOST_REQUIRE(!sd.find_or_create_trace_slice(2, open_state::read, file));</div>
-<div class="line"><span class="lineno">  627</span>      <a class="code hl_variable" href="namespaceapprove.html#ac74141eb5bed2ad90470ab44a35d0a4f">files</a>.insert(file.get_file_path().filename());</div>
+<div class="line"><span class="lineno">  627</span>      files.insert(file.get_file_path().filename());</div>
 <div class="line"><span class="lineno">  628</span>      BOOST_REQUIRE(!sd.find_or_create_index_slice(3, open_state::read, file));</div>
-<div class="line"><span class="lineno">  629</span>      <a class="code hl_variable" href="namespaceapprove.html#ac74141eb5bed2ad90470ab44a35d0a4f">files</a>.insert(file.get_file_path().filename());</div>
+<div class="line"><span class="lineno">  629</span>      files.insert(file.get_file_path().filename());</div>
 <div class="line"><span class="lineno">  630</span>      BOOST_REQUIRE(!sd.find_or_create_index_slice(4, open_state::read, file));</div>
 <div class="line"><span class="lineno">  631</span>      <span class="keyword">const</span> <span class="keyword">auto</span> index4 = file.get_file_path().filename();</div>
-<div class="line"><span class="lineno">  632</span>      <a class="code hl_variable" href="namespaceapprove.html#ac74141eb5bed2ad90470ab44a35d0a4f">files</a>.insert(index4);</div>
+<div class="line"><span class="lineno">  632</span>      files.insert(index4);</div>
 <div class="line"><span class="lineno">  633</span>      BOOST_REQUIRE(!sd.find_or_create_trace_slice(4, open_state::read, file));</div>
 <div class="line"><span class="lineno">  634</span>      <span class="keyword">const</span> <span class="keyword">auto</span> trace4 = file.get_file_path().filename();</div>
-<div class="line"><span class="lineno">  635</span>      <a class="code hl_variable" href="namespaceapprove.html#ac74141eb5bed2ad90470ab44a35d0a4f">files</a>.insert(trace4);</div>
+<div class="line"><span class="lineno">  635</span>      files.insert(trace4);</div>
 <div class="line"><span class="lineno">  636</span>      BOOST_REQUIRE(!sd.find_or_create_index_slice(5, open_state::read, file));</div>
 <div class="line"><span class="lineno">  637</span>      <span class="keyword">const</span> <span class="keyword">auto</span> index5 = file.get_file_path().filename();</div>
-<div class="line"><span class="lineno">  638</span>      <a class="code hl_variable" href="namespaceapprove.html#ac74141eb5bed2ad90470ab44a35d0a4f">files</a>.insert(index5);</div>
+<div class="line"><span class="lineno">  638</span>      files.insert(index5);</div>
 <div class="line"><span class="lineno">  639</span>      BOOST_REQUIRE(!sd.find_or_create_trace_slice(6, open_state::read, file));</div>
 <div class="line"><span class="lineno">  640</span>      <span class="keyword">const</span> <span class="keyword">auto</span> trace6 = file.get_file_path().filename();</div>
-<div class="line"><span class="lineno">  641</span>      <a class="code hl_variable" href="namespaceapprove.html#ac74141eb5bed2ad90470ab44a35d0a4f">files</a>.insert(trace6);</div>
+<div class="line"><span class="lineno">  641</span>      files.insert(trace6);</div>
 <div class="line"><span class="lineno">  642</span>      <a class="code hl_function" href="#ac49ab2cf53f615a1a84cdef0579d6fb8">verify_directory_contents</a>(tempdir.<a class="code hl_function" href="classfc_1_1temp__file__base.html#a7ef88f2ed75bf87d276a80ce9283c55e">path</a>(), files);</div>
 <div class="line"><span class="lineno">  643</span> </div>
 <div class="line"><span class="lineno">  644</span>      <span class="comment">// verify that the current_slice and the previous are maintained as long as lib - min_saved_blocks is part of previous slice</span></div>
@@ -445,7 +445,6 @@ Functions</h2></td></tr>
 <div class="ttc" id="aclassfc_1_1temp__directory_html"><div class="ttname"><a href="classfc_1_1temp__directory.html">fc::temp_directory</a></div><div class="ttdef"><b>Definition</b> <a href="filesystem_8hpp_source.html#l00223">filesystem.hpp:224</a></div></div>
 <div class="ttc" id="aclassfc_1_1temp__file__base_html_a7ef88f2ed75bf87d276a80ce9283c55e"><div class="ttname"><a href="classfc_1_1temp__file__base.html#a7ef88f2ed75bf87d276a80ce9283c55e">fc::temp_file_base::path</a></div><div class="ttdeci">const fc::path &amp; path() const</div><div class="ttdef"><b>Definition</b> <a href="filesystem_8cpp_source.html#l00441">filesystem.cpp:441</a></div></div>
 <div class="ttc" id="aclasssysio_1_1trace__api_1_1slice__directory_html"><div class="ttname"><a href="classsysio_1_1trace__api_1_1slice__directory.html">sysio::trace_api::slice_directory</a></div><div class="ttdef"><b>Definition</b> <a href="store__provider_8hpp_source.html#l00096">store_provider.hpp:96</a></div></div>
-<div class="ttc" id="anamespaceapprove_html_ac74141eb5bed2ad90470ab44a35d0a4f"><div class="ttname"><a href="namespaceapprove.html#ac74141eb5bed2ad90470ab44a35d0a4f">approve.files</a></div><div class="ttdeci">list files</div><div class="ttdef"><b>Definition</b> <a href="approve_8py_source.html#l00014">approve.py:14</a></div></div>
 <div class="ttc" id="astdint_8h_html_a435d1572bf3f880d55459d9805097f62"><div class="ttname"><a href="stdint_8h.html#a435d1572bf3f880d55459d9805097f62">uint32_t</a></div><div class="ttdeci">unsigned int uint32_t</div><div class="ttdef"><b>Definition</b> <a href="stdint_8h_source.html#l00126">stdint.h:126</a></div></div>
 <div class="ttc" id="atest__trace__file_8cpp_html_ac49ab2cf53f615a1a84cdef0579d6fb8"><div class="ttname"><a href="#ac49ab2cf53f615a1a84cdef0579d6fb8">verify_directory_contents</a></div><div class="ttdeci">void verify_directory_contents(const bfs::path &amp;tempdir, std::set&lt; bfs::path &gt; expected_files)</div><div class="ttdef"><b>Definition</b> <a href="test__trace__file_8cpp_source.html#l00576">test_trace_file.cpp:576</a></div></div>
 </div><!-- fragment --><div class="dynheader">
@@ -570,10 +569,10 @@ Here is the call graph for this function:</div>
 <div class="line"><span class="lineno">  694</span>      }</div>
 <div class="line"><span class="lineno">  695</span> </div>
 <div class="line"><span class="lineno">  696</span>      <span class="comment">// initial set is only indices and uncompressed traces</span></div>
-<div class="line"><span class="lineno">  697</span>      std::set&lt;bfs::path&gt; <a class="code hl_variable" href="namespaceapprove.html#ac74141eb5bed2ad90470ab44a35d0a4f">files</a>;</div>
+<div class="line"><span class="lineno">  697</span>      std::set&lt;bfs::path&gt; files;</div>
 <div class="line"><span class="lineno">  698</span>      <span class="keywordflow">for</span> (<span class="keyword">const</span> <span class="keyword">auto</span>&amp; e: file_paths) {</div>
-<div class="line"><span class="lineno">  699</span>         <a class="code hl_variable" href="namespaceapprove.html#ac74141eb5bed2ad90470ab44a35d0a4f">files</a>.insert(std::get&lt;0&gt;(e));</div>
-<div class="line"><span class="lineno">  700</span>         <a class="code hl_variable" href="namespaceapprove.html#ac74141eb5bed2ad90470ab44a35d0a4f">files</a>.insert(std::get&lt;1&gt;(e));</div>
+<div class="line"><span class="lineno">  699</span>         files.insert(std::get&lt;0&gt;(e));</div>
+<div class="line"><span class="lineno">  700</span>         files.insert(std::get&lt;1&gt;(e));</div>
 <div class="line"><span class="lineno">  701</span>      }</div>
 <div class="line"><span class="lineno">  702</span>      <a class="code hl_function" href="#ac49ab2cf53f615a1a84cdef0579d6fb8">verify_directory_contents</a>(tempdir.<a class="code hl_function" href="classfc_1_1temp__file__base.html#a7ef88f2ed75bf87d276a80ce9283c55e">path</a>(), files);</div>
 <div class="line"><span class="lineno">  703</span> </div>
@@ -584,8 +583,8 @@ Here is the call graph for this function:</div>
 <div class="line"><span class="lineno">  708</span>      <span class="keywordflow">for</span> (std::size_t reps = 0; reps &lt; file_paths.size(); reps++) {</div>
 <div class="line"><span class="lineno">  709</span>         <span class="comment">//  leading edge,</span></div>
 <div class="line"><span class="lineno">  710</span>         <span class="comment">//  compresses one slice</span></div>
-<div class="line"><span class="lineno">  711</span>         <a class="code hl_variable" href="namespaceapprove.html#ac74141eb5bed2ad90470ab44a35d0a4f">files</a>.erase(std::get&lt;1&gt;(file_paths.at(reps)));</div>
-<div class="line"><span class="lineno">  712</span>         <a class="code hl_variable" href="namespaceapprove.html#ac74141eb5bed2ad90470ab44a35d0a4f">files</a>.insert(std::get&lt;2&gt;(file_paths.at(reps)));</div>
+<div class="line"><span class="lineno">  711</span>         files.erase(std::get&lt;1&gt;(file_paths.at(reps)));</div>
+<div class="line"><span class="lineno">  712</span>         files.insert(std::get&lt;2&gt;(file_paths.at(reps)));</div>
 <div class="line"><span class="lineno">  713</span> </div>
 <div class="line"><span class="lineno">  714</span>         sd.run_maintenance_tasks(15 + (reps * <a class="code hl_variable" href="catch__reporter__console_8cpp.html#a2474a5474cbff19523a51eb1de01cda4">width</a>), {});</div>
 <div class="line"><span class="lineno">  715</span>         <a class="code hl_function" href="#ac49ab2cf53f615a1a84cdef0579d6fb8">verify_directory_contents</a>(tempdir.<a class="code hl_function" href="classfc_1_1temp__file__base.html#a7ef88f2ed75bf87d276a80ce9283c55e">path</a>(), files);</div>
@@ -597,9 +596,9 @@ Here is the call graph for this function:</div>
 <div class="line"><span class="lineno">  721</span> </div>
 <div class="line"><span class="lineno">  722</span>      <span class="comment">// make sure the test is correct and and no uncompressed files remain</span></div>
 <div class="line"><span class="lineno">  723</span>      <span class="keywordflow">for</span> (<span class="keyword">const</span> <span class="keyword">auto</span>&amp; e: file_paths) {</div>
-<div class="line"><span class="lineno">  724</span>         BOOST_REQUIRE_EQUAL(<a class="code hl_variable" href="namespaceapprove.html#ac74141eb5bed2ad90470ab44a35d0a4f">files</a>.count(std::get&lt;0&gt;(e)), 1);</div>
-<div class="line"><span class="lineno">  725</span>         BOOST_REQUIRE_EQUAL(<a class="code hl_variable" href="namespaceapprove.html#ac74141eb5bed2ad90470ab44a35d0a4f">files</a>.count(std::get&lt;1&gt;(e)), 0);</div>
-<div class="line"><span class="lineno">  726</span>         BOOST_REQUIRE_EQUAL(<a class="code hl_variable" href="namespaceapprove.html#ac74141eb5bed2ad90470ab44a35d0a4f">files</a>.count(std::get&lt;2&gt;(e)), 1);</div>
+<div class="line"><span class="lineno">  724</span>         BOOST_REQUIRE_EQUAL(files.count(std::get&lt;0&gt;(e)), 1);</div>
+<div class="line"><span class="lineno">  725</span>         BOOST_REQUIRE_EQUAL(files.count(std::get&lt;1&gt;(e)), 0);</div>
+<div class="line"><span class="lineno">  726</span>         BOOST_REQUIRE_EQUAL(files.count(std::get&lt;2&gt;(e)), 1);</div>
 <div class="line"><span class="lineno">  727</span>      }</div>
 <div class="line"><span class="lineno">  728</span>   }</div>
 </div><!-- fragment --><div class="dynheader">
@@ -720,10 +719,10 @@ Here is the call graph for this function:</div>
 <div class="line"><span class="lineno">  749</span>      }</div>
 <div class="line"><span class="lineno">  750</span> </div>
 <div class="line"><span class="lineno">  751</span>      <span class="comment">// initial set is only indices and uncompressed traces</span></div>
-<div class="line"><span class="lineno">  752</span>      std::set&lt;bfs::path&gt; <a class="code hl_variable" href="namespaceapprove.html#ac74141eb5bed2ad90470ab44a35d0a4f">files</a>;</div>
+<div class="line"><span class="lineno">  752</span>      std::set&lt;bfs::path&gt; files;</div>
 <div class="line"><span class="lineno">  753</span>      <span class="keywordflow">for</span> (<span class="keyword">const</span> <span class="keyword">auto</span>&amp; e: file_paths) {</div>
-<div class="line"><span class="lineno">  754</span>         <a class="code hl_variable" href="namespaceapprove.html#ac74141eb5bed2ad90470ab44a35d0a4f">files</a>.insert(std::get&lt;0&gt;(e));</div>
-<div class="line"><span class="lineno">  755</span>         <a class="code hl_variable" href="namespaceapprove.html#ac74141eb5bed2ad90470ab44a35d0a4f">files</a>.insert(std::get&lt;1&gt;(e));</div>
+<div class="line"><span class="lineno">  754</span>         files.insert(std::get&lt;0&gt;(e));</div>
+<div class="line"><span class="lineno">  755</span>         files.insert(std::get&lt;1&gt;(e));</div>
 <div class="line"><span class="lineno">  756</span>      }</div>
 <div class="line"><span class="lineno">  757</span>      <a class="code hl_function" href="#ac49ab2cf53f615a1a84cdef0579d6fb8">verify_directory_contents</a>(tempdir.<a class="code hl_function" href="classfc_1_1temp__file__base.html#a7ef88f2ed75bf87d276a80ce9283c55e">path</a>(), files);</div>
 <div class="line"><span class="lineno">  758</span> </div>
@@ -735,14 +734,14 @@ Here is the call graph for this function:</div>
 <div class="line"><span class="lineno">  764</span>         <span class="comment">//  leading edge,</span></div>
 <div class="line"><span class="lineno">  765</span>         <span class="comment">//  compresses one slice IF its not past the end of our test,</span></div>
 <div class="line"><span class="lineno">  766</span>         <span class="keywordflow">if</span> (reps &lt; file_paths.size()) {</div>
-<div class="line"><span class="lineno">  767</span>            <a class="code hl_variable" href="namespaceapprove.html#ac74141eb5bed2ad90470ab44a35d0a4f">files</a>.erase(std::get&lt;1&gt;(file_paths.at(reps)));</div>
-<div class="line"><span class="lineno">  768</span>            <a class="code hl_variable" href="namespaceapprove.html#ac74141eb5bed2ad90470ab44a35d0a4f">files</a>.insert(std::get&lt;2&gt;(file_paths.at(reps)));</div>
+<div class="line"><span class="lineno">  767</span>            files.erase(std::get&lt;1&gt;(file_paths.at(reps)));</div>
+<div class="line"><span class="lineno">  768</span>            files.insert(std::get&lt;2&gt;(file_paths.at(reps)));</div>
 <div class="line"><span class="lineno">  769</span>         }</div>
 <div class="line"><span class="lineno">  770</span> </div>
 <div class="line"><span class="lineno">  771</span>         <span class="comment">// removes one IF its not the first</span></div>
 <div class="line"><span class="lineno">  772</span>         <span class="keywordflow">if</span> (reps &gt; 0) {</div>
-<div class="line"><span class="lineno">  773</span>            <a class="code hl_variable" href="namespaceapprove.html#ac74141eb5bed2ad90470ab44a35d0a4f">files</a>.erase(std::get&lt;0&gt;(file_paths.at(reps-1)));</div>
-<div class="line"><span class="lineno">  774</span>            <a class="code hl_variable" href="namespaceapprove.html#ac74141eb5bed2ad90470ab44a35d0a4f">files</a>.erase(std::get&lt;2&gt;(file_paths.at(reps-1)));</div>
+<div class="line"><span class="lineno">  773</span>            files.erase(std::get&lt;0&gt;(file_paths.at(reps-1)));</div>
+<div class="line"><span class="lineno">  774</span>            files.erase(std::get&lt;2&gt;(file_paths.at(reps-1)));</div>
 <div class="line"><span class="lineno">  775</span>         }</div>
 <div class="line"><span class="lineno">  776</span>         sd.run_maintenance_tasks(15 + (reps * <a class="code hl_variable" href="catch__reporter__console_8cpp.html#a2474a5474cbff19523a51eb1de01cda4">width</a>), {});</div>
 <div class="line"><span class="lineno">  777</span>         <a class="code hl_function" href="#ac49ab2cf53f615a1a84cdef0579d6fb8">verify_directory_contents</a>(tempdir.<a class="code hl_function" href="classfc_1_1temp__file__base.html#a7ef88f2ed75bf87d276a80ce9283c55e">path</a>(), files);</div>
@@ -753,7 +752,7 @@ Here is the call graph for this function:</div>
 <div class="line"><span class="lineno">  782</span>      }</div>
 <div class="line"><span class="lineno">  783</span> </div>
 <div class="line"><span class="lineno">  784</span>      <span class="comment">// make sure the test is correct and ran through the permutations</span></div>
-<div class="line"><span class="lineno">  785</span>      BOOST_REQUIRE_EQUAL(<a class="code hl_variable" href="namespaceapprove.html#ac74141eb5bed2ad90470ab44a35d0a4f">files</a>.size(), 0);</div>
+<div class="line"><span class="lineno">  785</span>      BOOST_REQUIRE_EQUAL(files.size(), 0);</div>
 <div class="line"><span class="lineno">  786</span>   }</div>
 </div><!-- fragment --><div class="dynheader">
 Here is the call graph for this function:</div>
@@ -1274,7 +1273,7 @@ Here is the call graph for this function:</div>
 <div class="line"><span class="lineno">  843</span> </div>
 <div class="line"><span class="lineno">  844</span>      bt_data = <a class="code hl_function" href="namespace_xbyak_1_1util.html#a9589ac8435a111d7f6b850217829e34c">sp</a>.read_data_log(block_nums[1], block_offsets[1]);</div>
 <div class="line"><span class="lineno">  845</span>      BOOST_REQUIRE(bt_data);</div>
-<div class="line"><span class="lineno">  846</span>      <span class="keyword">auto</span> <a class="code hl_variable" href="namespacedevelop_build.html#ade64cd34608f9442ef3049116a2da428">v</a> = std::variant&lt;block_trace_v0, block_trace_v1, block_trace_v2&gt;(*bt_data);</div>
+<div class="line"><span class="lineno">  846</span>      <span class="keyword">auto</span> v = std::variant&lt;block_trace_v0, block_trace_v1, block_trace_v2&gt;(*bt_data);</div>
 <div class="line"><span class="lineno">  847</span>      BOOST_REQUIRE_EQUAL(std::get&lt;block_trace_v1&gt;(v), bt2_v1);</div>
 <div class="line"><span class="lineno">  848</span> </div>
 <div class="line"><span class="lineno">  849</span>      block_nums.clear();</div>
@@ -1310,7 +1309,6 @@ Here is the call graph for this function:</div>
 <div class="line"><span class="lineno">  879</span>   }</div>
 <div class="ttc" id="aclasssysio_1_1trace__api_1_1yield__exception_html"><div class="ttname"><a href="classsysio_1_1trace__api_1_1yield__exception.html">sysio::trace_api::yield_exception</a></div><div class="ttdef"><b>Definition</b> <a href="plugins_2trace__api__plugin_2include_2sysio_2trace__api_2common_8hpp_source.html#l00018">common.hpp:18</a></div></div>
 <div class="ttc" id="anamespace_xbyak_1_1util_html_a9589ac8435a111d7f6b850217829e34c"><div class="ttname"><a href="namespace_xbyak_1_1util.html#a9589ac8435a111d7f6b850217829e34c">Xbyak::util::sp</a></div><div class="ttdeci">static const Reg16 sp(Operand::SP)</div></div>
-<div class="ttc" id="anamespacedevelop_build_html_ade64cd34608f9442ef3049116a2da428"><div class="ttname"><a href="namespacedevelop_build.html#ade64cd34608f9442ef3049116a2da428">developBuild.v</a></div><div class="ttdeci">v</div><div class="ttdef"><b>Definition</b> <a href="develop_build_8py_source.html#l00006">developBuild.py:6</a></div></div>
 <div class="ttc" id="anamespacesysio_1_1trace__api_html_a7a6a31e37b6c94cbd85b0f2019e2ff3c"><div class="ttname"><a href="namespacesysio_1_1trace__api.html#a7a6a31e37b6c94cbd85b0f2019e2ff3c">sysio::trace_api::metadata_log_entry</a></div><div class="ttdeci">std::variant&lt; block_entry_v0, lib_entry_v0, block_trxs_entry &gt; metadata_log_entry</div><div class="ttdef"><b>Definition</b> <a href="metadata__log_8hpp_source.html#l00018">metadata_log.hpp:18</a></div></div>
 </div><!-- fragment --><div class="dynheader">
 Here is the call graph for this function:</div>
@@ -1402,7 +1400,7 @@ Here is the call graph for this function:</div>
 <div class="line"><span class="lineno">  936</span> </div>
 <div class="line"><span class="lineno">  937</span>      bt_data = <a class="code hl_function" href="namespace_xbyak_1_1util.html#a9589ac8435a111d7f6b850217829e34c">sp</a>.read_data_log(block_nums[1], block_offsets[1]);</div>
 <div class="line"><span class="lineno">  938</span>      BOOST_REQUIRE(bt_data);</div>
-<div class="line"><span class="lineno">  939</span>      <span class="keyword">auto</span> <a class="code hl_variable" href="namespacedevelop_build.html#ade64cd34608f9442ef3049116a2da428">v</a> = <a class="code hl_typedef" href="namespacesysio_1_1trace__api.html#a98bdcc53a9d9aa6aff851a743516c3b9">data_log_entry</a>(*bt_data);</div>
+<div class="line"><span class="lineno">  939</span>      <span class="keyword">auto</span> v = <a class="code hl_typedef" href="namespacesysio_1_1trace__api.html#a98bdcc53a9d9aa6aff851a743516c3b9">data_log_entry</a>(*bt_data);</div>
 <div class="line"><span class="lineno">  940</span>      BOOST_REQUIRE_EQUAL(std::get&lt;block_trace_v2&gt;(v), block_trace2_v2);</div>
 <div class="line"><span class="lineno">  941</span> </div>
 <div class="line"><span class="lineno">  942</span>      block_nums.clear();</div>
@@ -1789,7 +1787,7 @@ Here is the call graph for this function:</div>
 <div class="fragment"><div class="line"><span class="lineno">  576</span>                                                                                          {</div>
 <div class="line"><span class="lineno">  577</span>      std::set&lt;bfs::path&gt; unexpected_files;</div>
 <div class="line"><span class="lineno">  578</span>      <span class="keywordflow">for</span> (bfs::directory_iterator itr(tempdir); itr != <a class="code hl_class" href="classfc_1_1directory__iterator.html">directory_iterator</a>(); ++itr) {</div>
-<div class="line"><span class="lineno">  579</span>         <span class="keyword">const</span> <span class="keyword">auto</span> <a class="code hl_variable" href="namespaceembed_clara.html#a1e1bd594f85f58f5dca6c41c0ac720fb">filename</a> = itr-&gt;path().filename();</div>
+<div class="line"><span class="lineno">  579</span>         <span class="keyword">const</span> <span class="keyword">auto</span> filename = itr-&gt;path().filename();</div>
 <div class="line"><span class="lineno">  580</span>         <span class="keywordflow">if</span> (expected_files.erase(filename) &lt; 1) {</div>
 <div class="line"><span class="lineno">  581</span>            unexpected_files.insert(filename);</div>
 <div class="line"><span class="lineno">  582</span>         }</div>
@@ -1818,7 +1816,6 @@ Here is the call graph for this function:</div>
 <div class="line"><span class="lineno">  605</span>      BOOST_FAIL(msg);</div>
 <div class="line"><span class="lineno">  606</span>   }</div>
 <div class="ttc" id="aclassfc_1_1directory__iterator_html"><div class="ttname"><a href="classfc_1_1directory__iterator.html">fc::directory_iterator</a></div><div class="ttdef"><b>Definition</b> <a href="filesystem_8hpp_source.html#l00113">filesystem.hpp:113</a></div></div>
-<div class="ttc" id="anamespaceembed_clara_html_a1e1bd594f85f58f5dca6c41c0ac720fb"><div class="ttname"><a href="namespaceembed_clara.html#a1e1bd594f85f58f5dca6c41c0ac720fb">embedClara.filename</a></div><div class="ttdeci">filename</div><div class="ttdef"><b>Definition</b> <a href="embed_clara_8py_source.html#l00010">embedClara.py:10</a></div></div>
 </div><!-- fragment --><div class="dynheader">
 Here is the caller graph for this function:</div>
 <div class="dyncontent">

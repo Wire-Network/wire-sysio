@@ -1,5 +1,29 @@
 <map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
-<area shape="rect" id="Node000000" href="$struct_serialization_1_1_input_stream.html" title=" " alt="" coords="5,13,177,38"/>
-<area shape="rect" id="Node000001" href="$struct_serialization_1_1_memory_input_stream.html" title=" " alt="" coords="225,5,401,46"/>
-<area shape="poly" id="edge546_Node000000_Node000001" title=" " alt="" coords="192,23,224,23,224,28,192,28"/>
+<area shape="rect" id="Node000000" title=" " alt="" coords="5,153,109,179"/>
+<area shape="rect" id="Node000001" href="$class_catch_1_1_generator_exception.html" title=" " alt="" coords="157,5,336,31"/>
+<area shape="poly" id="edge517_Node000000_Node000001" title=" " alt="" coords="70,138,104,88,128,62,155,40,176,29,179,34,158,44,132,66,109,91,75,141"/>
+<area shape="rect" id="Node000002" href="$class_xbyak_1_1_error.html" title=" " alt="" coords="199,55,294,80"/>
+<area shape="poly" id="edge518_Node000000_Node000002" title=" " alt="" coords="81,141,115,114,156,89,198,74,200,79,158,94,118,118,85,145"/>
+<area shape="rect" id="Node000003" href="$classfc_1_1exception.html" title="Used to generate a useful error report when an exception is thrown." alt="" coords="198,104,294,130"/>
+<area shape="poly" id="edge519_Node000000_Node000003" title=" " alt="" coords="123,146,197,127,198,132,124,151"/>
+<area shape="rect" id="Node000006" href="$structsysio_1_1vm_1_1exception.html" title=" " alt="" coords="175,153,318,179"/>
+<area shape="poly" id="edge522_Node000000_Node000006" title=" " alt="" coords="124,164,175,164,175,169,124,169"/>
+<area shape="rect" id="Node000007" href="$classutf8_1_1exception.html" title=" " alt="" coords="193,203,300,228"/>
+<area shape="poly" id="edge523_Node000000_Node000007" title=" " alt="" coords="124,181,195,200,194,205,123,186"/>
+<area shape="rect" id="Node000012" href="$classwebsocketpp_1_1exception.html" title=" " alt="" coords="165,252,328,278"/>
+<area shape="poly" id="edge528_Node000000_Node000012" title=" " alt="" coords="85,187,118,214,158,238,185,249,183,254,155,243,115,218,81,191"/>
+<area shape="rect" id="Node000013" href="$classwebsocketpp_1_1http_1_1exception.html" title=" " alt="" coords="178,302,314,342"/>
+<area shape="poly" id="edge529_Node000000_Node000013" title=" " alt="" coords="75,191,110,240,132,266,158,288,179,300,177,305,155,292,129,270,105,243,71,194"/>
+<area shape="rect" id="Node000004" href="$classfc_1_1std__exception__wrapper.html" title="wrapper for std::exception" alt="" coords="384,47,558,72"/>
+<area shape="poly" id="edge520_Node000003_Node000004" title=" " alt="" coords="309,98,417,70,418,76,310,103"/>
+<area shape="rect" id="Node000005" href="$classfc_1_1unhandled__exception.html" title="re&#45;thrown whenever an unhandled exception is caught.Any exceptions thrown by 3rd party libraries that..." alt="" coords="390,96,552,122"/>
+<area shape="poly" id="edge521_Node000003_Node000005" title=" " alt="" coords="310,112,389,109,390,114,310,117"/>
+<area shape="rect" id="Node000008" href="$classutf8_1_1invalid__code__point.html" title=" " alt="" coords="410,146,533,186"/>
+<area shape="poly" id="edge524_Node000007_Node000008" title=" " alt="" coords="314,198,408,177,409,182,316,203"/>
+<area shape="rect" id="Node000009" href="$classutf8_1_1invalid__utf16.html" title=" " alt="" coords="409,211,533,236"/>
+<area shape="poly" id="edge525_Node000007_Node000009" title=" " alt="" coords="315,215,409,219,408,224,315,221"/>
+<area shape="rect" id="Node000010" href="$classutf8_1_1invalid__utf8.html" title=" " alt="" coords="412,260,530,286"/>
+<area shape="poly" id="edge526_Node000007_Node000010" title=" " alt="" coords="315,230,418,257,417,262,314,235"/>
+<area shape="rect" id="Node000011" href="$classutf8_1_1not__enough__room.html" title=" " alt="" coords="394,309,548,335"/>
+<area shape="poly" id="edge527_Node000007_Node000011" title=" " alt="" coords="316,227,338,237,354,252,362,267,371,282,386,296,406,306,404,311,382,300,366,285,358,270,349,255,334,242,314,231"/>
 </map>

@@ -1,5 +1,19 @@
 <map id="sysio::vm::registered_host_functions::add" name="sysio::vm::registered_host_functions::add">
-<area shape="rect" id="Node000001" title=" " alt="" coords="222,5,365,46"/>
-<area shape="rect" id="Node000002" href="$classvalidate__reflection_1_1_empty_scope.html#a1fb4f76506790294268dc078986d7430" title=" " alt="" coords="5,5,174,46"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="206,28,174,28,174,23,206,23"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="233,171,376,212"/>
+<area shape="rect" id="Node000002" href="$host__functions__tests_8cpp.html#ad5bda7d36608d7278a3921f06daf1ecc" title=" " alt="" coords="9,5,181,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="283,159,242,100,215,70,183,44,163,34,165,29,186,40,218,66,246,96,287,156"/>
+<area shape="rect" id="Node000003" href="$implementation__limits__tests_8cpp.html#a62a8ae4b1a8ab3f4a7d74bc1d458965d" title=" " alt="" coords="9,55,181,80"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="272,162,232,126,183,94,158,83,160,79,186,89,235,122,275,158"/>
+<area shape="rect" id="Node000004" href="$implementation__limits__tests_8cpp.html#a75852f164664918221f13dc5b1cd4ee7" title=" " alt="" coords="9,104,181,130"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="243,167,184,143,150,133,151,128,186,138,245,162"/>
+<area shape="rect" id="Node000005" href="$host__functions__tests_8cpp.html#a2259b64580f4291f036c5abba85870fa" title=" " alt="" coords="9,153,181,179"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="217,184,181,179,182,174,218,178"/>
+<area shape="rect" id="Node000006" href="$preconditions__tests_8cpp.html#ab6ebb1eb28c94cdff83d66d9ea24f935" title=" " alt="" coords="9,203,181,228"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="218,204,182,208,181,203,217,199"/>
+<area shape="rect" id="Node000007" href="$host__functions__tests_8cpp.html#a6b44e563c0402069274db771df1cc4dc" title=" " alt="" coords="9,252,181,278"/>
+<area shape="poly" id="edge6_Node000001_Node000007" title=" " alt="" coords="244,221,186,243,151,254,150,249,184,238,242,216"/>
+<area shape="rect" id="Node000008" href="$host__functions__tests_8cpp.html#aaa1f6066f869535b132215a0b0e9ea4b" title=" " alt="" coords="9,301,181,327"/>
+<area shape="poly" id="edge7_Node000001_Node000008" title=" " alt="" coords="275,225,234,260,186,293,160,303,158,298,183,288,231,256,271,221"/>
+<area shape="rect" id="Node000009" href="$structsysio_1_1chain_1_1webassembly_1_1host__function__registrator.html#a8373c77aa3ef9e367a25f8f52c55ea7d" title=" " alt="" coords="5,352,185,407"/>
+<area shape="poly" id="edge8_Node000001_Node000009" title=" " alt="" coords="285,227,243,284,216,315,186,342,169,353,166,349,183,337,213,311,239,281,281,224"/>
 </map>

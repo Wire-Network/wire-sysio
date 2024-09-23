@@ -87,7 +87,8 @@ Definition at line \mbox{\hyperlink{programs_2sysio-blocklog_2main_8cpp_source_l
 \DoxyCodeLine{00076\ \}}
 
 \end{DoxyCode}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -108,14 +109,14 @@ Definition at line \mbox{\hyperlink{programs_2sysio-blocklog_2main_8cpp_source_l
 \begin{DoxyCode}{0}
 \DoxyCodeLine{00205\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
 \DoxyCodeLine{00206\ \ \ \ \textcolor{keywordflow}{try}\ \{}
-\DoxyCodeLine{00207\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ bld\ =\ \mbox{\hyperlink{namespacebenchmark_compile_acf738bbf3b8391aa78929ceeceb8a03b}{options}}.at(\ \textcolor{stringliteral}{"{}blocks-\/dir"{}}\ ).as<bfs::path>();}
+\DoxyCodeLine{00207\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ bld\ =\ options.at(\ \textcolor{stringliteral}{"{}blocks-\/dir"{}}\ ).as<bfs::path>();}
 \DoxyCodeLine{00208\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ bld.is\_relative())}
 \DoxyCodeLine{00209\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structblocklog_aff8255d6c642b5df2997b0361a332f8e}{blocks\_dir}}\ =\ bfs::current\_path()\ /\ bld;}
 \DoxyCodeLine{00210\ \ \ \ \ \ \ \textcolor{keywordflow}{else}}
 \DoxyCodeLine{00211\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structblocklog_aff8255d6c642b5df2997b0361a332f8e}{blocks\_dir}}\ =\ bld;}
 \DoxyCodeLine{00212\ }
-\DoxyCodeLine{00213\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{namespacebenchmark_compile_acf738bbf3b8391aa78929ceeceb8a03b}{options}}.count(\ \textcolor{stringliteral}{"{}output-\/file"{}}\ ))\ \{}
-\DoxyCodeLine{00214\ \ \ \ \ \ \ \ \ \ bld\ =\ \mbox{\hyperlink{namespacebenchmark_compile_acf738bbf3b8391aa78929ceeceb8a03b}{options}}.at(\ \textcolor{stringliteral}{"{}output-\/file"{}}\ ).as<bfs::path>();}
+\DoxyCodeLine{00213\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (options.count(\ \textcolor{stringliteral}{"{}output-\/file"{}}\ ))\ \{}
+\DoxyCodeLine{00214\ \ \ \ \ \ \ \ \ \ bld\ =\ options.at(\ \textcolor{stringliteral}{"{}output-\/file"{}}\ ).as<bfs::path>();}
 \DoxyCodeLine{00215\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ bld.is\_relative())}
 \DoxyCodeLine{00216\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structblocklog_a742ff90b45cafbf8862479ade02278f4}{output\_file}}\ =\ bfs::current\_path()\ /\ bld;}
 \DoxyCodeLine{00217\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}}
@@ -133,14 +134,16 @@ Definition at line \mbox{\hyperlink{programs_2sysio-blocklog_2main_8cpp_source_l
 \DoxyCodeLine{00229\ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
 \includegraphics[width=350pt]{structblocklog_a9a8b4159b641c6ee906cbdc9f8a162d8_cgraph}
 \end{center}
 \end{figure}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -213,22 +216,22 @@ Definition at line \mbox{\hyperlink{programs_2sysio-blocklog_2main_8cpp_source_l
 \DoxyCodeLine{00129\ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{structblocklog_acfb43e80efae5b28b093b6873f95b7b8}{as\_json\_array}})}
 \DoxyCodeLine{00130\ \ \ \ \ \ \ *out\ <<\ \textcolor{stringliteral}{"{}["{}};}
 \DoxyCodeLine{00131\ \ \ \ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ block\_num\ =\ (\mbox{\hyperlink{structblocklog_af082dff0eddf0db2bf2c5918d7d5d6d8}{first\_block}}\ <\ 1)\ ?\ 1\ :\ \mbox{\hyperlink{structblocklog_af082dff0eddf0db2bf2c5918d7d5d6d8}{first\_block}};}
-\DoxyCodeLine{00132\ \ \ \ \mbox{\hyperlink{namespacesysio_1_1chain_aa10ee348c57604b615bc8570f6685102}{signed\_block\_ptr}}\ \mbox{\hyperlink{namespacecpp_1_1ast_a25b104cfd21fb8487a07063b6ce62062}{next}};}
+\DoxyCodeLine{00132\ \ \ \ \mbox{\hyperlink{namespacesysio_1_1chain_aa10ee348c57604b615bc8570f6685102}{signed\_block\_ptr}}\ \mbox{\hyperlink{namespaceutf8_afc093dfde66a6f52cb4a5caefe0e580d}{next}};}
 \DoxyCodeLine{00133\ \ \ \ \mbox{\hyperlink{classfc_1_1variant}{fc::variant}}\ pretty\_output;}
 \DoxyCodeLine{00134\ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1microseconds}{fc::microseconds}}\ deadline\ =\ \mbox{\hyperlink{namespacefc_a9623b8cae3f48bbed6aa1fc2afe9b174}{fc::seconds}}(10);}
-\DoxyCodeLine{00135\ \ \ \ \textcolor{keyword}{auto}\ print\_block\ =\ [\&](\mbox{\hyperlink{namespacesysio_1_1chain_aa10ee348c57604b615bc8570f6685102}{signed\_block\_ptr}}\&\ \mbox{\hyperlink{namespacecpp_1_1ast_a25b104cfd21fb8487a07063b6ce62062}{next}})\ \{}
+\DoxyCodeLine{00135\ \ \ \ \textcolor{keyword}{auto}\ print\_block\ =\ [\&](\mbox{\hyperlink{namespacesysio_1_1chain_aa10ee348c57604b615bc8570f6685102}{signed\_block\_ptr}}\&\ \mbox{\hyperlink{namespaceutf8_afc093dfde66a6f52cb4a5caefe0e580d}{next}})\ \{}
 \DoxyCodeLine{00136\ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1chain_1_1abi__serializer_a7e23d065d4624d99ec1945f3ea429415}{abi\_serializer::to\_variant}}(*next,}
 \DoxyCodeLine{00137\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ pretty\_output,}
 \DoxyCodeLine{00138\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ [](\ \mbox{\hyperlink{structsysio_1_1chain_1_1name}{account\_name}}\ n\ )\ \{\ \textcolor{keywordflow}{return}\ std::optional<abi\_serializer>();\ \},}
 \DoxyCodeLine{00139\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1chain_1_1abi__serializer_a2dc34bf706557f0c83d61b3791299c98}{abi\_serializer::create\_yield\_function}}(\ deadline\ ));}
-\DoxyCodeLine{00140\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\ block\_id\ =\ \mbox{\hyperlink{namespacecpp_1_1ast_a25b104cfd21fb8487a07063b6ce62062}{next}}-\/>calculate\_id();}
+\DoxyCodeLine{00140\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\ block\_id\ =\ \mbox{\hyperlink{namespaceutf8_afc093dfde66a6f52cb4a5caefe0e580d}{next}}-\/>calculate\_id();}
 \DoxyCodeLine{00141\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ ref\_block\_prefix\ =\ block\_id.\_hash[1];}
 \DoxyCodeLine{00142\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\ enhanced\_object\ =\ \mbox{\hyperlink{classfc_1_1mutable__variant__object}{fc::mutable\_variant\_object}}}
-\DoxyCodeLine{00143\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}block\_num"{}},\mbox{\hyperlink{namespacecpp_1_1ast_a25b104cfd21fb8487a07063b6ce62062}{next}}-\/>block\_num())}
+\DoxyCodeLine{00143\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}block\_num"{}},\mbox{\hyperlink{namespaceutf8_afc093dfde66a6f52cb4a5caefe0e580d}{next}}-\/>block\_num())}
 \DoxyCodeLine{00144\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}id"{}},\ block\_id)}
 \DoxyCodeLine{00145\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}ref\_block\_prefix"{}},\ ref\_block\_prefix)}
 \DoxyCodeLine{00146\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (pretty\_output.\mbox{\hyperlink{classfc_1_1variant_a17a7054a10963360c6a14d60f6e30128}{get\_object}}());}
-\DoxyCodeLine{00147\ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1variant}{fc::variant}}\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}(std::move(enhanced\_object));}
+\DoxyCodeLine{00147\ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1variant}{fc::variant}}\ v(std::move(enhanced\_object));}
 \DoxyCodeLine{00148\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{structblocklog_a6d60edbd915af4a8ea0b9f17b328b788}{no\_pretty\_print}})}
 \DoxyCodeLine{00149\ \ \ \ \ \ \ \ \ \ *out\ <<\ \mbox{\hyperlink{classfc_1_1json_aa6541960d7f05567559b866cfaf88dfa}{fc::json::to\_string}}(v,\ \mbox{\hyperlink{classfc_1_1time__point_aeccf1b70aa34b132c5269313b8a50573}{fc::time\_point::maximum}}());}
 \DoxyCodeLine{00150\ \ \ \ \ \ \ \textcolor{keywordflow}{else}}
@@ -247,7 +250,7 @@ Definition at line \mbox{\hyperlink{programs_2sysio-blocklog_2main_8cpp_source_l
 \DoxyCodeLine{00163\ \ \ \ \ \ \ \textcolor{keywordflow}{for}(\ \textcolor{keyword}{auto}\ bitr\ =\ fork\_db\_branch.rbegin();\ bitr\ !=\ fork\_db\_branch.rend()\ \&\&\ block\_num\ <=\ \mbox{\hyperlink{structblocklog_a504bea1a7eecb02361022f3be70943e3}{last\_block}};\ ++bitr\ )\ \{}
 \DoxyCodeLine{00164\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{structblocklog_acfb43e80efae5b28b093b6873f95b7b8}{as\_json\_array}}\ \&\&\ contains\_obj)}
 \DoxyCodeLine{00165\ \ \ \ \ \ \ \ \ \ \ \ \ *out\ <<\ \textcolor{stringliteral}{"{},"{}};}
-\DoxyCodeLine{00166\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ \mbox{\hyperlink{namespacecpp_1_1ast_a25b104cfd21fb8487a07063b6ce62062}{next}}\ =\ (*bitr)-\/>block;}
+\DoxyCodeLine{00166\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ \mbox{\hyperlink{namespaceutf8_afc093dfde66a6f52cb4a5caefe0e580d}{next}}\ =\ (*bitr)-\/>block;}
 \DoxyCodeLine{00167\ \ \ \ \ \ \ \ \ \ print\_block(next);}
 \DoxyCodeLine{00168\ \ \ \ \ \ \ \ \ \ ++block\_num;}
 \DoxyCodeLine{00169\ \ \ \ \ \ \ \ \ \ contains\_obj\ =\ \textcolor{keyword}{true};}
@@ -260,14 +263,16 @@ Definition at line \mbox{\hyperlink{programs_2sysio-blocklog_2main_8cpp_source_l
 \DoxyCodeLine{00176\ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
 \includegraphics[width=350pt]{structblocklog_ab8fb32dc3425a85102c05fe4a1c1fd62_cgraph}
 \end{center}
 \end{figure}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -313,14 +318,16 @@ Definition at line \mbox{\hyperlink{programs_2sysio-blocklog_2main_8cpp_source_l
 \DoxyCodeLine{00203\ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
 \includegraphics[width=257pt]{structblocklog_a28b743fa586fa3fdde6fe6d56c31bd10_cgraph}
 \end{center}
 \end{figure}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode

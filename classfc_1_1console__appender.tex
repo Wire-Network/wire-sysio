@@ -6,7 +6,8 @@
 
 
 
-Inheritance diagram for fc\+::console\+\_\+appender\+:\nopagebreak
+Inheritance diagram for fc\+::console\+\_\+appender\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -15,7 +16,8 @@ Inheritance diagram for fc\+::console\+\_\+appender\+:\nopagebreak
 \end{figure}
 
 
-Collaboration diagram for fc\+::console\+\_\+appender\+:\nopagebreak
+Collaboration diagram for fc\+::console\+\_\+appender\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -85,15 +87,16 @@ Definition at line \mbox{\hyperlink{console__appender_8cpp_source_l00029}{29}} o
 \begin{DoxyCode}{0}
 \DoxyCodeLine{00030\ \ \ \ :my(\textcolor{keyword}{new}\ impl) }
 \DoxyCodeLine{00031\ \ \ \ \{}
-\DoxyCodeLine{00032\ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1console__appender_ab859b37eea5c803c674ce786f0fa64c5}{configure}}(\ \mbox{\hyperlink{namespacebenchmark_compile_ad0ed96ae1454e4347ca61ac3887c379e}{args}}.as<\mbox{\hyperlink{classconfig}{config}}>()\ );}
+\DoxyCodeLine{00032\ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1console__appender_ab859b37eea5c803c674ce786f0fa64c5}{configure}}(\ args.as<\mbox{\hyperlink{classconfig}{config}}>()\ );}
 \DoxyCodeLine{00033\ \ \ \ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
-\includegraphics[width=334pt]{classfc_1_1console__appender_a0a006a1985fca8fa9168d983d2be0030_cgraph}
+\includegraphics[width=350pt]{classfc_1_1console__appender_a0a006a1985fca8fa9168d983d2be0030_cgraph}
 \end{center}
 \end{figure}
 \Hypertarget{classfc_1_1console__appender_a8f9dddd4a61b22543229631f43ace3d2}\index{fc::console\_appender@{fc::console\_appender}!console\_appender@{console\_appender}}
@@ -114,7 +117,8 @@ Definition at line \mbox{\hyperlink{console__appender_8cpp_source_l00035}{35}} o
 \DoxyCodeLine{00039\ \ \ \ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -185,7 +189,8 @@ Definition at line \mbox{\hyperlink{console__appender_8cpp_source_l00044}{44}} o
 \DoxyCodeLine{00061\ \ \ \ \}\ \mbox{\hyperlink{exception_8hpp_a094902280cad82ad6529ebbd12a697eb}{FC\_CAPTURE\_AND\_RETHROW}}(\ (console\_appender\_config)\ )\ \}}
 
 \end{DoxyCode}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -240,29 +245,29 @@ Definition at line \mbox{\hyperlink{console__appender_8cpp_source_l00093}{93}} o
 \DoxyCodeLine{00103\ \ \ \ \ \ \ file\_line\ +=\ \textcolor{charliteral}{':'};}
 \DoxyCodeLine{00104\ \ \ \ \ \ \ file\_line\ +=\ \mbox{\hyperlink{namespacefc_acc781e4860d923d50e0acd2b7dae30a4}{fixed\_size}}(\ \ 6,\ \mbox{\hyperlink{namespacefc_a4e07b3870aa72f8c38bdd5f78044dad1}{fc::to\_string}}(\ \mbox{\hyperlink{structcontext}{context}}.get\_line\_number()\ )\ );}
 \DoxyCodeLine{00105\ }
-\DoxyCodeLine{00106\ \ \ \ \ \ \ std::string\ \mbox{\hyperlink{namespacevalidate__reflection_a54d4e98ade8417b88a7e3859a693630a}{line}};}
-\DoxyCodeLine{00107\ \ \ \ \ \ \ \mbox{\hyperlink{namespacevalidate__reflection_a54d4e98ade8417b88a7e3859a693630a}{line}}.reserve(\ 256\ );}
+\DoxyCodeLine{00106\ \ \ \ \ \ \ std::string\ line;}
+\DoxyCodeLine{00107\ \ \ \ \ \ \ line.reserve(\ 256\ );}
 \DoxyCodeLine{00108\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(my-\/>use\_syslog\_header)\ \{}
 \DoxyCodeLine{00109\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{switch}(m.get\_context().get\_log\_level())\ \{}
 \DoxyCodeLine{00110\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{classfc_1_1log__level_a5a5e31c4c1f38d9115ecbe44927fb2e4a836fc8bbd6f9c9445879679eb512df49}{log\_level::error}}:}
-\DoxyCodeLine{00111\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacevalidate__reflection_a54d4e98ade8417b88a7e3859a693630a}{line}}\ +=\ \textcolor{stringliteral}{"{}<3>"{}};}
+\DoxyCodeLine{00111\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ line\ +=\ \textcolor{stringliteral}{"{}<3>"{}};}
 \DoxyCodeLine{00112\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
 \DoxyCodeLine{00113\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{classfc_1_1log__level_a5a5e31c4c1f38d9115ecbe44927fb2e4a890c8f6993efee47d617cf72e6b19583}{log\_level::warn}}:}
-\DoxyCodeLine{00114\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacevalidate__reflection_a54d4e98ade8417b88a7e3859a693630a}{line}}\ +=\ \textcolor{stringliteral}{"{}<4>"{}};}
+\DoxyCodeLine{00114\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ line\ +=\ \textcolor{stringliteral}{"{}<4>"{}};}
 \DoxyCodeLine{00115\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
 \DoxyCodeLine{00116\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{classfc_1_1log__level_a5a5e31c4c1f38d9115ecbe44927fb2e4afe6da1f3a75c3911b0b59bffaea070e1}{log\_level::info}}:}
-\DoxyCodeLine{00117\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacevalidate__reflection_a54d4e98ade8417b88a7e3859a693630a}{line}}\ +=\ \textcolor{stringliteral}{"{}<6>"{}};}
+\DoxyCodeLine{00117\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ line\ +=\ \textcolor{stringliteral}{"{}<6>"{}};}
 \DoxyCodeLine{00118\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
 \DoxyCodeLine{00119\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{classfc_1_1log__level_a5a5e31c4c1f38d9115ecbe44927fb2e4a30d2de77e71beb8d09d530cac04efa25}{log\_level::debug}}:}
-\DoxyCodeLine{00120\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacevalidate__reflection_a54d4e98ade8417b88a7e3859a693630a}{line}}\ +=\ \textcolor{stringliteral}{"{}<7>"{}};}
+\DoxyCodeLine{00120\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ line\ +=\ \textcolor{stringliteral}{"{}<7>"{}};}
 \DoxyCodeLine{00121\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
 \DoxyCodeLine{00122\ \ \ \ \ \ \ \ \ \ \}}
 \DoxyCodeLine{00123\ \ \ \ \ \ \ \}}
-\DoxyCodeLine{00124\ \ \ \ \ \ \ \mbox{\hyperlink{namespacevalidate__reflection_a54d4e98ade8417b88a7e3859a693630a}{line}}\ +=\ \mbox{\hyperlink{namespacefc_acc781e4860d923d50e0acd2b7dae30a4}{fixed\_size}}(\ \ 5,\ \mbox{\hyperlink{structcontext}{context}}.get\_log\_level().to\_string()\ );\ \mbox{\hyperlink{namespacevalidate__reflection_a54d4e98ade8417b88a7e3859a693630a}{line}}\ +=\ \textcolor{charliteral}{'\ '};}
+\DoxyCodeLine{00124\ \ \ \ \ \ \ line\ +=\ \mbox{\hyperlink{namespacefc_acc781e4860d923d50e0acd2b7dae30a4}{fixed\_size}}(\ \ 5,\ \mbox{\hyperlink{structcontext}{context}}.get\_log\_level().to\_string()\ );\ line\ +=\ \textcolor{charliteral}{'\ '};}
 \DoxyCodeLine{00125\ \ \ \ \ \ \ \textcolor{comment}{//\ use\ now()\ instead\ of\ context.get\_timestamp()\ because\ log\_message\ construction\ can\ include\ user\ provided\ long\ running\ calls}}
-\DoxyCodeLine{00126\ \ \ \ \ \ \ \mbox{\hyperlink{namespacevalidate__reflection_a54d4e98ade8417b88a7e3859a693630a}{line}}\ +=\ \mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}}(\ \mbox{\hyperlink{classfc_1_1time__point_aa164ff1268a16d4b32afcff181f6100e}{time\_point::now}}()\ );\ \mbox{\hyperlink{namespacevalidate__reflection_a54d4e98ade8417b88a7e3859a693630a}{line}}\ +=\ \textcolor{charliteral}{'\ '};}
-\DoxyCodeLine{00127\ \ \ \ \ \ \ \mbox{\hyperlink{namespacevalidate__reflection_a54d4e98ade8417b88a7e3859a693630a}{line}}\ +=\ \mbox{\hyperlink{namespacefc_acc781e4860d923d50e0acd2b7dae30a4}{fixed\_size}}(\ \ 9,\ \mbox{\hyperlink{structcontext}{context}}.get\_thread\_name()\ );\ \mbox{\hyperlink{namespacevalidate__reflection_a54d4e98ade8417b88a7e3859a693630a}{line}}\ +=\ \textcolor{charliteral}{'\ '};}
-\DoxyCodeLine{00128\ \ \ \ \ \ \ \mbox{\hyperlink{namespacevalidate__reflection_a54d4e98ade8417b88a7e3859a693630a}{line}}\ +=\ \mbox{\hyperlink{namespacefc_acc781e4860d923d50e0acd2b7dae30a4}{fixed\_size}}(\ 29,\ file\_line\ );\ \mbox{\hyperlink{namespacevalidate__reflection_a54d4e98ade8417b88a7e3859a693630a}{line}}\ +=\ \textcolor{charliteral}{'\ '};}
+\DoxyCodeLine{00126\ \ \ \ \ \ \ line\ +=\ \mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}}(\ \mbox{\hyperlink{classfc_1_1time__point_aa164ff1268a16d4b32afcff181f6100e}{time\_point::now}}()\ );\ line\ +=\ \textcolor{charliteral}{'\ '};}
+\DoxyCodeLine{00127\ \ \ \ \ \ \ line\ +=\ \mbox{\hyperlink{namespacefc_acc781e4860d923d50e0acd2b7dae30a4}{fixed\_size}}(\ \ 9,\ \mbox{\hyperlink{structcontext}{context}}.get\_thread\_name()\ );\ line\ +=\ \textcolor{charliteral}{'\ '};}
+\DoxyCodeLine{00128\ \ \ \ \ \ \ line\ +=\ \mbox{\hyperlink{namespacefc_acc781e4860d923d50e0acd2b7dae30a4}{fixed\_size}}(\ 29,\ file\_line\ );\ line\ +=\ \textcolor{charliteral}{'\ '};}
 \DoxyCodeLine{00129\ }
 \DoxyCodeLine{00130\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ me\ =\ \mbox{\hyperlink{structcontext}{context}}.get\_method();}
 \DoxyCodeLine{00131\ \ \ \ \ \ \ \textcolor{comment}{//\ strip\ all\ leading\ scopes...}}
@@ -273,10 +278,10 @@ Definition at line \mbox{\hyperlink{console__appender_8cpp_source_l00093}{93}} o
 \DoxyCodeLine{00136\ \ \ \ \ \ \ \ \ \ \}}
 \DoxyCodeLine{00137\ }
 \DoxyCodeLine{00138\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ me[\mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}]\ ==\ \textcolor{charliteral}{':'}\ )\ ++\mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}};}
-\DoxyCodeLine{00139\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacevalidate__reflection_a54d4e98ade8417b88a7e3859a693630a}{line}}\ +=\ \mbox{\hyperlink{namespacefc_acc781e4860d923d50e0acd2b7dae30a4}{fixed\_size}}(\ 20,\ \mbox{\hyperlink{structcontext}{context}}.get\_method().substr(\ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}},\ 20\ )\ );\ \mbox{\hyperlink{namespacevalidate__reflection_a54d4e98ade8417b88a7e3859a693630a}{line}}\ +=\ \textcolor{charliteral}{'\ '};}
+\DoxyCodeLine{00139\ \ \ \ \ \ \ \ \ \ line\ +=\ \mbox{\hyperlink{namespacefc_acc781e4860d923d50e0acd2b7dae30a4}{fixed\_size}}(\ 20,\ \mbox{\hyperlink{structcontext}{context}}.get\_method().substr(\ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}},\ 20\ )\ );\ line\ +=\ \textcolor{charliteral}{'\ '};}
 \DoxyCodeLine{00140\ \ \ \ \ \ \ \}}
-\DoxyCodeLine{00141\ \ \ \ \ \ \ \mbox{\hyperlink{namespacevalidate__reflection_a54d4e98ade8417b88a7e3859a693630a}{line}}\ +=\ \textcolor{stringliteral}{"{}]\ "{}};}
-\DoxyCodeLine{00142\ \ \ \ \ \ \ \mbox{\hyperlink{namespacevalidate__reflection_a54d4e98ade8417b88a7e3859a693630a}{line}}\ +=\ \mbox{\hyperlink{namespacefc_acd5129981ae93fce3154d3fed6f6acbc}{fc::format\_string}}(\ m.get\_format(),\ m.get\_data()\ );}
+\DoxyCodeLine{00141\ \ \ \ \ \ \ line\ +=\ \textcolor{stringliteral}{"{}]\ "{}};}
+\DoxyCodeLine{00142\ \ \ \ \ \ \ line\ +=\ \mbox{\hyperlink{namespacefc_acd5129981ae93fce3154d3fed6f6acbc}{fc::format\_string}}(\ m.get\_format(),\ m.get\_data()\ );}
 \DoxyCodeLine{00143\ }
 \DoxyCodeLine{00144\ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1console__appender_a819864eb29982c6c82397e91a8a4ada4}{print}}(\ line,\ my-\/>lc[\mbox{\hyperlink{structcontext}{context}}.get\_log\_level()]\ );}
 \DoxyCodeLine{00145\ }
@@ -286,7 +291,8 @@ Definition at line \mbox{\hyperlink{console__appender_8cpp_source_l00093}{93}} o
 \DoxyCodeLine{00149\ \ \ \ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -329,7 +335,8 @@ Definition at line \mbox{\hyperlink{console__appender_8cpp_source_l00151}{151}} 
 \DoxyCodeLine{00173\ \ \ \ \}}
 
 \end{DoxyCode}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode

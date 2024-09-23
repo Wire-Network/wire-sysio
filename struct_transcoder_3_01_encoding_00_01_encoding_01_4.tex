@@ -12,11 +12,11 @@ Specialization of \doxylink{struct_transcoder}{Transcoder} with same source and 
 \doxysubsubsection*{Static Public Member Functions}
 \begin{DoxyCompactItemize}
 \item 
-{\footnotesize template$<$typename Input\+Stream , typename Output\+Stream $>$ }\\static RAPIDJSON\+\_\+\+FORCEINLINE bool \mbox{\hyperlink{struct_transcoder_3_01_encoding_00_01_encoding_01_4_aad11cdc2b829123a7b9969e34d456813}{Transcode}} (Input\+Stream \&is, Output\+Stream \&os)
+{\footnotesize template$<$typename Input\+Stream , typename Output\+Stream $>$ }\\static RAPIDJSON\+\_\+\+FORCEINLINE bool \mbox{\hyperlink{struct_transcoder_3_01_encoding_00_01_encoding_01_4_aad11cdc2b829123a7b9969e34d456813}{Transcode}} (Input\+Stream \&is, Output\+Stream \&\mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}})
 \item 
-{\footnotesize template$<$typename Input\+Stream , typename Output\+Stream $>$ }\\static RAPIDJSON\+\_\+\+FORCEINLINE bool \mbox{\hyperlink{struct_transcoder_3_01_encoding_00_01_encoding_01_4_addf67decfff7d0de510c47842eb53cef}{Transcode\+Unsafe}} (Input\+Stream \&is, Output\+Stream \&os)
+{\footnotesize template$<$typename Input\+Stream , typename Output\+Stream $>$ }\\static RAPIDJSON\+\_\+\+FORCEINLINE bool \mbox{\hyperlink{struct_transcoder_3_01_encoding_00_01_encoding_01_4_addf67decfff7d0de510c47842eb53cef}{Transcode\+Unsafe}} (Input\+Stream \&is, Output\+Stream \&\mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}})
 \item 
-{\footnotesize template$<$typename Input\+Stream , typename Output\+Stream $>$ }\\static RAPIDJSON\+\_\+\+FORCEINLINE bool \mbox{\hyperlink{struct_transcoder_3_01_encoding_00_01_encoding_01_4_a536aa3930251161d05e112947ec2f9c8}{Validate}} (Input\+Stream \&is, Output\+Stream \&os)
+{\footnotesize template$<$typename Input\+Stream , typename Output\+Stream $>$ }\\static RAPIDJSON\+\_\+\+FORCEINLINE bool \mbox{\hyperlink{struct_transcoder_3_01_encoding_00_01_encoding_01_4_a536aa3930251161d05e112947ec2f9c8}{Validate}} (Input\+Stream \&is, Output\+Stream \&\mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}})
 \end{DoxyCompactItemize}
 
 
@@ -45,7 +45,7 @@ Definition at line \mbox{\hyperlink{encodings_8h_source_l00693}{693}} of file \m
 
 \begin{DoxyCode}{0}
 \DoxyCodeLine{00693\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
-\DoxyCodeLine{00694\ \ \ \ \ \ \ \ \ os.Put(is.Take());\ \ \textcolor{comment}{//\ Just\ copy\ one\ code\ unit.\ This\ semantic\ is\ different\ from\ primary\ template\ class.}}
+\DoxyCodeLine{00694\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}.Put(is.Take());\ \ \textcolor{comment}{//\ Just\ copy\ one\ code\ unit.\ This\ semantic\ is\ different\ from\ primary\ template\ class.}}
 \DoxyCodeLine{00695\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};}
 \DoxyCodeLine{00696\ \ \ \ \ \}}
 
@@ -65,12 +65,13 @@ Definition at line \mbox{\hyperlink{encodings_8h_source_l00699}{699}} of file \m
 
 \begin{DoxyCode}{0}
 \DoxyCodeLine{00699\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
-\DoxyCodeLine{00700\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{encodings_8h_ad57ba7f2912c5509924b69dec7db4396}{PutUnsafe}}(os,\ is.Take());\ \ \textcolor{comment}{//\ Just\ copy\ one\ code\ unit.\ This\ semantic\ is\ different\ from\ primary\ template\ class.}}
+\DoxyCodeLine{00700\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{encodings_8h_ad57ba7f2912c5509924b69dec7db4396}{PutUnsafe}}(\mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}},\ is.Take());\ \ \textcolor{comment}{//\ Just\ copy\ one\ code\ unit.\ This\ semantic\ is\ different\ from\ primary\ template\ class.}}
 \DoxyCodeLine{00701\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};}
 \DoxyCodeLine{00702\ \ \ \ \ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -92,7 +93,7 @@ Definition at line \mbox{\hyperlink{encodings_8h_source_l00705}{705}} of file \m
 
 \begin{DoxyCode}{0}
 \DoxyCodeLine{00705\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
-\DoxyCodeLine{00706\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ Encoding::Validate(is,\ os);\ \ \textcolor{comment}{//\ source/target\ encoding\ are\ the\ same}}
+\DoxyCodeLine{00706\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ Encoding::Validate(is,\ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}});\ \ \textcolor{comment}{//\ source/target\ encoding\ are\ the\ same}}
 \DoxyCodeLine{00707\ \ \ \ \ \}}
 
 \end{DoxyCode}

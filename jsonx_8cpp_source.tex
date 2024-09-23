@@ -22,7 +22,7 @@
 \DoxyCodeLine{\Hypertarget{jsonx_8cpp_source_l00018}00018\ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ OutputStream>}
 \DoxyCodeLine{\Hypertarget{jsonx_8cpp_source_l00019}\mbox{\hyperlink{class_jsonx_writer}{00019}}\ \textcolor{keyword}{class\ }\mbox{\hyperlink{class_jsonx_writer}{JsonxWriter}}\ \{}
 \DoxyCodeLine{\Hypertarget{jsonx_8cpp_source_l00020}00020\ \textcolor{keyword}{public}:}
-\DoxyCodeLine{\Hypertarget{jsonx_8cpp_source_l00021}\mbox{\hyperlink{class_jsonx_writer_aa43c2ee8f8c1875a20e120bcc174f70d}{00021}}\ \ \ \ \ \mbox{\hyperlink{class_jsonx_writer_aa43c2ee8f8c1875a20e120bcc174f70d}{JsonxWriter}}(OutputStream\&\ os)\ :\ os\_(os),\ name\_(),\ level\_(0),\ hasName\_(false)\ \{}
+\DoxyCodeLine{\Hypertarget{jsonx_8cpp_source_l00021}\mbox{\hyperlink{class_jsonx_writer_aa43c2ee8f8c1875a20e120bcc174f70d}{00021}}\ \ \ \ \ \mbox{\hyperlink{class_jsonx_writer_aa43c2ee8f8c1875a20e120bcc174f70d}{JsonxWriter}}(OutputStream\&\ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}})\ :\ os\_(\mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}),\ name\_(),\ level\_(0),\ hasName\_(false)\ \{}
 \DoxyCodeLine{\Hypertarget{jsonx_8cpp_source_l00022}00022\ \ \ \ \ \}}
 \DoxyCodeLine{\Hypertarget{jsonx_8cpp_source_l00023}00023\ }
 \DoxyCodeLine{\Hypertarget{jsonx_8cpp_source_l00024}\mbox{\hyperlink{class_jsonx_writer_a3dda55ba4832a85514cc9c3e66a8c12e}{00024}}\ \ \ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{class_jsonx_writer_a3dda55ba4832a85514cc9c3e66a8c12e}{Null}}()\ \{}
@@ -199,7 +199,7 @@
 \DoxyCodeLine{\Hypertarget{jsonx_8cpp_source_l00195}00195\ \ \ \ \ \textcolor{comment}{//\ Prepare\ JSON\ writer\ and\ output\ stream.}}
 \DoxyCodeLine{\Hypertarget{jsonx_8cpp_source_l00196}00196\ \ \ \ \ \textcolor{keywordtype}{char}\ writeBuffer[65536];}
 \DoxyCodeLine{\Hypertarget{jsonx_8cpp_source_l00197}00197\ \ \ \ \ \mbox{\hyperlink{class_file_write_stream}{FileWriteStream}}\ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}(stdout,\ writeBuffer,\ \textcolor{keyword}{sizeof}(writeBuffer));}
-\DoxyCodeLine{\Hypertarget{jsonx_8cpp_source_l00198}00198\ \ \ \ \ \mbox{\hyperlink{class_jsonx_writer}{JsonxWriter<FileWriteStream>}}\ writer(os);}
+\DoxyCodeLine{\Hypertarget{jsonx_8cpp_source_l00198}00198\ \ \ \ \ \mbox{\hyperlink{class_jsonx_writer}{JsonxWriter<FileWriteStream>}}\ writer(\mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}});}
 \DoxyCodeLine{\Hypertarget{jsonx_8cpp_source_l00199}00199\ }
 \DoxyCodeLine{\Hypertarget{jsonx_8cpp_source_l00200}00200\ \ \ \ \ \textcolor{comment}{//\ JSON\ reader\ parse\ from\ the\ input\ stream\ and\ let\ writer\ generate\ the\ output.}}
 \DoxyCodeLine{\Hypertarget{jsonx_8cpp_source_l00201}00201\ \ \ \ \ \textcolor{keywordflow}{if}\ (!reader.\mbox{\hyperlink{class_generic_reader_a0c450620d14ff1824e58bb7bd9b42099}{Parse}}(is,\ writer))\ \{}

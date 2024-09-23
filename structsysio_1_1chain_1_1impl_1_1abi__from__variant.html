@@ -173,7 +173,7 @@ template&lt;typename Resolver &gt; </div>
 <p class="definition">Definition at line <a class="el" href="abi__serializer_8hpp_source.html#l00753">753</a> of file <a class="el" href="abi__serializer_8hpp_source.html">abi_serializer.hpp</a>.</p>
 <div class="fragment"><div class="line"><span class="lineno">  754</span>      {</div>
 <div class="line"><span class="lineno">  755</span>         <span class="keyword">auto</span> h = ctx.enter_scope();</div>
-<div class="line"><span class="lineno">  756</span>         <span class="keyword">const</span> variant_object&amp; vo = <a class="code hl_variable" href="namespacedevelop_build.html#ade64cd34608f9442ef3049116a2da428">v</a>.get_object();</div>
+<div class="line"><span class="lineno">  756</span>         <span class="keyword">const</span> variant_object&amp; vo = v.<a class="code hl_function" href="classfc_1_1variant.html#a17a7054a10963360c6a14d60f6e30128">get_object</a>();</div>
 <div class="line"><span class="lineno">  757</span>         <a class="code hl_define" href="chain_2include_2sysio_2chain_2exceptions_8hpp.html#a40c2826a6fba35c1ffbf912bdf559792">SYS_ASSERT</a>(vo.contains(<span class="stringliteral">&quot;account&quot;</span>), packed_transaction_type_exception, <span class="stringliteral">&quot;Missing account&quot;</span>);</div>
 <div class="line"><span class="lineno">  758</span>         <a class="code hl_define" href="chain_2include_2sysio_2chain_2exceptions_8hpp.html#a40c2826a6fba35c1ffbf912bdf559792">SYS_ASSERT</a>(vo.contains(<span class="stringliteral">&quot;name&quot;</span>), packed_transaction_type_exception, <span class="stringliteral">&quot;Missing name&quot;</span>);</div>
 <div class="line"><span class="lineno">  759</span>         <a class="code hl_function" href="namespacefc.html#accef08adf4ee05c36ccc550d8101b08f">from_variant</a>(vo[<span class="stringliteral">&quot;account&quot;</span>], act.account);</div>
@@ -216,26 +216,30 @@ template&lt;typename Resolver &gt; </div>
 <div class="line"><span class="lineno">  796</span>                    <span class="stringliteral">&quot;Failed to deserialize data for ${account}:${name}&quot;</span>, (<span class="stringliteral">&quot;account&quot;</span>, act.account)(<span class="stringliteral">&quot;name&quot;</span>, act.name));</div>
 <div class="line"><span class="lineno">  797</span>      }</div>
 <div class="ttc" id="achain_2include_2sysio_2chain_2exceptions_8hpp_html_a40c2826a6fba35c1ffbf912bdf559792"><div class="ttname"><a href="chain_2include_2sysio_2chain_2exceptions_8hpp.html#a40c2826a6fba35c1ffbf912bdf559792">SYS_ASSERT</a></div><div class="ttdeci">#define SYS_ASSERT(expr, exc_type, FORMAT,...)</div><div class="ttdef"><b>Definition</b> <a href="chain_2include_2sysio_2chain_2exceptions_8hpp_source.html#l00007">exceptions.hpp:7</a></div></div>
-<div class="ttc" id="anamespacedevelop_build_html_ade64cd34608f9442ef3049116a2da428"><div class="ttname"><a href="namespacedevelop_build.html#ade64cd34608f9442ef3049116a2da428">developBuild.v</a></div><div class="ttdeci">v</div><div class="ttdef"><b>Definition</b> <a href="develop_build_8py_source.html#l00006">developBuild.py:6</a></div></div>
+<div class="ttc" id="aclassfc_1_1variant_html_a17a7054a10963360c6a14d60f6e30128"><div class="ttname"><a href="classfc_1_1variant.html#a17a7054a10963360c6a14d60f6e30128">fc::variant::get_object</a></div><div class="ttdeci">variant_object &amp; get_object()</div><div class="ttdef"><b>Definition</b> <a href="variant_8cpp_source.html#l00554">variant.cpp:554</a></div></div>
 <div class="ttc" id="anamespacefc_html_accef08adf4ee05c36ccc550d8101b08f"><div class="ttname"><a href="namespacefc.html#accef08adf4ee05c36ccc550d8101b08f">fc::from_variant</a></div><div class="ttdeci">void from_variant(const fc::variant &amp;v, sysio::chain::chain_id_type &amp;cid)</div><div class="ttdef"><b>Definition</b> <a href="chain__id__type_8cpp_source.html#l00018">chain_id_type.cpp:18</a></div></div>
 </div><!-- fragment --><div class="dynheader">
 Here is the call graph for this function:</div>
 <div class="dyncontent">
 <div class="center"><img src="structsysio_1_1chain_1_1impl_1_1abi__from__variant_ade26c910d071fe796e2cbce8ea7f777b_cgraph.png" border="0" usemap="#astructsysio_1_1chain_1_1impl_1_1abi__from__variant_ade26c910d071fe796e2cbce8ea7f777b_cgraph" alt=""/></div>
 <map name="astructsysio_1_1chain_1_1impl_1_1abi__from__variant_ade26c910d071fe796e2cbce8ea7f777b_cgraph" id="astructsysio_1_1chain_1_1impl_1_1abi__from__variant_ade26c910d071fe796e2cbce8ea7f777b_cgraph">
-<area shape="rect" title=" " alt="" coords="5,102,139,158"/>
+<area shape="rect" title=" " alt="" coords="5,148,139,203"/>
 <area shape="rect" href="classfc_1_1variant__object.html#ae4ed31b7cb6bc6e1d2873f9121049589" title=" " alt="" coords="201,38,322,78"/>
-<area shape="poly" title=" " alt="" coords="138,102,191,82,193,87,140,107"/>
+<area shape="poly" title=" " alt="" coords="105,145,143,116,185,88,193,83,196,88,188,92,146,120,108,149"/>
 <area shape="rect" href="structsysio_1_1chain_1_1impl_1_1abi__traverse__context.html#aa59879bd83e287e7174d4d0ba248d3ea" title=" " alt="" coords="187,102,337,158"/>
-<area shape="poly" title=" " alt="" coords="139,128,171,128,171,133,139,133"/>
+<area shape="poly" title=" " alt="" coords="139,157,171,149,172,154,140,162"/>
 <area shape="rect" href="namespacefc.html#accef08adf4ee05c36ccc550d8101b08f" title=" " alt="" coords="206,207,318,232"/>
-<area shape="poly" title=" " alt="" coords="134,156,220,197,218,202,131,161"/>
+<area shape="poly" title=" " alt="" coords="140,188,191,200,189,206,139,194"/>
+<area shape="rect" href="classfc_1_1variant.html#a17a7054a10963360c6a14d60f6e30128" title=" " alt="" coords="188,256,336,282"/>
+<area shape="poly" title=" " alt="" coords="116,202,188,242,200,248,198,253,185,247,113,206"/>
 <area shape="rect" href="classfc_1_1variant__object.html#a804706455398e249f6272b3ff19cef5d" title=" " alt="" coords="385,5,535,31"/>
 <area shape="poly" title=" " alt="" coords="322,43,378,32,379,37,323,49"/>
 <area shape="rect" href="classfc_1_1variant__object.html#acfef67913fd3c24ea8017b3a5ad49144" title=" " alt="" coords="400,79,521,120"/>
 <area shape="poly" title=" " alt="" coords="323,68,385,81,384,86,322,73"/>
 <area shape="poly" title=" " alt="" coords="422,79,421,69,427,60,440,55,460,53,482,55,495,61,492,66,480,60,460,58,441,60,430,64,426,70,428,78"/>
 <area shape="poly" title=" " alt="" coords="230,208,224,198,227,188,241,182,262,180,285,183,297,189,294,194,283,188,262,185,242,187,231,192,229,197,234,205"/>
+<area shape="rect" href="classfc_1_1variant.html#afaae1df286ff97c83301eda21dbd51ea" title=" " alt="" coords="392,256,529,282"/>
+<area shape="poly" title=" " alt="" coords="336,266,376,266,376,272,336,272"/>
 </map>
 </div>
 
@@ -416,7 +420,7 @@ template&lt;typename Resolver &gt; </div>
 <p class="definition">Definition at line <a class="el" href="abi__serializer_8hpp_source.html#l00800">800</a> of file <a class="el" href="abi__serializer_8hpp_source.html">abi_serializer.hpp</a>.</p>
 <div class="fragment"><div class="line"><span class="lineno">  801</span>      {</div>
 <div class="line"><span class="lineno">  802</span>         <span class="keyword">auto</span> h = ctx.enter_scope();</div>
-<div class="line"><span class="lineno">  803</span>         <span class="keyword">const</span> variant_object&amp; vo = <a class="code hl_variable" href="namespacedevelop_build.html#ade64cd34608f9442ef3049116a2da428">v</a>.get_object();</div>
+<div class="line"><span class="lineno">  803</span>         <span class="keyword">const</span> variant_object&amp; vo = v.<a class="code hl_function" href="classfc_1_1variant.html#a17a7054a10963360c6a14d60f6e30128">get_object</a>();</div>
 <div class="line"><span class="lineno">  804</span>         <a class="code hl_define" href="chain_2include_2sysio_2chain_2exceptions_8hpp.html#a40c2826a6fba35c1ffbf912bdf559792">SYS_ASSERT</a>(vo.contains(<span class="stringliteral">&quot;signatures&quot;</span>), packed_transaction_type_exception, <span class="stringliteral">&quot;Missing signatures&quot;</span>);</div>
 <div class="line"><span class="lineno">  805</span>         <a class="code hl_define" href="chain_2include_2sysio_2chain_2exceptions_8hpp.html#a40c2826a6fba35c1ffbf912bdf559792">SYS_ASSERT</a>(vo.contains(<span class="stringliteral">&quot;compression&quot;</span>), packed_transaction_type_exception, <span class="stringliteral">&quot;Missing compression&quot;</span>);</div>
 <div class="line"><span class="lineno">  806</span>         std::vector&lt;signature_type&gt; signatures;</div>
@@ -465,19 +469,23 @@ Here is the call graph for this function:</div>
 <div class="dyncontent">
 <div class="center"><img src="structsysio_1_1chain_1_1impl_1_1abi__from__variant_a45c46f0767d38a7913dd4bc36475f3de_cgraph.png" border="0" usemap="#astructsysio_1_1chain_1_1impl_1_1abi__from__variant_a45c46f0767d38a7913dd4bc36475f3de_cgraph" alt=""/></div>
 <map name="astructsysio_1_1chain_1_1impl_1_1abi__from__variant_a45c46f0767d38a7913dd4bc36475f3de_cgraph" id="astructsysio_1_1chain_1_1impl_1_1abi__from__variant_a45c46f0767d38a7913dd4bc36475f3de_cgraph">
-<area shape="rect" title=" " alt="" coords="5,102,139,158"/>
+<area shape="rect" title=" " alt="" coords="5,148,139,203"/>
 <area shape="rect" href="classfc_1_1variant__object.html#ae4ed31b7cb6bc6e1d2873f9121049589" title=" " alt="" coords="201,38,322,78"/>
-<area shape="poly" title=" " alt="" coords="138,102,191,82,193,87,140,107"/>
+<area shape="poly" title=" " alt="" coords="105,145,143,116,185,88,193,83,196,88,188,92,146,120,108,149"/>
 <area shape="rect" href="structsysio_1_1chain_1_1impl_1_1abi__traverse__context.html#aa59879bd83e287e7174d4d0ba248d3ea" title=" " alt="" coords="187,102,337,158"/>
-<area shape="poly" title=" " alt="" coords="139,128,171,128,171,133,139,133"/>
+<area shape="poly" title=" " alt="" coords="139,157,171,149,172,154,140,162"/>
 <area shape="rect" href="namespacefc.html#accef08adf4ee05c36ccc550d8101b08f" title=" " alt="" coords="206,207,318,232"/>
-<area shape="poly" title=" " alt="" coords="134,156,220,197,218,202,131,161"/>
+<area shape="poly" title=" " alt="" coords="140,188,191,200,189,206,139,194"/>
+<area shape="rect" href="classfc_1_1variant.html#a17a7054a10963360c6a14d60f6e30128" title=" " alt="" coords="188,256,336,282"/>
+<area shape="poly" title=" " alt="" coords="116,202,188,242,200,248,198,253,185,247,113,206"/>
 <area shape="rect" href="classfc_1_1variant__object.html#a804706455398e249f6272b3ff19cef5d" title=" " alt="" coords="385,5,535,31"/>
 <area shape="poly" title=" " alt="" coords="322,43,378,32,379,37,323,49"/>
 <area shape="rect" href="classfc_1_1variant__object.html#acfef67913fd3c24ea8017b3a5ad49144" title=" " alt="" coords="400,79,521,120"/>
 <area shape="poly" title=" " alt="" coords="323,68,385,81,384,86,322,73"/>
 <area shape="poly" title=" " alt="" coords="422,79,421,69,427,60,440,55,460,53,482,55,495,61,492,66,480,60,460,58,441,60,430,64,426,70,428,78"/>
 <area shape="poly" title=" " alt="" coords="230,208,224,198,227,188,241,182,262,180,285,183,297,189,294,194,283,188,262,185,242,187,231,192,229,197,234,205"/>
+<area shape="rect" href="classfc_1_1variant.html#afaae1df286ff97c83301eda21dbd51ea" title=" " alt="" coords="392,256,529,282"/>
+<area shape="poly" title=" " alt="" coords="336,266,376,266,376,272,336,272"/>
 </map>
 </div>
 
@@ -526,7 +534,7 @@ template&lt;typename M , typename Resolver , <a class="el" href="namespacesysio_
 <p class="definition">Definition at line <a class="el" href="abi__serializer_8hpp_source.html#l00738">738</a> of file <a class="el" href="abi__serializer_8hpp_source.html">abi_serializer.hpp</a>.</p>
 <div class="fragment"><div class="line"><span class="lineno">  739</span>      {</div>
 <div class="line"><span class="lineno">  740</span>         <span class="keyword">auto</span> h = ctx.enter_scope();</div>
-<div class="line"><span class="lineno">  741</span>         <span class="keyword">const</span> variant_object&amp; vo = <a class="code hl_variable" href="namespacedevelop_build.html#ade64cd34608f9442ef3049116a2da428">v</a>.get_object();</div>
+<div class="line"><span class="lineno">  741</span>         <span class="keyword">const</span> variant_object&amp; vo = v.<a class="code hl_function" href="classfc_1_1variant.html#a17a7054a10963360c6a14d60f6e30128">get_object</a>();</div>
 <div class="line"><span class="lineno">  742</span>         M obj;</div>
 <div class="line"><span class="lineno">  743</span>         <a class="code hl_define" href="scalar__4x64__impl_8h.html#a2384e06d62f7580d7599d3b77b68acbb">extract</a>(vo, obj, resolver, ctx);</div>
 <div class="line"><span class="lineno">  744</span>         o = std::make_shared&lt;M&gt;(obj);</div>
@@ -536,9 +544,13 @@ Here is the call graph for this function:</div>
 <div class="dyncontent">
 <div class="center"><img src="structsysio_1_1chain_1_1impl_1_1abi__from__variant_a836832ea7a0e61303e2f8ffb1812345d_cgraph.png" border="0" usemap="#astructsysio_1_1chain_1_1impl_1_1abi__from__variant_a836832ea7a0e61303e2f8ffb1812345d_cgraph" alt=""/></div>
 <map name="astructsysio_1_1chain_1_1impl_1_1abi__from__variant_a836832ea7a0e61303e2f8ffb1812345d_cgraph" id="astructsysio_1_1chain_1_1impl_1_1abi__from__variant_a836832ea7a0e61303e2f8ffb1812345d_cgraph">
-<area shape="rect" title=" " alt="" coords="5,5,139,61"/>
+<area shape="rect" title=" " alt="" coords="5,39,139,94"/>
 <area shape="rect" href="structsysio_1_1chain_1_1impl_1_1abi__traverse__context.html#aa59879bd83e287e7174d4d0ba248d3ea" title=" " alt="" coords="187,5,337,61"/>
-<area shape="poly" title=" " alt="" coords="139,30,171,30,171,36,139,36"/>
+<area shape="poly" title=" " alt="" coords="139,52,171,46,172,52,140,57"/>
+<area shape="rect" href="classfc_1_1variant.html#a17a7054a10963360c6a14d60f6e30128" title=" " alt="" coords="188,86,336,111"/>
+<area shape="poly" title=" " alt="" coords="140,75,174,81,173,86,139,80"/>
+<area shape="rect" href="classfc_1_1variant.html#afaae1df286ff97c83301eda21dbd51ea" title=" " alt="" coords="385,86,522,111"/>
+<area shape="poly" title=" " alt="" coords="336,96,369,96,369,101,336,101"/>
 </map>
 </div>
 
@@ -587,7 +599,7 @@ template&lt;typename M , typename Resolver , <a class="el" href="namespacesysio_
 <p class="definition">Definition at line <a class="el" href="abi__serializer_8hpp_source.html#l00720">720</a> of file <a class="el" href="abi__serializer_8hpp_source.html">abi_serializer.hpp</a>.</p>
 <div class="fragment"><div class="line"><span class="lineno">  721</span>      {</div>
 <div class="line"><span class="lineno">  722</span>         <span class="keyword">auto</span> h = ctx.enter_scope();</div>
-<div class="line"><span class="lineno">  723</span>         <span class="keyword">const</span> <a class="code hl_typedef" href="namespacefc.html#a9148361f6aaa3d739990a75ac557fe59">variants</a>&amp; <a class="code hl_typedef" href="namespacepicojson.html#ac1e72166adfe3d96dc58cddc7ebd536a">array</a> = <a class="code hl_variable" href="namespacedevelop_build.html#ade64cd34608f9442ef3049116a2da428">v</a>.get_array();</div>
+<div class="line"><span class="lineno">  723</span>         <span class="keyword">const</span> <a class="code hl_typedef" href="namespacefc.html#a9148361f6aaa3d739990a75ac557fe59">variants</a>&amp; <a class="code hl_typedef" href="namespacepicojson.html#ac1e72166adfe3d96dc58cddc7ebd536a">array</a> = v.<a class="code hl_function" href="classfc_1_1variant.html#aea83c87e4e1b1e185f57717b4bd683a5">get_array</a>();</div>
 <div class="line"><span class="lineno">  724</span>         o.clear();</div>
 <div class="line"><span class="lineno">  725</span>         o.reserve( <a class="code hl_typedef" href="namespacepicojson.html#ac1e72166adfe3d96dc58cddc7ebd536a">array</a>.size() );</div>
 <div class="line"><span class="lineno">  726</span>         <span class="keywordflow">for</span>( <span class="keyword">auto</span> itr = <a class="code hl_typedef" href="namespacepicojson.html#ac1e72166adfe3d96dc58cddc7ebd536a">array</a>.begin(); itr != <a class="code hl_typedef" href="namespacepicojson.html#ac1e72166adfe3d96dc58cddc7ebd536a">array</a>.end(); ++itr ) {</div>
@@ -596,6 +608,7 @@ template&lt;typename M , typename Resolver , <a class="el" href="namespacesysio_
 <div class="line"><span class="lineno">  729</span>            o.emplace_back(std::move(o_iter));</div>
 <div class="line"><span class="lineno">  730</span>         }</div>
 <div class="line"><span class="lineno">  731</span>      }</div>
+<div class="ttc" id="aclassfc_1_1variant_html_aea83c87e4e1b1e185f57717b4bd683a5"><div class="ttname"><a href="classfc_1_1variant.html#aea83c87e4e1b1e185f57717b4bd683a5">fc::variant::get_array</a></div><div class="ttdeci">variants &amp; get_array()</div><div class="ttdef"><b>Definition</b> <a href="variant_8cpp_source.html#l00496">variant.cpp:496</a></div></div>
 <div class="ttc" id="anamespacefc_html_a9148361f6aaa3d739990a75ac557fe59"><div class="ttname"><a href="namespacefc.html#a9148361f6aaa3d739990a75ac557fe59">fc::variants</a></div><div class="ttdeci">std::vector&lt; fc::variant &gt; variants</div><div class="ttdef"><b>Definition</b> <a href="fc_2include_2fc_2variant_8hpp_source.html#l00173">variant.hpp:173</a></div></div>
 <div class="ttc" id="anamespacepicojson_html_ac1e72166adfe3d96dc58cddc7ebd536a"><div class="ttname"><a href="namespacepicojson.html#ac1e72166adfe3d96dc58cddc7ebd536a">picojson::array</a></div><div class="ttdeci">value::array array</div><div class="ttdef"><b>Definition</b> <a href="spec__test__generator_8cpp_source.html#l00221">spec_test_generator.cpp:221</a></div></div>
 </div><!-- fragment --><div class="dynheader">
@@ -603,15 +616,19 @@ Here is the call graph for this function:</div>
 <div class="dyncontent">
 <div class="center"><img src="structsysio_1_1chain_1_1impl_1_1abi__from__variant_a0c7da9f35411a81e3291b2189cb43d05_cgraph.png" border="0" usemap="#astructsysio_1_1chain_1_1impl_1_1abi__from__variant_a0c7da9f35411a81e3291b2189cb43d05_cgraph" alt=""/></div>
 <map name="astructsysio_1_1chain_1_1impl_1_1abi__from__variant_a0c7da9f35411a81e3291b2189cb43d05_cgraph" id="astructsysio_1_1chain_1_1impl_1_1abi__from__variant_a0c7da9f35411a81e3291b2189cb43d05_cgraph">
-<area shape="rect" title=" " alt="" coords="5,73,139,129"/>
+<area shape="rect" title=" " alt="" coords="5,105,139,161"/>
 <area shape="rect" href="classfc_1_1array.html#a1735af1b0ae9cae989c1372b426d6b29" title=" " alt="" coords="208,5,316,31"/>
-<area shape="poly" title=" " alt="" coords="123,70,186,40,200,34,202,39,188,45,125,75"/>
+<area shape="poly" title=" " alt="" coords="101,103,139,70,185,40,195,35,198,40,188,44,143,74,104,107"/>
 <area shape="rect" href="classfc_1_1array.html#ab8a8e1a3e90d1bc519181ab464edfe29" title=" " alt="" coords="213,55,311,80"/>
-<area shape="poly" title=" " alt="" coords="139,86,197,76,198,81,140,92"/>
+<area shape="poly" title=" " alt="" coords="138,107,186,90,206,83,207,88,188,95,140,112"/>
 <area shape="rect" href="structsysio_1_1chain_1_1impl_1_1abi__traverse__context.html#aa59879bd83e287e7174d4d0ba248d3ea" title=" " alt="" coords="187,105,337,161"/>
-<area shape="poly" title=" " alt="" coords="140,109,172,115,171,120,139,115"/>
-<area shape="rect" href="classfc_1_1array.html#a0a4696737886d8a01c8eb75e2d234dc0" title=" " alt="" coords="211,185,312,211"/>
-<area shape="poly" title=" " alt="" coords="114,127,188,170,202,177,200,182,185,175,112,132"/>
+<area shape="poly" title=" " alt="" coords="139,130,171,130,171,136,139,136"/>
+<area shape="rect" href="classfc_1_1variant.html#aea83c87e4e1b1e185f57717b4bd683a5" title=" " alt="" coords="191,185,332,211"/>
+<area shape="poly" title=" " alt="" coords="140,154,188,170,207,177,206,182,186,175,138,159"/>
+<area shape="rect" href="classfc_1_1array.html#a0a4696737886d8a01c8eb75e2d234dc0" title=" " alt="" coords="211,235,312,260"/>
+<area shape="poly" title=" " alt="" coords="104,159,143,191,188,221,198,226,195,231,185,226,139,196,101,163"/>
+<area shape="rect" href="classfc_1_1variant.html#afaae1df286ff97c83301eda21dbd51ea" title=" " alt="" coords="385,185,522,211"/>
+<area shape="poly" title=" " alt="" coords="333,196,369,196,369,201,333,201"/>
 </map>
 </div>
 

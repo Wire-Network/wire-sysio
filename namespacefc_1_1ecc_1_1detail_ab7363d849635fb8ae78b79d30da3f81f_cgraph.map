@@ -1,5 +1,7 @@
 <map id="fc::ecc::detail::_left" name="fc::ecc::detail::_left">
-<area shape="rect" id="Node000001" title=" " alt="" coords="5,5,139,31"/>
-<area shape="rect" id="Node000002" href="$yubihsm__pkcs11_8c.html#ae785d5badbf1f08b491af31f32a135a1" title=" " alt="" coords="187,5,258,31"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="139,16,171,16,171,21,139,21"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,31,139,56"/>
+<area shape="rect" id="Node000002" href="$classfc_1_1sha512.html#ad8e5e86882db16c32ceea6516d7c9f14" title=" " alt="" coords="187,5,302,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="139,31,171,26,172,31,139,36"/>
+<area shape="rect" id="Node000003" href="$yubihsm__pkcs11_8c.html#ae785d5badbf1f08b491af31f32a135a1" title=" " alt="" coords="209,55,280,80"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="139,50,194,58,193,63,139,55"/>
 </map>

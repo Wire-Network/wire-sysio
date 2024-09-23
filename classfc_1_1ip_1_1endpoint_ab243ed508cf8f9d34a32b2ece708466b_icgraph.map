@@ -1,7 +1,9 @@
 <map id="fc::ip::endpoint::port" name="fc::ip::endpoint::port">
-<area shape="rect" id="Node000001" title=" " alt="" coords="373,13,510,38"/>
-<area shape="rect" id="Node000002" href="$namespacefc_1_1detail.html#af06ee7eaeece465975b471d5b8d98d6b" title=" " alt="" coords="183,13,325,38"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="357,28,326,28,326,23,357,23"/>
-<area shape="rect" id="Node000003" href="$classfc_1_1gelf__appender.html#ab6509d82a033f86a7066849841465ff0" title="Required for name resolution and socket initialization." alt="" coords="5,5,135,46"/>
-<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="167,28,135,28,135,23,167,23"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="373,31,510,56"/>
+<area shape="rect" id="Node000002" href="$namespacefc_1_1raw.html#a0fdb9c6ae378596a96db14f8c4408dee" title=" " alt="" coords="205,5,302,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="357,35,302,27,303,22,358,30"/>
+<area shape="rect" id="Node000003" href="$namespacefc_1_1detail.html#af06ee7eaeece465975b471d5b8d98d6b" title=" " alt="" coords="183,55,325,80"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="358,57,326,61,325,56,357,52"/>
+<area shape="rect" id="Node000004" href="$classfc_1_1gelf__appender.html#ab6509d82a033f86a7066849841465ff0" title="Required for name resolution and socket initialization." alt="" coords="5,47,135,88"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="167,70,135,70,135,65,167,65"/>
 </map>

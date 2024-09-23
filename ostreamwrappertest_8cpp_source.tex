@@ -35,8 +35,8 @@
 \DoxyCodeLine{\Hypertarget{ostreamwrappertest_8cpp_source_l00031}00031\ \ \ \ \ StringStreamType\ oss(\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}});}
 \DoxyCodeLine{\Hypertarget{ostreamwrappertest_8cpp_source_l00032}00032\ \ \ \ \ \mbox{\hyperlink{class_basic_o_stream_wrapper}{BasicOStreamWrapper<StringStreamType>}}\ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}(oss);}
 \DoxyCodeLine{\Hypertarget{ostreamwrappertest_8cpp_source_l00033}00033\ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{size\_t}\ i\ =\ 0;\ i\ <\ 3;\ i++)}
-\DoxyCodeLine{\Hypertarget{ostreamwrappertest_8cpp_source_l00034}00034\ \ \ \ \ \ \ \ \ os.Put(\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}[i]);}
-\DoxyCodeLine{\Hypertarget{ostreamwrappertest_8cpp_source_l00035}00035\ \ \ \ \ os.Flush();}
+\DoxyCodeLine{\Hypertarget{ostreamwrappertest_8cpp_source_l00034}00034\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}.Put(\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}[i]);}
+\DoxyCodeLine{\Hypertarget{ostreamwrappertest_8cpp_source_l00035}00035\ \ \ \ \ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}.Flush();}
 \DoxyCodeLine{\Hypertarget{ostreamwrappertest_8cpp_source_l00036}00036\ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{size\_t}\ i\ =\ 0;\ i\ <\ 3;\ i++)}
 \DoxyCodeLine{\Hypertarget{ostreamwrappertest_8cpp_source_l00037}00037\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{gtest_8h_a4159019abda84f5366acdb7604ff220a}{EXPECT\_EQ}}(\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}[i],\ oss.str()[i]);}
 \DoxyCodeLine{\Hypertarget{ostreamwrappertest_8cpp_source_l00038}00038\ \}}
@@ -61,13 +61,13 @@
 \DoxyCodeLine{\Hypertarget{ostreamwrappertest_8cpp_source_l00057}00057\ \ \ \ \ \mbox{\hyperlink{class_o_stream_wrapper}{OStreamWrapper}}\ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}(cout);}
 \DoxyCodeLine{\Hypertarget{ostreamwrappertest_8cpp_source_l00058}00058\ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}\ =\ \textcolor{stringliteral}{"{}Hello\ World!\(\backslash\)n"{}};}
 \DoxyCodeLine{\Hypertarget{ostreamwrappertest_8cpp_source_l00059}00059\ \ \ \ \ \textcolor{keywordflow}{while}\ (*\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}})}
-\DoxyCodeLine{\Hypertarget{ostreamwrappertest_8cpp_source_l00060}00060\ \ \ \ \ \ \ \ \ os.Put(*\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}++);}
-\DoxyCodeLine{\Hypertarget{ostreamwrappertest_8cpp_source_l00061}00061\ \ \ \ \ os.Flush();}
+\DoxyCodeLine{\Hypertarget{ostreamwrappertest_8cpp_source_l00060}00060\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}.Put(*\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}++);}
+\DoxyCodeLine{\Hypertarget{ostreamwrappertest_8cpp_source_l00061}00061\ \ \ \ \ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}.Flush();}
 \DoxyCodeLine{\Hypertarget{ostreamwrappertest_8cpp_source_l00062}00062\ \}}
 \DoxyCodeLine{\Hypertarget{ostreamwrappertest_8cpp_source_l00063}00063\ }
 \DoxyCodeLine{\Hypertarget{ostreamwrappertest_8cpp_source_l00064}00064\ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ FileStreamType>}
 \DoxyCodeLine{\Hypertarget{ostreamwrappertest_8cpp_source_l00065}00065\ \textcolor{keyword}{static}\ \textcolor{keywordtype}{void}\ TestFileStream()\ \{}
-\DoxyCodeLine{\Hypertarget{ostreamwrappertest_8cpp_source_l00066}00066\ \ \ \ \ \textcolor{keywordtype}{char}\ \mbox{\hyperlink{namespaceembed_clara_a1e1bd594f85f58f5dca6c41c0ac720fb}{filename}}[L\_tmpnam];}
+\DoxyCodeLine{\Hypertarget{ostreamwrappertest_8cpp_source_l00066}00066\ \ \ \ \ \textcolor{keywordtype}{char}\ filename[L\_tmpnam];}
 \DoxyCodeLine{\Hypertarget{ostreamwrappertest_8cpp_source_l00067}00067\ \ \ \ \ FILE*\ fp\ =\ \mbox{\hyperlink{unittest_8h_acb6251ae9b44050f1fcabf8d3c2e792b}{TempFile}}(filename);}
 \DoxyCodeLine{\Hypertarget{ostreamwrappertest_8cpp_source_l00068}00068\ \ \ \ \ fclose(fp);}
 \DoxyCodeLine{\Hypertarget{ostreamwrappertest_8cpp_source_l00069}00069\ }

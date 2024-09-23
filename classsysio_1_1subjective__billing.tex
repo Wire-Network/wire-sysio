@@ -63,7 +63,8 @@ Definition at line \mbox{\hyperlink{subjective__billing_8hpp_source_l00171}{171}
 \DoxyCodeLine{00173\ \ \ \ \}}
 
 \end{DoxyCode}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -153,7 +154,8 @@ Definition at line \mbox{\hyperlink{subjective__billing_8hpp_source_l00148}{148}
 \DoxyCodeLine{00169\ \ \ \ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -175,7 +177,8 @@ Definition at line \mbox{\hyperlink{subjective__billing_8hpp_source_l00117}{117}
 \DoxyCodeLine{00117\ \{\ \textcolor{keywordflow}{return}\ \_disabled\ ||\ \_disabled\_accounts.count(\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}\ );\ \}}
 
 \end{DoxyCode}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -203,7 +206,8 @@ Definition at line \mbox{\hyperlink{subjective__billing_8hpp_source_l00175}{175}
 \DoxyCodeLine{00181\ \ \ \ \}}
 
 \end{DoxyCode}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -225,21 +229,21 @@ Definition at line \mbox{\hyperlink{subjective__billing_8hpp_source_l00184}{184}
 \begin{DoxyCode}{0}
 \DoxyCodeLine{00184\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
 \DoxyCodeLine{00185\ \ \ \ \ \ \ \textcolor{keywordtype}{bool}\ exhausted\ =\ \textcolor{keyword}{false};}
-\DoxyCodeLine{00186\ \ \ \ \ \ \ \textcolor{keyword}{auto}\&\ \mbox{\hyperlink{namespacehost__functions__tests__1_a8496a24b5236a2dc07bb4f2930d88342}{idx}}\ =\ \_trx\_cache\_index.get<by\_expiry>();}
-\DoxyCodeLine{00187\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ !\mbox{\hyperlink{namespacehost__functions__tests__1_a8496a24b5236a2dc07bb4f2930d88342}{idx}}.empty()\ )\ \{}
+\DoxyCodeLine{00186\ \ \ \ \ \ \ \textcolor{keyword}{auto}\&\ idx\ =\ \_trx\_cache\_index.get<by\_expiry>();}
+\DoxyCodeLine{00187\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ !idx.empty()\ )\ \{}
 \DoxyCodeLine{00188\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\ time\_ordinal\ =\ time\_ordinal\_for(now);}
 \DoxyCodeLine{00189\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\ orig\_count\ =\ \_trx\_cache\_index.size();}
 \DoxyCodeLine{00190\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ num\_expired\ =\ 0;}
 \DoxyCodeLine{00191\ }
-\DoxyCodeLine{00192\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{while}(\ !\mbox{\hyperlink{namespacehost__functions__tests__1_a8496a24b5236a2dc07bb4f2930d88342}{idx}}.empty()\ )\ \{}
+\DoxyCodeLine{00192\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{while}(\ !idx.empty()\ )\ \{}
 \DoxyCodeLine{00193\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ \mbox{\hyperlink{namespaceboost_1_1fibers_1_1asio_a65142b77539b20ba6d2abb35a0d4f5d2}{yield}}()\ )\ \{}
 \DoxyCodeLine{00194\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ exhausted\ =\ \textcolor{keyword}{true};}
 \DoxyCodeLine{00195\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
 \DoxyCodeLine{00196\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
-\DoxyCodeLine{00197\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ b\ =\ \mbox{\hyperlink{namespacehost__functions__tests__1_a8496a24b5236a2dc07bb4f2930d88342}{idx}}.begin();}
+\DoxyCodeLine{00197\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ b\ =\ idx.begin();}
 \DoxyCodeLine{00198\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ b-\/>expiry\ >\ pending\_block\_time\ )\ \textcolor{keywordflow}{break};}
 \DoxyCodeLine{00199\ \ \ \ \ \ \ \ \ \ \ \ \ transition\_to\_expired(\ *b,\ time\_ordinal\ );}
-\DoxyCodeLine{00200\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacehost__functions__tests__1_a8496a24b5236a2dc07bb4f2930d88342}{idx}}.erase(\ b\ );}
+\DoxyCodeLine{00200\ \ \ \ \ \ \ \ \ \ \ \ \ idx.erase(\ b\ );}
 \DoxyCodeLine{00201\ \ \ \ \ \ \ \ \ \ \ \ \ num\_expired++;}
 \DoxyCodeLine{00202\ \ \ \ \ \ \ \ \ \ \}}
 \DoxyCodeLine{00203\ }
@@ -250,7 +254,8 @@ Definition at line \mbox{\hyperlink{subjective__billing_8hpp_source_l00184}{184}
 \DoxyCodeLine{00208\ \ \ \ \}}
 
 \end{DoxyCode}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -270,11 +275,11 @@ Definition at line \mbox{\hyperlink{subjective__billing_8hpp_source_l00105}{105}
 
 \begin{DoxyCode}{0}
 \DoxyCodeLine{00105\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
-\DoxyCodeLine{00106\ \ \ \ \ \ \ \textcolor{keyword}{auto}\&\ \mbox{\hyperlink{namespacehost__functions__tests__1_a8496a24b5236a2dc07bb4f2930d88342}{idx}}\ =\ \_trx\_cache\_index.get<by\_id>();}
-\DoxyCodeLine{00107\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ itr\ =\ \mbox{\hyperlink{namespacehost__functions__tests__1_a8496a24b5236a2dc07bb4f2930d88342}{idx}}.find(\ trx\_id\ );}
-\DoxyCodeLine{00108\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ itr\ !=\ \mbox{\hyperlink{namespacehost__functions__tests__1_a8496a24b5236a2dc07bb4f2930d88342}{idx}}.end()\ )\ \{}
+\DoxyCodeLine{00106\ \ \ \ \ \ \ \textcolor{keyword}{auto}\&\ idx\ =\ \_trx\_cache\_index.get<by\_id>();}
+\DoxyCodeLine{00107\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ itr\ =\ idx.find(\ trx\_id\ );}
+\DoxyCodeLine{00108\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ itr\ !=\ idx.end()\ )\ \{}
 \DoxyCodeLine{00109\ \ \ \ \ \ \ \ \ \ remove\_subjective\_billing(\ *itr,\ time\_ordinal\ );}
-\DoxyCodeLine{00110\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacehost__functions__tests__1_a8496a24b5236a2dc07bb4f2930d88342}{idx}}.erase(\ itr\ );}
+\DoxyCodeLine{00110\ \ \ \ \ \ \ \ \ \ idx.erase(\ itr\ );}
 \DoxyCodeLine{00111\ \ \ \ \ \ \ \}}
 \DoxyCodeLine{00112\ \ \ \ \}}
 
@@ -297,7 +302,8 @@ Definition at line \mbox{\hyperlink{subjective__billing_8hpp_source_l00214}{214}
 \DoxyCodeLine{00217\ \ \ \ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -339,14 +345,16 @@ Definition at line \mbox{\hyperlink{subjective__billing_8hpp_source_l00120}{120}
 \DoxyCodeLine{00137\ \ \ \ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
 \includegraphics[width=350pt]{classsysio_1_1subjective__billing_a443a458832b5c475272149ccb31db567_cgraph}
 \end{center}
 \end{figure}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -374,14 +382,16 @@ Definition at line \mbox{\hyperlink{subjective__billing_8hpp_source_l00139}{139}
 \DoxyCodeLine{00146\ \ \ \ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
 \includegraphics[width=350pt]{classsysio_1_1subjective__billing_a50d2b20b8dc816f33f480062a24e074a_cgraph}
 \end{center}
 \end{figure}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode

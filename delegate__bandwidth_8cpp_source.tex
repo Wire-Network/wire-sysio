@@ -335,12 +335,12 @@
 \DoxyCodeLine{\Hypertarget{delegate__bandwidth_8cpp_source_l00350}00350\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ voter\_itr\ =\ \_voters.find(\ voter.value\ );}
 \DoxyCodeLine{\Hypertarget{delegate__bandwidth_8cpp_source_l00351}00351\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ voter\_itr\ ==\ \_voters.end()\ )\ \{}
 \DoxyCodeLine{\Hypertarget{delegate__bandwidth_8cpp_source_l00352}00352\ \ \ \ \ \ \ \ \ \ voter\_itr\ =\ \_voters.emplace(\ voter,\ [\&](\ \textcolor{keyword}{auto}\&\ v\ )\ \{}
-\DoxyCodeLine{\Hypertarget{delegate__bandwidth_8cpp_source_l00353}00353\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.owner\ \ =\ voter;}
-\DoxyCodeLine{\Hypertarget{delegate__bandwidth_8cpp_source_l00354}00354\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.staked\ =\ total\_update.amount;}
+\DoxyCodeLine{\Hypertarget{delegate__bandwidth_8cpp_source_l00353}00353\ \ \ \ \ \ \ \ \ \ \ \ \ v.owner\ \ =\ voter;}
+\DoxyCodeLine{\Hypertarget{delegate__bandwidth_8cpp_source_l00354}00354\ \ \ \ \ \ \ \ \ \ \ \ \ v.staked\ =\ total\_update.amount;}
 \DoxyCodeLine{\Hypertarget{delegate__bandwidth_8cpp_source_l00355}00355\ \ \ \ \ \ \ \ \ \ \});}
 \DoxyCodeLine{\Hypertarget{delegate__bandwidth_8cpp_source_l00356}00356\ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
 \DoxyCodeLine{\Hypertarget{delegate__bandwidth_8cpp_source_l00357}00357\ \ \ \ \ \ \ \ \ \ \_voters.modify(\ voter\_itr,\ same\_payer,\ [\&](\ \textcolor{keyword}{auto}\&\ v\ )\ \{}
-\DoxyCodeLine{\Hypertarget{delegate__bandwidth_8cpp_source_l00358}00358\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.staked\ +=\ total\_update.amount;}
+\DoxyCodeLine{\Hypertarget{delegate__bandwidth_8cpp_source_l00358}00358\ \ \ \ \ \ \ \ \ \ \ \ \ v.staked\ +=\ total\_update.amount;}
 \DoxyCodeLine{\Hypertarget{delegate__bandwidth_8cpp_source_l00359}00359\ \ \ \ \ \ \ \ \ \ \});}
 \DoxyCodeLine{\Hypertarget{delegate__bandwidth_8cpp_source_l00360}00360\ \ \ \ \ \ \ \}}
 \DoxyCodeLine{\Hypertarget{delegate__bandwidth_8cpp_source_l00361}00361\ }

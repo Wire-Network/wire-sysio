@@ -6,7 +6,8 @@
 
 
 
-Inheritance diagram for Catch\+::Match\+Expr\texorpdfstring{$<$}{<} ArgT, MatcherT \texorpdfstring{$>$}{>}\+:\nopagebreak
+Inheritance diagram for Catch\+::Match\+Expr\texorpdfstring{$<$}{<} ArgT, MatcherT \texorpdfstring{$>$}{>}\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -15,7 +16,8 @@ Inheritance diagram for Catch\+::Match\+Expr\texorpdfstring{$<$}{<} ArgT, Matche
 \end{figure}
 
 
-Collaboration diagram for Catch\+::Match\+Expr\texorpdfstring{$<$}{<} ArgT, MatcherT \texorpdfstring{$>$}{>}\+:\nopagebreak
+Collaboration diagram for Catch\+::Match\+Expr\texorpdfstring{$<$}{<} ArgT, MatcherT \texorpdfstring{$>$}{>}\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -27,11 +29,11 @@ Collaboration diagram for Catch\+::Match\+Expr\texorpdfstring{$<$}{<} ArgT, Matc
 \item 
 \mbox{\hyperlink{class_catch_1_1_match_expr_ae55ee9bf46c8676c65e9df291a98c345}{Match\+Expr}} (ArgT const \&arg, MatcherT const \&matcher, \mbox{\hyperlink{class_catch_1_1_string_ref}{String\+Ref}} const \&matcher\+String)
 \item 
-void \mbox{\hyperlink{class_catch_1_1_match_expr_ad3e41adb597750b2219bb37e51185629}{stream\+Reconstructed\+Expression}} (std\+::ostream \&os) const override
+void \mbox{\hyperlink{class_catch_1_1_match_expr_ad3e41adb597750b2219bb37e51185629}{stream\+Reconstructed\+Expression}} (std\+::ostream \&\mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}) const override
 \item 
 \mbox{\hyperlink{class_catch_1_1_match_expr_ae55ee9bf46c8676c65e9df291a98c345}{Match\+Expr}} (ArgT const \&arg, MatcherT const \&matcher, \mbox{\hyperlink{class_catch_1_1_string_ref}{String\+Ref}} const \&matcher\+String)
 \item 
-void \mbox{\hyperlink{class_catch_1_1_match_expr_ad3e41adb597750b2219bb37e51185629}{stream\+Reconstructed\+Expression}} (std\+::ostream \&os) const override
+void \mbox{\hyperlink{class_catch_1_1_match_expr_ad3e41adb597750b2219bb37e51185629}{stream\+Reconstructed\+Expression}} (std\+::ostream \&\mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}) const override
 \end{DoxyCompactItemize}
 \doxysubsection*{Public Member Functions inherited from \mbox{\hyperlink{struct_catch_1_1_i_transient_expression}{Catch\+::\+ITransient\+Expression}}}
 \begin{DoxyCompactItemize}
@@ -134,15 +136,16 @@ Definition at line \mbox{\hyperlink{catch__capture__matchers_8h_source_l00034}{3
 \begin{DoxyCode}{0}
 \DoxyCodeLine{00034\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
 \DoxyCodeLine{00035\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ matcherAsString\ =\ m\_matcher.toString();}
-\DoxyCodeLine{00036\ \ \ \ \ \ \ \ \ \ \ \ \ os\ <<\ \mbox{\hyperlink{namespace_catch_1_1_detail_af0ad48344ffd3f92f3568465248a9880}{Catch::Detail::stringify}}(\ m\_arg\ )\ <<\ \textcolor{charliteral}{'\ '};}
+\DoxyCodeLine{00036\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}\ <<\ \mbox{\hyperlink{namespace_catch_1_1_detail_af0ad48344ffd3f92f3568465248a9880}{Catch::Detail::stringify}}(\ m\_arg\ )\ <<\ \textcolor{charliteral}{'\ '};}
 \DoxyCodeLine{00037\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ matcherAsString\ ==\ \mbox{\hyperlink{namespace_catch_1_1_detail_a466775f4eec29ffef29ab334cd885136}{Detail::unprintableString}}\ )}
-\DoxyCodeLine{00038\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ os\ <<\ m\_matcherString;}
+\DoxyCodeLine{00038\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}\ <<\ m\_matcherString;}
 \DoxyCodeLine{00039\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}}
-\DoxyCodeLine{00040\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ os\ <<\ matcherAsString;}
+\DoxyCodeLine{00040\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}\ <<\ matcherAsString;}
 \DoxyCodeLine{00041\ \ \ \ \ \ \ \ \ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -168,15 +171,16 @@ Definition at line \mbox{\hyperlink{single__include_2catch2_2catch_8hpp_source_l
 \begin{DoxyCode}{0}
 \DoxyCodeLine{03382\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
 \DoxyCodeLine{03383\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ matcherAsString\ =\ m\_matcher.toString();}
-\DoxyCodeLine{03384\ \ \ \ \ \ \ \ \ \ \ \ \ os\ <<\ \mbox{\hyperlink{namespace_catch_1_1_detail_af0ad48344ffd3f92f3568465248a9880}{Catch::Detail::stringify}}(\ m\_arg\ )\ <<\ \textcolor{charliteral}{'\ '};}
+\DoxyCodeLine{03384\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}\ <<\ \mbox{\hyperlink{namespace_catch_1_1_detail_af0ad48344ffd3f92f3568465248a9880}{Catch::Detail::stringify}}(\ m\_arg\ )\ <<\ \textcolor{charliteral}{'\ '};}
 \DoxyCodeLine{03385\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ matcherAsString\ ==\ \mbox{\hyperlink{namespace_catch_1_1_detail_a466775f4eec29ffef29ab334cd885136}{Detail::unprintableString}}\ )}
-\DoxyCodeLine{03386\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ os\ <<\ m\_matcherString;}
+\DoxyCodeLine{03386\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}\ <<\ m\_matcherString;}
 \DoxyCodeLine{03387\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}}
-\DoxyCodeLine{03388\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ os\ <<\ matcherAsString;}
+\DoxyCodeLine{03388\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}\ <<\ matcherAsString;}
 \DoxyCodeLine{03389\ \ \ \ \ \ \ \ \ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode

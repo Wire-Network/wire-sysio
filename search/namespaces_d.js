@@ -1,4 +1,6 @@
 var searchData=
 [
-  ['objectwithconversions_0',['ObjectWithConversions',['../namespace_object_with_conversions.html',1,'']]]
+  ['rapidjson_0',['rapidjson',['../namespacerapidjson.html',1,'']]],
+  ['regexp_1',['Regexp',['../namespace_regexp.html',1,'']]],
+  ['runtime_2',['Runtime',['../namespace_runtime.html',1,'']]]
 ];

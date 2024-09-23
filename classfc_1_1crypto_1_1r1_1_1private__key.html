@@ -285,7 +285,7 @@ Friends</h2></td></tr>
 <div class="line"><span class="lineno">  403</span><span class="preprocessor">#if 0</span></div>
 <div class="line"><span class="lineno">  404</span>          = bigint( EC_KEY_get0_private_key( k );</div>
 <div class="line"><span class="lineno">  405</span>       EC_POINT* <a class="code hl_variable" href="yubihsm__pkcs11_8c.html#a3037ff69dd24c6e34aee6fdd45269f13">pub</a>   = EC_KEY_get0_public_key( k );</div>
-<div class="line"><span class="lineno">  406</span>       EC_GROUP* <a class="code hl_variable" href="namespaceupload.html#a9d33d66de17175dced88ffe95f079226">group</a> = EC_KEY_get0_group( k );</div>
+<div class="line"><span class="lineno">  406</span>       EC_GROUP* group = EC_KEY_get0_group( k );</div>
 <div class="line"><span class="lineno">  407</span> </div>
 <div class="line"><span class="lineno">  408</span>       EC_POINT_get_affine_coordinates_GFp( group, pub, <a class="code hl_enumvalue" href="namespacesysio.html#a5c18cd9d34b8c5d3af8e2de75577673fa1f42b089b0bc1105b38f19140a65cc2a">self</a>.my-&gt;_pub_x.get(), <a class="code hl_enumvalue" href="namespacesysio.html#a5c18cd9d34b8c5d3af8e2de75577673fa1f42b089b0bc1105b38f19140a65cc2a">self</a>.my-&gt;_pub_y.get(), <span class="keyword">nullptr</span><span class="comment">/*ctx*/</span> );</div>
 <div class="line"><span class="lineno">  409</span> </div>
@@ -297,7 +297,6 @@ Friends</h2></td></tr>
 <div class="ttc" id="aclassfc_1_1crypto_1_1r1_1_1private__key_html_aacb8cbcb47a95c250d67f4643f310c80"><div class="ttname"><a href="#aacb8cbcb47a95c250d67f4643f310c80">fc::crypto::r1::private_key::private_key</a></div><div class="ttdeci">private_key()</div><div class="ttdef"><b>Definition</b> <a href="elliptic__r1_8cpp_source.html#l00331">elliptic_r1.cpp:331</a></div></div>
 <div class="ttc" id="aexception_8hpp_html_a7590ddac4f181b661c3eeaf5feccc6ac"><div class="ttname"><a href="exception_8hpp.html#a7590ddac4f181b661c3eeaf5feccc6ac">FC_THROW_EXCEPTION</a></div><div class="ttdeci">#define FC_THROW_EXCEPTION(EXCEPTION, FORMAT,...)</div><div class="ttdef"><b>Definition</b> <a href="exception_8hpp_source.html#l00395">exception.hpp:395</a></div></div>
 <div class="ttc" id="anamespacesysio_html_a5c18cd9d34b8c5d3af8e2de75577673fa1f42b089b0bc1105b38f19140a65cc2a"><div class="ttname"><a href="namespacesysio.html#a5c18cd9d34b8c5d3af8e2de75577673fa1f42b089b0bc1105b38f19140a65cc2a">sysio::self</a></div><div class="ttdeci">@ self</div><div class="ttdoc">the connection is to itself</div><div class="ttdef"><b>Definition</b> <a href="plugins_2net__plugin_2include_2sysio_2net__plugin_2protocol_8hpp_source.html#l00048">protocol.hpp:48</a></div></div>
-<div class="ttc" id="anamespaceupload_html_a9d33d66de17175dced88ffe95f079226"><div class="ttname"><a href="namespaceupload.html#a9d33d66de17175dced88ffe95f079226">upload.group</a></div><div class="ttdeci">group</div><div class="ttdef"><b>Definition</b> <a href="googlemock_2scripts_2upload_8py_source.html#l00397">upload.py:397</a></div></div>
 <div class="ttc" id="ayubihsm__pkcs11_8c_html_a3037ff69dd24c6e34aee6fdd45269f13"><div class="ttname"><a href="yubihsm__pkcs11_8c.html#a3037ff69dd24c6e34aee6fdd45269f13">pub</a></div><div class="ttdeci">bool pub</div><div class="ttdef"><b>Definition</b> <a href="yubihsm__pkcs11_8c_source.html#l01928">yubihsm_pkcs11.c:1928</a></div></div>
 </div><!-- fragment --><div class="dynheader">
 Here is the caller graph for this function:</div>
@@ -347,7 +346,7 @@ Here is the caller graph for this function:</div>
 <div class="line"><span class="lineno">  336</span>        ssl_bignum z;</div>
 <div class="line"><span class="lineno">  337</span>        BN_bin2bn((<span class="keywordtype">unsigned</span> <span class="keywordtype">char</span>*)&amp;offset, <span class="keyword">sizeof</span>(offset), z);</div>
 <div class="line"><span class="lineno">  338</span> </div>
-<div class="line"><span class="lineno">  339</span>        ec_group <a class="code hl_variable" href="namespaceupload.html#a9d33d66de17175dced88ffe95f079226">group</a>(EC_GROUP_new_by_curve_name(NID_X9_62_prime256v1));</div>
+<div class="line"><span class="lineno">  339</span>        ec_group group(EC_GROUP_new_by_curve_name(NID_X9_62_prime256v1));</div>
 <div class="line"><span class="lineno">  340</span>        bn_ctx ctx(BN_CTX_new());</div>
 <div class="line"><span class="lineno">  341</span>        ssl_bignum order;</div>
 <div class="line"><span class="lineno">  342</span>        EC_GROUP_get_order(group, order, ctx);</div>

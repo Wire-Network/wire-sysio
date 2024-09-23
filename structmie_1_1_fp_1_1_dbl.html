@@ -222,7 +222,7 @@ Static Public Attributes</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="friends" name="friends"></a>
 Friends</h2></td></tr>
-<tr class="memitem:a4f0a55b242b3ca6d2b1f67915da11bcb" id="r_a4f0a55b242b3ca6d2b1f67915da11bcb"><td class="memItemLeft" align="right" valign="top">std::ostream &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a4f0a55b242b3ca6d2b1f67915da11bcb">operator&lt;&lt;</a> (std::ostream &amp;os, const <a class="el" href="structmie_1_1_fp_1_1_dbl.html">Dbl</a> &amp;x)</td></tr>
+<tr class="memitem:a4f0a55b242b3ca6d2b1f67915da11bcb" id="r_a4f0a55b242b3ca6d2b1f67915da11bcb"><td class="memItemLeft" align="right" valign="top">std::ostream &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a4f0a55b242b3ca6d2b1f67915da11bcb">operator&lt;&lt;</a> (std::ostream &amp;<a class="el" href="environment_8hpp.html#a3951483d0b31c29ca95336206cd35238">os</a>, const <a class="el" href="structmie_1_1_fp_1_1_dbl.html">Dbl</a> &amp;x)</td></tr>
 <tr class="separator:a4f0a55b242b3ca6d2b1f67915da11bcb"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
@@ -988,8 +988,9 @@ Here is the caller graph for this function:</div>
 
 <p class="definition">Definition at line <a class="el" href="zm2_8h_source.html#l00348">348</a> of file <a class="el" href="zm2_8h_source.html">zm2.h</a>.</p>
 <div class="fragment"><div class="line"><span class="lineno">  349</span>        {</div>
-<div class="line"><span class="lineno">  350</span>            <span class="keywordflow">return</span> os &lt;&lt; x.toString(os.flags() &amp; std::ios_base::hex ? 16 : 10);</div>
+<div class="line"><span class="lineno">  350</span>            <span class="keywordflow">return</span> <a class="code hl_variable" href="environment_8hpp.html#a3951483d0b31c29ca95336206cd35238">os</a> &lt;&lt; x.toString(<a class="code hl_variable" href="environment_8hpp.html#a3951483d0b31c29ca95336206cd35238">os</a>.flags() &amp; std::ios_base::hex ? 16 : 10);</div>
 <div class="line"><span class="lineno">  351</span>        }</div>
+<div class="ttc" id="aenvironment_8hpp_html_a3951483d0b31c29ca95336206cd35238"><div class="ttname"><a href="environment_8hpp.html#a3951483d0b31c29ca95336206cd35238">os</a></div><div class="ttdeci">os_t os</div><div class="ttdef"><b>Definition</b> <a href="environment_8hpp_source.html#l00023">environment.hpp:23</a></div></div>
 </div><!-- fragment -->
 </div>
 </div>

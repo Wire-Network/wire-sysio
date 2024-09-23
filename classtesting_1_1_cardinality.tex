@@ -21,12 +21,12 @@ bool \mbox{\hyperlink{classtesting_1_1_cardinality_a57128ba46931e24a2b39af177e33
 \item 
 bool \mbox{\hyperlink{classtesting_1_1_cardinality_a9b6a55179f6dcc8fadec26e6d93f3e88}{Is\+Over\+Saturated\+By\+Call\+Count}} (int call\+\_\+count) const
 \item 
-void \mbox{\hyperlink{classtesting_1_1_cardinality_a2955f4b65022c422f56e79b767c4fa71}{Describe\+To}} (\+::std\+::ostream \texorpdfstring{$\ast$}{*}os) const
+void \mbox{\hyperlink{classtesting_1_1_cardinality_a2955f4b65022c422f56e79b767c4fa71}{Describe\+To}} (\+::std\+::ostream \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}) const
 \end{DoxyCompactItemize}
 \doxysubsubsection*{Static Public Member Functions}
 \begin{DoxyCompactItemize}
 \item 
-static void \mbox{\hyperlink{classtesting_1_1_cardinality_a7cbea339e2f3072a98367e087aa296e8}{Describe\+Actual\+Call\+Count\+To}} (int actual\+\_\+call\+\_\+count, \+::std\+::ostream \texorpdfstring{$\ast$}{*}os)
+static void \mbox{\hyperlink{classtesting_1_1_cardinality_a7cbea339e2f3072a98367e087aa296e8}{Describe\+Actual\+Call\+Count\+To}} (int actual\+\_\+call\+\_\+count, \+::std\+::ostream \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}})
 \end{DoxyCompactItemize}
 
 
@@ -86,7 +86,8 @@ Definition at line \mbox{\hyperlink{gmock-cardinalities_8h_source_l00094}{94}} o
 \DoxyCodeLine{00094\ \{\ \textcolor{keywordflow}{return}\ impl\_-\/>ConservativeLowerBound();\ \}}
 
 \end{DoxyCode}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -108,7 +109,8 @@ Definition at line \mbox{\hyperlink{gmock-cardinalities_8h_source_l00095}{95}} o
 \DoxyCodeLine{00095\ \{\ \textcolor{keywordflow}{return}\ impl\_-\/>ConservativeUpperBound();\ \}}
 
 \end{DoxyCode}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -129,14 +131,15 @@ Definition at line \mbox{\hyperlink{gmock-cardinalities_8cc_source_l00130}{130}}
 \begin{DoxyCode}{0}
 \DoxyCodeLine{00131\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
 \DoxyCodeLine{00132\ \ \ \textcolor{keywordflow}{if}\ (actual\_call\_count\ >\ 0)\ \{}
-\DoxyCodeLine{00133\ \ \ \ \ *os\ <<\ \textcolor{stringliteral}{"{}called\ "{}}\ <<\ FormatTimes(actual\_call\_count);}
+\DoxyCodeLine{00133\ \ \ \ \ *\mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}\ <<\ \textcolor{stringliteral}{"{}called\ "{}}\ <<\ FormatTimes(actual\_call\_count);}
 \DoxyCodeLine{00134\ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
-\DoxyCodeLine{00135\ \ \ \ \ *os\ <<\ \textcolor{stringliteral}{"{}never\ called"{}};}
+\DoxyCodeLine{00135\ \ \ \ \ *\mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}\ <<\ \textcolor{stringliteral}{"{}never\ called"{}};}
 \DoxyCodeLine{00136\ \ \ \}}
 \DoxyCodeLine{00137\ \}}
 
 \end{DoxyCode}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -155,10 +158,11 @@ Definition at line \mbox{\hyperlink{gmock-cardinalities_8h_source_l00115}{115}} 
 
 
 \begin{DoxyCode}{0}
-\DoxyCodeLine{00115\ \{\ impl\_-\/>DescribeTo(os);\ \}}
+\DoxyCodeLine{00115\ \{\ impl\_-\/>DescribeTo(\mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}});\ \}}
 
 \end{DoxyCode}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode

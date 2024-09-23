@@ -44,7 +44,7 @@ Definition at line \mbox{\hyperlink{abi__serializer_8hpp_source_l00753}{753}} of
 \begin{DoxyCode}{0}
 \DoxyCodeLine{00754\ \ \ \ \ \ \ \{}
 \DoxyCodeLine{00755\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ h\ =\ ctx.enter\_scope();}
-\DoxyCodeLine{00756\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ variant\_object\&\ vo\ =\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.get\_object();}
+\DoxyCodeLine{00756\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ variant\_object\&\ vo\ =\ v.\mbox{\hyperlink{classfc_1_1variant_a17a7054a10963360c6a14d60f6e30128}{get\_object}}();}
 \DoxyCodeLine{00757\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp_a40c2826a6fba35c1ffbf912bdf559792}{SYS\_ASSERT}}(vo.contains(\textcolor{stringliteral}{"{}account"{}}),\ packed\_transaction\_type\_exception,\ \textcolor{stringliteral}{"{}Missing\ account"{}});}
 \DoxyCodeLine{00758\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp_a40c2826a6fba35c1ffbf912bdf559792}{SYS\_ASSERT}}(vo.contains(\textcolor{stringliteral}{"{}name"{}}),\ packed\_transaction\_type\_exception,\ \textcolor{stringliteral}{"{}Missing\ name"{}});}
 \DoxyCodeLine{00759\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacefc_accef08adf4ee05c36ccc550d8101b08f}{from\_variant}}(vo[\textcolor{stringliteral}{"{}account"{}}],\ act.account);}
@@ -88,7 +88,8 @@ Definition at line \mbox{\hyperlink{abi__serializer_8hpp_source_l00753}{753}} of
 \DoxyCodeLine{00797\ \ \ \ \ \ \ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -121,14 +122,16 @@ Definition at line \mbox{\hyperlink{abi__serializer_8hpp_source_l00702}{702}} of
 \DoxyCodeLine{00706\ \ \ \ \ \ \ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
 \includegraphics[width=329pt]{structsysio_1_1chain_1_1impl_1_1abi__from__variant_a733b2b85ed5f3e9826f93bb5d1af0d8c_cgraph}
 \end{center}
 \end{figure}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -150,7 +153,7 @@ Definition at line \mbox{\hyperlink{abi__serializer_8hpp_source_l00800}{800}} of
 \begin{DoxyCode}{0}
 \DoxyCodeLine{00801\ \ \ \ \ \ \ \{}
 \DoxyCodeLine{00802\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ h\ =\ ctx.enter\_scope();}
-\DoxyCodeLine{00803\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ variant\_object\&\ vo\ =\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.get\_object();}
+\DoxyCodeLine{00803\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ variant\_object\&\ vo\ =\ v.\mbox{\hyperlink{classfc_1_1variant_a17a7054a10963360c6a14d60f6e30128}{get\_object}}();}
 \DoxyCodeLine{00804\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp_a40c2826a6fba35c1ffbf912bdf559792}{SYS\_ASSERT}}(vo.contains(\textcolor{stringliteral}{"{}signatures"{}}),\ packed\_transaction\_type\_exception,\ \textcolor{stringliteral}{"{}Missing\ signatures"{}});}
 \DoxyCodeLine{00805\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp_a40c2826a6fba35c1ffbf912bdf559792}{SYS\_ASSERT}}(vo.contains(\textcolor{stringliteral}{"{}compression"{}}),\ packed\_transaction\_type\_exception,\ \textcolor{stringliteral}{"{}Missing\ compression"{}});}
 \DoxyCodeLine{00806\ \ \ \ \ \ \ \ \ \ std::vector<signature\_type>\ signatures;}
@@ -193,7 +196,8 @@ Definition at line \mbox{\hyperlink{abi__serializer_8hpp_source_l00800}{800}} of
 \DoxyCodeLine{00843\ \ \ \ \ \ \ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -215,18 +219,19 @@ Definition at line \mbox{\hyperlink{abi__serializer_8hpp_source_l00738}{738}} of
 \begin{DoxyCode}{0}
 \DoxyCodeLine{00739\ \ \ \ \ \ \ \{}
 \DoxyCodeLine{00740\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ h\ =\ ctx.enter\_scope();}
-\DoxyCodeLine{00741\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ variant\_object\&\ vo\ =\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.get\_object();}
+\DoxyCodeLine{00741\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ variant\_object\&\ vo\ =\ v.\mbox{\hyperlink{classfc_1_1variant_a17a7054a10963360c6a14d60f6e30128}{get\_object}}();}
 \DoxyCodeLine{00742\ \ \ \ \ \ \ \ \ \ M\ obj;}
 \DoxyCodeLine{00743\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{scalar__4x64__impl_8h_a2384e06d62f7580d7599d3b77b68acbb}{extract}}(vo,\ obj,\ resolver,\ ctx);}
 \DoxyCodeLine{00744\ \ \ \ \ \ \ \ \ \ o\ =\ std::make\_shared<M>(obj);}
 \DoxyCodeLine{00745\ \ \ \ \ \ \ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
-\includegraphics[width=329pt]{structsysio_1_1chain_1_1impl_1_1abi__from__variant_a836832ea7a0e61303e2f8ffb1812345d_cgraph}
+\includegraphics[width=350pt]{structsysio_1_1chain_1_1impl_1_1abi__from__variant_a836832ea7a0e61303e2f8ffb1812345d_cgraph}
 \end{center}
 \end{figure}
 \Hypertarget{structsysio_1_1chain_1_1impl_1_1abi__from__variant_a0c7da9f35411a81e3291b2189cb43d05}\index{sysio::chain::impl::abi\_from\_variant@{sysio::chain::impl::abi\_from\_variant}!extract@{extract}}
@@ -244,7 +249,7 @@ Definition at line \mbox{\hyperlink{abi__serializer_8hpp_source_l00720}{720}} of
 \begin{DoxyCode}{0}
 \DoxyCodeLine{00721\ \ \ \ \ \ \ \{}
 \DoxyCodeLine{00722\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ h\ =\ ctx.enter\_scope();}
-\DoxyCodeLine{00723\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{namespacefc_a9148361f6aaa3d739990a75ac557fe59}{variants}}\&\ \mbox{\hyperlink{namespacepicojson_ac1e72166adfe3d96dc58cddc7ebd536a}{array}}\ =\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.get\_array();}
+\DoxyCodeLine{00723\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{namespacefc_a9148361f6aaa3d739990a75ac557fe59}{variants}}\&\ \mbox{\hyperlink{namespacepicojson_ac1e72166adfe3d96dc58cddc7ebd536a}{array}}\ =\ v.\mbox{\hyperlink{classfc_1_1variant_aea83c87e4e1b1e185f57717b4bd683a5}{get\_array}}();}
 \DoxyCodeLine{00724\ \ \ \ \ \ \ \ \ \ o.clear();}
 \DoxyCodeLine{00725\ \ \ \ \ \ \ \ \ \ o.reserve(\ \mbox{\hyperlink{namespacepicojson_ac1e72166adfe3d96dc58cddc7ebd536a}{array}}.size()\ );}
 \DoxyCodeLine{00726\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}(\ \textcolor{keyword}{auto}\ itr\ =\ \mbox{\hyperlink{namespacepicojson_ac1e72166adfe3d96dc58cddc7ebd536a}{array}}.begin();\ itr\ !=\ \mbox{\hyperlink{namespacepicojson_ac1e72166adfe3d96dc58cddc7ebd536a}{array}}.end();\ ++itr\ )\ \{}
@@ -255,11 +260,12 @@ Definition at line \mbox{\hyperlink{abi__serializer_8hpp_source_l00720}{720}} of
 \DoxyCodeLine{00731\ \ \ \ \ \ \ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
-\includegraphics[width=329pt]{structsysio_1_1chain_1_1impl_1_1abi__from__variant_a0c7da9f35411a81e3291b2189cb43d05_cgraph}
+\includegraphics[width=350pt]{structsysio_1_1chain_1_1impl_1_1abi__from__variant_a0c7da9f35411a81e3291b2189cb43d05_cgraph}
 \end{center}
 \end{figure}
 

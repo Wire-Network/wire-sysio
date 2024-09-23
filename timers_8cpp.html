@@ -530,13 +530,13 @@ Here is the caller graph for this function:</div>
 <div class="line"><span class="lineno">   56</span>    <span class="keywordflow">try</span> {</div>
 <div class="line"><span class="lineno">   57</span>        boost::asio::io_service io_service;</div>
 <div class="line"><span class="lineno">   58</span>        tcp::acceptor acceptor(io_service, tcp::endpoint(tcp::v6(), port));</div>
-<div class="line"><span class="lineno">   59</span>        tcp::socket socket(io_service);</div>
+<div class="line"><span class="lineno">   59</span>        tcp::socket <a class="code hl_enumvalue" href="namespacewebsocketpp_1_1transport_1_1asio_1_1socket_1_1error.html#a828ddaa5ed63a761e1b557465a35f05aa0c31b356014843e1d09514e794a539a7">socket</a>(io_service);</div>
 <div class="line"><span class="lineno">   60</span> </div>
 <div class="line"><span class="lineno">   61</span>        acceptor.accept(socket);</div>
 <div class="line"><span class="lineno">   62</span>        <span class="keywordflow">for</span> (;;) {</div>
 <div class="line"><span class="lineno">   63</span>            <span class="keywordtype">char</span> data[512];</div>
 <div class="line"><span class="lineno">   64</span>            boost::system::error_code ec;</div>
-<div class="line"><span class="lineno">   65</span>            socket.read_some(boost::asio::buffer(data), ec);</div>
+<div class="line"><span class="lineno">   65</span>            <a class="code hl_enumvalue" href="namespacewebsocketpp_1_1transport_1_1asio_1_1socket_1_1error.html#a828ddaa5ed63a761e1b557465a35f05aa0c31b356014843e1d09514e794a539a7">socket</a>.read_some(boost::asio::buffer(data), ec);</div>
 <div class="line"><span class="lineno">   66</span>            <span class="keywordflow">if</span> (ec == boost::asio::error::eof) {</div>
 <div class="line"><span class="lineno">   67</span>                <span class="keywordflow">break</span>;</div>
 <div class="line"><span class="lineno">   68</span>            } <span class="keywordflow">else</span> <span class="keywordflow">if</span> (ec) {</div>
@@ -550,6 +550,7 @@ Here is the caller graph for this function:</div>
 <div class="line"><span class="lineno">   76</span>        std::cout &lt;&lt; ec.message() &lt;&lt; std::endl;</div>
 <div class="line"><span class="lineno">   77</span>    }</div>
 <div class="line"><span class="lineno">   78</span>}</div>
+<div class="ttc" id="anamespacewebsocketpp_1_1transport_1_1asio_1_1socket_1_1error_html_a828ddaa5ed63a761e1b557465a35f05aa0c31b356014843e1d09514e794a539a7"><div class="ttname"><a href="namespacewebsocketpp_1_1transport_1_1asio_1_1socket_1_1error.html#a828ddaa5ed63a761e1b557465a35f05aa0c31b356014843e1d09514e794a539a7">websocketpp::transport::asio::socket::error::socket</a></div><div class="ttdeci">@ socket</div><div class="ttdef"><b>Definition</b> <a href="transport_2asio_2security_2base_8hpp_source.html#l00083">base.hpp:83</a></div></div>
 </div><!-- fragment --><div class="dynheader">
 Here is the caller graph for this function:</div>
 <div class="dyncontent">

@@ -1,9 +1,0 @@
-<map id="embed.LineMapper.mapFile" name="embed.LineMapper.mapFile">
-<area shape="rect" id="Node000001" title=" " alt="" coords="5,31,186,56"/>
-<area shape="rect" id="Node000002" href="$classembed_1_1_line_mapper.html#a98d45d187f555e8a42ffdf703f8e0dd2" title=" " alt="" coords="234,5,417,31"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="186,31,218,27,218,33,186,36"/>
-<area shape="rect" id="Node000003" href="$210-_evt-_event_listeners_8cpp.html#a91b9457094088a57b7ba14d485a8771e" title=" " alt="" coords="302,55,348,80"/>
-<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="186,50,287,61,286,66,186,56"/>
-<area shape="rect" id="Node000004" href="$210-_evt-_event_listeners_8cpp.html#aaf05ec28baf9169e247960554e9ffbcb" title=" " alt="" coords="465,55,503,80"/>
-<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="349,65,449,65,449,70,349,70"/>
-</map>

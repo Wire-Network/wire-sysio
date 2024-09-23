@@ -6,7 +6,8 @@
 
 
 
-Collaboration diagram for sysio\+::chain\+::apply\+\_\+context\+:\nopagebreak
+Collaboration diagram for sysio\+::chain\+::apply\+\_\+context\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -195,7 +196,8 @@ Definition at line \mbox{\hyperlink{apply__context_8cpp_source_l01050}{1050}} of
 \DoxyCodeLine{01057\ \}}
 
 \end{DoxyCode}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -217,14 +219,16 @@ Definition at line \mbox{\hyperlink{apply__context_8hpp_source_l00502}{502}} of 
 \DoxyCodeLine{00502\ \{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classsysio_1_1chain_1_1apply__context_a2310a1978f97847e770f7525391d0abc}{cancel\_deferred\_transaction}}(sender\_id,\ receiver);\ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
 \includegraphics[width=209pt]{classsysio_1_1chain_1_1apply__context_a11dd9c8743b410d5007894bbc786f4ce_cgraph}
 \end{center}
 \end{figure}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -259,7 +263,8 @@ Definition at line \mbox{\hyperlink{apply__context_8cpp_source_l00626}{626}} of 
 \DoxyCodeLine{00639\ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -332,7 +337,8 @@ Definition at line \mbox{\hyperlink{apply__context_8cpp_source_l00973}{973}} of 
 \DoxyCodeLine{00985\ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -364,7 +370,8 @@ Definition at line \mbox{\hyperlink{apply__context_8cpp_source_l00914}{914}} of 
 \DoxyCodeLine{00924\ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -391,16 +398,17 @@ Definition at line \mbox{\hyperlink{apply__context_8cpp_source_l00987}{987}} of 
 \DoxyCodeLine{00992\ }
 \DoxyCodeLine{00993\ \ \ \ \textcolor{keyword}{auto}\ table\_end\_itr\ =\ keyval\_cache.cache\_table(\ *tab\ );}
 \DoxyCodeLine{00994\ }
-\DoxyCodeLine{00995\ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ \mbox{\hyperlink{namespacehost__functions__tests__1_a8496a24b5236a2dc07bb4f2930d88342}{idx}}\ =\ \mbox{\hyperlink{classsysio_1_1chain_1_1apply__context_ac3b6e6353b5ecebcb305e1d3dcfac4eb}{db}}.\mbox{\hyperlink{classchainbase_1_1database_a4d5297635dcf70be481d9b600da9bc13}{get\_index}}<\mbox{\hyperlink{namespacesysio_1_1chain_aac1a2c1330fcb6c8002d59d4d1de5858}{key\_value\_index}},\ by\_scope\_primary>();}
-\DoxyCodeLine{00996\ \ \ \ \textcolor{keyword}{auto}\ itr\ =\ \mbox{\hyperlink{namespacehost__functions__tests__1_a8496a24b5236a2dc07bb4f2930d88342}{idx}}.lower\_bound(\ boost::make\_tuple(\ tab-\/>id,\ \textcolor{keywordtype}{id}\ )\ );}
-\DoxyCodeLine{00997\ \ \ \ \textcolor{keywordflow}{if}(\ itr\ ==\ \mbox{\hyperlink{namespacehost__functions__tests__1_a8496a24b5236a2dc07bb4f2930d88342}{idx}}.end()\ )\ \textcolor{keywordflow}{return}\ table\_end\_itr;}
+\DoxyCodeLine{00995\ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ idx\ =\ \mbox{\hyperlink{classsysio_1_1chain_1_1apply__context_ac3b6e6353b5ecebcb305e1d3dcfac4eb}{db}}.\mbox{\hyperlink{classchainbase_1_1database_a4d5297635dcf70be481d9b600da9bc13}{get\_index}}<\mbox{\hyperlink{namespacesysio_1_1chain_aac1a2c1330fcb6c8002d59d4d1de5858}{key\_value\_index}},\ by\_scope\_primary>();}
+\DoxyCodeLine{00996\ \ \ \ \textcolor{keyword}{auto}\ itr\ =\ idx.lower\_bound(\ boost::make\_tuple(\ tab-\/>id,\ \textcolor{keywordtype}{id}\ )\ );}
+\DoxyCodeLine{00997\ \ \ \ \textcolor{keywordflow}{if}(\ itr\ ==\ idx.end()\ )\ \textcolor{keywordflow}{return}\ table\_end\_itr;}
 \DoxyCodeLine{00998\ \ \ \ \textcolor{keywordflow}{if}(\ itr-\/>t\_id\ !=\ tab-\/>id\ )\ \textcolor{keywordflow}{return}\ table\_end\_itr;}
 \DoxyCodeLine{00999\ }
 \DoxyCodeLine{01000\ \ \ \ \textcolor{keywordflow}{return}\ keyval\_cache.add(\ *itr\ );}
 \DoxyCodeLine{01001\ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -423,19 +431,20 @@ Definition at line \mbox{\hyperlink{apply__context_8cpp_source_l00926}{926}} of 
 \DoxyCodeLine{00927\ \ \ \ \textcolor{keywordflow}{if}(\ iterator\ <\ -\/1\ )\ \textcolor{keywordflow}{return}\ -\/1;\ \textcolor{comment}{//\ cannot\ increment\ past\ end\ iterator\ of\ table}}
 \DoxyCodeLine{00928\ }
 \DoxyCodeLine{00929\ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ obj\ =\ keyval\_cache.get(\ iterator\ );\ \textcolor{comment}{//\ Check\ for\ iterator\ !=\ -\/1\ happens\ in\ this\ call}}
-\DoxyCodeLine{00930\ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ \mbox{\hyperlink{namespacehost__functions__tests__1_a8496a24b5236a2dc07bb4f2930d88342}{idx}}\ =\ \mbox{\hyperlink{classsysio_1_1chain_1_1apply__context_ac3b6e6353b5ecebcb305e1d3dcfac4eb}{db}}.\mbox{\hyperlink{classchainbase_1_1database_a4d5297635dcf70be481d9b600da9bc13}{get\_index}}<\mbox{\hyperlink{namespacesysio_1_1chain_aac1a2c1330fcb6c8002d59d4d1de5858}{key\_value\_index}},\ by\_scope\_primary>();}
+\DoxyCodeLine{00930\ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ idx\ =\ \mbox{\hyperlink{classsysio_1_1chain_1_1apply__context_ac3b6e6353b5ecebcb305e1d3dcfac4eb}{db}}.\mbox{\hyperlink{classchainbase_1_1database_a4d5297635dcf70be481d9b600da9bc13}{get\_index}}<\mbox{\hyperlink{namespacesysio_1_1chain_aac1a2c1330fcb6c8002d59d4d1de5858}{key\_value\_index}},\ by\_scope\_primary>();}
 \DoxyCodeLine{00931\ }
-\DoxyCodeLine{00932\ \ \ \ \textcolor{keyword}{auto}\ itr\ =\ \mbox{\hyperlink{namespacehost__functions__tests__1_a8496a24b5236a2dc07bb4f2930d88342}{idx}}.iterator\_to(\ obj\ );}
+\DoxyCodeLine{00932\ \ \ \ \textcolor{keyword}{auto}\ itr\ =\ idx.iterator\_to(\ obj\ );}
 \DoxyCodeLine{00933\ \ \ \ ++itr;}
 \DoxyCodeLine{00934\ }
-\DoxyCodeLine{00935\ \ \ \ \textcolor{keywordflow}{if}(\ itr\ ==\ \mbox{\hyperlink{namespacehost__functions__tests__1_a8496a24b5236a2dc07bb4f2930d88342}{idx}}.end()\ ||\ itr-\/>t\_id\ !=\ obj.t\_id\ )\ \textcolor{keywordflow}{return}\ keyval\_cache.get\_end\_iterator\_by\_table\_id(obj.t\_id);}
+\DoxyCodeLine{00935\ \ \ \ \textcolor{keywordflow}{if}(\ itr\ ==\ idx.end()\ ||\ itr-\/>t\_id\ !=\ obj.t\_id\ )\ \textcolor{keywordflow}{return}\ keyval\_cache.get\_end\_iterator\_by\_table\_id(obj.t\_id);}
 \DoxyCodeLine{00936\ }
 \DoxyCodeLine{00937\ \ \ \ primary\ =\ itr-\/>primary\_key;}
 \DoxyCodeLine{00938\ \ \ \ \textcolor{keywordflow}{return}\ keyval\_cache.add(\ *itr\ );}
 \DoxyCodeLine{00939\ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -455,15 +464,15 @@ Definition at line \mbox{\hyperlink{apply__context_8cpp_source_l00941}{941}} of 
 
 \begin{DoxyCode}{0}
 \DoxyCodeLine{00941\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
-\DoxyCodeLine{00942\ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ \mbox{\hyperlink{namespacehost__functions__tests__1_a8496a24b5236a2dc07bb4f2930d88342}{idx}}\ =\ \mbox{\hyperlink{classsysio_1_1chain_1_1apply__context_ac3b6e6353b5ecebcb305e1d3dcfac4eb}{db}}.\mbox{\hyperlink{classchainbase_1_1database_a4d5297635dcf70be481d9b600da9bc13}{get\_index}}<\mbox{\hyperlink{namespacesysio_1_1chain_aac1a2c1330fcb6c8002d59d4d1de5858}{key\_value\_index}},\ by\_scope\_primary>();}
+\DoxyCodeLine{00942\ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ idx\ =\ \mbox{\hyperlink{classsysio_1_1chain_1_1apply__context_ac3b6e6353b5ecebcb305e1d3dcfac4eb}{db}}.\mbox{\hyperlink{classchainbase_1_1database_a4d5297635dcf70be481d9b600da9bc13}{get\_index}}<\mbox{\hyperlink{namespacesysio_1_1chain_aac1a2c1330fcb6c8002d59d4d1de5858}{key\_value\_index}},\ by\_scope\_primary>();}
 \DoxyCodeLine{00943\ }
 \DoxyCodeLine{00944\ \ \ \ \textcolor{keywordflow}{if}(\ iterator\ <\ -\/1\ )\ \textcolor{comment}{//\ is\ end\ iterator}}
 \DoxyCodeLine{00945\ \ \ \ \{}
 \DoxyCodeLine{00946\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ tab\ =\ keyval\_cache.find\_table\_by\_end\_iterator(iterator);}
 \DoxyCodeLine{00947\ \ \ \ \ \ \ \mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp_a40c2826a6fba35c1ffbf912bdf559792}{SYS\_ASSERT}}(\ tab,\ invalid\_table\_iterator,\ \textcolor{stringliteral}{"{}not\ a\ valid\ end\ iterator"{}}\ );}
 \DoxyCodeLine{00948\ }
-\DoxyCodeLine{00949\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ itr\ =\ \mbox{\hyperlink{namespacehost__functions__tests__1_a8496a24b5236a2dc07bb4f2930d88342}{idx}}.upper\_bound(tab-\/>id);}
-\DoxyCodeLine{00950\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ \mbox{\hyperlink{namespacehost__functions__tests__1_a8496a24b5236a2dc07bb4f2930d88342}{idx}}.begin()\ ==\ \mbox{\hyperlink{namespacehost__functions__tests__1_a8496a24b5236a2dc07bb4f2930d88342}{idx}}.end()\ ||\ itr\ ==\ \mbox{\hyperlink{namespacehost__functions__tests__1_a8496a24b5236a2dc07bb4f2930d88342}{idx}}.begin()\ )\ \textcolor{keywordflow}{return}\ -\/1;\ \textcolor{comment}{//\ Empty\ table}}
+\DoxyCodeLine{00949\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ itr\ =\ idx.upper\_bound(tab-\/>id);}
+\DoxyCodeLine{00950\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ idx.begin()\ ==\ idx.end()\ ||\ itr\ ==\ idx.begin()\ )\ \textcolor{keywordflow}{return}\ -\/1;\ \textcolor{comment}{//\ Empty\ table}}
 \DoxyCodeLine{00951\ }
 \DoxyCodeLine{00952\ \ \ \ \ \ \ -\/-\/itr;}
 \DoxyCodeLine{00953\ }
@@ -475,8 +484,8 @@ Definition at line \mbox{\hyperlink{apply__context_8cpp_source_l00941}{941}} of 
 \DoxyCodeLine{00959\ }
 \DoxyCodeLine{00960\ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ obj\ =\ keyval\_cache.get(iterator);\ \textcolor{comment}{//\ Check\ for\ iterator\ !=\ -\/1\ happens\ in\ this\ call}}
 \DoxyCodeLine{00961\ }
-\DoxyCodeLine{00962\ \ \ \ \textcolor{keyword}{auto}\ itr\ =\ \mbox{\hyperlink{namespacehost__functions__tests__1_a8496a24b5236a2dc07bb4f2930d88342}{idx}}.iterator\_to(obj);}
-\DoxyCodeLine{00963\ \ \ \ \textcolor{keywordflow}{if}(\ itr\ ==\ \mbox{\hyperlink{namespacehost__functions__tests__1_a8496a24b5236a2dc07bb4f2930d88342}{idx}}.begin()\ )\ \textcolor{keywordflow}{return}\ -\/1;\ \textcolor{comment}{//\ cannot\ decrement\ past\ beginning\ iterator\ of\ table}}
+\DoxyCodeLine{00962\ \ \ \ \textcolor{keyword}{auto}\ itr\ =\ idx.iterator\_to(obj);}
+\DoxyCodeLine{00963\ \ \ \ \textcolor{keywordflow}{if}(\ itr\ ==\ idx.begin()\ )\ \textcolor{keywordflow}{return}\ -\/1;\ \textcolor{comment}{//\ cannot\ decrement\ past\ beginning\ iterator\ of\ table}}
 \DoxyCodeLine{00964\ }
 \DoxyCodeLine{00965\ \ \ \ -\/-\/itr;}
 \DoxyCodeLine{00966\ }
@@ -487,7 +496,8 @@ Definition at line \mbox{\hyperlink{apply__context_8cpp_source_l00941}{941}} of 
 \DoxyCodeLine{00971\ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -543,7 +553,8 @@ Definition at line \mbox{\hyperlink{apply__context_8cpp_source_l00878}{878}} of 
 \DoxyCodeLine{00912\ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -567,14 +578,16 @@ Definition at line \mbox{\hyperlink{apply__context_8cpp_source_l00778}{778}} of 
 \DoxyCodeLine{00780\ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
 \includegraphics[width=195pt]{classsysio_1_1chain_1_1apply__context_a525b0d91b1afb457e7371ff689fcefda_cgraph}
 \end{center}
 \end{figure}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -650,7 +663,8 @@ Definition at line \mbox{\hyperlink{apply__context_8cpp_source_l00822}{822}} of 
 \DoxyCodeLine{00876\ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -677,16 +691,17 @@ Definition at line \mbox{\hyperlink{apply__context_8cpp_source_l01003}{1003}} of
 \DoxyCodeLine{01008\ }
 \DoxyCodeLine{01009\ \ \ \ \textcolor{keyword}{auto}\ table\_end\_itr\ =\ keyval\_cache.cache\_table(\ *tab\ );}
 \DoxyCodeLine{01010\ }
-\DoxyCodeLine{01011\ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ \mbox{\hyperlink{namespacehost__functions__tests__1_a8496a24b5236a2dc07bb4f2930d88342}{idx}}\ =\ \mbox{\hyperlink{classsysio_1_1chain_1_1apply__context_ac3b6e6353b5ecebcb305e1d3dcfac4eb}{db}}.\mbox{\hyperlink{classchainbase_1_1database_a4d5297635dcf70be481d9b600da9bc13}{get\_index}}<\mbox{\hyperlink{namespacesysio_1_1chain_aac1a2c1330fcb6c8002d59d4d1de5858}{key\_value\_index}},\ by\_scope\_primary>();}
-\DoxyCodeLine{01012\ \ \ \ \textcolor{keyword}{auto}\ itr\ =\ \mbox{\hyperlink{namespacehost__functions__tests__1_a8496a24b5236a2dc07bb4f2930d88342}{idx}}.upper\_bound(\ boost::make\_tuple(\ tab-\/>id,\ \textcolor{keywordtype}{id}\ )\ );}
-\DoxyCodeLine{01013\ \ \ \ \textcolor{keywordflow}{if}(\ itr\ ==\ \mbox{\hyperlink{namespacehost__functions__tests__1_a8496a24b5236a2dc07bb4f2930d88342}{idx}}.end()\ )\ \textcolor{keywordflow}{return}\ table\_end\_itr;}
+\DoxyCodeLine{01011\ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ idx\ =\ \mbox{\hyperlink{classsysio_1_1chain_1_1apply__context_ac3b6e6353b5ecebcb305e1d3dcfac4eb}{db}}.\mbox{\hyperlink{classchainbase_1_1database_a4d5297635dcf70be481d9b600da9bc13}{get\_index}}<\mbox{\hyperlink{namespacesysio_1_1chain_aac1a2c1330fcb6c8002d59d4d1de5858}{key\_value\_index}},\ by\_scope\_primary>();}
+\DoxyCodeLine{01012\ \ \ \ \textcolor{keyword}{auto}\ itr\ =\ idx.upper\_bound(\ boost::make\_tuple(\ tab-\/>id,\ \textcolor{keywordtype}{id}\ )\ );}
+\DoxyCodeLine{01013\ \ \ \ \textcolor{keywordflow}{if}(\ itr\ ==\ idx.end()\ )\ \textcolor{keywordflow}{return}\ table\_end\_itr;}
 \DoxyCodeLine{01014\ \ \ \ \textcolor{keywordflow}{if}(\ itr-\/>t\_id\ !=\ tab-\/>id\ )\ \textcolor{keywordflow}{return}\ table\_end\_itr;}
 \DoxyCodeLine{01015\ }
 \DoxyCodeLine{01016\ \ \ \ \textcolor{keywordflow}{return}\ keyval\_cache.add(\ *itr\ );}
 \DoxyCodeLine{01017\ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -729,7 +744,8 @@ Definition at line \mbox{\hyperlink{apply__context_8cpp_source_l00200}{200}} of 
 \DoxyCodeLine{00222\ \}\ }
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -884,14 +900,16 @@ Definition at line \mbox{\hyperlink{apply__context_8cpp_source_l00053}{53}} of f
 \DoxyCodeLine{00187\ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
 \includegraphics[width=350pt]{classsysio_1_1chain_1_1apply__context_a3d55f08ae8c014eb7cca9d36b43e8220_cgraph}
 \end{center}
 \end{figure}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -936,7 +954,8 @@ Definition at line \mbox{\hyperlink{apply__context_8cpp_source_l00400}{400}} of 
 \DoxyCodeLine{00423\ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -1052,7 +1071,8 @@ Definition at line \mbox{\hyperlink{apply__context_8cpp_source_l00312}{312}} of 
 \DoxyCodeLine{00398\ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -1082,14 +1102,16 @@ Definition at line \mbox{\hyperlink{apply__context_8cpp_source_l00189}{189}} of 
 \DoxyCodeLine{00198\ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
 \includegraphics[width=350pt]{classsysio_1_1chain_1_1apply__context_a89069192fcd50a9ebbe656f8868e7b90_cgraph}
 \end{center}
 \end{figure}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -1149,7 +1171,8 @@ Definition at line \mbox{\hyperlink{apply__context_8cpp_source_l00737}{737}} of 
 \DoxyCodeLine{00761\ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -1179,7 +1202,8 @@ Definition at line \mbox{\hyperlink{apply__context_8cpp_source_l00713}{713}} of 
 \DoxyCodeLine{00721\ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -1218,7 +1242,8 @@ Definition at line \mbox{\hyperlink{apply__context_8cpp_source_l00228}{228}} of 
 \DoxyCodeLine{00246\ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -1252,7 +1277,8 @@ Definition at line \mbox{\hyperlink{apply__context_8cpp_source_l00763}{763}} of 
 \DoxyCodeLine{00776\ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -1316,7 +1342,8 @@ Definition at line \mbox{\hyperlink{apply__context_8cpp_source_l00257}{257}} of 
 \DoxyCodeLine{00262\ \}}
 
 \end{DoxyCode}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -1343,7 +1370,8 @@ Definition at line \mbox{\hyperlink{apply__context_8cpp_source_l00276}{276}} of 
 \DoxyCodeLine{00281\ \}}
 
 \end{DoxyCode}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -1370,7 +1398,8 @@ Definition at line \mbox{\hyperlink{apply__context_8cpp_source_l00224}{224}} of 
 \DoxyCodeLine{00226\ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -1428,14 +1457,16 @@ Definition at line \mbox{\hyperlink{apply__context_8cpp_source_l01042}{1042}} of
 \DoxyCodeLine{01048\ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
 \includegraphics[width=350pt]{classsysio_1_1chain_1_1apply__context_aa5a5520ad95838d777834dd408a2c71d_cgraph}
 \end{center}
 \end{figure}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -1463,14 +1494,16 @@ Definition at line \mbox{\hyperlink{apply__context_8cpp_source_l01028}{1028}} of
 \DoxyCodeLine{01034\ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
 \includegraphics[width=350pt]{classsysio_1_1chain_1_1apply__context_a2ef781fcd0596791a3edb004b4f5c8c5_cgraph}
 \end{center}
 \end{figure}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -1497,14 +1530,16 @@ Definition at line \mbox{\hyperlink{apply__context_8cpp_source_l01036}{1036}} of
 \DoxyCodeLine{01041\ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
 \includegraphics[width=350pt]{classsysio_1_1chain_1_1apply__context_acb20a8d75fff438efadb4976a6fdce31_cgraph}
 \end{center}
 \end{figure}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -1545,7 +1580,8 @@ Definition at line \mbox{\hyperlink{apply__context_8cpp_source_l00248}{248}} of 
 \DoxyCodeLine{00255\ \}}
 
 \end{DoxyCode}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -1602,7 +1638,8 @@ Definition at line \mbox{\hyperlink{apply__context_8cpp_source_l00283}{283}} of 
 \DoxyCodeLine{00294\ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -1653,7 +1690,8 @@ Definition at line \mbox{\hyperlink{apply__context_8cpp_source_l00641}{641}} of 
 \DoxyCodeLine{00649\ \}}
 
 \end{DoxyCode}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -1873,7 +1911,8 @@ Definition at line \mbox{\hyperlink{apply__context_8cpp_source_l00426}{426}} of 
 \DoxyCodeLine{00624\ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -1906,14 +1945,16 @@ Definition at line \mbox{\hyperlink{apply__context_8cpp_source_l00723}{723}} of 
 \DoxyCodeLine{00734\ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
 \includegraphics[width=350pt]{classsysio_1_1chain_1_1apply__context_a49f2feb0d0ce2cb21c74f871432392e9_cgraph}
 \end{center}
 \end{figure}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode

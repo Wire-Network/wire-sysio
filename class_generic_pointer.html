@@ -972,7 +972,7 @@ template&lt;typename ValueType , typename <a class="el" href="classrapidjson_1_1
 <div class="line"><span class="lineno">  348</span> </div>
 <div class="line"><span class="lineno">  350</span> </div>
 <div class="line"><span class="lineno">  351</span> </div>
-<div class="line"><span class="lineno">  353</span>    <span class="keyword">const</span> Token* <a class="code hl_function" href="namespacecpp_1_1tokenize.html#abdc89f5b08e972e7404e9b9ac1dd17ff">GetTokens</a>()<span class="keyword"> const </span>{ <span class="keywordflow">return</span> <a class="code hl_variable" href="#a997793c66ea1a264089c37c8731eb138">tokens_</a>; }</div>
+<div class="line"><span class="lineno">  353</span>    <span class="keyword">const</span> Token* GetTokens()<span class="keyword"> const </span>{ <span class="keywordflow">return</span> <a class="code hl_variable" href="#a997793c66ea1a264089c37c8731eb138">tokens_</a>; }</div>
 <div class="line"><span class="lineno">  354</span> </div>
 <div class="line"><span class="lineno">  356</span>    <span class="keywordtype">size_t</span> GetTokenCount()<span class="keyword"> const </span>{ <span class="keywordflow">return</span> <a class="code hl_variable" href="#a7051cf59af6622542a050bd0ff0340f8">tokenCount_</a>; }</div>
 <div class="line"><span class="lineno">  357</span> </div>
@@ -1028,14 +1028,14 @@ template&lt;typename ValueType , typename <a class="el" href="classrapidjson_1_1
 <div class="line"><span class="lineno">  420</span> </div>
 <div class="line"><span class="lineno">  422</span> </div>
 <div class="line"><span class="lineno">  426</span>    <span class="keyword">template</span>&lt;<span class="keyword">typename</span> OutputStream&gt;</div>
-<div class="line"><span class="lineno">  427</span>    <span class="keywordtype">bool</span> Stringify(OutputStream&amp; os)<span class="keyword"> const </span>{</div>
-<div class="line"><span class="lineno">  428</span>        <span class="keywordflow">return</span> Stringify&lt;false, OutputStream&gt;(os);</div>
+<div class="line"><span class="lineno">  427</span>    <span class="keywordtype">bool</span> Stringify(OutputStream&amp; <a class="code hl_variable" href="environment_8hpp.html#a3951483d0b31c29ca95336206cd35238">os</a>)<span class="keyword"> const </span>{</div>
+<div class="line"><span class="lineno">  428</span>        <span class="keywordflow">return</span> Stringify&lt;false, OutputStream&gt;(<a class="code hl_variable" href="environment_8hpp.html#a3951483d0b31c29ca95336206cd35238">os</a>);</div>
 <div class="line"><span class="lineno">  429</span>    }</div>
 <div class="line"><span class="lineno">  430</span> </div>
 <div class="line"><span class="lineno">  432</span> </div>
 <div class="line"><span class="lineno">  436</span>    <span class="keyword">template</span>&lt;<span class="keyword">typename</span> OutputStream&gt;</div>
-<div class="line"><span class="lineno">  437</span>    <span class="keywordtype">bool</span> StringifyUriFragment(OutputStream&amp; os)<span class="keyword"> const </span>{</div>
-<div class="line"><span class="lineno">  438</span>        <span class="keywordflow">return</span> Stringify&lt;true, OutputStream&gt;(os);</div>
+<div class="line"><span class="lineno">  437</span>    <span class="keywordtype">bool</span> StringifyUriFragment(OutputStream&amp; <a class="code hl_variable" href="environment_8hpp.html#a3951483d0b31c29ca95336206cd35238">os</a>)<span class="keyword"> const </span>{</div>
+<div class="line"><span class="lineno">  438</span>        <span class="keywordflow">return</span> Stringify&lt;true, OutputStream&gt;(<a class="code hl_variable" href="environment_8hpp.html#a3951483d0b31c29ca95336206cd35238">os</a>);</div>
 <div class="line"><span class="lineno">  439</span>    }</div>
 <div class="line"><span class="lineno">  440</span> </div>
 <div class="line"><span class="lineno">  442</span> </div>
@@ -1044,42 +1044,42 @@ template&lt;typename ValueType , typename <a class="el" href="classrapidjson_1_1
 <div class="line"><span class="lineno">  447</span> </div>
 <div class="line"><span class="lineno">  461</span>    <a class="code hl_enumeration" href="namespace_i_r.html#aa1afcba889279fa935b76ba278be7fd6">ValueType</a>&amp; Create(ValueType&amp; root, <span class="keyword">typename</span> ValueType::AllocatorType&amp; <a class="code hl_variable" href="#aeb61ba8e67260b43090791eeca8b90e0">allocator</a>, <span class="keywordtype">bool</span>* alreadyExist = 0)<span class="keyword"> const </span>{</div>
 <div class="line"><span class="lineno">  462</span>        <a class="code hl_define" href="group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g.html#gabeba18d612187bad2ac62aed9276d47c">RAPIDJSON_ASSERT</a>(IsValid());</div>
-<div class="line"><span class="lineno">  463</span>        <a class="code hl_enumeration" href="namespace_i_r.html#aa1afcba889279fa935b76ba278be7fd6">ValueType</a>* <a class="code hl_variable" href="namespacedevelop_build.html#ade64cd34608f9442ef3049116a2da428">v</a> = &amp;root;</div>
+<div class="line"><span class="lineno">  463</span>        <a class="code hl_enumeration" href="namespace_i_r.html#aa1afcba889279fa935b76ba278be7fd6">ValueType</a>* v = &amp;root;</div>
 <div class="line"><span class="lineno">  464</span>        <span class="keywordtype">bool</span> exist = <span class="keyword">true</span>;</div>
 <div class="line"><span class="lineno">  465</span>        <span class="keywordflow">for</span> (<span class="keyword">const</span> Token *t = <a class="code hl_variable" href="#a997793c66ea1a264089c37c8731eb138">tokens_</a>; t != <a class="code hl_variable" href="#a997793c66ea1a264089c37c8731eb138">tokens_</a> + <a class="code hl_variable" href="#a7051cf59af6622542a050bd0ff0340f8">tokenCount_</a>; ++t) {</div>
-<div class="line"><span class="lineno">  466</span>            <span class="keywordflow">if</span> (<a class="code hl_variable" href="namespacedevelop_build.html#ade64cd34608f9442ef3049116a2da428">v</a>-&gt;IsArray() &amp;&amp; t-&gt;name[0] == <span class="charliteral">&#39;-&#39;</span> &amp;&amp; t-&gt;length == 1) {</div>
-<div class="line"><span class="lineno">  467</span>                <a class="code hl_variable" href="namespacedevelop_build.html#ade64cd34608f9442ef3049116a2da428">v</a>-&gt;PushBack(<a class="code hl_enumeration" href="namespace_i_r.html#aa1afcba889279fa935b76ba278be7fd6">ValueType</a>().Move(), <a class="code hl_variable" href="#aeb61ba8e67260b43090791eeca8b90e0">allocator</a>);</div>
-<div class="line"><span class="lineno">  468</span>                <a class="code hl_variable" href="namespacedevelop_build.html#ade64cd34608f9442ef3049116a2da428">v</a> = &amp;((*v)[<a class="code hl_variable" href="namespacedevelop_build.html#ade64cd34608f9442ef3049116a2da428">v</a>-&gt;Size() - 1]);</div>
+<div class="line"><span class="lineno">  466</span>            <span class="keywordflow">if</span> (v-&gt;IsArray() &amp;&amp; t-&gt;name[0] == <span class="charliteral">&#39;-&#39;</span> &amp;&amp; t-&gt;length == 1) {</div>
+<div class="line"><span class="lineno">  467</span>                v-&gt;PushBack(<a class="code hl_enumeration" href="namespace_i_r.html#aa1afcba889279fa935b76ba278be7fd6">ValueType</a>().Move(), <a class="code hl_variable" href="#aeb61ba8e67260b43090791eeca8b90e0">allocator</a>);</div>
+<div class="line"><span class="lineno">  468</span>                v = &amp;((*v)[v-&gt;Size() - 1]);</div>
 <div class="line"><span class="lineno">  469</span>                exist = <span class="keyword">false</span>;</div>
 <div class="line"><span class="lineno">  470</span>            }</div>
 <div class="line"><span class="lineno">  471</span>            <span class="keywordflow">else</span> {</div>
 <div class="line"><span class="lineno">  472</span>                <span class="keywordflow">if</span> (t-&gt;index == kPointerInvalidIndex) { <span class="comment">// must be object name</span></div>
-<div class="line"><span class="lineno">  473</span>                    <span class="keywordflow">if</span> (!<a class="code hl_variable" href="namespacedevelop_build.html#ade64cd34608f9442ef3049116a2da428">v</a>-&gt;IsObject())</div>
-<div class="line"><span class="lineno">  474</span>                        <a class="code hl_variable" href="namespacedevelop_build.html#ade64cd34608f9442ef3049116a2da428">v</a>-&gt;SetObject(); <span class="comment">// Change to Object</span></div>
+<div class="line"><span class="lineno">  473</span>                    <span class="keywordflow">if</span> (!v-&gt;IsObject())</div>
+<div class="line"><span class="lineno">  474</span>                        v-&gt;SetObject(); <span class="comment">// Change to Object</span></div>
 <div class="line"><span class="lineno">  475</span>                }</div>
 <div class="line"><span class="lineno">  476</span>                <span class="keywordflow">else</span> { <span class="comment">// object name or array index</span></div>
-<div class="line"><span class="lineno">  477</span>                    <span class="keywordflow">if</span> (!<a class="code hl_variable" href="namespacedevelop_build.html#ade64cd34608f9442ef3049116a2da428">v</a>-&gt;IsArray() &amp;&amp; !<a class="code hl_variable" href="namespacedevelop_build.html#ade64cd34608f9442ef3049116a2da428">v</a>-&gt;IsObject())</div>
-<div class="line"><span class="lineno">  478</span>                        <a class="code hl_variable" href="namespacedevelop_build.html#ade64cd34608f9442ef3049116a2da428">v</a>-&gt;SetArray(); <span class="comment">// Change to Array</span></div>
+<div class="line"><span class="lineno">  477</span>                    <span class="keywordflow">if</span> (!v-&gt;IsArray() &amp;&amp; !v-&gt;IsObject())</div>
+<div class="line"><span class="lineno">  478</span>                        v-&gt;SetArray(); <span class="comment">// Change to Array</span></div>
 <div class="line"><span class="lineno">  479</span>                }</div>
 <div class="line"><span class="lineno">  480</span> </div>
-<div class="line"><span class="lineno">  481</span>                <span class="keywordflow">if</span> (<a class="code hl_variable" href="namespacedevelop_build.html#ade64cd34608f9442ef3049116a2da428">v</a>-&gt;IsArray()) {</div>
-<div class="line"><span class="lineno">  482</span>                    <span class="keywordflow">if</span> (t-&gt;index &gt;= <a class="code hl_variable" href="namespacedevelop_build.html#ade64cd34608f9442ef3049116a2da428">v</a>-&gt;Size()) {</div>
-<div class="line"><span class="lineno">  483</span>                        <a class="code hl_variable" href="namespacedevelop_build.html#ade64cd34608f9442ef3049116a2da428">v</a>-&gt;Reserve(t-&gt;index + 1, <a class="code hl_variable" href="#aeb61ba8e67260b43090791eeca8b90e0">allocator</a>);</div>
-<div class="line"><span class="lineno">  484</span>                        <span class="keywordflow">while</span> (t-&gt;index &gt;= <a class="code hl_variable" href="namespacedevelop_build.html#ade64cd34608f9442ef3049116a2da428">v</a>-&gt;Size())</div>
-<div class="line"><span class="lineno">  485</span>                            <a class="code hl_variable" href="namespacedevelop_build.html#ade64cd34608f9442ef3049116a2da428">v</a>-&gt;PushBack(<a class="code hl_enumeration" href="namespace_i_r.html#aa1afcba889279fa935b76ba278be7fd6">ValueType</a>().Move(), <a class="code hl_variable" href="#aeb61ba8e67260b43090791eeca8b90e0">allocator</a>);</div>
+<div class="line"><span class="lineno">  481</span>                <span class="keywordflow">if</span> (v-&gt;IsArray()) {</div>
+<div class="line"><span class="lineno">  482</span>                    <span class="keywordflow">if</span> (t-&gt;index &gt;= v-&gt;Size()) {</div>
+<div class="line"><span class="lineno">  483</span>                        v-&gt;Reserve(t-&gt;index + 1, <a class="code hl_variable" href="#aeb61ba8e67260b43090791eeca8b90e0">allocator</a>);</div>
+<div class="line"><span class="lineno">  484</span>                        <span class="keywordflow">while</span> (t-&gt;index &gt;= v-&gt;Size())</div>
+<div class="line"><span class="lineno">  485</span>                            v-&gt;PushBack(<a class="code hl_enumeration" href="namespace_i_r.html#aa1afcba889279fa935b76ba278be7fd6">ValueType</a>().Move(), <a class="code hl_variable" href="#aeb61ba8e67260b43090791eeca8b90e0">allocator</a>);</div>
 <div class="line"><span class="lineno">  486</span>                        exist = <span class="keyword">false</span>;</div>
 <div class="line"><span class="lineno">  487</span>                    }</div>
-<div class="line"><span class="lineno">  488</span>                    <a class="code hl_variable" href="namespacedevelop_build.html#ade64cd34608f9442ef3049116a2da428">v</a> = &amp;((*v)[t-&gt;index]);</div>
+<div class="line"><span class="lineno">  488</span>                    v = &amp;((*v)[t-&gt;index]);</div>
 <div class="line"><span class="lineno">  489</span>                }</div>
 <div class="line"><span class="lineno">  490</span>                <span class="keywordflow">else</span> {</div>
-<div class="line"><span class="lineno">  491</span>                    <span class="keyword">typename</span> ValueType::MemberIterator m = <a class="code hl_variable" href="namespacedevelop_build.html#ade64cd34608f9442ef3049116a2da428">v</a>-&gt;FindMember(<a class="code hl_struct" href="struct_generic_string_ref.html">GenericStringRef&lt;Ch&gt;</a>(t-&gt;name, t-&gt;length));</div>
-<div class="line"><span class="lineno">  492</span>                    <span class="keywordflow">if</span> (m == <a class="code hl_variable" href="namespacedevelop_build.html#ade64cd34608f9442ef3049116a2da428">v</a>-&gt;MemberEnd()) {</div>
-<div class="line"><span class="lineno">  493</span>                        <a class="code hl_variable" href="namespacedevelop_build.html#ade64cd34608f9442ef3049116a2da428">v</a>-&gt;AddMember(<a class="code hl_enumeration" href="namespace_i_r.html#aa1afcba889279fa935b76ba278be7fd6">ValueType</a>(t-&gt;name, t-&gt;length, <a class="code hl_variable" href="#aeb61ba8e67260b43090791eeca8b90e0">allocator</a>).Move(), <a class="code hl_enumeration" href="namespace_i_r.html#aa1afcba889279fa935b76ba278be7fd6">ValueType</a>().Move(), <a class="code hl_variable" href="#aeb61ba8e67260b43090791eeca8b90e0">allocator</a>);</div>
-<div class="line"><span class="lineno">  494</span>                        <a class="code hl_variable" href="namespacedevelop_build.html#ade64cd34608f9442ef3049116a2da428">v</a> = &amp;(--<a class="code hl_variable" href="namespacedevelop_build.html#ade64cd34608f9442ef3049116a2da428">v</a>-&gt;MemberEnd())-&gt;value; <span class="comment">// Assumes AddMember() appends at the end</span></div>
+<div class="line"><span class="lineno">  491</span>                    <span class="keyword">typename</span> ValueType::MemberIterator m = v-&gt;FindMember(<a class="code hl_struct" href="struct_generic_string_ref.html">GenericStringRef&lt;Ch&gt;</a>(t-&gt;name, t-&gt;length));</div>
+<div class="line"><span class="lineno">  492</span>                    <span class="keywordflow">if</span> (m == v-&gt;MemberEnd()) {</div>
+<div class="line"><span class="lineno">  493</span>                        v-&gt;AddMember(<a class="code hl_enumeration" href="namespace_i_r.html#aa1afcba889279fa935b76ba278be7fd6">ValueType</a>(t-&gt;name, t-&gt;length, <a class="code hl_variable" href="#aeb61ba8e67260b43090791eeca8b90e0">allocator</a>).Move(), <a class="code hl_enumeration" href="namespace_i_r.html#aa1afcba889279fa935b76ba278be7fd6">ValueType</a>().Move(), <a class="code hl_variable" href="#aeb61ba8e67260b43090791eeca8b90e0">allocator</a>);</div>
+<div class="line"><span class="lineno">  494</span>                        v = &amp;(--v-&gt;MemberEnd())-&gt;value; <span class="comment">// Assumes AddMember() appends at the end</span></div>
 <div class="line"><span class="lineno">  495</span>                        exist = <span class="keyword">false</span>;</div>
 <div class="line"><span class="lineno">  496</span>                    }</div>
 <div class="line"><span class="lineno">  497</span>                    <span class="keywordflow">else</span></div>
-<div class="line"><span class="lineno">  498</span>                        <a class="code hl_variable" href="namespacedevelop_build.html#ade64cd34608f9442ef3049116a2da428">v</a> = &amp;m-&gt;value;</div>
+<div class="line"><span class="lineno">  498</span>                        v = &amp;m-&gt;value;</div>
 <div class="line"><span class="lineno">  499</span>                }</div>
 <div class="line"><span class="lineno">  500</span>            }</div>
 <div class="line"><span class="lineno">  501</span>        }</div>
@@ -1087,7 +1087,7 @@ template&lt;typename ValueType , typename <a class="el" href="classrapidjson_1_1
 <div class="line"><span class="lineno">  503</span>        <span class="keywordflow">if</span> (alreadyExist)</div>
 <div class="line"><span class="lineno">  504</span>            *alreadyExist = exist;</div>
 <div class="line"><span class="lineno">  505</span> </div>
-<div class="line"><span class="lineno">  506</span>        <span class="keywordflow">return</span> *<a class="code hl_variable" href="namespacedevelop_build.html#ade64cd34608f9442ef3049116a2da428">v</a>;</div>
+<div class="line"><span class="lineno">  506</span>        <span class="keywordflow">return</span> *v;</div>
 <div class="line"><span class="lineno">  507</span>    }</div>
 <div class="line"><span class="lineno">  508</span> </div>
 <div class="line"><span class="lineno">  510</span> </div>
@@ -1102,21 +1102,21 @@ template&lt;typename ValueType , typename <a class="el" href="classrapidjson_1_1
 <div class="line"><span class="lineno">  526</span> </div>
 <div class="line"><span class="lineno">  539</span>    <a class="code hl_enumeration" href="namespace_i_r.html#aa1afcba889279fa935b76ba278be7fd6">ValueType</a>* Get(ValueType&amp; root, <span class="keywordtype">size_t</span>* unresolvedTokenIndex = 0)<span class="keyword"> const </span>{</div>
 <div class="line"><span class="lineno">  540</span>        <a class="code hl_define" href="group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g.html#gabeba18d612187bad2ac62aed9276d47c">RAPIDJSON_ASSERT</a>(IsValid());</div>
-<div class="line"><span class="lineno">  541</span>        <a class="code hl_enumeration" href="namespace_i_r.html#aa1afcba889279fa935b76ba278be7fd6">ValueType</a>* <a class="code hl_variable" href="namespacedevelop_build.html#ade64cd34608f9442ef3049116a2da428">v</a> = &amp;root;</div>
+<div class="line"><span class="lineno">  541</span>        <a class="code hl_enumeration" href="namespace_i_r.html#aa1afcba889279fa935b76ba278be7fd6">ValueType</a>* v = &amp;root;</div>
 <div class="line"><span class="lineno">  542</span>        <span class="keywordflow">for</span> (<span class="keyword">const</span> Token *t = <a class="code hl_variable" href="#a997793c66ea1a264089c37c8731eb138">tokens_</a>; t != <a class="code hl_variable" href="#a997793c66ea1a264089c37c8731eb138">tokens_</a> + <a class="code hl_variable" href="#a7051cf59af6622542a050bd0ff0340f8">tokenCount_</a>; ++t) {</div>
-<div class="line"><span class="lineno">  543</span>            <span class="keywordflow">switch</span> (<a class="code hl_variable" href="namespacedevelop_build.html#ade64cd34608f9442ef3049116a2da428">v</a>-&gt;GetType()) {</div>
+<div class="line"><span class="lineno">  543</span>            <span class="keywordflow">switch</span> (v-&gt;GetType()) {</div>
 <div class="line"><span class="lineno">  544</span>            <span class="keywordflow">case</span> <a class="code hl_enumvalue" href="rapidjson_8h.html#a1d1cfd8ffb84e947f82999c682b666a7a146f46700e905e8df96a6a90b5c7640f">kObjectType</a>:</div>
 <div class="line"><span class="lineno">  545</span>                {</div>
-<div class="line"><span class="lineno">  546</span>                    <span class="keyword">typename</span> ValueType::MemberIterator m = <a class="code hl_variable" href="namespacedevelop_build.html#ade64cd34608f9442ef3049116a2da428">v</a>-&gt;FindMember(<a class="code hl_struct" href="struct_generic_string_ref.html">GenericStringRef&lt;Ch&gt;</a>(t-&gt;name, t-&gt;length));</div>
-<div class="line"><span class="lineno">  547</span>                    <span class="keywordflow">if</span> (m == <a class="code hl_variable" href="namespacedevelop_build.html#ade64cd34608f9442ef3049116a2da428">v</a>-&gt;MemberEnd())</div>
+<div class="line"><span class="lineno">  546</span>                    <span class="keyword">typename</span> ValueType::MemberIterator m = v-&gt;FindMember(<a class="code hl_struct" href="struct_generic_string_ref.html">GenericStringRef&lt;Ch&gt;</a>(t-&gt;name, t-&gt;length));</div>
+<div class="line"><span class="lineno">  547</span>                    <span class="keywordflow">if</span> (m == v-&gt;MemberEnd())</div>
 <div class="line"><span class="lineno">  548</span>                        <span class="keywordflow">break</span>;</div>
-<div class="line"><span class="lineno">  549</span>                    <a class="code hl_variable" href="namespacedevelop_build.html#ade64cd34608f9442ef3049116a2da428">v</a> = &amp;m-&gt;value;</div>
+<div class="line"><span class="lineno">  549</span>                    v = &amp;m-&gt;value;</div>
 <div class="line"><span class="lineno">  550</span>                }</div>
 <div class="line"><span class="lineno">  551</span>                <span class="keywordflow">continue</span>;</div>
 <div class="line"><span class="lineno">  552</span>            <span class="keywordflow">case</span> <a class="code hl_enumvalue" href="rapidjson_8h.html#a1d1cfd8ffb84e947f82999c682b666a7af41527d6925efa3c5c3dadb23dfef7c8">kArrayType</a>:</div>
-<div class="line"><span class="lineno">  553</span>                <span class="keywordflow">if</span> (t-&gt;index == kPointerInvalidIndex || t-&gt;index &gt;= <a class="code hl_variable" href="namespacedevelop_build.html#ade64cd34608f9442ef3049116a2da428">v</a>-&gt;Size())</div>
+<div class="line"><span class="lineno">  553</span>                <span class="keywordflow">if</span> (t-&gt;index == kPointerInvalidIndex || t-&gt;index &gt;= v-&gt;Size())</div>
 <div class="line"><span class="lineno">  554</span>                    <span class="keywordflow">break</span>;</div>
-<div class="line"><span class="lineno">  555</span>                <a class="code hl_variable" href="namespacedevelop_build.html#ade64cd34608f9442ef3049116a2da428">v</a> = &amp;((*v)[t-&gt;index]);</div>
+<div class="line"><span class="lineno">  555</span>                v = &amp;((*v)[t-&gt;index]);</div>
 <div class="line"><span class="lineno">  556</span>                <span class="keywordflow">continue</span>;</div>
 <div class="line"><span class="lineno">  557</span>            <span class="keywordflow">default</span>:</div>
 <div class="line"><span class="lineno">  558</span>                <span class="keywordflow">break</span>;</div>
@@ -1127,7 +1127,7 @@ template&lt;typename ValueType , typename <a class="el" href="classrapidjson_1_1
 <div class="line"><span class="lineno">  563</span>                *unresolvedTokenIndex = <span class="keyword">static_cast&lt;</span><span class="keywordtype">size_t</span><span class="keyword">&gt;</span>(t - <a class="code hl_variable" href="#a997793c66ea1a264089c37c8731eb138">tokens_</a>);</div>
 <div class="line"><span class="lineno">  564</span>            <span class="keywordflow">return</span> 0;</div>
 <div class="line"><span class="lineno">  565</span>        }</div>
-<div class="line"><span class="lineno">  566</span>        <span class="keywordflow">return</span> <a class="code hl_variable" href="namespacedevelop_build.html#ade64cd34608f9442ef3049116a2da428">v</a>;</div>
+<div class="line"><span class="lineno">  566</span>        <span class="keywordflow">return</span> v;</div>
 <div class="line"><span class="lineno">  567</span>    }</div>
 <div class="line"><span class="lineno">  568</span> </div>
 <div class="line"><span class="lineno">  570</span> </div>
@@ -1141,21 +1141,21 @@ template&lt;typename ValueType , typename <a class="el" href="classrapidjson_1_1
 <div class="line"><span class="lineno">  584</span> </div>
 <div class="line"><span class="lineno">  593</span>    <a class="code hl_enumeration" href="namespace_i_r.html#aa1afcba889279fa935b76ba278be7fd6">ValueType</a>&amp; GetWithDefault(ValueType&amp; root, <span class="keyword">const</span> ValueType&amp; <a class="code hl_variable" href="pointer_8h.html#a3db30c1795eb39d4452f8698f4a67f05">defaultValue</a>, <span class="keyword">typename</span> ValueType::AllocatorType&amp; <a class="code hl_variable" href="#aeb61ba8e67260b43090791eeca8b90e0">allocator</a>)<span class="keyword"> const </span>{</div>
 <div class="line"><span class="lineno">  594</span>        <span class="keywordtype">bool</span> alreadyExist;</div>
-<div class="line"><span class="lineno">  595</span>        <a class="code hl_enumeration" href="namespace_i_r.html#aa1afcba889279fa935b76ba278be7fd6">ValueType</a>&amp; <a class="code hl_variable" href="namespacedevelop_build.html#ade64cd34608f9442ef3049116a2da428">v</a> = Create(root, <a class="code hl_variable" href="#aeb61ba8e67260b43090791eeca8b90e0">allocator</a>, &amp;alreadyExist);</div>
-<div class="line"><span class="lineno">  596</span>        <span class="keywordflow">return</span> alreadyExist ? <a class="code hl_variable" href="namespacedevelop_build.html#ade64cd34608f9442ef3049116a2da428">v</a> : <a class="code hl_variable" href="namespacedevelop_build.html#ade64cd34608f9442ef3049116a2da428">v</a>.CopyFrom(<a class="code hl_variable" href="pointer_8h.html#a3db30c1795eb39d4452f8698f4a67f05">defaultValue</a>, <a class="code hl_variable" href="#aeb61ba8e67260b43090791eeca8b90e0">allocator</a>);</div>
+<div class="line"><span class="lineno">  595</span>        <a class="code hl_enumeration" href="namespace_i_r.html#aa1afcba889279fa935b76ba278be7fd6">ValueType</a>&amp; v = Create(root, <a class="code hl_variable" href="#aeb61ba8e67260b43090791eeca8b90e0">allocator</a>, &amp;alreadyExist);</div>
+<div class="line"><span class="lineno">  596</span>        <span class="keywordflow">return</span> alreadyExist ? v : v.CopyFrom(<a class="code hl_variable" href="pointer_8h.html#a3db30c1795eb39d4452f8698f4a67f05">defaultValue</a>, <a class="code hl_variable" href="#aeb61ba8e67260b43090791eeca8b90e0">allocator</a>);</div>
 <div class="line"><span class="lineno">  597</span>    }</div>
 <div class="line"><span class="lineno">  598</span> </div>
 <div class="line"><span class="lineno">  600</span>    <a class="code hl_enumeration" href="namespace_i_r.html#aa1afcba889279fa935b76ba278be7fd6">ValueType</a>&amp; GetWithDefault(ValueType&amp; root, <span class="keyword">const</span> <a class="code hl_typedef" href="#a77f7746a798967ee3f9aa608164eafef">Ch</a>* <a class="code hl_variable" href="pointer_8h.html#a3db30c1795eb39d4452f8698f4a67f05">defaultValue</a>, <span class="keyword">typename</span> ValueType::AllocatorType&amp; <a class="code hl_variable" href="#aeb61ba8e67260b43090791eeca8b90e0">allocator</a>)<span class="keyword"> const </span>{</div>
 <div class="line"><span class="lineno">  601</span>        <span class="keywordtype">bool</span> alreadyExist;</div>
-<div class="line"><span class="lineno">  602</span>        <a class="code hl_enumeration" href="namespace_i_r.html#aa1afcba889279fa935b76ba278be7fd6">ValueType</a>&amp; <a class="code hl_variable" href="namespacedevelop_build.html#ade64cd34608f9442ef3049116a2da428">v</a> = Create(root, <a class="code hl_variable" href="#aeb61ba8e67260b43090791eeca8b90e0">allocator</a>, &amp;alreadyExist);</div>
-<div class="line"><span class="lineno">  603</span>        <span class="keywordflow">return</span> alreadyExist ? <a class="code hl_variable" href="namespacedevelop_build.html#ade64cd34608f9442ef3049116a2da428">v</a> : <a class="code hl_variable" href="namespacedevelop_build.html#ade64cd34608f9442ef3049116a2da428">v</a>.SetString(<a class="code hl_variable" href="pointer_8h.html#a3db30c1795eb39d4452f8698f4a67f05">defaultValue</a>, <a class="code hl_variable" href="#aeb61ba8e67260b43090791eeca8b90e0">allocator</a>);</div>
+<div class="line"><span class="lineno">  602</span>        <a class="code hl_enumeration" href="namespace_i_r.html#aa1afcba889279fa935b76ba278be7fd6">ValueType</a>&amp; v = Create(root, <a class="code hl_variable" href="#aeb61ba8e67260b43090791eeca8b90e0">allocator</a>, &amp;alreadyExist);</div>
+<div class="line"><span class="lineno">  603</span>        <span class="keywordflow">return</span> alreadyExist ? v : v.SetString(<a class="code hl_variable" href="pointer_8h.html#a3db30c1795eb39d4452f8698f4a67f05">defaultValue</a>, <a class="code hl_variable" href="#aeb61ba8e67260b43090791eeca8b90e0">allocator</a>);</div>
 <div class="line"><span class="lineno">  604</span>    }</div>
 <div class="line"><span class="lineno">  605</span> </div>
 <div class="line"><span class="lineno">  606</span><span class="preprocessor">#if RAPIDJSON_HAS_STDSTRING</span></div>
 <div class="line"><span class="lineno">  608</span>    <a class="code hl_enumeration" href="namespace_i_r.html#aa1afcba889279fa935b76ba278be7fd6">ValueType</a>&amp; GetWithDefault(ValueType&amp; root, <span class="keyword">const</span> std::basic_string&lt;Ch&gt;&amp; <a class="code hl_variable" href="pointer_8h.html#a3db30c1795eb39d4452f8698f4a67f05">defaultValue</a>, <span class="keyword">typename</span> ValueType::AllocatorType&amp; <a class="code hl_variable" href="#aeb61ba8e67260b43090791eeca8b90e0">allocator</a>)<span class="keyword"> const </span>{</div>
 <div class="line"><span class="lineno">  609</span>        <span class="keywordtype">bool</span> alreadyExist;</div>
-<div class="line"><span class="lineno">  610</span>        <a class="code hl_enumeration" href="namespace_i_r.html#aa1afcba889279fa935b76ba278be7fd6">ValueType</a>&amp; <a class="code hl_variable" href="namespacedevelop_build.html#ade64cd34608f9442ef3049116a2da428">v</a> = Create(root, <a class="code hl_variable" href="#aeb61ba8e67260b43090791eeca8b90e0">allocator</a>, &amp;alreadyExist);</div>
-<div class="line"><span class="lineno">  611</span>        <span class="keywordflow">return</span> alreadyExist ? <a class="code hl_variable" href="namespacedevelop_build.html#ade64cd34608f9442ef3049116a2da428">v</a> : <a class="code hl_variable" href="namespacedevelop_build.html#ade64cd34608f9442ef3049116a2da428">v</a>.SetString(<a class="code hl_variable" href="pointer_8h.html#a3db30c1795eb39d4452f8698f4a67f05">defaultValue</a>, <a class="code hl_variable" href="#aeb61ba8e67260b43090791eeca8b90e0">allocator</a>);</div>
+<div class="line"><span class="lineno">  610</span>        <a class="code hl_enumeration" href="namespace_i_r.html#aa1afcba889279fa935b76ba278be7fd6">ValueType</a>&amp; v = Create(root, <a class="code hl_variable" href="#aeb61ba8e67260b43090791eeca8b90e0">allocator</a>, &amp;alreadyExist);</div>
+<div class="line"><span class="lineno">  611</span>        <span class="keywordflow">return</span> alreadyExist ? v : v.SetString(<a class="code hl_variable" href="pointer_8h.html#a3db30c1795eb39d4452f8698f4a67f05">defaultValue</a>, <a class="code hl_variable" href="#aeb61ba8e67260b43090791eeca8b90e0">allocator</a>);</div>
 <div class="line"><span class="lineno">  612</span>    }</div>
 <div class="line"><span class="lineno">  613</span><span class="preprocessor">#endif</span></div>
 <div class="line"><span class="lineno">  614</span> </div>
@@ -1268,35 +1268,35 @@ template&lt;typename ValueType , typename <a class="el" href="classrapidjson_1_1
 <div class="line"><span class="lineno">  773</span>        <span class="keywordflow">if</span> (<a class="code hl_variable" href="#a7051cf59af6622542a050bd0ff0340f8">tokenCount_</a> == 0) <span class="comment">// Cannot erase the root</span></div>
 <div class="line"><span class="lineno">  774</span>            <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
 <div class="line"><span class="lineno">  775</span> </div>
-<div class="line"><span class="lineno">  776</span>        <a class="code hl_enumeration" href="namespace_i_r.html#aa1afcba889279fa935b76ba278be7fd6">ValueType</a>* <a class="code hl_variable" href="namespacedevelop_build.html#ade64cd34608f9442ef3049116a2da428">v</a> = &amp;root;</div>
+<div class="line"><span class="lineno">  776</span>        <a class="code hl_enumeration" href="namespace_i_r.html#aa1afcba889279fa935b76ba278be7fd6">ValueType</a>* v = &amp;root;</div>
 <div class="line"><span class="lineno">  777</span>        <span class="keyword">const</span> Token* last = <a class="code hl_variable" href="#a997793c66ea1a264089c37c8731eb138">tokens_</a> + (<a class="code hl_variable" href="#a7051cf59af6622542a050bd0ff0340f8">tokenCount_</a> - 1);</div>
 <div class="line"><span class="lineno">  778</span>        <span class="keywordflow">for</span> (<span class="keyword">const</span> Token *t = <a class="code hl_variable" href="#a997793c66ea1a264089c37c8731eb138">tokens_</a>; t != last; ++t) {</div>
-<div class="line"><span class="lineno">  779</span>            <span class="keywordflow">switch</span> (<a class="code hl_variable" href="namespacedevelop_build.html#ade64cd34608f9442ef3049116a2da428">v</a>-&gt;GetType()) {</div>
+<div class="line"><span class="lineno">  779</span>            <span class="keywordflow">switch</span> (v-&gt;GetType()) {</div>
 <div class="line"><span class="lineno">  780</span>            <span class="keywordflow">case</span> <a class="code hl_enumvalue" href="rapidjson_8h.html#a1d1cfd8ffb84e947f82999c682b666a7a146f46700e905e8df96a6a90b5c7640f">kObjectType</a>:</div>
 <div class="line"><span class="lineno">  781</span>                {</div>
-<div class="line"><span class="lineno">  782</span>                    <span class="keyword">typename</span> ValueType::MemberIterator m = <a class="code hl_variable" href="namespacedevelop_build.html#ade64cd34608f9442ef3049116a2da428">v</a>-&gt;FindMember(<a class="code hl_struct" href="struct_generic_string_ref.html">GenericStringRef&lt;Ch&gt;</a>(t-&gt;name, t-&gt;length));</div>
-<div class="line"><span class="lineno">  783</span>                    <span class="keywordflow">if</span> (m == <a class="code hl_variable" href="namespacedevelop_build.html#ade64cd34608f9442ef3049116a2da428">v</a>-&gt;MemberEnd())</div>
+<div class="line"><span class="lineno">  782</span>                    <span class="keyword">typename</span> ValueType::MemberIterator m = v-&gt;FindMember(<a class="code hl_struct" href="struct_generic_string_ref.html">GenericStringRef&lt;Ch&gt;</a>(t-&gt;name, t-&gt;length));</div>
+<div class="line"><span class="lineno">  783</span>                    <span class="keywordflow">if</span> (m == v-&gt;MemberEnd())</div>
 <div class="line"><span class="lineno">  784</span>                        <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
-<div class="line"><span class="lineno">  785</span>                    <a class="code hl_variable" href="namespacedevelop_build.html#ade64cd34608f9442ef3049116a2da428">v</a> = &amp;m-&gt;value;</div>
+<div class="line"><span class="lineno">  785</span>                    v = &amp;m-&gt;value;</div>
 <div class="line"><span class="lineno">  786</span>                }</div>
 <div class="line"><span class="lineno">  787</span>                <span class="keywordflow">break</span>;</div>
 <div class="line"><span class="lineno">  788</span>            <span class="keywordflow">case</span> <a class="code hl_enumvalue" href="rapidjson_8h.html#a1d1cfd8ffb84e947f82999c682b666a7af41527d6925efa3c5c3dadb23dfef7c8">kArrayType</a>:</div>
-<div class="line"><span class="lineno">  789</span>                <span class="keywordflow">if</span> (t-&gt;index == kPointerInvalidIndex || t-&gt;index &gt;= <a class="code hl_variable" href="namespacedevelop_build.html#ade64cd34608f9442ef3049116a2da428">v</a>-&gt;Size())</div>
+<div class="line"><span class="lineno">  789</span>                <span class="keywordflow">if</span> (t-&gt;index == kPointerInvalidIndex || t-&gt;index &gt;= v-&gt;Size())</div>
 <div class="line"><span class="lineno">  790</span>                    <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
-<div class="line"><span class="lineno">  791</span>                <a class="code hl_variable" href="namespacedevelop_build.html#ade64cd34608f9442ef3049116a2da428">v</a> = &amp;((*v)[t-&gt;index]);</div>
+<div class="line"><span class="lineno">  791</span>                v = &amp;((*v)[t-&gt;index]);</div>
 <div class="line"><span class="lineno">  792</span>                <span class="keywordflow">break</span>;</div>
 <div class="line"><span class="lineno">  793</span>            <span class="keywordflow">default</span>:</div>
 <div class="line"><span class="lineno">  794</span>                <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
 <div class="line"><span class="lineno">  795</span>            }</div>
 <div class="line"><span class="lineno">  796</span>        }</div>
 <div class="line"><span class="lineno">  797</span> </div>
-<div class="line"><span class="lineno">  798</span>        <span class="keywordflow">switch</span> (<a class="code hl_variable" href="namespacedevelop_build.html#ade64cd34608f9442ef3049116a2da428">v</a>-&gt;GetType()) {</div>
+<div class="line"><span class="lineno">  798</span>        <span class="keywordflow">switch</span> (v-&gt;GetType()) {</div>
 <div class="line"><span class="lineno">  799</span>        <span class="keywordflow">case</span> <a class="code hl_enumvalue" href="rapidjson_8h.html#a1d1cfd8ffb84e947f82999c682b666a7a146f46700e905e8df96a6a90b5c7640f">kObjectType</a>:</div>
-<div class="line"><span class="lineno">  800</span>            <span class="keywordflow">return</span> <a class="code hl_variable" href="namespacedevelop_build.html#ade64cd34608f9442ef3049116a2da428">v</a>-&gt;EraseMember(<a class="code hl_struct" href="struct_generic_string_ref.html">GenericStringRef&lt;Ch&gt;</a>(last-&gt;name, last-&gt;length));</div>
+<div class="line"><span class="lineno">  800</span>            <span class="keywordflow">return</span> v-&gt;EraseMember(<a class="code hl_struct" href="struct_generic_string_ref.html">GenericStringRef&lt;Ch&gt;</a>(last-&gt;name, last-&gt;length));</div>
 <div class="line"><span class="lineno">  801</span>        <span class="keywordflow">case</span> <a class="code hl_enumvalue" href="rapidjson_8h.html#a1d1cfd8ffb84e947f82999c682b666a7af41527d6925efa3c5c3dadb23dfef7c8">kArrayType</a>:</div>
-<div class="line"><span class="lineno">  802</span>            <span class="keywordflow">if</span> (last-&gt;index == kPointerInvalidIndex || last-&gt;index &gt;= <a class="code hl_variable" href="namespacedevelop_build.html#ade64cd34608f9442ef3049116a2da428">v</a>-&gt;Size())</div>
+<div class="line"><span class="lineno">  802</span>            <span class="keywordflow">if</span> (last-&gt;index == kPointerInvalidIndex || last-&gt;index &gt;= v-&gt;Size())</div>
 <div class="line"><span class="lineno">  803</span>                <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
-<div class="line"><span class="lineno">  804</span>            <a class="code hl_variable" href="namespacedevelop_build.html#ade64cd34608f9442ef3049116a2da428">v</a>-&gt;Erase(<a class="code hl_variable" href="namespacedevelop_build.html#ade64cd34608f9442ef3049116a2da428">v</a>-&gt;Begin() + last-&gt;index);</div>
+<div class="line"><span class="lineno">  804</span>            v-&gt;Erase(v-&gt;Begin() + last-&gt;index);</div>
 <div class="line"><span class="lineno">  805</span>            <span class="keywordflow">return</span> <span class="keyword">true</span>;</div>
 <div class="line"><span class="lineno">  806</span>        <span class="keywordflow">default</span>:</div>
 <div class="line"><span class="lineno">  807</span>            <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
@@ -1383,12 +1383,12 @@ template&lt;typename ValueType , typename <a class="el" href="classrapidjson_1_1
 <div class="line"><span class="lineno">  904</span>                    <span class="keywordflow">if</span> (c == <span class="charliteral">&#39;%&#39;</span>) {</div>
 <div class="line"><span class="lineno">  905</span>                        PercentDecodeStream is(&amp;<a class="code hl_variable" href="pointer_8h.html#adb82dfe18535e9a30aa97d275f82bd55">source</a>[i], <a class="code hl_variable" href="pointer_8h.html#adb82dfe18535e9a30aa97d275f82bd55">source</a> + length);</div>
 <div class="line"><span class="lineno">  906</span>                        <a class="code hl_struct" href="struct_generic_insitu_string_stream.html">GenericInsituStringStream&lt;EncodingType&gt;</a> <a class="code hl_variable" href="environment_8hpp.html#a3951483d0b31c29ca95336206cd35238">os</a>(<a class="code hl_variable" href="catch__reporter__console_8cpp.html#a9b45b3e13bd9167aab02e17e08916231">name</a>);</div>
-<div class="line"><span class="lineno">  907</span>                        <a class="code hl_typedef" href="#a77f7746a798967ee3f9aa608164eafef">Ch</a>* begin = os.PutBegin();</div>
-<div class="line"><span class="lineno">  908</span>                        <span class="keywordflow">if</span> (!<a class="code hl_struct" href="struct_transcoder.html">Transcoder</a>&lt;<a class="code hl_struct" href="struct_u_t_f8.html">UTF8&lt;&gt;</a>, <a class="code hl_typedef" href="#a06534f32c7e26ae8d2e1b199634ceb19">EncodingType</a>&gt;().Validate(is, os) || !is.IsValid()) {</div>
+<div class="line"><span class="lineno">  907</span>                        <a class="code hl_typedef" href="#a77f7746a798967ee3f9aa608164eafef">Ch</a>* begin = <a class="code hl_variable" href="environment_8hpp.html#a3951483d0b31c29ca95336206cd35238">os</a>.PutBegin();</div>
+<div class="line"><span class="lineno">  908</span>                        <span class="keywordflow">if</span> (!<a class="code hl_struct" href="struct_transcoder.html">Transcoder</a>&lt;<a class="code hl_struct" href="struct_u_t_f8.html">UTF8&lt;&gt;</a>, <a class="code hl_typedef" href="#a06534f32c7e26ae8d2e1b199634ceb19">EncodingType</a>&gt;().Validate(is, <a class="code hl_variable" href="environment_8hpp.html#a3951483d0b31c29ca95336206cd35238">os</a>) || !is.IsValid()) {</div>
 <div class="line"><span class="lineno">  909</span>                            <a class="code hl_variable" href="#a8898ec432dc40b28f79db78dc4ca83e0">parseErrorCode_</a> = <a class="code hl_enumvalue" href="group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s.html#ggacb2e274f33e54d91b96e9883a99a98beac0c1b013c0db34dcc5a47fc1ee7a8c35">kPointerParseErrorInvalidPercentEncoding</a>;</div>
 <div class="line"><span class="lineno">  910</span>                            <span class="keywordflow">goto</span> error;</div>
 <div class="line"><span class="lineno">  911</span>                        }</div>
-<div class="line"><span class="lineno">  912</span>                        <span class="keywordtype">size_t</span> <a class="code hl_variable" href="yubihsm__pkcs11_8c.html#a7360b55975153b822efc5217b7734e6a">len</a> = os.PutEnd(begin);</div>
+<div class="line"><span class="lineno">  912</span>                        <span class="keywordtype">size_t</span> <a class="code hl_variable" href="yubihsm__pkcs11_8c.html#a7360b55975153b822efc5217b7734e6a">len</a> = <a class="code hl_variable" href="environment_8hpp.html#a3951483d0b31c29ca95336206cd35238">os</a>.PutEnd(begin);</div>
 <div class="line"><span class="lineno">  913</span>                        i += is.Tell() - 1;</div>
 <div class="line"><span class="lineno">  914</span>                        <span class="keywordflow">if</span> (<a class="code hl_variable" href="yubihsm__pkcs11_8c.html#a7360b55975153b822efc5217b7734e6a">len</a> == 1)</div>
 <div class="line"><span class="lineno">  915</span>                            c = *<a class="code hl_variable" href="catch__reporter__console_8cpp.html#a9b45b3e13bd9167aab02e17e08916231">name</a>;</div>
@@ -1472,34 +1472,34 @@ template&lt;typename ValueType , typename <a class="el" href="classrapidjson_1_1
 <div class="line"><span class="lineno">  993</span> </div>
 <div class="line"><span class="lineno">  995</span> </div>
 <div class="line"><span class="lineno"> 1000</span>    <span class="keyword">template</span>&lt;<span class="keywordtype">bool</span> uriFragment, <span class="keyword">typename</span> OutputStream&gt;</div>
-<div class="line"><span class="lineno"> 1001</span>    <span class="keywordtype">bool</span> Stringify(OutputStream&amp; os)<span class="keyword"> const </span>{</div>
+<div class="line"><span class="lineno"> 1001</span>    <span class="keywordtype">bool</span> Stringify(OutputStream&amp; <a class="code hl_variable" href="environment_8hpp.html#a3951483d0b31c29ca95336206cd35238">os</a>)<span class="keyword"> const </span>{</div>
 <div class="line"><span class="lineno"> 1002</span>        <a class="code hl_define" href="group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g.html#gabeba18d612187bad2ac62aed9276d47c">RAPIDJSON_ASSERT</a>(IsValid());</div>
 <div class="line"><span class="lineno"> 1003</span> </div>
 <div class="line"><span class="lineno"> 1004</span>        <span class="keywordflow">if</span> (uriFragment)</div>
-<div class="line"><span class="lineno"> 1005</span>            os.Put(<span class="charliteral">&#39;#&#39;</span>);</div>
+<div class="line"><span class="lineno"> 1005</span>            <a class="code hl_variable" href="environment_8hpp.html#a3951483d0b31c29ca95336206cd35238">os</a>.Put(<span class="charliteral">&#39;#&#39;</span>);</div>
 <div class="line"><span class="lineno"> 1006</span> </div>
 <div class="line"><span class="lineno"> 1007</span>        <span class="keywordflow">for</span> (Token *t = <a class="code hl_variable" href="#a997793c66ea1a264089c37c8731eb138">tokens_</a>; t != <a class="code hl_variable" href="#a997793c66ea1a264089c37c8731eb138">tokens_</a> + <a class="code hl_variable" href="#a7051cf59af6622542a050bd0ff0340f8">tokenCount_</a>; ++t) {</div>
-<div class="line"><span class="lineno"> 1008</span>            os.Put(<span class="charliteral">&#39;/&#39;</span>);</div>
+<div class="line"><span class="lineno"> 1008</span>            <a class="code hl_variable" href="environment_8hpp.html#a3951483d0b31c29ca95336206cd35238">os</a>.Put(<span class="charliteral">&#39;/&#39;</span>);</div>
 <div class="line"><span class="lineno"> 1009</span>            <span class="keywordflow">for</span> (<span class="keywordtype">size_t</span> <a class="code hl_variable" href="yubihsm__pkcs11_8c.html#a538d097420e725c4dad63c3caa9e55bd">j</a> = 0; <a class="code hl_variable" href="yubihsm__pkcs11_8c.html#a538d097420e725c4dad63c3caa9e55bd">j</a> &lt; t-&gt;length; <a class="code hl_variable" href="yubihsm__pkcs11_8c.html#a538d097420e725c4dad63c3caa9e55bd">j</a>++) {</div>
 <div class="line"><span class="lineno"> 1010</span>                <a class="code hl_typedef" href="#a77f7746a798967ee3f9aa608164eafef">Ch</a> c = t-&gt;name[<a class="code hl_variable" href="yubihsm__pkcs11_8c.html#a538d097420e725c4dad63c3caa9e55bd">j</a>];</div>
 <div class="line"><span class="lineno"> 1011</span>                <span class="keywordflow">if</span> (c == <span class="charliteral">&#39;~&#39;</span>) {</div>
-<div class="line"><span class="lineno"> 1012</span>                    os.Put(<span class="charliteral">&#39;~&#39;</span>);</div>
-<div class="line"><span class="lineno"> 1013</span>                    os.Put(<span class="charliteral">&#39;0&#39;</span>);</div>
+<div class="line"><span class="lineno"> 1012</span>                    <a class="code hl_variable" href="environment_8hpp.html#a3951483d0b31c29ca95336206cd35238">os</a>.Put(<span class="charliteral">&#39;~&#39;</span>);</div>
+<div class="line"><span class="lineno"> 1013</span>                    <a class="code hl_variable" href="environment_8hpp.html#a3951483d0b31c29ca95336206cd35238">os</a>.Put(<span class="charliteral">&#39;0&#39;</span>);</div>
 <div class="line"><span class="lineno"> 1014</span>                }</div>
 <div class="line"><span class="lineno"> 1015</span>                <span class="keywordflow">else</span> <span class="keywordflow">if</span> (c == <span class="charliteral">&#39;/&#39;</span>) {</div>
-<div class="line"><span class="lineno"> 1016</span>                    os.Put(<span class="charliteral">&#39;~&#39;</span>);</div>
-<div class="line"><span class="lineno"> 1017</span>                    os.Put(<span class="charliteral">&#39;1&#39;</span>);</div>
+<div class="line"><span class="lineno"> 1016</span>                    <a class="code hl_variable" href="environment_8hpp.html#a3951483d0b31c29ca95336206cd35238">os</a>.Put(<span class="charliteral">&#39;~&#39;</span>);</div>
+<div class="line"><span class="lineno"> 1017</span>                    <a class="code hl_variable" href="environment_8hpp.html#a3951483d0b31c29ca95336206cd35238">os</a>.Put(<span class="charliteral">&#39;1&#39;</span>);</div>
 <div class="line"><span class="lineno"> 1018</span>                }</div>
 <div class="line"><span class="lineno"> 1019</span>                <span class="keywordflow">else</span> <span class="keywordflow">if</span> (uriFragment &amp;&amp; NeedPercentEncode(c)) { </div>
 <div class="line"><span class="lineno"> 1020</span>                    <span class="comment">// Transcode to UTF8 sequence</span></div>
 <div class="line"><span class="lineno"> 1021</span>                    <a class="code hl_struct" href="struct_generic_string_stream.html">GenericStringStream&lt;typename ValueType::EncodingType&gt;</a> <a class="code hl_variable" href="pointer_8h.html#adb82dfe18535e9a30aa97d275f82bd55">source</a>(&amp;t-&gt;name[<a class="code hl_variable" href="yubihsm__pkcs11_8c.html#a538d097420e725c4dad63c3caa9e55bd">j</a>]);</div>
-<div class="line"><span class="lineno"> 1022</span>                    PercentEncodeStream&lt;OutputStream&gt; target(os);</div>
+<div class="line"><span class="lineno"> 1022</span>                    PercentEncodeStream&lt;OutputStream&gt; target(<a class="code hl_variable" href="environment_8hpp.html#a3951483d0b31c29ca95336206cd35238">os</a>);</div>
 <div class="line"><span class="lineno"> 1023</span>                    <span class="keywordflow">if</span> (!<a class="code hl_struct" href="struct_transcoder.html">Transcoder</a>&lt;<a class="code hl_typedef" href="#a06534f32c7e26ae8d2e1b199634ceb19">EncodingType</a>, <a class="code hl_struct" href="struct_u_t_f8.html">UTF8&lt;&gt;</a> &gt;().Validate(<a class="code hl_variable" href="pointer_8h.html#adb82dfe18535e9a30aa97d275f82bd55">source</a>, target))</div>
 <div class="line"><span class="lineno"> 1024</span>                        <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
 <div class="line"><span class="lineno"> 1025</span>                    <a class="code hl_variable" href="yubihsm__pkcs11_8c.html#a538d097420e725c4dad63c3caa9e55bd">j</a> += <a class="code hl_variable" href="pointer_8h.html#adb82dfe18535e9a30aa97d275f82bd55">source</a>.Tell() - 1;</div>
 <div class="line"><span class="lineno"> 1026</span>                }</div>
 <div class="line"><span class="lineno"> 1027</span>                <span class="keywordflow">else</span></div>
-<div class="line"><span class="lineno"> 1028</span>                    os.Put(c);</div>
+<div class="line"><span class="lineno"> 1028</span>                    <a class="code hl_variable" href="environment_8hpp.html#a3951483d0b31c29ca95336206cd35238">os</a>.Put(c);</div>
 <div class="line"><span class="lineno"> 1029</span>            }</div>
 <div class="line"><span class="lineno"> 1030</span>        }</div>
 <div class="line"><span class="lineno"> 1031</span>        <span class="keywordflow">return</span> <span class="keyword">true</span>;</div>
@@ -1563,8 +1563,6 @@ template&lt;typename ValueType , typename <a class="el" href="classrapidjson_1_1
 <div class="ttc" id="ahash__impl_8h_html_ab0a0d1ad13c7e4d3cb38c89f7127c85a"><div class="ttname"><a href="hash__impl_8h.html#ab0a0d1ad13c7e4d3cb38c89f7127c85a">Ch</a></div><div class="ttdeci">#define Ch(x, y, z)</div><div class="ttdef"><b>Definition</b> <a href="hash__impl_8h_source.html#l00017">hash_impl.h:17</a></div></div>
 <div class="ttc" id="ajmp_8cpp_html_aca9876635a5afd01576dae38f10dc723"><div class="ttname"><a href="jmp_8cpp.html#aca9876635a5afd01576dae38f10dc723">diff</a></div><div class="ttdeci">void diff(const std::string &amp;a, const std::string &amp;b)</div><div class="ttdef"><b>Definition</b> <a href="jmp_8cpp_source.html#l00018">jmp.cpp:18</a></div></div>
 <div class="ttc" id="anamespace_i_r_html_aa1afcba889279fa935b76ba278be7fd6"><div class="ttname"><a href="namespace_i_r.html#aa1afcba889279fa935b76ba278be7fd6">IR::ValueType</a></div><div class="ttdeci">ValueType</div><div class="ttdef"><b>Definition</b> <a href="_types_8h_source.html#l00013">Types.h:14</a></div></div>
-<div class="ttc" id="anamespacecpp_1_1tokenize_html_abdc89f5b08e972e7404e9b9ac1dd17ff"><div class="ttname"><a href="namespacecpp_1_1tokenize.html#abdc89f5b08e972e7404e9b9ac1dd17ff">cpp.tokenize.GetTokens</a></div><div class="ttdeci">GetTokens(source)</div><div class="ttdef"><b>Definition</b> <a href="tokenize_8py_source.html#l00119">tokenize.py:119</a></div></div>
-<div class="ttc" id="anamespacedevelop_build_html_ade64cd34608f9442ef3049116a2da428"><div class="ttname"><a href="namespacedevelop_build.html#ade64cd34608f9442ef3049116a2da428">developBuild.v</a></div><div class="ttdeci">v</div><div class="ttdef"><b>Definition</b> <a href="develop_build_8py_source.html#l00006">developBuild.py:6</a></div></div>
 <div class="ttc" id="anamespaceinternal_html_a489150922c0320e4290b455bf3c6e36c"><div class="ttname"><a href="namespaceinternal.html#a489150922c0320e4290b455bf3c6e36c">internal::u64toa</a></div><div class="ttdeci">char * u64toa(uint64_t value, char *buffer)</div><div class="ttdef"><b>Definition</b> <a href="itoa_8h_source.html#l00126">itoa.h:126</a></div></div>
 <div class="ttc" id="anamespaceinternal_html_a90e3cb218b557548f361e99dc718b4b1"><div class="ttname"><a href="namespaceinternal.html#a90e3cb218b557548f361e99dc718b4b1">internal::u32toa</a></div><div class="ttdeci">char * u32toa(uint32_t value, char *buffer)</div><div class="ttdef"><b>Definition</b> <a href="itoa_8h_source.html#l00039">itoa.h:39</a></div></div>
 <div class="ttc" id="apointer_8h_html_a1a309f137cf282fe5bdc882038e728d9"><div class="ttname"><a href="pointer_8h.html#a1a309f137cf282fe5bdc882038e728d9">value</a></div><div class="ttdeci">const GenericPointer&lt; typename T::ValueType &gt; T2 value</div><div class="ttdef"><b>Definition</b> <a href="pointer_8h_source.html#l01282">pointer.h:1282</a></div></div>

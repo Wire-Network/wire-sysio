@@ -55,7 +55,7 @@
 \DoxyCodeLine{\Hypertarget{extrakeys_2tests__exhaustive__impl_8h_source_l00051}00051\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aba1590ff86288c886c47dc8a27b30467}{CHECK}}(secp256k1\_fe\_equal\_var(\&fe,\ \&group[i].x));}
 \DoxyCodeLine{\Hypertarget{extrakeys_2tests__exhaustive__impl_8h_source_l00052}00052\ }
 \DoxyCodeLine{\Hypertarget{extrakeys_2tests__exhaustive__impl_8h_source_l00053}00053\ \ \ \ \ \ \ \ \ \textcolor{comment}{/*\ Check\ the\ parity\ against\ the\ precomputed\ group.\ */}}
-\DoxyCodeLine{\Hypertarget{extrakeys_2tests__exhaustive__impl_8h_source_l00054}00054\ \ \ \ \ \ \ \ \ fe\ =\ \mbox{\hyperlink{namespaceupload_a9d33d66de17175dced88ffe95f079226}{group}}[i].y;}
+\DoxyCodeLine{\Hypertarget{extrakeys_2tests__exhaustive__impl_8h_source_l00054}00054\ \ \ \ \ \ \ \ \ fe\ =\ group[i].\mbox{\hyperlink{structsecp256k1__ge_a604295983a1f4aa6e8b5b0f1e46f9ee0}{y}};}
 \DoxyCodeLine{\Hypertarget{extrakeys_2tests__exhaustive__impl_8h_source_l00055}00055\ \ \ \ \ \ \ \ \ secp256k1\_fe\_normalize\_var(\&fe);}
 \DoxyCodeLine{\Hypertarget{extrakeys_2tests__exhaustive__impl_8h_source_l00056}00056\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aba1590ff86288c886c47dc8a27b30467}{CHECK}}(secp256k1\_fe\_is\_odd(\&fe)\ ==\ parities[i\ -\/\ 1]);}
 \DoxyCodeLine{\Hypertarget{extrakeys_2tests__exhaustive__impl_8h_source_l00057}00057\ }

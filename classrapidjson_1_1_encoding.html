@@ -111,13 +111,13 @@ $(function(){initNavTree('classrapidjson_1_1_encoding.html',''); initResizable(t
 <div class="line">    enum { supportUnicode = 1 }; <span class="comment">// or 0 if not supporting unicode</span></div>
 <div class="line"> </div>
 <div class="line">    <span class="keyword">template</span>&lt;<span class="keyword">typename</span> OutputStream&gt;</div>
-<div class="line">    <span class="keyword">static</span> <span class="keywordtype">void</span> Encode(OutputStream&amp; os, <span class="keywordtype">unsigned</span> codepoint);</div>
+<div class="line">    <span class="keyword">static</span> <span class="keywordtype">void</span> Encode(OutputStream&amp; <a class="code hl_variable" href="environment_8hpp.html#a3951483d0b31c29ca95336206cd35238">os</a>, <span class="keywordtype">unsigned</span> codepoint);</div>
 <div class="line"> </div>
 <div class="line">    <span class="keyword">template</span> &lt;<span class="keyword">typename</span> InputStream&gt;</div>
 <div class="line">    <span class="keyword">static</span> <span class="keywordtype">bool</span> Decode(InputStream&amp; is, <span class="keywordtype">unsigned</span>* codepoint);</div>
 <div class="line"> </div>
 <div class="line">    <span class="keyword">template</span> &lt;<span class="keyword">typename</span> InputStream, <span class="keyword">typename</span> OutputStream&gt;</div>
-<div class="line">    <span class="keyword">static</span> <span class="keywordtype">bool</span> Validate(InputStream&amp; is, OutputStream&amp; os);</div>
+<div class="line">    <span class="keyword">static</span> <span class="keywordtype">bool</span> Validate(InputStream&amp; is, OutputStream&amp; <a class="code hl_variable" href="environment_8hpp.html#a3951483d0b31c29ca95336206cd35238">os</a>);</div>
 <div class="line"> </div>
 <div class="line">    <span class="comment">// The following functions are deal with byte streams.</span></div>
 <div class="line"> </div>
@@ -128,13 +128,14 @@ $(function(){initNavTree('classrapidjson_1_1_encoding.html',''); initResizable(t
 <div class="line">    <span class="keyword">static</span> <a class="code hl_define" href="hash__impl_8h.html#ab0a0d1ad13c7e4d3cb38c89f7127c85a">Ch</a> Take(InputByteStream&amp; is);</div>
 <div class="line"> </div>
 <div class="line">    <span class="keyword">template</span> &lt;<span class="keyword">typename</span> OutputByteStream&gt;</div>
-<div class="line">    <span class="keyword">static</span> <span class="keywordtype">void</span> PutBOM(OutputByteStream&amp; os);</div>
+<div class="line">    <span class="keyword">static</span> <span class="keywordtype">void</span> PutBOM(OutputByteStream&amp; <a class="code hl_variable" href="environment_8hpp.html#a3951483d0b31c29ca95336206cd35238">os</a>);</div>
 <div class="line"> </div>
 <div class="line">    <span class="keyword">template</span> &lt;<span class="keyword">typename</span> OutputByteStream&gt;</div>
-<div class="line">    <span class="keyword">static</span> <span class="keywordtype">void</span> <a class="code hl_function" href="bench_8cpp.html#a8496465558c5f8a68e4583295fb89c7d">Put</a>(OutputByteStream&amp; os, <a class="code hl_define" href="hash__impl_8h.html#ab0a0d1ad13c7e4d3cb38c89f7127c85a">Ch</a> c);</div>
+<div class="line">    <span class="keyword">static</span> <span class="keywordtype">void</span> <a class="code hl_function" href="bench_8cpp.html#a8496465558c5f8a68e4583295fb89c7d">Put</a>(OutputByteStream&amp; <a class="code hl_variable" href="environment_8hpp.html#a3951483d0b31c29ca95336206cd35238">os</a>, <a class="code hl_define" href="hash__impl_8h.html#ab0a0d1ad13c7e4d3cb38c89f7127c85a">Ch</a> c);</div>
 <div class="line">};</div>
 <div class="ttc" id="abench_8cpp_html_a8496465558c5f8a68e4583295fb89c7d"><div class="ttname"><a href="bench_8cpp.html#a8496465558c5f8a68e4583295fb89c7d">Put</a></div><div class="ttdeci">mie::Vuint Put(const uint64_t *x, size_t n)</div><div class="ttdef"><b>Definition</b> <a href="bench_8cpp_source.html#l00096">bench.cpp:96</a></div></div>
 <div class="ttc" id="aclassrapidjson_1_1_encoding_html"><div class="ttname"><a href="classrapidjson_1_1_encoding.html">Encoding</a></div><div class="ttdoc">Concept for encoding of Unicode characters.</div></div>
+<div class="ttc" id="aenvironment_8hpp_html_a3951483d0b31c29ca95336206cd35238"><div class="ttname"><a href="environment_8hpp.html#a3951483d0b31c29ca95336206cd35238">os</a></div><div class="ttdeci">os_t os</div><div class="ttdef"><b>Definition</b> <a href="environment_8hpp_source.html#l00023">environment.hpp:23</a></div></div>
 <div class="ttc" id="ahash__impl_8h_html_ab0a0d1ad13c7e4d3cb38c89f7127c85a"><div class="ttname"><a href="hash__impl_8h.html#ab0a0d1ad13c7e4d3cb38c89f7127c85a">Ch</a></div><div class="ttdeci">#define Ch(x, y, z)</div><div class="ttdef"><b>Definition</b> <a href="hash__impl_8h_source.html#l00017">hash_impl.h:17</a></div></div>
 </div><!-- fragment --> </div><hr/>The documentation for this class was generated from the following file:<ul>
 <li>libraries/fc/include/fc/crypto/webauthn_json/include/rapidjson/<a class="el" href="encodings_8h_source.html">encodings.h</a></li>

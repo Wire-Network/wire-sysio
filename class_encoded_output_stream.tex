@@ -17,7 +17,7 @@ typedef Encoding\+::\+Ch \mbox{\hyperlink{class_encoded_output_stream_a0d712ef1a
 \doxysubsubsection*{Public Member Functions}
 \begin{DoxyCompactItemize}
 \item 
-\mbox{\hyperlink{class_encoded_output_stream_ad3360c613a30a6a15526ae9ad63bd004}{Encoded\+Output\+Stream}} (Output\+Byte\+Stream \&os, bool put\+BOM=true)
+\mbox{\hyperlink{class_encoded_output_stream_ad3360c613a30a6a15526ae9ad63bd004}{Encoded\+Output\+Stream}} (Output\+Byte\+Stream \&\mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}, bool put\+BOM=true)
 \item 
 void \mbox{\hyperlink{class_encoded_output_stream_a0f3c00f94c195a38d78c05ecda497481}{Put}} (\mbox{\hyperlink{class_encoded_output_stream_a0d712ef1ad976be0bf4b531c4d65b00c}{Ch}} c)
 \item 
@@ -79,7 +79,7 @@ Definition at line \mbox{\hyperlink{encodedstream_8h_source_l00105}{105}} of fil
 
 
 \begin{DoxyCode}{0}
-\DoxyCodeLine{00105\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ :\ os\_(os)\ \{\ }
+\DoxyCodeLine{00105\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ :\ os\_(\mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}})\ \{\ }
 \DoxyCodeLine{00106\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (putBOM)}
 \DoxyCodeLine{00107\ \ \ \ \ \ \ \ \ \ \ \ \ Encoding::PutBOM(os\_);}
 \DoxyCodeLine{00108\ \ \ \ \ \}}
@@ -104,7 +104,8 @@ Definition at line \mbox{\hyperlink{encodedstream_8h_source_l00111}{111}} of fil
 \DoxyCodeLine{00111\ \{\ os\_.Flush();\ \}}
 
 \end{DoxyCode}
-Here is the caller graph for this function\+:\nopagebreak
+Here is the caller graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode

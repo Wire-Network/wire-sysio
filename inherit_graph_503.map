@@ -1,11 +1,5 @@
 <map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
-<area shape="rect" id="Node000000" href="$classfc_1_1api__base.html" title=" " alt="" coords="5,78,98,104"/>
-<area shape="rect" id="Node000001" href="$classfc_1_1api.html" title=" " alt="" coords="146,5,305,46"/>
-<area shape="poly" id="edge359_Node000000_Node000001" title=" " alt="" coords="101,70,168,44,170,49,103,75"/>
-<area shape="rect" id="Node000003" href="$classfc_1_1api.html" title=" " alt="" coords="163,71,288,111"/>
-<area shape="poly" id="edge361_Node000000_Node000003" title=" " alt="" coords="113,88,163,88,163,94,113,94"/>
-<area shape="rect" id="Node000004" href="$classfc_1_1detail_1_1any__api.html" title=" " alt="" coords="163,136,288,161"/>
-<area shape="poly" id="edge362_Node000000_Node000004" title=" " alt="" coords="106,107,147,120,183,132,181,137,145,126,105,112"/>
-<area shape="rect" id="Node000002" href="$classfc_1_1actor.html" title=" " alt="" coords="353,13,497,38"/>
-<area shape="poly" id="edge360_Node000001_Node000002" title=" " alt="" coords="320,23,353,23,353,28,320,28"/>
+<area shape="rect" id="Node000000" href="$classfc_1_1appender__factory.html" title=" " alt="" coords="5,13,146,38"/>
+<area shape="rect" id="Node000001" href="$classfc_1_1detail_1_1appender__factory__impl.html" title=" " alt="" coords="194,5,326,46"/>
+<area shape="poly" id="edge365_Node000000_Node000001" title=" " alt="" coords="161,23,193,23,193,28,161,28"/>
 </map>

@@ -62,19 +62,20 @@ Definition at line \mbox{\hyperlink{chain__plugin_8hpp_source_l00729}{729}} of f
 
 \begin{DoxyCode}{0}
 \DoxyCodeLine{00729\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
-\DoxyCodeLine{00730\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ [](\textcolor{keyword}{const}\ \mbox{\hyperlink{structsysio_1_1chain__apis_1_1keytype__converter_3_01chain__apis_1_1ripemd160_00_01chain__apis_1_1hex_01_4_aacdbb18e4286f717cd6810ddaa824b4f}{input\_type}}\&\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}})\ \{}
+\DoxyCodeLine{00730\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ [](\textcolor{keyword}{const}\ \mbox{\hyperlink{structsysio_1_1chain__apis_1_1keytype__converter_3_01chain__apis_1_1ripemd160_00_01chain__apis_1_1hex_01_4_aacdbb18e4286f717cd6810ddaa824b4f}{input\_type}}\&\ v)\ \{}
 \DoxyCodeLine{00731\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ The\ input\ is\ in\ big\ endian,\ i.e.\ 83a83a3876c64c33f66f33c54f1869edef5b5d4a000000000000000000000000}}
 \DoxyCodeLine{00732\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ fixed\_bytes\ will\ convert\ the\ input\ to\ array\ of\ 2\ uint128\_t\ in\ little\ endian,\ i.e.\ ed69184fc5336ff6334cc676383aa883\ 0000000000000000000000004a5d5bef}}
 \DoxyCodeLine{00733\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ which\ is\ the\ format\ used\ by\ secondary\ index}}
 \DoxyCodeLine{00734\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\ buffer[20];}
-\DoxyCodeLine{00735\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_ae785d5badbf1f08b491af31f32a135a1}{memcpy}}(buffer,\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.data(),\ 20);}
+\DoxyCodeLine{00735\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_ae785d5badbf1f08b491af31f32a135a1}{memcpy}}(buffer,\ v.data(),\ 20);}
 \DoxyCodeLine{00736\ \ \ \ \ \ \ \ \ \ \ \ \ fixed\_bytes<20>\ fb(buffer);\ }
 \DoxyCodeLine{00737\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespacesysio_1_1chain_a4404f0f28252f82bd7b98d70d1605e4f}{chain::key256\_t}}(fb.get\_array());}
 \DoxyCodeLine{00738\ \ \ \ \ \ \ \ \ \};}
 \DoxyCodeLine{00739\ \ \ \ \ \ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode

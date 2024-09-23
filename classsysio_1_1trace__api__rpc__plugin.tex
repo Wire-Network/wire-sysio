@@ -6,7 +6,8 @@
 
 
 
-Inheritance diagram for sysio\+::trace\+\_\+api\+\_\+rpc\+\_\+plugin\+:\nopagebreak
+Inheritance diagram for sysio\+::trace\+\_\+api\+\_\+rpc\+\_\+plugin\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -15,7 +16,8 @@ Inheritance diagram for sysio\+::trace\+\_\+api\+\_\+rpc\+\_\+plugin\+:\nopagebr
 \end{figure}
 
 
-Collaboration diagram for sysio\+::trace\+\_\+api\+\_\+rpc\+\_\+plugin\+:\nopagebreak
+Collaboration diagram for sysio\+::trace\+\_\+api\+\_\+rpc\+\_\+plugin\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -142,7 +144,8 @@ Definition at line \mbox{\hyperlink{trace__api__plugin_8cpp_source_l00492}{492}}
 \DoxyCodeLine{00494\ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -162,10 +165,10 @@ Definition at line \mbox{\hyperlink{trace__api__plugin_8cpp_source_l00476}{476}}
 
 \begin{DoxyCode}{0}
 \DoxyCodeLine{00476\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
-\DoxyCodeLine{00477\ \ \ \ \textcolor{keyword}{auto}\ \mbox{\hyperlink{namespacecommon}{common}}\ =\ std::make\_shared<trace\_api\_common\_impl>();}
-\DoxyCodeLine{00478\ \ \ \ \mbox{\hyperlink{namespacecommon}{common}}-\/>plugin\_initialize(options);}
+\DoxyCodeLine{00477\ \ \ \ \textcolor{keyword}{auto}\ common\ =\ std::make\_shared<trace\_api\_common\_impl>();}
+\DoxyCodeLine{00478\ \ \ \ common-\/>plugin\_initialize(options);}
 \DoxyCodeLine{00479\ }
-\DoxyCodeLine{00480\ \ \ \ rpc\ =\ std::make\_shared<trace\_api\_rpc\_plugin\_impl>(\mbox{\hyperlink{namespacecommon}{common}});}
+\DoxyCodeLine{00480\ \ \ \ rpc\ =\ std::make\_shared<trace\_api\_rpc\_plugin\_impl>(common);}
 \DoxyCodeLine{00481\ \ \ \ rpc-\/>plugin\_initialize(options);}
 \DoxyCodeLine{00482\ \}}
 
@@ -226,7 +229,8 @@ Definition at line \mbox{\hyperlink{trace__api__plugin_8cpp_source_l00471}{471}}
 \DoxyCodeLine{00474\ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode

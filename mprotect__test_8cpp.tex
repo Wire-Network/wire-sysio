@@ -3,7 +3,8 @@
 {\ttfamily \#include "{}xbyak/xbyak.\+h"{}}\newline
 {\ttfamily \#include $<$string.\+h$>$}\newline
 {\ttfamily \#include $<$vector$>$}\newline
-Include dependency graph for mprotect\+\_\+test.\+cpp\+:\nopagebreak
+Include dependency graph for mprotect\+\_\+test.\+cpp\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -60,16 +61,16 @@ Definition at line \mbox{\hyperlink{mprotect__test_8cpp_source_l00014}{14}} of f
 \DoxyCodeLine{00020\ \ \ \ \ puts(\textcolor{stringliteral}{"{}use\ Allocator\ with\ posix\_memalign"{}});}
 \DoxyCodeLine{00021\ \textcolor{preprocessor}{\#endif}}
 \DoxyCodeLine{00022\ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{quantize_8cpp_ab2b6b0c222cd1ce70d6a831f57241e59}{N}}\ =\ 70000;}
-\DoxyCodeLine{00023\ \ \ \ \ std::vector<Code*>\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}(\mbox{\hyperlink{quantize_8cpp_ab2b6b0c222cd1ce70d6a831f57241e59}{N}});}
+\DoxyCodeLine{00023\ \ \ \ \ std::vector<Code*>\ v(\mbox{\hyperlink{quantize_8cpp_ab2b6b0c222cd1ce70d6a831f57241e59}{N}});}
 \DoxyCodeLine{00024\ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{int}\ i\ =\ 0;\ i\ <\ \mbox{\hyperlink{quantize_8cpp_ab2b6b0c222cd1ce70d6a831f57241e59}{N}};\ i++)\ \{}
-\DoxyCodeLine{00025\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}[i]\ =\ \textcolor{keyword}{new}\ \mbox{\hyperlink{struct_code}{Code}}(i);}
+\DoxyCodeLine{00025\ \ \ \ \ \ \ \ \ v[i]\ =\ \textcolor{keyword}{new}\ \mbox{\hyperlink{struct_code}{Code}}(i);}
 \DoxyCodeLine{00026\ \ \ \ \ \}}
 \DoxyCodeLine{00027\ \ \ \ \ \textcolor{keywordtype}{long}\ \textcolor{keywordtype}{long}\ sum\ =\ 0;}
 \DoxyCodeLine{00028\ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{int}\ i\ =\ 0;\ i\ <\ \mbox{\hyperlink{quantize_8cpp_ab2b6b0c222cd1ce70d6a831f57241e59}{N}};\ i++)\ \{}
-\DoxyCodeLine{00029\ \ \ \ \ \ \ \ \ sum\ +=\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}[i]-\/>getCode<int\ (*)()>()();}
+\DoxyCodeLine{00029\ \ \ \ \ \ \ \ \ sum\ +=\ v[i]-\/>getCode<int\ (*)()>()();}
 \DoxyCodeLine{00030\ \ \ \ \ \}}
 \DoxyCodeLine{00031\ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{int}\ i\ =\ 0;\ i\ <\ \mbox{\hyperlink{quantize_8cpp_ab2b6b0c222cd1ce70d6a831f57241e59}{N}};\ i++)\ \{}
-\DoxyCodeLine{00032\ \ \ \ \ \ \ \ \ \textcolor{keyword}{delete}\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}[i];}
+\DoxyCodeLine{00032\ \ \ \ \ \ \ \ \ \textcolor{keyword}{delete}\ v[i];}
 \DoxyCodeLine{00033\ \ \ \ \ \}}
 \DoxyCodeLine{00034\ \ \ \ \ \mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{printf}}(\textcolor{stringliteral}{"{}sum=\%lld\(\backslash\)n"{}},\ sum);}
 \DoxyCodeLine{00035\ \}\ \textcolor{keywordflow}{catch}\ (std::exception\&\ e)\ \{}

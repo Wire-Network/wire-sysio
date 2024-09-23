@@ -62,11 +62,11 @@
 \DoxyCodeLine{\Hypertarget{account__query__db_8hpp_source_l00105}00105\ \ \ \ \}}
 \DoxyCodeLine{\Hypertarget{account__query__db_8hpp_source_l00106}00106\ }
 \DoxyCodeLine{\Hypertarget{account__query__db_8hpp_source_l00113}\mbox{\hyperlink{namespacefc_aa409225bf170e60801465d280507b26d}{00113}}\ \ \ \ \textcolor{keyword}{inline}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespacefc_accef08adf4ee05c36ccc550d8101b08f}{from\_variant}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1variant}{fc::variant}}\&\ v,\ \mbox{\hyperlink{structsysio_1_1chain__apis_1_1account__query__db_1_1get__accounts__by__authorizers__params_1_1permission__level}{params::permission\_level}}\&\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}})\ \{}
-\DoxyCodeLine{\Hypertarget{account__query__db_8hpp_source_l00114}00114\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (v.is\_string())\ \{}
+\DoxyCodeLine{\Hypertarget{account__query__db_8hpp_source_l00114}00114\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (v.\mbox{\hyperlink{classfc_1_1variant_ac51c0354c1fcef2cc5ce43a5062e8de6}{is\_string}}())\ \{}
 \DoxyCodeLine{\Hypertarget{account__query__db_8hpp_source_l00115}00115\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacefc_accef08adf4ee05c36ccc550d8101b08f}{from\_variant}}(v,\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}.actor);}
 \DoxyCodeLine{\Hypertarget{account__query__db_8hpp_source_l00116}00116\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}.permission\ =\ \{\};}
-\DoxyCodeLine{\Hypertarget{account__query__db_8hpp_source_l00117}00117\ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}\ (v.is\_object())\ \{}
-\DoxyCodeLine{\Hypertarget{account__query__db_8hpp_source_l00118}00118\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ vo\ =\ v.get\_object();}
+\DoxyCodeLine{\Hypertarget{account__query__db_8hpp_source_l00117}00117\ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}\ (v.\mbox{\hyperlink{classfc_1_1variant_aa542b555ee260a07e61a2d38ff765d87}{is\_object}}())\ \{}
+\DoxyCodeLine{\Hypertarget{account__query__db_8hpp_source_l00118}00118\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ vo\ =\ v.\mbox{\hyperlink{classfc_1_1variant_a17a7054a10963360c6a14d60f6e30128}{get\_object}}();}
 \DoxyCodeLine{\Hypertarget{account__query__db_8hpp_source_l00119}00119\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(vo.contains(\textcolor{stringliteral}{"{}actor"{}}))}
 \DoxyCodeLine{\Hypertarget{account__query__db_8hpp_source_l00120}00120\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacefc_accef08adf4ee05c36ccc550d8101b08f}{from\_variant}}(vo[\textcolor{stringliteral}{"{}actor"{}}],\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}.actor);}
 \DoxyCodeLine{\Hypertarget{account__query__db_8hpp_source_l00121}00121\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}}

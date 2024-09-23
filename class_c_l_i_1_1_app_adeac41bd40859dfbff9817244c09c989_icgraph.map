@@ -1,90 +1,60 @@
 <map id="CLI::App::get_name" name="CLI::App::get_name">
-<area shape="rect" id="Node000001" title="Get the name of the current app." alt="" coords="1660,988,1798,1013"/>
-<area shape="rect" id="Node000002" href="$class_c_l_i_1_1_app.html#aade2ac30d86141da0d55d9181ac8b710" title="Helper function to run through all possible comparisons of subcommand names to check there is no over..." alt="" coords="1433,692,1585,733"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="1707,977,1524,735,1528,732,1711,973"/>
-<area shape="rect" id="Node000022" href="$class_c_l_i_1_1_app.html#a4933a7e5603ab5eaa9705d4027e6cb12" title=" " alt="" coords="1442,938,1576,964"/>
-<area shape="poly" id="edge24_Node000001_Node000022" title=" " alt="" coords="1653,986,1569,967,1570,962,1654,981"/>
-<area shape="rect" id="Node000033" href="$class_c_l_i_1_1_app.html#ad03898df2eadbe937c81d80215169235" title=" " alt="" coords="1417,988,1601,1013"/>
-<area shape="poly" id="edge41_Node000001_Node000033" title=" " alt="" coords="1645,1003,1601,1003,1601,998,1645,998"/>
-<area shape="rect" id="Node000036" href="$class_c_l_i_1_1_app.html#a63c0110a3e63515e3b9b70b7b560d676" title="Check to see if a subcommand is part of this command and get a shared_ptr to it." alt="" coords="1406,1060,1612,1085"/>
-<area shape="poly" id="edge45_Node000001_Node000036" title=" " alt="" coords="1674,1021,1552,1061,1550,1056,1672,1016"/>
-<area shape="rect" id="Node000038" href="$class_c_l_i_1_1_app.html#a2d6847ad9eec079214a61d834f29e35f" title=" " alt="" coords="1456,1153,1562,1178"/>
-<area shape="poly" id="edge48_Node000001_Node000038" title=" " alt="" coords="1704,1025,1614,1100,1533,1154,1530,1150,1610,1096,1700,1021"/>
-<area shape="poly" id="edge2_Node000002_Node000002" title=" " alt="" coords="1545,679,1531,673,1509,671,1488,673,1475,677,1470,683,1472,691,1467,692,1465,682,1472,673,1487,667,1509,665,1533,668,1547,674"/>
-<area shape="rect" id="Node000003" href="$class_c_l_i_1_1_app.html#a99e2ddf1ae27593e19162eba3aec5fcd" title="Add a previously created app as a subcommand." alt="" coords="1170,353,1358,378"/>
-<area shape="poly" id="edge3_Node000002_Node000003" title=" " alt="" coords="1499,677,1483,615,1456,538,1437,498,1415,459,1388,423,1356,392,1339,381,1342,377,1359,388,1392,419,1419,456,1442,495,1461,536,1489,614,1504,676"/>
-<area shape="rect" id="Node000004" href="$class_c_l_i_1_1_app.html#ad5d02ee857879c6abd007c8293a1151a" title="Set an alias for the app." alt="" coords="1210,674,1318,700"/>
-<area shape="poly" id="edge4_Node000002_Node000004" title=" " alt="" coords="1417,706,1318,695,1319,690,1418,700"/>
-<area shape="rect" id="Node000007" href="$class_c_l_i_1_1_app.html#a1e0b05ed58f80301b945ffc344b61aa3" title="Ignore case. Subcommands inherit value." alt="" coords="1188,724,1340,749"/>
-<area shape="poly" id="edge7_Node000002_Node000007" title=" " alt="" coords="1417,724,1340,732,1340,726,1417,719"/>
-<area shape="rect" id="Node000008" href="$class_c_l_i_1_1_app.html#aca4afbde81a59b25fc514b960d472c08" title="Ignore underscore. Subcommands inherit value." alt="" coords="1170,773,1358,798"/>
-<area shape="poly" id="edge8_Node000002_Node000008" title=" " alt="" coords="1433,741,1358,764,1320,775,1318,770,1357,759,1432,736"/>
-<area shape="rect" id="Node000009" href="$class_c_l_i_1_1_app.html#a76d7d45b60647632df392dd5e696877a" title="Set a name for the app (empty will use parser to set the name)" alt="" coords="1207,402,1321,428"/>
-<area shape="poly" id="edge9_Node000002_Node000009" title=" " alt="" coords="1479,681,1274,430,1278,427,1483,678"/>
-<area shape="rect" id="Node000005" href="$classcpp_1_1ast_1_1_typedef.html#ac461b1e6209716f39cc06baa5d726f56" title=" " alt="" coords="946,676,1108,701"/>
-<area shape="poly" id="edge5_Node000004_Node000005" title=" " alt="" coords="1194,690,1108,691,1108,685,1194,685"/>
-<area shape="rect" id="Node000006" href="$classcpp_1_1ast_1_1_typedef.html#ad94253075cea5a5110bf5e9b8fe0ee61" title=" " alt="" coords="942,725,1112,750"/>
-<area shape="poly" id="edge6_Node000004_Node000006" title=" " alt="" coords="1195,704,1091,727,1090,722,1194,699"/>
-<area shape="poly" id="edge15_Node000009_Node000005" title=" " alt="" coords="1257,444,1240,492,1213,552,1175,613,1151,641,1124,665,1103,677,1100,673,1121,661,1147,637,1170,610,1208,549,1236,490,1252,442"/>
-<area shape="rect" id="Node000010" href="$classcpp_1_1ast_1_1___nested_type.html#a944c5478ca7586a71d1d10bfcc7be1bb" title=" " alt="" coords="952,5,1102,46"/>
-<area shape="poly" id="edge10_Node000009_Node000010" title=" " alt="" coords="1191,408,1168,393,1152,372,1141,350,1132,308,1134,267,1142,225,1151,184,1153,143,1145,101,1135,81,1120,59,1101,44,1104,40,1124,56,1140,78,1150,100,1159,142,1156,185,1147,226,1139,267,1137,308,1146,348,1157,369,1172,389,1194,404"/>
-<area shape="rect" id="Node000011" href="$classcpp_1_1ast_1_1_class.html#a572953e3438a048cdc5f103fbf6ab7b0" title=" " alt="" coords="952,70,1102,96"/>
-<area shape="poly" id="edge11_Node000009_Node000011" title=" " alt="" coords="1191,408,1168,393,1145,357,1136,320,1137,284,1144,248,1150,213,1152,178,1143,143,1120,109,1101,95,1104,91,1124,105,1148,141,1157,178,1155,214,1149,249,1143,285,1141,320,1149,355,1172,389,1194,404"/>
-<area shape="rect" id="Node000012" href="$classcpp_1_1ast_1_1_define.html#a8e51e0611e1a76c5874f6b39e27a6d6a" title=" " alt="" coords="950,120,1104,145"/>
-<area shape="poly" id="edge12_Node000009_Node000012" title=" " alt="" coords="1191,408,1168,393,1148,363,1140,333,1140,304,1144,274,1148,245,1148,216,1140,188,1120,160,1102,146,1106,142,1124,156,1145,186,1153,216,1153,245,1149,275,1145,304,1145,333,1153,361,1172,389,1194,404"/>
-<area shape="rect" id="Node000013" href="$classcpp_1_1ast_1_1_function.html#a61e8eadca35b3848183554f62acf0ffb" title=" " alt="" coords="962,169,1092,210"/>
-<area shape="poly" id="edge13_Node000009_Node000013" title=" " alt="" coords="1191,408,1169,393,1152,372,1144,350,1143,308,1142,266,1135,245,1120,225,1107,214,1091,205,1094,201,1110,209,1124,221,1140,243,1147,265,1148,308,1149,349,1157,369,1172,389,1194,403"/>
-<area shape="rect" id="Node000014" href="$classcpp_1_1ast_1_1_parameter.html#aebd069a2a057dc791df21c56e22912bb" title=" " alt="" coords="962,235,1093,275"/>
-<area shape="poly" id="edge14_Node000009_Node000014" title=" " alt="" coords="1191,406,1169,393,1157,380,1149,367,1143,341,1138,315,1131,303,1121,290,1092,273,1095,268,1124,286,1136,300,1143,313,1148,340,1154,365,1161,377,1172,389,1194,401"/>
-<area shape="rect" id="Node000015" href="$classcpp_1_1tokenize_1_1_token.html#ad93a4059e9932fa2dea149510f0ef002" title=" " alt="" coords="958,300,1096,341"/>
-<area shape="poly" id="edge16_Node000009_Node000015" title=" " alt="" coords="1192,403,1169,393,1144,375,1121,356,1095,344,1097,339,1124,351,1148,371,1172,389,1194,398"/>
-<area shape="rect" id="Node000016" href="$classvalidate__reflection_1_1_empty_scope.html#a423076007160dd8dd8e9b314aa1429b1" title=" " alt="" coords="943,365,1111,406"/>
-<area shape="poly" id="edge17_Node000009_Node000016" title=" " alt="" coords="1192,409,1111,399,1112,393,1193,404"/>
-<area shape="rect" id="Node000017" href="$classvalidate__reflection_1_1_empty_scope.html#a5c2e058527ec1f3b72266c29c77ad0b2" title=" " alt="" coords="943,480,1111,521"/>
-<area shape="poly" id="edge18_Node000009_Node000017" title=" " alt="" coords="1213,436,1087,482,1085,477,1211,431"/>
-<area shape="rect" id="Node000018" href="$classvalidate__reflection_1_1_empty_scope.html#a1fb4f76506790294268dc078986d7430" title=" " alt="" coords="708,452,876,493"/>
-<area shape="poly" id="edge21_Node000009_Node000018" title=" " alt="" coords="1192,426,877,465,876,460,1192,421"/>
-<area shape="rect" id="Node000019" href="$classcpp_1_1ast_1_1___generic_declaration.html#a4851c5ea09b0a312d762342b71211bb1" title=" " alt="" coords="932,545,1122,586"/>
-<area shape="poly" id="edge20_Node000009_Node000019" title=" " alt="" coords="1241,441,1190,488,1124,535,1098,547,1095,542,1121,530,1186,484,1237,437"/>
-<area shape="rect" id="Node000020" href="$classcpp_1_1ast_1_1_variable_declaration.html#ad8821ceb26b91d7c3604486a424c3f8f" title=" " alt="" coords="935,611,1119,651"/>
-<area shape="poly" id="edge22_Node000009_Node000020" title=" " alt="" coords="1251,443,1202,520,1166,563,1124,600,1102,612,1100,608,1121,596,1162,559,1197,517,1247,440"/>
-<area shape="poly" id="edge19_Node000017_Node000018" title=" " alt="" coords="927,491,876,485,877,480,928,486"/>
-<area shape="rect" id="Node000021" href="$classcpp_1_1ast_1_1_variable_declaration.html#aeafe1b55bcf3005d00951f0accb18def" title=" " alt="" coords="700,611,884,651"/>
-<area shape="poly" id="edge23_Node000020_Node000021" title=" " alt="" coords="919,634,885,634,885,628,919,628"/>
-<area shape="rect" id="Node000023" href="$class_c_l_i_1_1_app.html#a4e0c00ce18bbfca1ae890a653bbd2b93" title="Verify required options and cross requirements. Subcommands too (only if selected)." alt="" coords="1197,823,1331,863"/>
-<area shape="poly" id="edge25_Node000022_Node000023" title=" " alt="" coords="1465,934,1357,884,1315,866,1317,861,1359,879,1467,929"/>
-<area shape="rect" id="Node000032" href="$class_c_l_i_1_1_app.html#ae42bbb6618616072e520a0cebe62d240" title="Internal function to run (App) callback, bottom up." alt="" coords="1187,938,1341,964"/>
-<area shape="poly" id="edge36_Node000022_Node000032" title=" " alt="" coords="1427,954,1342,954,1342,948,1427,948"/>
-<area shape="rect" id="Node000024" href="$class_c_l_i_1_1_app.html#a241ba75a6c98b36349ae2f71a9137291" title="Internal parse function." alt="" coords="167,892,287,917"/>
-<area shape="poly" id="edge26_Node000023_Node000024" title=" " alt="" coords="1181,829,1122,819,958,799,793,794,583,794,534,797,485,805,391,832,310,865,253,893,251,888,308,860,389,827,484,800,534,791,583,788,793,788,958,794,1123,814,1182,823"/>
-<area shape="rect" id="Node000027" href="$class_c_l_i_1_1_app.html#a1f7a70f4bc4c375a7de10073a5de709d" title="Fill in a single config option." alt="" coords="946,879,1108,919"/>
-<area shape="poly" id="edge29_Node000023_Node000027" title=" " alt="" coords="1182,865,1109,882,1108,877,1181,860"/>
-<area shape="rect" id="Node000030" href="$class_c_l_i_1_1_app.html#a0fec24c804daf5b458bb5762e4e75a73" title="Process callbacks and such." alt="" coords="335,889,469,914"/>
-<area shape="poly" id="edge35_Node000023_Node000030" title=" " alt="" coords="1181,841,1053,838,887,839,703,848,609,857,518,870,477,879,440,891,438,886,476,874,517,864,608,852,702,842,887,833,1053,832,1181,836"/>
-<area shape="rect" id="Node000025" href="$class_c_l_i_1_1_app.html#a8ffb155a1153ee23d442c5bfed21225c" title="The real work is done here. Expects a reversed vector." alt="" coords="5,944,119,969"/>
-<area shape="poly" id="edge27_Node000024_Node000025" title=" " alt="" coords="170,925,106,946,104,940,169,920"/>
-<area shape="rect" id="Node000026" href="$class_c_l_i_1_1_app.html#a878c1067ade7145aa11478d64f5173ed" title=" " alt="" coords="5,993,119,1018"/>
-<area shape="poly" id="edge28_Node000024_Node000026" title=" " alt="" coords="174,927,168,930,154,944,145,956,135,970,120,984,102,995,99,990,117,980,131,966,140,953,150,940,165,926,171,922"/>
-<area shape="rect" id="Node000028" href="$class_c_l_i_1_1_app.html#aee09795046c3b47948e6c2fa45349eca" title=" " alt="" coords="711,886,873,912"/>
-<area shape="poly" id="edge30_Node000027_Node000028" title=" " alt="" coords="931,902,873,902,873,896,931,896"/>
-<area shape="rect" id="Node000029" href="$class_c_l_i_1_1_app.html#a7a15e5743d4a8eccac57955ed5a6a3b6" title="Read and process a configuration file (main app only)" alt="" coords="517,879,652,919"/>
-<area shape="poly" id="edge31_Node000028_Node000029" title=" " alt="" coords="695,902,652,902,652,896,695,896"/>
-<area shape="poly" id="edge32_Node000029_Node000030" title=" " alt="" coords="502,903,470,903,470,898,502,898"/>
-<area shape="poly" id="edge34_Node000030_Node000024" title=" " alt="" coords="319,906,287,906,287,901,319,900"/>
-<area shape="rect" id="Node000031" href="$class_c_l_i_1_1_app.html#a26a92886a7d7f10a9afbd39b6535f42b" title="Internal parse function." alt="" coords="167,941,287,966"/>
-<area shape="poly" id="edge33_Node000030_Node000031" title=" " alt="" coords="343,922,273,943,272,938,341,917"/>
-<area shape="poly" id="edge37_Node000032_Node000024" title=" " alt="" coords="1171,955,793,959,583,959,501,955,420,945,284,920,285,915,420,940,502,950,583,954,793,954,1171,950"/>
-<area shape="poly" id="edge39_Node000032_Node000025" title=" " alt="" coords="1179,970,1002,996,898,1006,793,1010,401,1010,323,1006,247,997,118,972,119,967,247,991,324,1001,401,1004,793,1004,897,1000,1001,991,1178,965"/>
-<area shape="poly" id="edge40_Node000032_Node000026" title=" " alt="" coords="1187,971,1172,977,1148,993,1123,1008,1034,1039,962,1054,888,1060,793,1060,401,1060,323,1056,245,1047,116,1022,117,1016,246,1042,323,1051,401,1055,793,1055,887,1054,961,1049,1033,1033,1121,1003,1145,989,1169,973,1185,966"/>
-<area shape="poly" id="edge38_Node000032_Node000027" title=" " alt="" coords="1187,937,1108,919,1109,914,1188,932"/>
-<area shape="poly" id="edge42_Node000033_Node000027" title=" " alt="" coords="1414,984,1404,979,1389,966,1380,952,1371,939,1356,928,1295,906,1229,895,1166,891,1108,893,1108,887,1166,886,1230,889,1296,901,1359,923,1375,935,1384,949,1393,962,1407,974,1417,979"/>
-<area shape="rect" id="Node000034" href="$class_c_l_i_1_1_app.html#ad07c68d1fcede041fa7fed647e5e3d84" title="Check to see if given subcommand was selected." alt="" coords="1172,988,1356,1013"/>
-<area shape="poly" id="edge43_Node000033_Node000034" title=" " alt="" coords="1401,1003,1356,1003,1356,998,1401,998"/>
-<area shape="rect" id="Node000035" href="$class_c_l_i_1_1_app.html#a5afd7a600223bae58b46aaff670e2d25" title="Check with name instead of pointer to see if subcommand was selected." alt="" coords="1172,1037,1356,1062"/>
-<area shape="poly" id="edge44_Node000033_Node000035" title=" " alt="" coords="1427,1019,1332,1039,1331,1034,1426,1014"/>
-<area shape="rect" id="Node000037" href="$class_c_l_i_1_1_option__group.html#a1be93903743c2cdc64f1237ca956ff0b" title="Add an existing subcommand to be a member of an option_group." alt="" coords="1196,1111,1332,1151"/>
-<area shape="poly" id="edge46_Node000036_Node000037" title=" " alt="" coords="1438,1092,1333,1117,1332,1112,1437,1087"/>
-<area shape="poly" id="edge47_Node000037_Node000037" title=" " alt="" coords="1303,1098,1288,1092,1264,1089,1241,1091,1228,1096,1222,1102,1225,1109,1219,1111,1217,1101,1225,1092,1240,1086,1264,1084,1290,1086,1305,1093"/>
-<area shape="rect" id="Node000039" href="$class_c_l_i_1_1_app.html#aac000657ef11647125ba91af38fd7d9c" title="Print a nice error message and return the exit code." alt="" coords="1213,1176,1315,1201"/>
-<area shape="poly" id="edge49_Node000038_Node000039" title=" " alt="" coords="1441,1175,1316,1186,1315,1181,1440,1169"/>
+<area shape="rect" id="Node000001" title="Get the name of the current app." alt="" coords="1609,417,1747,443"/>
+<area shape="rect" id="Node000002" href="$class_c_l_i_1_1_app.html#aade2ac30d86141da0d55d9181ac8b710" title="Helper function to run through all possible comparisons of subcommand names to check there is no over..." alt="" coords="1382,122,1534,162"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="1656,406,1473,165,1477,162,1660,403"/>
+<area shape="rect" id="Node000008" href="$class_c_l_i_1_1_app.html#a4933a7e5603ab5eaa9705d4027e6cb12" title=" " alt="" coords="1391,368,1524,394"/>
+<area shape="poly" id="edge8_Node000001_Node000008" title=" " alt="" coords="1602,416,1518,397,1519,392,1603,411"/>
+<area shape="rect" id="Node000019" href="$class_c_l_i_1_1_app.html#ad03898df2eadbe937c81d80215169235" title=" " alt="" coords="1366,417,1550,443"/>
+<area shape="poly" id="edge25_Node000001_Node000019" title=" " alt="" coords="1594,433,1550,433,1550,428,1594,428"/>
+<area shape="rect" id="Node000022" href="$class_c_l_i_1_1_app.html#a63c0110a3e63515e3b9b70b7b560d676" title="Check to see if a subcommand is part of this command and get a shared_ptr to it." alt="" coords="1355,489,1561,515"/>
+<area shape="poly" id="edge29_Node000001_Node000022" title=" " alt="" coords="1623,451,1501,491,1499,486,1621,446"/>
+<area shape="rect" id="Node000024" href="$class_c_l_i_1_1_app.html#a2d6847ad9eec079214a61d834f29e35f" title=" " alt="" coords="1405,583,1510,608"/>
+<area shape="poly" id="edge32_Node000001_Node000024" title=" " alt="" coords="1653,455,1563,530,1482,584,1479,580,1559,525,1649,451"/>
+<area shape="poly" id="edge2_Node000002_Node000002" title=" " alt="" coords="1494,109,1480,103,1458,100,1437,102,1424,107,1419,113,1421,121,1416,122,1414,112,1421,103,1436,97,1458,95,1482,98,1496,104"/>
+<area shape="rect" id="Node000003" href="$class_c_l_i_1_1_app.html#a99e2ddf1ae27593e19162eba3aec5fcd" title="Add a previously created app as a subcommand." alt="" coords="1119,5,1307,31"/>
+<area shape="poly" id="edge3_Node000002_Node000003" title=" " alt="" coords="1417,114,1366,78,1306,45,1276,34,1278,29,1308,40,1369,73,1421,110"/>
+<area shape="rect" id="Node000004" href="$class_c_l_i_1_1_app.html#ad5d02ee857879c6abd007c8293a1151a" title="Set an alias for the app." alt="" coords="1159,55,1267,80"/>
+<area shape="poly" id="edge4_Node000002_Node000004" title=" " alt="" coords="1383,119,1306,94,1267,83,1268,78,1307,89,1384,114"/>
+<area shape="rect" id="Node000005" href="$class_c_l_i_1_1_app.html#a1e0b05ed58f80301b945ffc344b61aa3" title="Ignore case. Subcommands inherit value." alt="" coords="1137,104,1289,130"/>
+<area shape="poly" id="edge5_Node000002_Node000005" title=" " alt="" coords="1366,135,1289,127,1289,122,1366,130"/>
+<area shape="rect" id="Node000006" href="$class_c_l_i_1_1_app.html#aca4afbde81a59b25fc514b960d472c08" title="Ignore underscore. Subcommands inherit value." alt="" coords="1119,153,1307,179"/>
+<area shape="poly" id="edge6_Node000002_Node000006" title=" " alt="" coords="1366,154,1307,160,1307,154,1366,148"/>
+<area shape="rect" id="Node000007" href="$class_c_l_i_1_1_app.html#a76d7d45b60647632df392dd5e696877a" title="Set a name for the app (empty will use parser to set the name)" alt="" coords="1156,203,1270,228"/>
+<area shape="poly" id="edge7_Node000002_Node000007" title=" " alt="" coords="1382,170,1307,194,1269,205,1267,200,1306,189,1381,165"/>
+<area shape="rect" id="Node000009" href="$class_c_l_i_1_1_app.html#a4e0c00ce18bbfca1ae890a653bbd2b93" title="Verify required options and cross requirements. Subcommands too (only if selected)." alt="" coords="1146,252,1280,293"/>
+<area shape="poly" id="edge9_Node000008_Node000009" title=" " alt="" coords="1414,363,1306,314,1264,296,1266,291,1308,309,1416,359"/>
+<area shape="rect" id="Node000018" href="$class_c_l_i_1_1_app.html#ae42bbb6618616072e520a0cebe62d240" title="Internal function to run (App) callback, bottom up." alt="" coords="1136,368,1290,394"/>
+<area shape="poly" id="edge20_Node000008_Node000018" title=" " alt="" coords="1376,384,1291,384,1291,378,1376,378"/>
+<area shape="rect" id="Node000010" href="$class_c_l_i_1_1_app.html#a241ba75a6c98b36349ae2f71a9137291" title="Internal parse function." alt="" coords="167,320,287,346"/>
+<area shape="poly" id="edge10_Node000009_Node000010" title=" " alt="" coords="1130,259,970,235,876,226,782,222,583,222,534,225,485,233,391,261,310,294,253,322,251,317,308,289,389,256,484,228,534,220,583,217,782,217,876,220,970,230,1131,254"/>
+<area shape="rect" id="Node000013" href="$class_c_l_i_1_1_app.html#a1f7a70f4bc4c375a7de10073a5de709d" title="Fill in a single config option." alt="" coords="910,307,1071,348"/>
+<area shape="poly" id="edge13_Node000009_Node000013" title=" " alt="" coords="1132,295,1072,310,1071,305,1131,290"/>
+<area shape="rect" id="Node000016" href="$class_c_l_i_1_1_app.html#a0fec24c804daf5b458bb5762e4e75a73" title="Process callbacks and such." alt="" coords="335,317,469,343"/>
+<area shape="poly" id="edge19_Node000009_Node000016" title=" " alt="" coords="1130,271,1010,268,857,269,687,278,518,298,477,307,440,319,438,314,476,302,517,293,687,273,857,264,1010,263,1130,266"/>
+<area shape="rect" id="Node000011" href="$class_c_l_i_1_1_app.html#a8ffb155a1153ee23d442c5bfed21225c" title="The real work is done here. Expects a reversed vector." alt="" coords="5,372,119,398"/>
+<area shape="poly" id="edge11_Node000010_Node000011" title=" " alt="" coords="170,353,106,374,104,369,169,348"/>
+<area shape="rect" id="Node000012" href="$class_c_l_i_1_1_app.html#a878c1067ade7145aa11478d64f5173ed" title=" " alt="" coords="5,421,119,447"/>
+<area shape="poly" id="edge12_Node000010_Node000012" title=" " alt="" coords="174,355,168,359,154,372,145,385,135,398,120,412,102,423,99,418,117,408,131,395,140,382,150,369,165,355,171,351"/>
+<area shape="rect" id="Node000014" href="$class_c_l_i_1_1_app.html#aee09795046c3b47948e6c2fa45349eca" title=" " alt="" coords="700,315,862,340"/>
+<area shape="poly" id="edge14_Node000013_Node000014" title=" " alt="" coords="895,330,862,330,862,325,895,325"/>
+<area shape="rect" id="Node000015" href="$class_c_l_i_1_1_app.html#a7a15e5743d4a8eccac57955ed5a6a3b6" title="Read and process a configuration file (main app only)" alt="" coords="517,307,652,348"/>
+<area shape="poly" id="edge15_Node000014_Node000015" title=" " alt="" coords="684,330,652,330,652,325,684,325"/>
+<area shape="poly" id="edge16_Node000015_Node000016" title=" " alt="" coords="502,331,470,332,470,327,502,326"/>
+<area shape="poly" id="edge18_Node000016_Node000010" title=" " alt="" coords="319,334,287,335,287,329,319,329"/>
+<area shape="rect" id="Node000017" href="$class_c_l_i_1_1_app.html#a26a92886a7d7f10a9afbd39b6535f42b" title="Internal parse function." alt="" coords="167,369,287,395"/>
+<area shape="poly" id="edge17_Node000016_Node000017" title=" " alt="" coords="343,350,273,371,272,366,341,345"/>
+<area shape="poly" id="edge21_Node000018_Node000010" title=" " alt="" coords="1120,385,782,387,583,387,501,384,420,374,284,349,285,344,420,369,502,378,583,382,782,382,1120,380"/>
+<area shape="poly" id="edge23_Node000018_Node000011" title=" " alt="" coords="1132,400,971,425,877,434,782,438,401,438,323,434,247,425,118,401,119,396,247,420,324,429,401,433,782,433,876,429,971,420,1132,394"/>
+<area shape="poly" id="edge24_Node000018_Node000012" title=" " alt="" coords="1136,401,1121,407,1097,422,1072,437,994,464,930,480,865,487,782,489,401,489,323,485,245,475,116,450,117,445,246,470,323,480,401,484,782,484,865,482,929,475,992,459,1070,432,1094,418,1118,402,1134,396"/>
+<area shape="poly" id="edge22_Node000018_Node000013" title=" " alt="" coords="1141,366,1071,349,1073,344,1142,361"/>
+<area shape="poly" id="edge26_Node000019_Node000013" title=" " alt="" coords="1363,414,1353,408,1338,395,1329,382,1320,369,1305,358,1247,337,1186,326,1126,321,1072,322,1072,317,1126,316,1187,320,1249,332,1308,353,1324,365,1333,379,1342,392,1356,404,1366,409"/>
+<area shape="rect" id="Node000020" href="$class_c_l_i_1_1_app.html#ad07c68d1fcede041fa7fed647e5e3d84" title="Check to see if given subcommand was selected." alt="" coords="1121,417,1305,443"/>
+<area shape="poly" id="edge27_Node000019_Node000020" title=" " alt="" coords="1350,433,1305,433,1305,428,1350,428"/>
+<area shape="rect" id="Node000021" href="$class_c_l_i_1_1_app.html#a5afd7a600223bae58b46aaff670e2d25" title="Check with name instead of pointer to see if subcommand was selected." alt="" coords="1121,467,1305,492"/>
+<area shape="poly" id="edge28_Node000019_Node000021" title=" " alt="" coords="1376,449,1281,469,1280,463,1375,444"/>
+<area shape="rect" id="Node000023" href="$class_c_l_i_1_1_option__group.html#a1be93903743c2cdc64f1237ca956ff0b" title="Add an existing subcommand to be a member of an option_group." alt="" coords="1145,540,1281,581"/>
+<area shape="poly" id="edge30_Node000022_Node000023" title=" " alt="" coords="1387,522,1282,547,1281,542,1386,517"/>
+<area shape="poly" id="edge31_Node000023_Node000023" title=" " alt="" coords="1249,527,1236,521,1213,519,1192,521,1179,526,1174,532,1176,539,1171,540,1169,531,1176,521,1191,516,1213,514,1237,516,1251,522"/>
+<area shape="rect" id="Node000025" href="$class_c_l_i_1_1_app.html#aac000657ef11647125ba91af38fd7d9c" title="Print a nice error message and return the exit code." alt="" coords="1162,605,1264,631"/>
+<area shape="poly" id="edge33_Node000024_Node000025" title=" " alt="" coords="1390,604,1265,616,1264,611,1389,599"/>
 </map>

@@ -15,7 +15,7 @@
 \DoxyCodeLine{\Hypertarget{sortkeys_8cpp_source_l00011}00011\ \textcolor{keyword}{static}\ \textcolor{keywordtype}{void}\ printIt(\textcolor{keyword}{const}\ \mbox{\hyperlink{class_generic_value}{Value}}\ \&doc)\ \{}
 \DoxyCodeLine{\Hypertarget{sortkeys_8cpp_source_l00012}00012\ \ \ \ \ \textcolor{keywordtype}{char}\ writeBuffer[65536];}
 \DoxyCodeLine{\Hypertarget{sortkeys_8cpp_source_l00013}00013\ \ \ \ \ \mbox{\hyperlink{class_file_write_stream}{FileWriteStream}}\ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}(stdout,\ writeBuffer,\ \textcolor{keyword}{sizeof}(writeBuffer));}
-\DoxyCodeLine{\Hypertarget{sortkeys_8cpp_source_l00014}00014\ \ \ \ \ \mbox{\hyperlink{class_pretty_writer}{PrettyWriter<FileWriteStream>}}\ writer(os);}
+\DoxyCodeLine{\Hypertarget{sortkeys_8cpp_source_l00014}00014\ \ \ \ \ \mbox{\hyperlink{class_pretty_writer}{PrettyWriter<FileWriteStream>}}\ writer(\mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}});}
 \DoxyCodeLine{\Hypertarget{sortkeys_8cpp_source_l00015}00015\ \ \ \ \ doc.Accept(writer);}
 \DoxyCodeLine{\Hypertarget{sortkeys_8cpp_source_l00016}00016\ \ \ \ \ cout\ <<\ endl;}
 \DoxyCodeLine{\Hypertarget{sortkeys_8cpp_source_l00017}00017\ \}}

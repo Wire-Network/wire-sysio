@@ -23,8 +23,8 @@
 \DoxyCodeLine{\Hypertarget{catch__assertionhandler_8cpp_source_l00019}00019\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespace_catch}{Catch}}\ \{}
 \DoxyCodeLine{\Hypertarget{catch__assertionhandler_8cpp_source_l00020}00020\ }
 \DoxyCodeLine{\Hypertarget{catch__assertionhandler_8cpp_source_l00021}00021\ \ \ \ \ \textcolor{keyword}{namespace\ }\{}
-\DoxyCodeLine{\Hypertarget{catch__assertionhandler_8cpp_source_l00022}00022\ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ \mbox{\hyperlink{namespace_catch_abf821d46e662c8d93d80a98d79a10314}{operator\ <<}}(\ std::ostream\&\ os,\ ITransientExpression\ \textcolor{keyword}{const}\&\ expr\ )\ -\/>\ std::ostream\&\ \{}
-\DoxyCodeLine{\Hypertarget{catch__assertionhandler_8cpp_source_l00023}00023\ \ \ \ \ \ \ \ \ \ \ \ \ expr.streamReconstructedExpression(\ os\ );}
+\DoxyCodeLine{\Hypertarget{catch__assertionhandler_8cpp_source_l00022}00022\ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ \mbox{\hyperlink{namespace_catch_abf821d46e662c8d93d80a98d79a10314}{operator\ <<}}(\ std::ostream\&\ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}},\ ITransientExpression\ \textcolor{keyword}{const}\&\ expr\ )\ -\/>\ std::ostream\&\ \{}
+\DoxyCodeLine{\Hypertarget{catch__assertionhandler_8cpp_source_l00023}00023\ \ \ \ \ \ \ \ \ \ \ \ \ expr.streamReconstructedExpression(\ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}\ );}
 \DoxyCodeLine{\Hypertarget{catch__assertionhandler_8cpp_source_l00024}00024\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}};}
 \DoxyCodeLine{\Hypertarget{catch__assertionhandler_8cpp_source_l00025}00025\ \ \ \ \ \ \ \ \ \}}
 \DoxyCodeLine{\Hypertarget{catch__assertionhandler_8cpp_source_l00026}00026\ \ \ \ \ \}}
@@ -39,18 +39,18 @@
 \DoxyCodeLine{\Hypertarget{catch__assertionhandler_8cpp_source_l00035}00035\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ m\_transientExpression\ !=\ \textcolor{keyword}{nullptr};}
 \DoxyCodeLine{\Hypertarget{catch__assertionhandler_8cpp_source_l00036}00036\ \ \ \ \ \}}
 \DoxyCodeLine{\Hypertarget{catch__assertionhandler_8cpp_source_l00037}00037\ }
-\DoxyCodeLine{\Hypertarget{catch__assertionhandler_8cpp_source_l00038}\mbox{\hyperlink{class_catch_1_1_lazy_expression_aa01086581cab2fcd2d4580b8fa787dfc}{00038}}\ \ \ \ \ \textcolor{keyword}{auto}\ \mbox{\hyperlink{namespace_catch_abf821d46e662c8d93d80a98d79a10314}{operator\ <<\ }}(\ std::ostream\&\ os,\ \mbox{\hyperlink{class_catch_1_1_lazy_expression}{LazyExpression}}\ \textcolor{keyword}{const}\&\ lazyExpr\ )\ -\/>\ std::ostream\&\ \{}
+\DoxyCodeLine{\Hypertarget{catch__assertionhandler_8cpp_source_l00038}\mbox{\hyperlink{class_catch_1_1_lazy_expression_aa01086581cab2fcd2d4580b8fa787dfc}{00038}}\ \ \ \ \ \textcolor{keyword}{auto}\ \mbox{\hyperlink{namespace_catch_abf821d46e662c8d93d80a98d79a10314}{operator\ <<\ }}(\ std::ostream\&\ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}},\ \mbox{\hyperlink{class_catch_1_1_lazy_expression}{LazyExpression}}\ \textcolor{keyword}{const}\&\ lazyExpr\ )\ -\/>\ std::ostream\&\ \{}
 \DoxyCodeLine{\Hypertarget{catch__assertionhandler_8cpp_source_l00039}00039\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ lazyExpr.m\_isNegated\ )}
-\DoxyCodeLine{\Hypertarget{catch__assertionhandler_8cpp_source_l00040}00040\ \ \ \ \ \ \ \ \ \ \ \ \ os\ <<\ \textcolor{stringliteral}{"{}!"{}};}
+\DoxyCodeLine{\Hypertarget{catch__assertionhandler_8cpp_source_l00040}00040\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}\ <<\ \textcolor{stringliteral}{"{}!"{}};}
 \DoxyCodeLine{\Hypertarget{catch__assertionhandler_8cpp_source_l00041}00041\ }
 \DoxyCodeLine{\Hypertarget{catch__assertionhandler_8cpp_source_l00042}00042\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ lazyExpr\ )\ \{}
 \DoxyCodeLine{\Hypertarget{catch__assertionhandler_8cpp_source_l00043}00043\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ lazyExpr.m\_isNegated\ \&\&\ lazyExpr.m\_transientExpression-\/>isBinaryExpression()\ )}
-\DoxyCodeLine{\Hypertarget{catch__assertionhandler_8cpp_source_l00044}00044\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ os\ <<\ \textcolor{stringliteral}{"{}("{}}\ <<\ *lazyExpr.m\_transientExpression\ <<\ \textcolor{stringliteral}{"{})"{}};}
+\DoxyCodeLine{\Hypertarget{catch__assertionhandler_8cpp_source_l00044}00044\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}\ <<\ \textcolor{stringliteral}{"{}("{}}\ <<\ *lazyExpr.m\_transientExpression\ <<\ \textcolor{stringliteral}{"{})"{}};}
 \DoxyCodeLine{\Hypertarget{catch__assertionhandler_8cpp_source_l00045}00045\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}}
-\DoxyCodeLine{\Hypertarget{catch__assertionhandler_8cpp_source_l00046}00046\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ os\ <<\ *lazyExpr.m\_transientExpression;}
+\DoxyCodeLine{\Hypertarget{catch__assertionhandler_8cpp_source_l00046}00046\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}\ <<\ *lazyExpr.m\_transientExpression;}
 \DoxyCodeLine{\Hypertarget{catch__assertionhandler_8cpp_source_l00047}00047\ \ \ \ \ \ \ \ \ \}}
 \DoxyCodeLine{\Hypertarget{catch__assertionhandler_8cpp_source_l00048}00048\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}\ \{}
-\DoxyCodeLine{\Hypertarget{catch__assertionhandler_8cpp_source_l00049}00049\ \ \ \ \ \ \ \ \ \ \ \ \ os\ <<\ \textcolor{stringliteral}{"{}\{**\ error\ -\/\ unchecked\ empty\ expression\ requested\ **\}"{}};}
+\DoxyCodeLine{\Hypertarget{catch__assertionhandler_8cpp_source_l00049}00049\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}\ <<\ \textcolor{stringliteral}{"{}\{**\ error\ -\/\ unchecked\ empty\ expression\ requested\ **\}"{}};}
 \DoxyCodeLine{\Hypertarget{catch__assertionhandler_8cpp_source_l00050}00050\ \ \ \ \ \ \ \ \ \}}
 \DoxyCodeLine{\Hypertarget{catch__assertionhandler_8cpp_source_l00051}00051\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}};}
 \DoxyCodeLine{\Hypertarget{catch__assertionhandler_8cpp_source_l00052}00052\ \ \ \ \ \}}

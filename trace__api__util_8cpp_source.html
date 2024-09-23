@@ -152,16 +152,16 @@ $(function(){initNavTree('trace__api__util_8cpp_source.html',''); initResizable(
 <div class="line"><a id="l00050" name="l00050"></a><span class="lineno">   50</span>   std::vector&lt;std::string&gt; args = bpo::collect_unrecognized(parsed_args.options, bpo::include_positional);</div>
 <div class="line"><a id="l00051" name="l00051"></a><span class="lineno">   51</span> </div>
 <div class="line"><a id="l00052" name="l00052"></a><span class="lineno">   52</span>   <span class="keyword">auto</span> show_help = [&amp;](std::ostream&amp; <a class="code hl_variable" href="environment_8hpp.html#a3951483d0b31c29ca95336206cd35238">os</a>) {</div>
-<div class="line"><a id="l00053" name="l00053"></a><span class="lineno">   53</span>      os &lt;&lt;</div>
+<div class="line"><a id="l00053" name="l00053"></a><span class="lineno">   53</span>      <a class="code hl_variable" href="environment_8hpp.html#a3951483d0b31c29ca95336206cd35238">os</a> &lt;&lt;</div>
 <div class="line"><a id="l00054" name="l00054"></a><span class="lineno">   54</span>         <span class="stringliteral">&quot;Usage: trace_api_util &lt;options&gt; command ...\n&quot;</span></div>
 <div class="line"><a id="l00055" name="l00055"></a><span class="lineno">   55</span>         <span class="stringliteral">&quot;\n&quot;</span></div>
 <div class="line"><a id="l00056" name="l00056"></a><span class="lineno">   56</span>         <span class="stringliteral">&quot;Commands:\n&quot;</span>;</div>
 <div class="line"><a id="l00057" name="l00057"></a><span class="lineno">   57</span> </div>
 <div class="line"><a id="l00058" name="l00058"></a><span class="lineno">   58</span>      <span class="keywordflow">for</span> (<span class="keyword">const</span> <span class="keyword">auto</span>&amp; e: command_map) {</div>
-<div class="line"><a id="l00059" name="l00059"></a><span class="lineno">   59</span>         os &lt;&lt; <span class="stringliteral">&quot;  &quot;</span> &lt;&lt; e.second-&gt;name &lt;&lt; <span class="stringliteral">&quot;              &quot;</span> &lt;&lt; e.second-&gt;slug &lt;&lt; <span class="stringliteral">&quot;\n&quot;</span>;</div>
+<div class="line"><a id="l00059" name="l00059"></a><span class="lineno">   59</span>         <a class="code hl_variable" href="environment_8hpp.html#a3951483d0b31c29ca95336206cd35238">os</a> &lt;&lt; <span class="stringliteral">&quot;  &quot;</span> &lt;&lt; e.second-&gt;name &lt;&lt; <span class="stringliteral">&quot;              &quot;</span> &lt;&lt; e.second-&gt;slug &lt;&lt; <span class="stringliteral">&quot;\n&quot;</span>;</div>
 <div class="line"><a id="l00060" name="l00060"></a><span class="lineno">   60</span>      }</div>
 <div class="line"><a id="l00061" name="l00061"></a><span class="lineno">   61</span> </div>
-<div class="line"><a id="l00062" name="l00062"></a><span class="lineno">   62</span>      os &lt;&lt; <span class="stringliteral">&quot;\n&quot;</span> &lt;&lt; vis_desc &lt;&lt; <span class="stringliteral">&quot;\n&quot;</span>;</div>
+<div class="line"><a id="l00062" name="l00062"></a><span class="lineno">   62</span>      <a class="code hl_variable" href="environment_8hpp.html#a3951483d0b31c29ca95336206cd35238">os</a> &lt;&lt; <span class="stringliteral">&quot;\n&quot;</span> &lt;&lt; vis_desc &lt;&lt; <span class="stringliteral">&quot;\n&quot;</span>;</div>
 <div class="line"><a id="l00063" name="l00063"></a><span class="lineno">   63</span>   };</div>
 <div class="line"><a id="l00064" name="l00064"></a><span class="lineno">   64</span> </div>
 <div class="line"><a id="l00065" name="l00065"></a><span class="lineno">   65</span>   <span class="keywordflow">if</span> (args.size() &lt; 1) {</div>

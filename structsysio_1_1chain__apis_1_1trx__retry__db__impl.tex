@@ -116,9 +116,9 @@ Definition at line \mbox{\hyperlink{trx__retry__db_8cpp_source_l00128}{128}} of 
 \DoxyCodeLine{00140\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ \mbox{\hyperlink{namespacesysio_1_1chain_a9a9946a27c3832394b9b2b3911e0733c}{chain::is\_onblock}}(\ *trace\ )\ )\ \textcolor{keywordflow}{return};}
 \DoxyCodeLine{00141\ }
 \DoxyCodeLine{00142\ \ \ \ \ \ \ \textcolor{comment}{//\ Is\ this\ a\ transaction\ we\ are\ tracking}}
-\DoxyCodeLine{00143\ \ \ \ \ \ \ \textcolor{keyword}{auto}\&\ \mbox{\hyperlink{namespacehost__functions__tests__1_a8496a24b5236a2dc07bb4f2930d88342}{idx}}\ =\ \_tracked\_trxs.\mbox{\hyperlink{classfc_1_1tracked__storage_ab578f3765c80c8cee1d758d440c99e90}{index}}().get<by\_trx\_id>();}
-\DoxyCodeLine{00144\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ itr\ =\ \mbox{\hyperlink{namespacehost__functions__tests__1_a8496a24b5236a2dc07bb4f2930d88342}{idx}}.find(trace-\/>id);}
-\DoxyCodeLine{00145\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ itr\ !=\ \mbox{\hyperlink{namespacehost__functions__tests__1_a8496a24b5236a2dc07bb4f2930d88342}{idx}}.end()\ )\ \{}
+\DoxyCodeLine{00143\ \ \ \ \ \ \ \textcolor{keyword}{auto}\&\ idx\ =\ \_tracked\_trxs.\mbox{\hyperlink{classfc_1_1tracked__storage_ab578f3765c80c8cee1d758d440c99e90}{index}}().get<by\_trx\_id>();}
+\DoxyCodeLine{00144\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ itr\ =\ idx.find(trace-\/>id);}
+\DoxyCodeLine{00145\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ itr\ !=\ idx.end()\ )\ \{}
 \DoxyCodeLine{00146\ \ \ \ \ \ \ \ \ \ \_tracked\_trxs.\mbox{\hyperlink{classfc_1_1tracked__storage_a857cf0f6d4ca31111b633b9d4c923ffe}{modify}}(\ itr,\ [\&trace,\ \&control=\_controller,\ \&abi\_max\_time=\_abi\_serializer\_max\_time](\ tracked\_transaction\&\ tt\ )\ \{}
 \DoxyCodeLine{00147\ \ \ \ \ \ \ \ \ \ \ \ \ tt.block\_num\ =\ trace-\/>block\_num;}
 \DoxyCodeLine{00148\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{try}\ \{}
@@ -135,7 +135,8 @@ Definition at line \mbox{\hyperlink{trx__retry__db_8cpp_source_l00128}{128}} of 
 \DoxyCodeLine{00159\ \ \ \ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -195,7 +196,8 @@ Definition at line \mbox{\hyperlink{trx__retry__db_8cpp_source_l00108}{108}} of 
 \DoxyCodeLine{00110\ \ \ \ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -231,7 +233,8 @@ Definition at line \mbox{\hyperlink{trx__retry__db_8cpp_source_l00112}{112}} of 
 \DoxyCodeLine{00126\ \ \ \ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode

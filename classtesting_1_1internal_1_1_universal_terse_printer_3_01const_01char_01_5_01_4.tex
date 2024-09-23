@@ -7,7 +7,7 @@
 \doxysubsubsection*{Static Public Member Functions}
 \begin{DoxyCompactItemize}
 \item 
-static void \mbox{\hyperlink{classtesting_1_1internal_1_1_universal_terse_printer_3_01const_01char_01_5_01_4_a37a3be2d26dc07b24d16c2b5eb88ecda}{Print}} (const char \texorpdfstring{$\ast$}{*}str, \+::std\+::ostream \texorpdfstring{$\ast$}{*}os)
+static void \mbox{\hyperlink{classtesting_1_1internal_1_1_universal_terse_printer_3_01const_01char_01_5_01_4_a37a3be2d26dc07b24d16c2b5eb88ecda}{Print}} (const char \texorpdfstring{$\ast$}{*}str, \+::std\+::ostream \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}})
 \end{DoxyCompactItemize}
 
 
@@ -33,14 +33,15 @@ Definition at line \mbox{\hyperlink{gtest-printers_8h_source_l00883}{883}} of fi
 \begin{DoxyCode}{0}
 \DoxyCodeLine{00883\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
 \DoxyCodeLine{00884\ \ \ \ \ \textcolor{keywordflow}{if}\ (str\ ==\ NULL)\ \{}
-\DoxyCodeLine{00885\ \ \ \ \ \ \ *os\ <<\ \textcolor{stringliteral}{"{}NULL"{}};}
+\DoxyCodeLine{00885\ \ \ \ \ \ \ *\mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}\ <<\ \textcolor{stringliteral}{"{}NULL"{}};}
 \DoxyCodeLine{00886\ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
-\DoxyCodeLine{00887\ \ \ \ \ \ \ \mbox{\hyperlink{namespacetesting_1_1internal_a30708fa2bacf11895b03bdb21eb72309}{UniversalPrint}}(std::string(str),\ os);}
+\DoxyCodeLine{00887\ \ \ \ \ \ \ \mbox{\hyperlink{namespacetesting_1_1internal_a30708fa2bacf11895b03bdb21eb72309}{UniversalPrint}}(std::string(str),\ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}});}
 \DoxyCodeLine{00888\ \ \ \ \ \}}
 \DoxyCodeLine{00889\ \ \ \}}
 
 \end{DoxyCode}
-Here is the call graph for this function\+:\nopagebreak
+Here is the call graph for this function\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode

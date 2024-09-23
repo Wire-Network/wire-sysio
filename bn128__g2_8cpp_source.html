@@ -118,7 +118,7 @@ $(function(){initNavTree('bn128__g2_8cpp_source.html',''); initResizable(true); 
 <div class="line"><a id="l00023" name="l00023"></a><span class="lineno">   23</span> </div>
 <div class="line"><a id="l00024" name="l00024"></a><span class="lineno">   24</span><a class="code hl_struct" href="structbn_1_1_fp2_t.html">bn::Fp2</a> bn128_G2::sqrt(<span class="keyword">const</span> <a class="code hl_struct" href="structbn_1_1_fp2_t.html">bn::Fp2</a> &amp;el)</div>
 <div class="line"><a id="l00025" name="l00025"></a><span class="lineno">   25</span>{</div>
-<div class="line"><a id="l00026" name="l00026"></a><span class="lineno">   26</span>    <span class="keywordtype">size_t</span> <a class="code hl_variable" href="namespacedevelop_build.html#ade64cd34608f9442ef3049116a2da428">v</a> = <a class="code hl_variable" href="namespacelibff.html#a1112b4d1ba35f7970584b58e71cc67d1">bn128_Fq2_s</a>;</div>
+<div class="line"><a id="l00026" name="l00026"></a><span class="lineno">   26</span>    <span class="keywordtype">size_t</span> v = <a class="code hl_variable" href="namespacelibff.html#a1112b4d1ba35f7970584b58e71cc67d1">bn128_Fq2_s</a>;</div>
 <div class="line"><a id="l00027" name="l00027"></a><span class="lineno">   27</span>    <a class="code hl_struct" href="structbn_1_1_fp2_t.html">bn::Fp2</a> z = <a class="code hl_variable" href="namespacelibff.html#a78ffae38ed0a2ff96a1cd52d15c8ea5a">bn128_Fq2_nqr_to_t</a>;</div>
 <div class="line"><a id="l00028" name="l00028"></a><span class="lineno">   28</span>    <a class="code hl_struct" href="structbn_1_1_fp2_t.html">bn::Fp2</a> w = <a class="code hl_function" href="namespacemie.html#a595f193249b72c666b84e42439a60817">mie::power</a>(el, <a class="code hl_variable" href="namespacelibff.html#a828eae4a6832493134229f574df7fdbd">bn128_Fq2_t_minus_1_over_2</a>);</div>
 <div class="line"><a id="l00029" name="l00029"></a><span class="lineno">   29</span>    <a class="code hl_struct" href="structbn_1_1_fp2_t.html">bn::Fp2</a> x = el * w;</div>
@@ -127,7 +127,7 @@ $(function(){initNavTree('bn128__g2_8cpp_source.html',''); initResizable(true); 
 <div class="line"><a id="l00032" name="l00032"></a><span class="lineno">   32</span><span class="preprocessor">#if DEBUG</span></div>
 <div class="line"><a id="l00033" name="l00033"></a><span class="lineno">   33</span>    <span class="comment">// check if square with Euler&#39;s criterion</span></div>
 <div class="line"><a id="l00034" name="l00034"></a><span class="lineno">   34</span>    <a class="code hl_struct" href="structbn_1_1_fp2_t.html">bn::Fp2</a> check = b;</div>
-<div class="line"><a id="l00035" name="l00035"></a><span class="lineno">   35</span>    <span class="keywordflow">for</span> (<span class="keywordtype">size_t</span> i = 0; i &lt; <a class="code hl_variable" href="namespacedevelop_build.html#ade64cd34608f9442ef3049116a2da428">v</a>-1; ++i)</div>
+<div class="line"><a id="l00035" name="l00035"></a><span class="lineno">   35</span>    <span class="keywordflow">for</span> (<span class="keywordtype">size_t</span> i = 0; i &lt; v-1; ++i)</div>
 <div class="line"><a id="l00036" name="l00036"></a><span class="lineno">   36</span>    {</div>
 <div class="line"><a id="l00037" name="l00037"></a><span class="lineno">   37</span>        <a class="code hl_variable" href="structbn_1_1_fp2_t.html#a4f9744dae3a0fba74fe4a0ff89353c42">bn::Fp2::square</a>(check, check);</div>
 <div class="line"><a id="l00038" name="l00038"></a><span class="lineno">   38</span>    }</div>
@@ -149,7 +149,7 @@ $(function(){initNavTree('bn128__g2_8cpp_source.html',''); initResizable(true); 
 <div class="line"><a id="l00054" name="l00054"></a><span class="lineno">   54</span>            m += 1;</div>
 <div class="line"><a id="l00055" name="l00055"></a><span class="lineno">   55</span>        }</div>
 <div class="line"><a id="l00056" name="l00056"></a><span class="lineno">   56</span> </div>
-<div class="line"><a id="l00057" name="l00057"></a><span class="lineno">   57</span>        <span class="keywordtype">int</span> <a class="code hl_variable" href="yubihsm__pkcs11_8c.html#a538d097420e725c4dad63c3caa9e55bd">j</a> = <a class="code hl_variable" href="namespacedevelop_build.html#ade64cd34608f9442ef3049116a2da428">v</a>-m-1;</div>
+<div class="line"><a id="l00057" name="l00057"></a><span class="lineno">   57</span>        <span class="keywordtype">int</span> <a class="code hl_variable" href="yubihsm__pkcs11_8c.html#a538d097420e725c4dad63c3caa9e55bd">j</a> = v-m-1;</div>
 <div class="line"><a id="l00058" name="l00058"></a><span class="lineno">   58</span>        w = z;</div>
 <div class="line"><a id="l00059" name="l00059"></a><span class="lineno">   59</span>        <span class="keywordflow">while</span> (<a class="code hl_variable" href="yubihsm__pkcs11_8c.html#a538d097420e725c4dad63c3caa9e55bd">j</a> &gt; 0)</div>
 <div class="line"><a id="l00060" name="l00060"></a><span class="lineno">   60</span>        {</div>
@@ -160,7 +160,7 @@ $(function(){initNavTree('bn128__g2_8cpp_source.html',''); initResizable(true); 
 <div class="line"><a id="l00065" name="l00065"></a><span class="lineno">   65</span>        z = w * w;</div>
 <div class="line"><a id="l00066" name="l00066"></a><span class="lineno">   66</span>        b = b * z;</div>
 <div class="line"><a id="l00067" name="l00067"></a><span class="lineno">   67</span>        x = x * w;</div>
-<div class="line"><a id="l00068" name="l00068"></a><span class="lineno">   68</span>        <a class="code hl_variable" href="namespacedevelop_build.html#ade64cd34608f9442ef3049116a2da428">v</a> = m;</div>
+<div class="line"><a id="l00068" name="l00068"></a><span class="lineno">   68</span>        v = m;</div>
 <div class="line"><a id="l00069" name="l00069"></a><span class="lineno">   69</span>    }</div>
 <div class="line"><a id="l00070" name="l00070"></a><span class="lineno">   70</span> </div>
 <div class="line"><a id="l00071" name="l00071"></a><span class="lineno">   71</span>    <span class="keywordflow">return</span> x;</div>
@@ -689,7 +689,6 @@ $(function(){initNavTree('bn128__g2_8cpp_source.html',''); initResizable(true); 
 <div class="ttc" id="anamespacebn_1_1ecop_html_a0e64ca6d01c24fb266f1986ebce3a07d"><div class="ttname"><a href="namespacebn_1_1ecop.html#a0e64ca6d01c24fb266f1986ebce3a07d">bn::ecop::ECDouble</a></div><div class="ttdeci">void ECDouble(FF *out, const FF *in)</div><div class="ttdef"><b>Definition</b> <a href="bn_8h_source.html#l02497">bn.h:2497</a></div></div>
 <div class="ttc" id="anamespacebn_1_1ecop_html_abcaa67b67f6c2af1201769cd15cbbed9"><div class="ttname"><a href="namespacebn_1_1ecop.html#abcaa67b67f6c2af1201769cd15cbbed9">bn::ecop::ECAdd</a></div><div class="ttdeci">void ECAdd(FF *out, const FF *a, const FF *b)</div><div class="ttdef"><b>Definition</b> <a href="bn_8h_source.html#l02526">bn.h:2526</a></div></div>
 <div class="ttc" id="anamespacebn_html_afe11bd65aac84b50b31d9984d059be92"><div class="ttname"><a href="namespacebn.html#afe11bd65aac84b50b31d9984d059be92">bn::Fp2</a></div><div class="ttdeci">Fp2T&lt; Fp &gt; Fp2</div><div class="ttdef"><b>Definition</b> <a href="bn_8h_source.html#l02954">bn.h:2954</a></div></div>
-<div class="ttc" id="anamespacedevelop_build_html_ade64cd34608f9442ef3049116a2da428"><div class="ttname"><a href="namespacedevelop_build.html#ade64cd34608f9442ef3049116a2da428">developBuild.v</a></div><div class="ttdeci">v</div><div class="ttdef"><b>Definition</b> <a href="develop_build_8py_source.html#l00006">developBuild.py:6</a></div></div>
 <div class="ttc" id="anamespacelibff_html"><div class="ttname"><a href="namespacelibff.html">libff</a></div><div class="ttdef"><b>Definition</b> <a href="alt__bn128__g1_8cpp_source.html#l00010">alt_bn128_g1.cpp:10</a></div></div>
 <div class="ttc" id="anamespacelibff_html_a01d56d482f213915af4492d3831d0b19"><div class="ttname"><a href="namespacelibff.html#a01d56d482f213915af4492d3831d0b19">libff::bn128_twist_coeff_b</a></div><div class="ttdeci">bn::Fp2 bn128_twist_coeff_b</div><div class="ttdef"><b>Definition</b> <a href="bn128__init_8cpp_source.html#l00023">bn128_init.cpp:23</a></div></div>
 <div class="ttc" id="anamespacelibff_html_a1112b4d1ba35f7970584b58e71cc67d1"><div class="ttname"><a href="namespacelibff.html#a1112b4d1ba35f7970584b58e71cc67d1">libff::bn128_Fq2_s</a></div><div class="ttdeci">size_t bn128_Fq2_s</div><div class="ttdef"><b>Definition</b> <a href="bn128__init_8cpp_source.html#l00024">bn128_init.cpp:24</a></div></div>

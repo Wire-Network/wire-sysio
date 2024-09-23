@@ -588,13 +588,13 @@
 \DoxyCodeLine{\Hypertarget{dtoa_8c_source_l00584}00584\ \ \textcolor{keyword}{static}\ \textcolor{keywordtype}{void}}
 \DoxyCodeLine{\Hypertarget{dtoa_8c_source_l00585}00585\ Bfree}
 \DoxyCodeLine{\Hypertarget{dtoa_8c_source_l00586}00586\ \textcolor{preprocessor}{\#ifdef\ KR\_headers}}
-\DoxyCodeLine{\Hypertarget{dtoa_8c_source_l00587}00587\ \ \ \ \ (\mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}})\ \mbox{\hyperlink{struct_bigint}{Bigint}}\ *v;}
+\DoxyCodeLine{\Hypertarget{dtoa_8c_source_l00587}00587\ \ \ \ \ (v)\ \mbox{\hyperlink{struct_bigint}{Bigint}}\ *v;}
 \DoxyCodeLine{\Hypertarget{dtoa_8c_source_l00588}00588\ \textcolor{preprocessor}{\#else}}
-\DoxyCodeLine{\Hypertarget{dtoa_8c_source_l00589}00589\ \ \ \ \ (\mbox{\hyperlink{struct_bigint}{Bigint}}\ *\mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}})}
+\DoxyCodeLine{\Hypertarget{dtoa_8c_source_l00589}00589\ \ \ \ \ (\mbox{\hyperlink{struct_bigint}{Bigint}}\ *v)}
 \DoxyCodeLine{\Hypertarget{dtoa_8c_source_l00590}00590\ \#endif}
 \DoxyCodeLine{\Hypertarget{dtoa_8c_source_l00591}00591\ \{}
 \DoxyCodeLine{\Hypertarget{dtoa_8c_source_l00592}00592\ \ \ \ \ \textcolor{keywordflow}{if}\ (v)\ \{}
-\DoxyCodeLine{\Hypertarget{dtoa_8c_source_l00593}00593\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}-\/>k\ >\ \mbox{\hyperlink{dtoa_8c_a60a2b72a9437564147596c3308b55845}{Kmax}})}
+\DoxyCodeLine{\Hypertarget{dtoa_8c_source_l00593}00593\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (v-\/>k\ >\ \mbox{\hyperlink{dtoa_8c_a60a2b72a9437564147596c3308b55845}{Kmax}})}
 \DoxyCodeLine{\Hypertarget{dtoa_8c_source_l00594}00594\ \textcolor{preprocessor}{\#ifdef\ FREE}}
 \DoxyCodeLine{\Hypertarget{dtoa_8c_source_l00595}00595\ \ \ \ \ \ \ \ \ \ \ \ \ FREE((\textcolor{keywordtype}{void}*)v);}
 \DoxyCodeLine{\Hypertarget{dtoa_8c_source_l00596}00596\ \textcolor{preprocessor}{\#else}}
@@ -602,8 +602,8 @@
 \DoxyCodeLine{\Hypertarget{dtoa_8c_source_l00598}00598\ \textcolor{preprocessor}{\#endif}}
 \DoxyCodeLine{\Hypertarget{dtoa_8c_source_l00599}00599\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}\ \{}
 \DoxyCodeLine{\Hypertarget{dtoa_8c_source_l00600}00600\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{dtoa_8c_aa1ff217ff4152aa5d9a76f64bc4bbbf7}{ACQUIRE\_DTOA\_LOCK}}(0);}
-\DoxyCodeLine{\Hypertarget{dtoa_8c_source_l00601}00601\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}-\/>next\ =\ freelist[\mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}-\/>k];}
-\DoxyCodeLine{\Hypertarget{dtoa_8c_source_l00602}00602\ \ \ \ \ \ \ \ \ \ \ \ \ freelist[\mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}-\/>k]\ =\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}};}
+\DoxyCodeLine{\Hypertarget{dtoa_8c_source_l00601}00601\ \ \ \ \ \ \ \ \ \ \ \ \ v-\/>next\ =\ freelist[v-\/>k];}
+\DoxyCodeLine{\Hypertarget{dtoa_8c_source_l00602}00602\ \ \ \ \ \ \ \ \ \ \ \ \ freelist[v-\/>k]\ =\ v;}
 \DoxyCodeLine{\Hypertarget{dtoa_8c_source_l00603}00603\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{dtoa_8c_a1f3a0f9150a393b662d93578d7f0f581}{FREE\_DTOA\_LOCK}}(0);}
 \DoxyCodeLine{\Hypertarget{dtoa_8c_source_l00604}00604\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
 \DoxyCodeLine{\Hypertarget{dtoa_8c_source_l00605}00605\ \ \ \ \ \ \ \ \ \}}

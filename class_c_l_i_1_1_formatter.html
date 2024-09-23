@@ -616,7 +616,7 @@ Here is the caller graph for this function:</div>
 <div class="fragment"><div class="line"><span class="lineno"> 7960</span>                                                                                               {</div>
 <div class="line"><span class="lineno"> 7961</span>    std::stringstream out;</div>
 <div class="line"><span class="lineno"> 7962</span> </div>
-<div class="line"><span class="lineno"> 7963</span>    out &lt;&lt; <span class="stringliteral">&quot;\n&quot;</span> &lt;&lt; <a class="code hl_variable" href="namespaceupload.html#a9d33d66de17175dced88ffe95f079226">group</a> &lt;&lt; <span class="stringliteral">&quot;:\n&quot;</span>;</div>
+<div class="line"><span class="lineno"> 7963</span>    out &lt;&lt; <span class="stringliteral">&quot;\n&quot;</span> &lt;&lt; group &lt;&lt; <span class="stringliteral">&quot;:\n&quot;</span>;</div>
 <div class="line"><span class="lineno"> 7964</span>    <span class="keywordflow">for</span>(<span class="keyword">const</span> Option *opt : opts) {</div>
 <div class="line"><span class="lineno"> 7965</span>        out &lt;&lt; <a class="code hl_function" href="#a1503e498cef1cab66a01d84bac59b5d8">make_option</a>(opt, is_positional);</div>
 <div class="line"><span class="lineno"> 7966</span>    }</div>
@@ -624,7 +624,6 @@ Here is the caller graph for this function:</div>
 <div class="line"><span class="lineno"> 7968</span>    <span class="keywordflow">return</span> out.str();</div>
 <div class="line"><span class="lineno"> 7969</span>}</div>
 <div class="ttc" id="aclass_c_l_i_1_1_formatter_html_a1503e498cef1cab66a01d84bac59b5d8"><div class="ttname"><a href="#a1503e498cef1cab66a01d84bac59b5d8">CLI::Formatter::make_option</a></div><div class="ttdeci">virtual std::string make_option(const Option *opt, bool is_positional) const</div><div class="ttdoc">This prints out an option help line, either positional or optional form.</div><div class="ttdef"><b>Definition</b> <a href="_c_l_i11_8hpp_source.html#l03299">CLI11.hpp:3299</a></div></div>
-<div class="ttc" id="anamespaceupload_html_a9d33d66de17175dced88ffe95f079226"><div class="ttname"><a href="namespaceupload.html#a9d33d66de17175dced88ffe95f079226">upload.group</a></div><div class="ttdeci">group</div><div class="ttdef"><b>Definition</b> <a href="googlemock_2scripts_2upload_8py_source.html#l00397">upload.py:397</a></div></div>
 </div><!-- fragment --><div class="dynheader">
 Here is the call graph for this function:</div>
 <div class="dyncontent">
@@ -759,13 +758,13 @@ Here is the caller graph for this function:</div>
 <div class="line"><span class="lineno"> 7985</span>    <span class="comment">// Options</span></div>
 <div class="line"><span class="lineno"> 7986</span>    <span class="keywordflow">for</span>(<span class="keyword">const</span> std::string &amp;group : groups) {</div>
 <div class="line"><span class="lineno"> 7987</span>        std::vector&lt;const Option *&gt; opts = <a class="code hl_function" href="namespaceappbase.html#a99374dc23934f008a09f2f79be9eae40">app</a>-&gt;<a class="code hl_function" href="classappbase_1_1application.html#a1cd05ae43f6400f07f9c60a09cc610cb">get_options</a>([app, mode, &amp;group](<span class="keyword">const</span> Option *opt) {</div>
-<div class="line"><span class="lineno"> 7988</span>            <span class="keywordflow">return</span> opt-&gt;get_group() == <a class="code hl_variable" href="namespaceupload.html#a9d33d66de17175dced88ffe95f079226">group</a>                    <span class="comment">// Must be in the right group</span></div>
+<div class="line"><span class="lineno"> 7988</span>            <span class="keywordflow">return</span> opt-&gt;get_group() == group                    <span class="comment">// Must be in the right group</span></div>
 <div class="line"><span class="lineno"> 7989</span>                   &amp;&amp; opt-&gt;nonpositional()                      <span class="comment">// Must not be a positional</span></div>
 <div class="line"><span class="lineno"> 7990</span>                   &amp;&amp; (mode != <a class="code hl_enumvalue" href="namespace_c_l_i.html#a97e7d97131e3889f32b721570eca119cae80155eceb940c89e2de63ad05868db2">AppFormatMode::Sub</a>               <span class="comment">// If mode is Sub, then</span></div>
 <div class="line"><span class="lineno"> 7991</span>                       || (<a class="code hl_function" href="namespaceappbase.html#a99374dc23934f008a09f2f79be9eae40">app</a>-&gt;get_help_ptr() != opt           <span class="comment">// Ignore help pointer</span></div>
 <div class="line"><span class="lineno"> 7992</span>                           &amp;&amp; <a class="code hl_function" href="namespaceappbase.html#a99374dc23934f008a09f2f79be9eae40">app</a>-&gt;get_help_all_ptr() != opt)); <span class="comment">// Ignore help all pointer</span></div>
 <div class="line"><span class="lineno"> 7993</span>        });</div>
-<div class="line"><span class="lineno"> 7994</span>        <span class="keywordflow">if</span>(!<a class="code hl_variable" href="namespaceupload.html#a9d33d66de17175dced88ffe95f079226">group</a>.empty() &amp;&amp; !opts.empty()) {</div>
+<div class="line"><span class="lineno"> 7994</span>        <span class="keywordflow">if</span>(!group.empty() &amp;&amp; !opts.empty()) {</div>
 <div class="line"><span class="lineno"> 7995</span>            out &lt;&lt; <a class="code hl_function" href="#aebbdf79e2615ea7d16fe8f30fb6551fc">make_group</a>(group, <span class="keyword">false</span>, opts);</div>
 <div class="line"><span class="lineno"> 7996</span> </div>
 <div class="line"><span class="lineno"> 7997</span>            <span class="keywordflow">if</span>(group != groups.back())</div>
@@ -1817,7 +1816,7 @@ Here is the caller graph for this function:</div>
 <div class="line"><span class="lineno"> 8126</span> </div>
 <div class="line"><span class="lineno"> 8127</span>    <span class="comment">// For each group, filter out and print subcommands</span></div>
 <div class="line"><span class="lineno"> 8128</span>    <span class="keywordflow">for</span>(<span class="keyword">const</span> std::string &amp;group : subcmd_groups_seen) {</div>
-<div class="line"><span class="lineno"> 8129</span>        out &lt;&lt; <span class="stringliteral">&quot;\n&quot;</span> &lt;&lt; <a class="code hl_variable" href="namespaceupload.html#a9d33d66de17175dced88ffe95f079226">group</a> &lt;&lt; <span class="stringliteral">&quot;:\n&quot;</span>;</div>
+<div class="line"><span class="lineno"> 8129</span>        out &lt;&lt; <span class="stringliteral">&quot;\n&quot;</span> &lt;&lt; group &lt;&lt; <span class="stringliteral">&quot;:\n&quot;</span>;</div>
 <div class="line"><span class="lineno"> 8130</span>        std::vector&lt;const App *&gt; subcommands_group = <a class="code hl_function" href="namespaceappbase.html#a99374dc23934f008a09f2f79be9eae40">app</a>-&gt;get_subcommands(</div>
 <div class="line"><span class="lineno"> 8131</span>            [&amp;group](<span class="keyword">const</span> App *sub_app) { <span class="keywordflow">return</span> <a class="code hl_function" href="namespace_c_l_i_1_1detail.html#ae83709ec148057ec53df4383645727e9">detail::to_lower</a>(sub_app-&gt;get_group()) == <a class="code hl_function" href="namespace_c_l_i_1_1detail.html#ae83709ec148057ec53df4383645727e9">detail::to_lower</a>(group); });</div>
 <div class="line"><span class="lineno"> 8132</span>        <span class="keywordflow">for</span>(<span class="keyword">const</span> App *new_com : subcommands_group) {</div>

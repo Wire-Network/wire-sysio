@@ -1,0 +1,7 @@
+<map id="websocketpp::extensions::permessage_deflate::enabled::enable_server_no_context_takeover" name="websocketpp::extensions::permessage_deflate::enabled::enable_server_no_context_takeover">
+<area shape="rect" id="Node000001" title="Reset server&#39;s outgoing LZ77 sliding window for each new message." alt="" coords="250,8,419,79"/>
+<area shape="rect" id="Node000002" href="$permessage__deflate_8cpp.html#a7073585a8bb58a3e2781b431db43089b" title=" " alt="" coords="5,5,202,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="234,35,202,32,202,26,235,30"/>
+<area shape="rect" id="Node000003" href="$permessage__deflate_8cpp.html#a83d5121172749453521988f9cc80b7b0" title=" " alt="" coords="5,55,202,80"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="235,57,202,60,202,55,234,51"/>
+</map>
